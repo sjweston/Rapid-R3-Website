@@ -1,5 +1,5 @@
 ---
-title: "Sample report"
+title: "Week 2 Summary"
 output: 
   html_document
   
@@ -21,54 +21,24 @@ library(zipcode)
 
 
 ```{r score datafile, echo = F, warning = F, message = F}
-data(zipcode)
-r1data = read_sav(here("../Survey 1/R3.R1 DATA CLEAN/R3.R1.13APR20.CLEAN.sav"))
 
 # source functions --------------------------------------------------------
 
 source(here("Functions/score_report.R"))
 source(here("Functions/summarizing_report.R"))
 
-scored = score_report(data = r1data, week = 1)
+
+# score master --------------------------------------------------------
+
+source(here("Scripts/score data.R"))
+
+scored = scored %>%
+  filter(Week == 2)
 
 ```
 
-```{r identify demo groups}
-different_groupings = c(
-  "disability",
-  "income.cat",
-  "working_current",
-  "essential",
-  "single",
-  "num_children",
-  "minority",
-  "region",
-  "latinx",
-  "black"
-)
-
-binary_groupings = c(
-  "disability",
-  "working_current",
-  "essential",
-  "single",
-  "minority",
-  "latinx",
-  "black"
-)
-
-groupings_labels = c(
-  "Parents of children with disabilities",
-  "Income (in thousands/year)",
-  "Working parents",
-  "Essential employees",
-  "Single parents",
-  "Number of children in household",
-  "Non-white parents",
-  "Geographic region",
-  "Latinx parents",
-  "African American parents"
-)
+```{r, key demographics}
+source(here("Scripts/demo groups.R"))
 ```
 
 ```{r identify binary variables}
@@ -154,7 +124,7 @@ perc.all$N = nrow(scored)
 ```
 
 ```{r percentages by group}
-for(i in different_groupings){
+for(i in demos){
   
   new_perc = scored %>%
     select(all_of(i), all_of(binary_vars))
@@ -175,7 +145,7 @@ for(i in different_groupings){
     mutate(group_label = i) %>%
     mutate(group = as.character(group))
   
-  if(i %in% binary_groupings){
+  if(i %in% binary_demos){
     new_perc = filter(new_perc, group == "1")
     new_perc$group = NA_character_}
   
@@ -187,8 +157,8 @@ for(i in different_groupings){
 
 ```{r, results = 'asis'}
 #build groupings
-group.levels = c("all", binary_groupings, setdiff(different_groupings, binary_groupings))
-group.labels = c("All participants", groupings_labels[order(match(different_groupings, group.levels))])
+group.levels = c("all", binary_demos, setdiff(demos, binary_demos))
+group.labels = c("All participants", demo_labels[order(match(demos, group.levels))])
 
 perc.all$group_label = factor(perc.all$group_label, levels = group.levels)
 perc.all = arrange(perc.all, group_label)

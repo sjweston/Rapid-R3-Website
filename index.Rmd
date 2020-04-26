@@ -47,84 +47,12 @@ library(ggsn)
 ```
 
 ```{r score datafile, echo = F, warning = F, message = F}
-
-data(zipcode)
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
-
-# source functions --------------------------------------------------------
-
-source(here("Functions/score_report.R"))
-
-# score data --------------------------------------------------------------
-
-scored = score_report(data = master, master = T)
-
-# poverty threshold --------------------------------------------------------------
-
-census = readxl::read_xls(here("thresh19.xls"), sheet = 2)
-
-scored = scored %>%
-  select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw) %>%
-  full_join(census) %>%
-  mutate(poverty = ifelse(income < poverty_threshold,1,0)) %>%
-  select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty) %>%
-  full_join(scored)
-
-# days sheltering in place
-
-shelter = readxl::read_xlsx(here("shelter_finra.xlsx"), sheet = 1)
-shelter = shelter %>%
-  mutate(Order = as.Date(Order))
-
-scored = scored %>%
-  full_join(shelter) %>%
-  mutate(days_sheltering = Date-Order) %>%
-  mutate(days_sheltering = ifelse(!is.na(state) & is.na(days_sheltering), 0, days_sheltering)) 
-
+source(here("Scripts/score data.R"))
 ```
 
 
-
-
 ```{r, key demographics}
-demos = c(
-  "disability",
-  "income.cat",
-  "working_current",
-  "essential",
-  "single",
-  "num_children",
-  "minority",
-  "region",
-  "latinx",
-  "black",
-  "poverty"
-)
-
-binary_demos = c(
-  "disability",
-  "working_current",
-  "essential",
-  "single",
-  "minority",
-  "latinx",
-  "black",
-  "poverty"
-)
-
-demo_labels = c(
-  "Parents of children with disabilities",
-  "Income (in thousands/year)",
-  "Working parents",
-  "Essential employees",
-  "Single parents",
-  "Number of children in household",
-  "Non-white parents",
-  "Geographic region",
-  "Latinx parents",
-  "African American parents",
-  "Families below the poverty threshold"
-)
+source(here("Scripts/demo groups.R"))
 ```
 
 ```{r get baseline week}
