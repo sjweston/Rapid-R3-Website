@@ -55,21 +55,6 @@ source(here("Scripts/score data.R"))
 source(here("Scripts/demo groups.R"))
 ```
 
-```{r get baseline week}
-pre_pandemic = scored %>%
-  select(CaregiverID, Week, BaselineWeek, all_of(demos), income, state, contains("_pre")) %>%
-  select(-working_current) %>%
-  group_by(CaregiverID) %>%
-  filter(Week == min(Week)) %>%
-  ungroup() %>%
-  mutate(Week = 0)
-
-names(pre_pandemic) = gsub("_pre", "_current", names(pre_pandemic))
-scored = scored %>%
-  select(-contains("_pre")) %>%
-  full_join(pre_pandemic)
-```
-
 # Who are we studying?
 
 ## Caregivers from many demographic groups

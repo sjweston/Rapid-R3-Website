@@ -36,3 +36,14 @@ demo_labels = c(
   "African American parents",
   "Families below the poverty threshold"
 )
+
+binary_labels = c(
+  "Parents of children with disabilities",
+  "Working parents",
+  "Essential employees",
+  "Single parents",
+  "Non-white parents",
+  "Latinx parents",
+  "African American parents",
+  "Families below the poverty threshold"
+)

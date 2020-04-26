@@ -26,21 +26,9 @@ library(ggthemr)
 
 
 ```{r score datafile, echo = F, warning = F, message = F}
+# score master --------------------------------------------------------
 
-data(zipcode)
-r1data = read_sav(here("../Survey 1/R3.R1 DATA CLEAN/R3.R1.13APR20.CLEAN.sav"))
-r2data = read_sav(here("../Survey 2/R3.R2 Merged/R3.R2.18APR20.ALL.sav"))
-
-# source functions --------------------------------------------------------
-
-source(here("Functions/score_report.R"))
-
-# score data --------------------------------------------------------------
-
-scored_1 = score_report(data = r1data, week = 1)
-scored_2 = score_report(data = r2data, week = 2)
-
-scored = full_join(scored_1, scored_2)
+source(here("Scripts/score data.R"))
 ```
 
 ```{r}
