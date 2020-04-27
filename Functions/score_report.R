@@ -133,6 +133,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     anxiety_current = rowMeans(data[,find_items("GAD2.002.[a-b]$", data)], na.rm=T)
     newdata$anxiety_current_some = ifelse(anxiety_current > 0, 1, 0)
     newdata$anxiety_current_lots = ifelse(anxiety_current > 1, 1, 0)
+    newdata$anxiety = anxiety_current
   }
   if(contains_items("GAD2.001", data)){
     anxiety_pre = rowMeans(data[,find_items("GAD2.001.[a-b]$", data)], na.rm=T)
@@ -146,6 +147,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     depress_current = rowMeans(data[,find_items("PHQ.002.[a-b]$", data)], na.rm=T)
     newdata$depress_current_some = ifelse(depress_current > 0, 1, 0)
     newdata$depress_current_lots = ifelse(depress_current > 1, 1, 0)
+    newdata$depress = depress_current
   }
   
   if(contains_items("PHQ.001", data)){
@@ -160,6 +162,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("STRESS.002", data)){
     newdata$stress_current_some = ifelse(data$STRESS.002 > 0, 1, 0)
     newdata$stress_current_lots = ifelse(data$STRESS.002 > 2, 1, 0)
+    newdata$stress = data$STRESS.002
   }
   if(contains_items("STRESS.001", data)){
     stress_change = data$STRESS.002 - data$STRESS.001
@@ -270,6 +273,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("CBCL.002.a", data)){
     newdata$fussy_current_some = ifelse(data$CBCL.002.a > 0, 1, 0)
     newdata$fussy_current_lots = ifelse(data$CBCL.002.a > 1, 1, 0)
+    newdata$fussy = data$CBCL.002.a 
   }
   if(contains_items("CBCL.001.a", data)){
     newdata$fussy_pre_some = ifelse(data$CBCL.001.a > 0, 1, 0)
@@ -281,6 +285,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("CBCL.002.b", data)){
     newdata$fear_current_some = ifelse(data$CBCL.002.b > 0, 1, 0)
     newdata$fear_current_lots = ifelse(data$CBCL.002.b > 1, 1, 0)
+    newdata$fear = data$CBCL.002.b
   }
   if(contains_items("CBCL.002.a", data)){
     newdata$fear_pre_some = ifelse(data$CBCL.002.a > 0, 1, 0)
