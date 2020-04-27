@@ -997,18 +997,14 @@ scored %>%
 ```{r, results='asis'}
 # create table with corx
 cor <-  scored %>%
-  select(binary_demos, anxiety, depress, stress, fear, fussy, days_sheltering, positive, hospitalizedCurrently, hospitalizedCumulative) %>%
+  select(all_of(binary_demos), anxiety, depress, stress, fear, fussy, days_sheltering, positive, hospitalizedCurrently, hospitalizedCumulative) %>%
   mutate_all(as.numeric) %>%
-  corx(triangle = "lower", # print just lower triangle
-       stars = c(0.05, 0.01, 0.001), # tell it which p values to star
-       describe = c(`M` = mean, `SD` = sd)) # optionally provide descriptives
+  cor(., use = "pairwise")
 
-# print the apa table with apa_table()
-apa_table(cor$apa, # apa contains the data.frame needed for apa_table
-          caption = "Correlation matrix",
-          note = "* p < 0.05; ** p < 0.01; *** p < 0.001",
-          escape = TRUE)
+rownames(cor) = paste0(1:nrow(cor), ". ", rownames(cor))
+colnames(cor) = paste0(1:nrow(cor))
 
+kable(cor, digits = 2, )
 ```
 
 
