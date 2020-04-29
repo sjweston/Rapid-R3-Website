@@ -26,6 +26,7 @@ library(zipcode)
 library(ggthemr)
 library(corx)
 library(papaja)
+library(zoo)
 ```
 
 
@@ -43,38 +44,78 @@ total_weeks = max(scored$Week, na.rm=T)
 
 ## By number of days {.tabset}
 
-### Caregiver Anxiety
+```{r}
 
-```{r chunk 3}
-anxiety_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), anxiety_current_some) %>%
+trend_days_sheltering = function(variable, dataset, label){
+
+  demo_data = dataset %>%
+  select(CaregiverID, 
+         days_sheltering, 
+         all_of(binary_demos), 
+         all_of(variable)) %>%
+    rename("variable" = variable) %>%
   gather("demo", "value", all_of(binary_demos)) %>%
   filter(value == 1) %>%
   group_by(demo, days_sheltering) %>%
   summarize(total = n(),
-            percent = 100*sum(anxiety_current_some, na.rm=T)/total) %>%
+            percent = 100*sum(variable, na.rm=T)/total) %>%
   ungroup() %>% 
   mutate(demo = factor(demo, 
                        levels = binary_demos, 
                        labels = binary_labels))
+# create NA rows for days that don't exist
+demo_data = expand_grid(
+  demo = unique(demo_data$demo),
+  days_sheltering = seq(from = min(demo_data$days_sheltering, 
+                                   na.rm = T),
+                        to = max(demo_data$days_sheltering, 
+                                 na.rm=T),
+                        by = 1)) %>% 
+  full_join(demo_data) %>%
+  #create rolling average
+  group_by(demo) %>%
+  arrange(days_sheltering) %>%
+  mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
 
-anxiety_date_all = scored %>%
-  select(CaregiverID, days_sheltering, anxiety_current_some) %>%
+all_data = dataset %>%
+  select(CaregiverID, days_sheltering, variable) %>%
+  rename("variable" = variable) %>%
   group_by(days_sheltering) %>%
   summarize(total = n(),
-            percent = 100*sum(anxiety_current_some, na.rm=T)/total) 
+            percent = 100*sum(variable, na.rm=T)/total) %>%
+  arrange(days_sheltering) %>%
+  mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
 
-anxiety_date_demo %>%
+plot = demo_data %>%
   ggplot(aes(x = days_sheltering, y = percent)) +
   geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = anxiety_date_all, linetype = "dashed", se = F, color = "black") +
+  geom_smooth(data = all_data, linetype = "dashed", se = F, color = "black") +
   labs(x = "Days sheltering in place",
        y = "Percent of demographic group",
-       title = "__ Percent of caregivers report some or a lot of anxiety",
+       title = paste0("__ Percent of caregivers report ", label),
        color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
+       caption = "Entire sample is represented by the black, dashed line.
+       Percent represents rolling 3-day average.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+return.list = list(demo_data = demo_data,
+                   all_data = all_data,
+                   plot = plot)
+}
+```
+
+
+### Caregiver Anxiety
+
+```{r chunk 3}
+after_shelter = scored %>%
+  filter(days_sheltering > 0)
+
+anxiety_plot = trend_days_sheltering(variable = "anxiety_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of anxiety")
+anxiety_plot$plot
 ```
 
 ```{r chunk 4, results = 'asis'}
@@ -98,35 +139,11 @@ scored %>%
 ### Caregiver Depression
 
 ```{r chunk 5}
-depress_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), depress_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(depress_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+depress_plot = trend_days_sheltering(variable = "depress_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of depression")
+depress_plot$plot
 
-depress_date_all = scored %>%
-  select(CaregiverID, days_sheltering, depress_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(depress_current_some, na.rm=T)/total) 
-
-depress_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = depress_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report some or a lot of depression",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
 ```
 
 ```{r chunk 6, results = 'asis'}
@@ -148,35 +165,11 @@ scored %>%
 ### Caregiver Stress
 
 ```{r chunk 7}
-stress_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), stress_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(stress_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+stress_plot = trend_days_sheltering(variable = "stress_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of stress")
+stress_plot$plot
 
-stress_date_all = scored %>%
-  select(CaregiverID, days_sheltering, stress_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(stress_current_some, na.rm=T)/total) 
-
-stress_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = stress_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report some or a lot of stress",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
 ```
 
 ```{r chunk 8, results = 'asis'}
@@ -197,35 +190,10 @@ scored %>%
 ### Child Externalizing
 
 ```{r chunk 9}
-fussy_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), fussy_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fussy_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
-
-fussy_date_all = scored %>%
-  select(CaregiverID, days_sheltering, fussy_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fussy_current_some, na.rm=T)/total) 
-
-fussy_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = fussy_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report  children are sometimes or often fussy or defiant",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+fussy_plot = trend_days_sheltering(variable = "fussy",
+                                     dataset = after_shelter, 
+                                     label = "children are sometimes or often fussy or defiant")
+fussy_plot$plot
 ```
 
 ```{r chunk 10, results = 'asis'}
@@ -247,35 +215,10 @@ scored %>%
 ### Child Internalizing
 
 ```{r chunk 11}
-fear_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), fear_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fear_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
-
-fear_date_all = scored %>%
-  select(CaregiverID, days_sheltering, fear_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fear_current_some, na.rm=T)/total) 
-
-fear_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = fear_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report children are sometimes or often too fearful or anxious",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+fear_plot = trend_days_sheltering(variable = "fear",
+                                     dataset = after_shelter, 
+                                     label = "children are sometimes or often fearful or anxious")
+fear_plot$plot
 ```
 
 ```{r chunk 12, results = 'asis'}
@@ -989,7 +932,7 @@ scored %>%
 
 ```{r}
 scored %>%
-  select(binary_demos, anxiety, depress, stress, fear, fussy, days_sheltering, positive, hospitalizedCurrently, hospitalizedCumulative) %>%
+  select(binary_demos, anxiety, depress, stress, fear, fussy, days_sheltering, total_cases, new_cases_twoweeks, growth_cases_oneweek, total_deaths_per1000) %>%
   cor(., use = "pairwise") %>%
   corrplot::corrplot()
 ```
@@ -997,14 +940,14 @@ scored %>%
 ```{r, results='asis'}
 # create table with corx
 cor <-  scored %>%
-  select(all_of(binary_demos), anxiety, depress, stress, fear, fussy, days_sheltering, positive, hospitalizedCurrently, hospitalizedCumulative) %>%
+  select(all_of(binary_demos), anxiety, depress, stress, fear, fussy, days_sheltering, total_cases, new_cases_twoweeks, growth_cases_oneweek, total_deaths_per1000) %>%
   mutate_all(as.numeric) %>%
   cor(., use = "pairwise")
 
 rownames(cor) = paste0(1:nrow(cor), ". ", rownames(cor))
 colnames(cor) = paste0(1:nrow(cor))
 
-kable(cor, digits = 2, )
+kable(cor, digits = 2, caption = "Correlations between study variables.")
 ```
 
 

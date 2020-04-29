@@ -349,6 +349,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   if(contains_items("DEMO.001", data)){
     state = unlist(sapply(data$DEMO.001, identify_state))
+    newdata$zip = data$DEMO.001
     newdata$state = state
     newdata$region = case_when(
       state %in% c("ME", "NH", "VT", "MA", "RI", "CT",

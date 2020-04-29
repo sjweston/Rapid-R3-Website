@@ -7,6 +7,8 @@ library(haven)
 # install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
 library(zipcode)
 library(jsonlite)
+library(readr)
+library(zoo) # for rolling averages and sums!
 
 data(zipcode)
 master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
@@ -25,7 +27,7 @@ scored = score_report(data = master, master = T)
 
 # poverty threshold --------------------------------------------------------------
 
-census = readxl::read_xls(here("thresh19.xls"), sheet = 2)
+census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
 
 scored = scored %>%
   select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw) %>%
@@ -52,7 +54,7 @@ scored = scored %>%
 # days sheltering in place ------------------------------------------------
 
 
-shelter = readxl::read_xlsx(here("shelter_finra.xlsx"), sheet = 1)
+shelter = readxl::read_xlsx(here("data/shelter_finra.xlsx"), sheet = 1)
 shelter = shelter %>%
   mutate(Order = as.Date(Order))
 
@@ -65,10 +67,60 @@ scored = scored %>%
 # COVID-19 state statistics -----------------------------------------------
 
 
-state_covid = jsonlite::fromJSON("https://covidtracking.com/api/v1/states/daily.json")
-state_covid = state_covid %>%
-  mutate(date = as.Date(as.character(date), format = "%Y%m%d")) %>%
-  rename(Date = date)
+# state_covid = jsonlite::fromJSON("https://covidtracking.com/api/v1/states/daily.json")
+# state_covid = state_covid %>%
+#   mutate(date = as.Date(as.character(date), format = "%Y%m%d")) %>%
+#   rename(Date = date)
+# 
+# scored = scored %>%
+#   left_join(state_covid)
+
+
+# COVID-19 county statistics ----------------------------------------------
+# data from US Census bureau https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/counties/totals/
+
+pop_est = read.csv(here("data/co-est2019-alldata.csv"), stringsAsFactors = F)
+
+pop_est = pop_est %>%
+  filter(COUNTY !=0) %>%
+  mutate(state_fips = str_pad(STATE, width = 2, side = "left", pad = "0"),
+         county_fips = str_pad(COUNTY, width = 3, side = "left", pad = "0"),
+         fips = paste0(state_fips, county_fips)) %>%
+  rename(population  = POPESTIMATE2019) %>%
+  select(fips, population)
+
+github.location = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv"
+nyt_data = read_csv(url(github.location))
+
+nyt_data = nyt_data %>%
+  full_join(pop_est) # add population estimates
+
+nyt_data = nyt_data %>%
+  group_by(county) %>%
+  arrange(date) %>%
+  mutate(
+    total_cases = cumsum(cases),
+    total_deaths = cumsum(deaths),
+    new_cases_twoweeks = rollapplyr(cases, FUN = sum, partial = T, width = 14),
+    new_deaths_twoweeks = rollapplyr(deaths, FUN = sum, partial = T, width = 14),
+    growth_cases_oneweek = 100*(rollapplyr(cases, FUN = sum, partial = T, width = 7))/lag(total_cases, 7),
+    doubling_time_cases = 7*(70/growth_cases_oneweek),
+    total_cases_per1000 = (total_cases/population)*1000,
+    total_deaths_per1000 = (total_deaths/population)*1000,
+    new_cases_per1000 = (new_cases_twoweeks/population)*1000,
+    new_deaths_per1000 = (new_deaths_twoweeks/population)*1000)
+
+# ADD IN GROWTH FOR DEATHS, WHEN CODE FINALIZED
+
+
+#data from https://simplemaps.com/data/us-zips  
+
+county_crosswalk = read.csv(here("data/uszips.csv"), stringsAsFactors = F)
+county_crosswalk = county_crosswalk %>%
+  select(zip, county_fips) %>%
+  rename(fips = county_fips) %>%
+  mutate_all(as.character)
 
 scored = scored %>%
-  left_join(state_covid)
+  full_join(county_crosswalk) %>%
+  full_join(nyt_data)
