@@ -110,7 +110,7 @@ return.list = list(demo_data = demo_data,
 
 ```{r chunk 3}
 after_shelter = scored %>%
-  filter(days_sheltering > 0)
+  filter(Week > 0)
 
 anxiety_plot = trend_days_sheltering(variable = "anxiety_current_some",
                                      dataset = after_shelter, 
@@ -187,6 +187,7 @@ scored %>%
         caption = "Stress is the respose to a single item.")
   
 ```
+
 ### Child Externalizing
 
 ```{r chunk 9}
