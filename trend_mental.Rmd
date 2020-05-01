@@ -113,36 +113,34 @@ anxiety_date_demo %>%
 
 ## By days sheltering in place
 
+
 ```{r}
-anxiety_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), anxiety_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(anxiety_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+source(here("Functions/trend_days_sheltering_rolling.R"))
+```
 
-anxiety_date_all = scored %>%
-  select(CaregiverID, days_sheltering, anxiety_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(anxiety_current_some, na.rm=T)/total) 
 
-anxiety_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = anxiety_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report some or a lot of anxiety",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+```{r}
+after_shelter = scored %>%
+  filter(Week > 0)
+
+anxiety_plot = trend_days_sheltering_binary(variable = "anxiety_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of anxiety",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+anxiety_plot$plot
+```
+
+```{r}
+after_shelter = scored %>%
+  filter(Week > 0)
+
+anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of anxiety",
+                                     groups = c("region"),
+                                     group_levels = unique(after_shelter$region))
+anxiety_plot$plot
 ```
 
 # Depression {.tabset}
@@ -220,35 +218,27 @@ depress_date_demo %>%
 ## By days sheltering in place
 
 ```{r}
-depress_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), depress_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(depress_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+after_shelter = scored %>%
+  filter(Week > 0)
 
-depress_date_all = scored %>%
-  select(CaregiverID, days_sheltering, depress_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(depress_current_some, na.rm=T)/total) 
+depress_plot = trend_days_sheltering_binary(variable = "depress_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of depression",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+depress_plot$plot
+```
 
-depress_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = depress_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report some or a lot of depression",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+```{r}
+after_shelter = scored %>%
+  filter(Week > 0)
+
+depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of depression",
+                                     groups = c("region"),
+                                     group_levels = unique(after_shelter$region))
+depress_plot$plot
 ```
 
 # Stress {.tabset}
@@ -326,37 +316,28 @@ stress_date_demo %>%
 ## By days sheltering in place
 
 ```{r}
-stress_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), stress_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(stress_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+after_shelter = scored %>%
+  filter(Week > 0)
 
-stress_date_all = scored %>%
-  select(CaregiverID, days_sheltering, stress_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(stress_current_some, na.rm=T)/total) 
-
-stress_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = stress_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report some or a lot of stress",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+stress_plot = trend_days_sheltering_binary(variable = "stress_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of stress",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+stress_plot$plot
 ```
 
+```{r}
+after_shelter = scored %>%
+  filter(Week > 0)
+
+stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of stress",
+                                     groups = c("region"),
+                                     group_levels = unique(after_shelter$region))
+stress_plot$plot
+```
 
 # Loneliness {.tabset}
 
@@ -433,35 +414,27 @@ lonely_date_demo %>%
 ## By days sheltering in place
 
 ```{r}
-lonely_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), lonely_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(lonely_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+after_shelter = scored %>%
+  filter(Week > 0)
 
-lonely_date_all = scored %>%
-  select(CaregiverID, days_sheltering, lonely_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(lonely_current_some, na.rm=T)/total) 
+lonely_plot = trend_days_sheltering_binary(variable = "lonely_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of loneliness",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+lonely_plot$plot
+```
 
-lonely_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = lonely_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report some or a lot of loneliness",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+```{r}
+after_shelter = scored %>%
+  filter(Week > 0)
+
+lonely_plot = trend_days_sheltering_cat(variable = "lonely_current_some",
+                                     dataset = after_shelter, 
+                                     label = "some or a lot of loneliness",
+                                     groups = c("region"),
+                                     group_levels = unique(after_shelter$region))
+lonely_plot$plot
 ```
 
 

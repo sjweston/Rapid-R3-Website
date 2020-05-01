@@ -38,6 +38,10 @@ total_weeks = max(scored$Week, na.rm=T)
 ```
 
 
+```{r}
+source(here("Functions/trend_days_sheltering_rolling.R"))
+```
+
 
 # Externalizing behavior {.tabset}
 
@@ -114,36 +118,31 @@ fussy_date_demo %>%
 ## By days sheltering in place
 
 ```{r}
-fussy_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), fussy_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fussy_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+after_shelter = scored %>%
+  filter(Week > 0)
 
-fussy_date_all = scored %>%
-  select(CaregiverID, days_sheltering, fussy_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fussy_current_some, na.rm=T)/total) 
-
-fussy_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = fussy_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report  children are sometimes or often fussy or defiant",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+fussy_plot = trend_days_sheltering_binary(variable = "fussy_current_some",
+                                     dataset = after_shelter, 
+                                     label = "children are sometimes or often defiant or fussy",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+fussy_plot$plot
 ```
+
+```{r}
+after_shelter = scored %>%
+  filter(Week > 0)
+
+fussy_plot = trend_days_sheltering_cat(variable = "fussy_current_some",
+                                     dataset = after_shelter, 
+                                     label = "children are sometimes or often defiant or fussy",
+                                     groups = c("region"),
+                                     group_levels = unique(after_shelter$region))
+fussy_plot$plot
+```
+
+
+
 
 # Internalizing behavior {.tabset}
 
@@ -220,34 +219,26 @@ fear_date_demo %>%
 ## By days sheltering in place
 
 ```{r}
-fear_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), fear_current_some) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fear_current_some, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
+after_shelter = scored %>%
+  filter(Week > 0)
 
-fear_date_all = scored %>%
-  select(CaregiverID, days_sheltering, fear_current_some) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(fear_current_some, na.rm=T)/total) 
+fear_plot = trend_days_sheltering_binary(variable = "fear_current_some",
+                                     dataset = after_shelter, 
+                                     label = "children are sometimes or often anxious or fearful",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+fear_plot$plot
+```
 
-fear_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = fear_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers report children are sometimes or often too fearful or anxious",
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+```{r}
+after_shelter = scored %>%
+  filter(Week > 0)
+
+fear_plot = trend_days_sheltering_cat(variable = "fear_current_some",
+                                     dataset = after_shelter, 
+                                     label = "children are sometimes or often anxious or fearful",
+                                     groups = c("region"),
+                                     group_levels = unique(after_shelter$region))
+fear_plot$plot
 ```
 
