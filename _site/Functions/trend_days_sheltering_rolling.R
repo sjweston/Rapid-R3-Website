@@ -28,7 +28,7 @@ trend_days_sheltering_binary = function(variable, dataset, label, groups, group_
     #create rolling average
     group_by(demo) %>%
     arrange(days_sheltering) %>%
-    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
+    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 5))
   
   all_data = dataset %>%
     select(CaregiverID, days_sheltering, variable) %>%
@@ -37,18 +37,18 @@ trend_days_sheltering_binary = function(variable, dataset, label, groups, group_
     summarize(total = n(),
               percent = 100*sum(variable, na.rm=T)/total) %>%
     arrange(days_sheltering) %>%
-    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
+    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 5))
   
   plot = demo_data %>%
     ggplot(aes(x = days_sheltering, y = percent)) +
-    geom_smooth(aes(color = demo),se = F) +
-    geom_smooth(data = all_data, linetype = "dashed", se = F, color = "black") +
+    geom_line(aes(color = demo), alpha = .7) +
+    geom_line(data = all_data, linetype = "dashed", color = "black") +
     labs(x = "Days sheltering in place",
          y = "Percent of demographic group",
          title = paste0("__ Percent of caregivers report ", label),
          color = "Key demographics", 
          caption = "Entire sample is represented by the black, dashed line.
-       Percent represents rolling 3-day average.") +
+       Percent represents rolling 5-day average.") +
     theme_minimal() +
     theme(plot.title.position = "plot")
   
@@ -87,7 +87,7 @@ trend_days_sheltering_cat = function(variable, dataset, label, groups, group_lev
     #create rolling average
     group_by(groups) %>%
     arrange(days_sheltering) %>%
-    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
+    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 5))
   
   all_data = dataset %>%
     select(CaregiverID, days_sheltering, variable) %>%
@@ -96,18 +96,18 @@ trend_days_sheltering_cat = function(variable, dataset, label, groups, group_lev
     summarize(total = n(),
               percent = 100*sum(variable, na.rm=T)/total) %>%
     arrange(days_sheltering) %>%
-    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
+    mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 5))
   
   plot = groups_data %>%
     ggplot(aes(x = days_sheltering, y = percent)) +
-    geom_smooth(aes(color = groups),se = F) +
-    geom_smooth(data = all_data, linetype = "dashed", se = F, color = "black") +
+    geom_line(aes(color = groups), alpha = .6) +
+    geom_line(data = all_data, linetype = "dashed",  color = "black") +
     labs(x = "Days sheltering in place",
          y = "Percent of group",
          title = paste0("__ Percent of caregivers report ", label),
          color = "Key groupsgraphics", 
          caption = "Entire sample is represented by the black, dashed line.
-       Percent represents rolling 3-day average.") +
+       Percent represents rolling 5-day average.") +
     theme_minimal() +
     theme(plot.title.position = "plot")
   

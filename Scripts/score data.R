@@ -5,6 +5,8 @@ library(kableExtra)
 library(haven)
 # require(devtools)
 # install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(janitor)
+library(psych)
 library(zipcode)
 library(jsonlite)
 library(readr)
@@ -12,6 +14,8 @@ library(zoo) # for rolling averages and sums!
 
 data(zipcode)
 master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
+
+master = filter(master, CaregiverID != "")
 
 # source functions --------------------------------------------------------
 
@@ -30,8 +34,9 @@ scored = score_report(data = master, master = T)
 census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
 
 scored = scored %>%
-  select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw) %>%
-  full_join(census) %>%
+  select(CaregiverID, Week, BaselineWeek, income, 
+         household_size, num_children_raw) %>%
+  left_join(census) %>%
   mutate(poverty = ifelse(income < poverty_threshold,1,0)) %>%
   select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty) %>%
   full_join(scored)
@@ -96,7 +101,7 @@ nyt_data = nyt_data %>%
   full_join(pop_est) # add population estimates
 
 nyt_data = nyt_data %>%
-  group_by(county) %>%
+  group_by(fips) %>%
   arrange(date) %>%
   mutate(
     total_cases = cumsum(cases),
@@ -108,7 +113,11 @@ nyt_data = nyt_data %>%
     total_cases_per1000 = (total_cases/population)*1000,
     total_deaths_per1000 = (total_deaths/population)*1000,
     new_cases_per1000 = (new_cases_twoweeks/population)*1000,
-    new_deaths_per1000 = (new_deaths_twoweeks/population)*1000)
+    new_deaths_per1000 = (new_deaths_twoweeks/population)*1000) %>%
+  select(fips, date, total_cases, total_deaths, 
+         new_cases_twoweeks, new_deaths_twoweeks, growth_cases_oneweek, 
+         doubling_time_cases, total_cases_per1000, total_deaths_per1000, 
+         new_cases_per1000, new_deaths_per1000)
 
 # ADD IN GROWTH FOR DEATHS, WHEN CODE FINALIZED
 
@@ -119,8 +128,15 @@ county_crosswalk = read.csv(here("data/uszips.csv"), stringsAsFactors = F)
 county_crosswalk = county_crosswalk %>%
   select(zip, county_fips) %>%
   rename(fips = county_fips) %>%
-  mutate_all(as.character)
+  mutate_all(as.character) %>%
+  right_join(nyt_data) %>%
+  rename(Date = date)
+
+after0 = scored %>%
+  filter(Week > 0) %>%
+  left_join(county_crosswalk, by = c("zip", "Date"))
 
 scored = scored %>%
-  full_join(county_crosswalk) %>%
-  full_join(nyt_data)
+  filter(Week == 0) %>%
+  full_join(after0)
+
