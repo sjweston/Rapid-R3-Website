@@ -82,6 +82,18 @@ stress_plot = trend_days_sheltering_binary(variable = "stress_current_some",
 stress_plot$plot
 ```
 
+
+### Caregiver loneliness
+
+```{r }
+lonely_plot = trend_days_sheltering_binary(variable = "lonely_current_some",
+                                     dataset = scored, 
+                                     label = "some or a lot of loneliness",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+lonely_plot$plot
+```
+
 ### Child externalizing
 
 ```{r fussy}
@@ -92,6 +104,8 @@ fussy_plot = trend_days_sheltering_binary(variable = "fussy_current_some",
                                      group_labels = "Parents of children with disabilities")
 fussy_plot$plot
 ```
+
+
 
 ### Child internalizing
 
@@ -212,6 +226,7 @@ stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
                                      group_levels = unique(disability$region))
 stress_plot$plot
 ```
+
 
 ### Child externalizing
 
