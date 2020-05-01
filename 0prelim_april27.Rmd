@@ -45,64 +45,7 @@ total_weeks = max(scored$Week, na.rm=T)
 ## By number of days {.tabset}
 
 ```{r}
-
-trend_days_sheltering = function(variable, dataset, label){
-
-  demo_data = dataset %>%
-  select(CaregiverID, 
-         days_sheltering, 
-         all_of(binary_demos), 
-         all_of(variable)) %>%
-    rename("variable" = variable) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(variable, na.rm=T)/total) %>%
-  ungroup() %>% 
-  mutate(demo = factor(demo, 
-                       levels = binary_demos, 
-                       labels = binary_labels))
-# create NA rows for days that don't exist
-demo_data = expand_grid(
-  demo = unique(demo_data$demo),
-  days_sheltering = seq(from = min(demo_data$days_sheltering, 
-                                   na.rm = T),
-                        to = max(demo_data$days_sheltering, 
-                                 na.rm=T),
-                        by = 1)) %>% 
-  full_join(demo_data) %>%
-  #create rolling average
-  group_by(demo) %>%
-  arrange(days_sheltering) %>%
-  mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
-
-all_data = dataset %>%
-  select(CaregiverID, days_sheltering, variable) %>%
-  rename("variable" = variable) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(variable, na.rm=T)/total) %>%
-  arrange(days_sheltering) %>%
-  mutate(percent = rollapplyr(percent, FUN = mean, partial = T, width = 3))
-
-plot = demo_data %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = all_data, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = paste0("__ Percent of caregivers report ", label),
-       color = "Key demographics", 
-       caption = "Entire sample is represented by the black, dashed line.
-       Percent represents rolling 3-day average.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
-
-return.list = list(demo_data = demo_data,
-                   all_data = all_data,
-                   plot = plot)
-}
+source(here("Functions/trend_days_sheltering_rolling.R"))
 ```
 
 
@@ -112,9 +55,11 @@ return.list = list(demo_data = demo_data,
 after_shelter = scored %>%
   filter(Week > 0)
 
-anxiety_plot = trend_days_sheltering(variable = "anxiety_current_some",
+anxiety_plot = trend_days_sheltering_binary(variable = "anxiety_current_some",
                                      dataset = after_shelter, 
-                                     label = "some or a lot of anxiety")
+                                     label = "some or a lot of anxiety",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
 anxiety_plot$plot
 ```
 
@@ -139,9 +84,11 @@ scored %>%
 ### Caregiver Depression
 
 ```{r chunk 5}
-depress_plot = trend_days_sheltering(variable = "depress_current_some",
+depress_plot = trend_days_sheltering_binary(variable = "depress_current_some",
                                      dataset = after_shelter, 
-                                     label = "some or a lot of depression")
+                                     label = "some or a lot of depression",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
 depress_plot$plot
 
 ```
@@ -165,9 +112,11 @@ scored %>%
 ### Caregiver Stress
 
 ```{r chunk 7}
-stress_plot = trend_days_sheltering(variable = "stress_current_some",
+stress_plot = trend_days_sheltering_binary(variable = "stress_current_some",
                                      dataset = after_shelter, 
-                                     label = "some or a lot of stress")
+                                     label = "some or a lot of stress",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
 stress_plot$plot
 
 ```
@@ -191,9 +140,11 @@ scored %>%
 ### Child Externalizing
 
 ```{r chunk 9}
-fussy_plot = trend_days_sheltering(variable = "fussy",
+fussy_plot = trend_days_sheltering_binary(variable = "fussy_current_some",
                                      dataset = after_shelter, 
-                                     label = "children are sometimes or often fussy or defiant")
+                                     label = "children are sometimes or often fussy or defiant",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
 fussy_plot$plot
 ```
 
@@ -216,9 +167,11 @@ scored %>%
 ### Child Internalizing
 
 ```{r chunk 11}
-fear_plot = trend_days_sheltering(variable = "fear",
+fear_plot = trend_days_sheltering_binary(variable = "fear_current_some",
                                      dataset = after_shelter, 
-                                     label = "children are sometimes or often fearful or anxious")
+                                     label = "children are sometimes or often fearful or anxious",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
 fear_plot$plot
 ```
 
@@ -701,75 +654,29 @@ scored %>%
 ## Parent education
 
 ```{r}
-parent_edu_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), parent_edu_interrupt) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(parent_edu_interrupt, na.rm=T)/total) %>%
-  ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = binary_demos,
-                       labels = binary_labels))
-
-parent_edu_date_all = scored %>%
-  select(CaregiverID, days_sheltering, parent_edu_interrupt) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(parent_edu_interrupt, na.rm=T)/total)
-
-parent_edu_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = parent_edu_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers reporting interrupted education",
-       color = "Key demographics",
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+parent_edu_plot = trend_days_sheltering_binary(variable = "parent_edu_interrupt",
+                                     dataset = after_shelter, 
+                                     label = "interrupted education",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+parent_edu_plot$plot
 ```
 
 ## Child education
 
 ```{r}
-child_edu_date_demo = scored %>%
-  select(CaregiverID, days_sheltering, all_of(binary_demos), child_edu_interrupt) %>%
-  gather("demo", "value", all_of(binary_demos)) %>%
-  filter(value == 1) %>%
-  group_by(demo, days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(child_edu_interrupt, na.rm=T)/total) %>%
-  ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = binary_demos,
-                       labels = binary_labels))
-
-child_edu_date_all = scored %>%
-  select(CaregiverID, days_sheltering, child_edu_interrupt) %>%
-  group_by(days_sheltering) %>%
-  summarize(total = n(),
-            percent = 100*sum(child_edu_interrupt, na.rm=T)/total)
-
-child_edu_date_demo %>%
-  ggplot(aes(x = days_sheltering, y = percent)) +
-  geom_smooth(aes(color = demo),se = F) +
-  geom_smooth(data = child_edu_date_all, linetype = "dashed", se = F, color = "black") +
-  labs(x = "Days sheltering in place",
-       y = "Percent of demographic group",
-       title = "__ Percent of caregivers reporting interrupted child's education",
-       color = "Key demographics",
-       caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
-  theme(plot.title.position = "plot")
+child_edu_plot = trend_days_sheltering_binary(variable = "child_edu_interrupt",
+                                     dataset = after_shelter, 
+                                     label = "child(ren)'s education interrupted",
+                                     groups = binary_demos,
+                                     group_labels = binary_labels)
+child_edu_plot$plot
 ```
 
 ## Childcare by family member
 
 ```{r}
-scored %>%
+after_shelter %>%
   select(CaregiverID, days_sheltering, all_of(binary_demos), hours_familyCC_current) %>%
   mutate(everyone = 1) %>%
   gather("demo", "value", everyone, all_of(binary_demos)) %>%
@@ -798,7 +705,7 @@ scored %>%
 ## Childcare by non-family member
 
 ```{r}
-scored %>%
+after_shelter %>%
   select(CaregiverID, days_sheltering, all_of(binary_demos), hours_nonfamilyCC_current) %>%
   mutate(everyone = 1) %>%
   gather("demo", "value", everyone, all_of(binary_demos)) %>%
@@ -829,7 +736,7 @@ scored %>%
 ## Parent well-being
 
 ```{r}
-scored %>%
+after_shelter %>%
   mutate(worker = case_when(
     essential == 1 ~ "Essential worker",
     working_current == 1 & essential == 0 ~ "Non-essential worker"
@@ -849,7 +756,7 @@ scored %>%
 ```
 
 ```{r}
-scored %>%
+after_shelter %>%
   mutate(worker = case_when(
     essential == 1 ~ "Essential worker",
     working_current == 1 & essential == 0 ~ "Non-essential worker"
@@ -881,7 +788,7 @@ scored %>%
 ## Child well-being
 
 ```{r}
-scored %>%
+after_shelter %>%
   mutate(worker = case_when(
     essential == 1 ~ "Essential worker",
     working_current == 1 & essential == 0 ~ "Non-essential worker"
@@ -901,7 +808,7 @@ scored %>%
 ```
 
 ```{r}
-scored %>%
+after_shelter %>%
   mutate(worker = case_when(
     essential == 1 ~ "Essential worker",
     working_current == 1 & essential == 0 ~ "Non-essential worker"
@@ -932,7 +839,7 @@ scored %>%
 # Demographic correlations
 
 ```{r}
-scored %>%
+after_shelter %>%
   select(binary_demos, anxiety, depress, stress, fear, fussy, days_sheltering, total_cases, new_cases_twoweeks, growth_cases_oneweek, total_deaths_per1000) %>%
   cor(., use = "pairwise") %>%
   corrplot::corrplot()
@@ -940,7 +847,7 @@ scored %>%
 
 ```{r, results='asis'}
 # create table with corx
-cor <-  scored %>%
+cor <-  after_shelter %>%
   select(all_of(binary_demos), anxiety, depress, stress, fear, fussy, days_sheltering, total_cases, new_cases_twoweeks, growth_cases_oneweek, total_deaths_per1000) %>%
   mutate_all(as.numeric) %>%
   cor(., use = "pairwise")

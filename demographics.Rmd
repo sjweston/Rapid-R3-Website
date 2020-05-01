@@ -42,7 +42,7 @@ scored = score_report(data = master, master = T)
 
 # poverty threshold --------------------------------------------------------------
 
-census = readxl::read_xls(here("thresh19.xls"), sheet = 2)
+census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
 
 scored = scored %>%
   select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw) %>%
@@ -53,7 +53,7 @@ scored = scored %>%
 
 # days sheltering in place
 
-shelter = readxl::read_xlsx(here("shelter_finra.xlsx"), sheet = 1)
+shelter = readxl::read_xlsx(here("data/shelter_finra.xlsx"), sheet = 1)
 shelter = shelter %>%
   mutate(Order = as.Date(Order))
 
