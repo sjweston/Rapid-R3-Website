@@ -141,6 +141,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$anxiety_pre_some = ifelse(anxiety_pre > 0, 1, 0)
     newdata$anxiety_pre_lots = ifelse(anxiety_pre > 1, 1, 0)
     newdata$anxiety_increase = ifelse(anxiety_change > 0, 1, 0)
+    newdata$anxiety_pre = anxiety_pre
   }
   
   if(contains_items("PHQ.002", data)){
@@ -157,6 +158,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     depress_change = depress_current - depress_pre
     newdata$depress_pre = depress_pre
     newdata$depress_increase  = ifelse(depress_change > 0, 1, 0)
+    newdata$depress_pre = depress_pre
   }
   
   if(contains_items("STRESS.002", data)){
@@ -169,6 +171,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$stress_pre_some = ifelse(data$STRESS.001 > 0, 1, 0)
     newdata$stress_pre_lots = ifelse(data$STRESS.001 > 2, 1, 0)
     newdata$stress_increase  = ifelse(stress_change > 0, 1, 0)
+    newdata$stress_pre = data$STRESS.001
   }
   
   
@@ -276,6 +279,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$fussy = data$CBCL.002.a 
   }
   if(contains_items("CBCL.001.a", data)){
+    newdata$fussy_pre = data$CBCL.001.a
     newdata$fussy_pre_some = ifelse(data$CBCL.001.a > 0, 1, 0)
     newdata$fussy_pre_lots = ifelse(data$CBCL.001.a > 1, 1, 0)
     fussy_difference = data$CBCL.002.a-data$CBCL.001.a
@@ -288,6 +292,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$fear = data$CBCL.002.b
   }
   if(contains_items("CBCL.002.a", data)){
+    newdata$fear_pre = data$CBCL.002.a
     newdata$fear_pre_some = ifelse(data$CBCL.002.a > 0, 1, 0)
     newdata$fear_pre_lots = ifelse(data$CBCL.002.a > 1, 1, 0)
     fear_difference = data$CBCL.002.a-data$CBCL.002.a

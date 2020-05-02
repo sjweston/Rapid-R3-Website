@@ -44,7 +44,8 @@ scored = scored %>%
 # baseline week -----------------------------------------------------------
 
 pre_pandemic = scored %>%
-  select(CaregiverID, Week, BaselineWeek, all_of(demos), income, state, contains("_pre")) %>%
+  select(CaregiverID, Week, BaselineWeek, all_of(demos), income, state, 
+         contains("_pre")) %>%
   select(-working_current) %>%
   group_by(CaregiverID) %>%
   filter(Week == min(Week)) %>%
@@ -52,6 +53,7 @@ pre_pandemic = scored %>%
   mutate(Week = 0)
 
 names(pre_pandemic) = gsub("_pre", "_current", names(pre_pandemic))
+names(pre_pandemic) = gsub("_current$", "", names(pre_pandemic))
 scored = scored %>%
   select(-contains("_pre")) %>%
   full_join(pre_pandemic)
