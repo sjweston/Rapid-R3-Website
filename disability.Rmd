@@ -28,6 +28,7 @@ library(corx)
 library(papaja)
 library(zoo)
 library(ggpubr)
+library(lme4)
 ```
 
 
@@ -493,9 +494,9 @@ disability %>%
           desc_stat = "mean_ci")
 ```
 
-# Loss 
+# Loss {.tabset}
 
-## of income
+## Income
 
 ```{r}
 week1 = scored %>%
@@ -513,8 +514,135 @@ week1 %>%
             percent = decreased_income/n)
 ```
 
-## of non family childcare
+## Non-family childcare
 
 ```{r}
 chisq.test(week1$disability, week1$decrease_nonfamilyCC)
+week1 %>%
+  ungroup()%>%
+  select(disability, decrease_nonfamilyCC) %>%
+  group_by(disability) %>%
+  summarize(n = n(),
+            decrease_nonfamilyCC = sum(decrease_nonfamilyCC,na.rm = T),
+            percent = decrease_nonfamilyCC/n)
 ```
+
+# Testing predictors of well-being in this demo{.tabset}
+
+```{r}
+
+mlm.model = function(abdata){
+  mod = lmer(o.value~p.value + (1|CaregiverID), 
+             data = abdata,
+             control=lmerControl(check.nobs.vs.nlev="ignore",
+                                 check.nobs.vs.nRE = "ignore"),)
+  return(mod)
+}
+```
+
+
+```{r}
+disability = disability %>%
+  mutate(children2 = ifelse(num_children_raw >= 2, 1, 0),
+         children3 = ifelse(num_children_raw >= 3, 1, 0))
+predictors = c("income_decreaed", 
+               "employment_decreased",
+               "difficulty_basics",
+               "children2", 
+               "children3", 
+               "access_online", 
+               "access_telehealth", 
+               "poverty", 
+               "child_edu_interrupt", 
+               "parent_edu_interrupt",
+               "delay_healthcare",
+               "black",
+               "latinx",
+               "single",
+               "essential")
+predictor.labels = c(
+  "Lost income since pandemic",
+  "Lost employment since pandemic",
+  "Have difficulty paying for basics",
+  "Two or more children in household",
+  "Three or more children in household",
+  "Can access online serivices",
+  "Can access telehealth serivices",
+  "Below the poverty threshold",
+  "Child education interrupted",
+  "Parent education interrupted",
+  "Have delayed healthcare",
+  "African American",
+  "Latinx",
+  "Single",
+  "Essential employees"
+)
+unique = disability %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup()
+  
+N = apply(unique[,predictors], 2, FUN = sum, na.rm=T)
+
+predictor.labels = paste0(predictor.labels, " (N = ", N, ")")
+
+pred.table = disability %>%
+  #censor number of children
+  mutate(num_children_raw = ifelse(num_children_raw > 4, 4, num_children_raw)) %>%
+  select(CaregiverID, anxiety, depress, stress, 
+         fussy, fear, all_of(predictors)) %>%
+  gather("outcome", "o.value", anxiety, depress, stress, 
+         fussy, fear) %>%
+  gather("predictor", "p.value", all_of(predictors)) %>%
+  group_by(outcome,predictor) %>%
+  nest() %>%
+  mutate(model = purrr::map(data, mlm.model)) %>%
+  mutate(output = purrr::map(model, broom::tidy)) %>%
+  select(outcome, predictor, output) %>%
+  unnest(output) %>%
+  filter(term == "p.value") %>%
+  mutate(pvalue = purrr::map_dbl(statistic, 
+                              .f = function(x) pt(q = abs(x), 
+                                                  df = 250, 
+                                                  lower.tail = F)*2)) %>%
+  select(outcome, predictor, estimate, std.error, pvalue) %>%
+  ungroup() %>%
+  mutate(holm = p.adjust(pvalue,  method = "holm")) %>%
+  mutate(outcome = factor(outcome, 
+                          levels = c("anxiety", "depress", "stress", 
+         "fussy", "fear"),
+         labels = c("Caregiver anxiety", "Careviver depression", "Caregver stress", 
+         "Child externalzing", "Child internalizing")))
+```
+
+```{r}
+source(here("Functions/summarizing_report.R"))
+```
+
+```{r}
+first.row = sapply(predictors, 
+                   first_instance, 
+                   string = pred.table$predictor)
+last.row = sapply(predictors, 
+                  last_instance, 
+                  string = pred.table$predictor)
+
+
+each_string = paste0("group_rows(group_label = \" ", 
+                     predictor.labels, 
+                     "\" , start_row = ", 
+                     first.row, 
+                     ", end_row = ", 
+                     last.row, 
+                     ")")
+each_string = paste(each_string, collapse = " %>% ")
+
+
+beginning= "pred.table %>% select(-predictor) %>% kable(., col.names = c(\"Outcome\", \"Coefficient Estimate\", \"Std. Error\", \"p-value\", \" Corrected p-value\"), digits = c(1,2,2,3,3)) %>%
+  kable_styling() %>%
+footnote(general = \"Coefficients estimated using a multi-level model in which responses are nested within caregivers. In the case of binary predictors, we report the number (N) of participants who fall into the category listed. p-values are adjusted using a Holm correction\") %>%"
+
+eval(parse(text = paste0(beginning, each_string)))
+```
+
+
