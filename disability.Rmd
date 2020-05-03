@@ -493,3 +493,28 @@ disability %>%
           desc_stat = "mean_ci")
 ```
 
+# Loss 
+
+## of income
+
+```{r}
+week1 = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week > 0) %>%
+  filter(Week == min(Week))
+
+chisq.test(week1$disability, week1$income_decreaed)
+week1 %>%
+  ungroup()%>%
+  select(disability, income_decreaed) %>%
+  group_by(disability) %>%
+  summarize(n = n(),
+            decreased_income = sum(income_decreaed,na.rm = T),
+            percent = decreased_income/n)
+```
+
+## of non family childcare
+
+```{r}
+chisq.test(week1$disability, week1$decrease_nonfamilyCC)
+```
