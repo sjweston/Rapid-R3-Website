@@ -105,7 +105,7 @@ trend_days_sheltering_cat = function(variable, dataset, label, groups, group_lev
     labs(x = "Days sheltering in place",
          y = "Percent of group",
          title = paste0("__ Percent of caregivers report ", label),
-         color = "Key groupsgraphics", 
+         color = "Key groups", 
          caption = "Entire sample is represented by the black, dashed line.
        Percent represents rolling 5-day average.") +
     theme_minimal() +
