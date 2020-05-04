@@ -527,7 +527,7 @@ week1 %>%
             percent = decrease_nonfamilyCC/n)
 ```
 
-# Testing predictors of well-being in this demo{.tabset}
+# Testing predictors of well-being in this demo 
 
 ```{r}
 
@@ -646,3 +646,69 @@ eval(parse(text = paste0(beginning, each_string)))
 ```
 
 
+## Trends by income {.tabset}
+
+### Caregiver anxiety
+
+```{r }
+anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of anxiety",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+anxiety_plot$plot
+```
+
+### Caregiver depression
+
+```{r }
+depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of depression",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+depress_plot$plot
+```
+
+### Caregiver stress
+
+```{r }
+stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of stress",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+stress_plot$plot
+```
+
+### Child externalizing
+
+```{r }
+fussy_plot = trend_days_sheltering_cat(variable = "fussy_current_some",
+                                     dataset = disability, 
+                                     label = "children are sometimes or often fussy or defiant",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+fussy_plot$plot
+```
+
+### Child internalizing
+
+```{r }
+fear_plot = trend_days_sheltering_cat(variable = "fear_current_some",
+                                     dataset = disability, 
+                                     label = "children are sometimes or often fearful or anxious",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+fear_plot$plot
+```
