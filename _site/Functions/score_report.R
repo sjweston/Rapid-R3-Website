@@ -217,7 +217,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     income[which(inc.missing == 3)] = NA
     newdata$income = income
     income = income/1000
-    newdata$income.cat = cut(income, breaks =  quantile(income, probs = seq(.1, .9, by = .1), na.rm=T) )
+    newdata$income.cat = cut(income, breaks =  quantile(income, probs = seq(.1, .9, by = .1), na.rm=T))
+    newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
   }
   
   
