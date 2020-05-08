@@ -34,9 +34,11 @@ library(lme4)
 ```{r score datafile, echo = F, warning = F, message = F}
 ## score master --------------------------------------------------------
 source(here("Scripts/score data.R"))
-scored0 = scored
+scored0 = scored %>%
+  filter(Week < 4)
 scored = scored %>%
-  filter(Week > 0)
+  filter(Week > 0) %>%
+  filter(Week < 4)
 ```
 
 ```{rchunk 2}
@@ -48,8 +50,22 @@ total_weeks = max(scored$Week, na.rm=T)
 control = lmerControl(check.nobs.vs.nlev = "ignore", 
                       check.nobs.vs.nRE = "ignore")
 
-meds = c("insurance", "child_insurance", "access_online", "suspected_covid", "diagnosed_covid", "hospital", "hospital_covid", "support_decrease", "lost_free_lunch", "employment_decreased", "losejob_sickleave", "income_decreaed", "difficulty_basics", "minority", "black", "latinx")
-
+meds = c("insurance", 
+         "child_insurance", 
+         #"access_online", 
+         #"suspected_covid", 
+         #"diagnosed_covid", 
+         #"hospital", 
+         #"hospital_covid", 
+         "support_decrease", 
+         "lost_free_lunch", 
+         "employment_decreased", 
+         "losejob_sickleave", 
+         "income_decreaed", 
+         "difficulty_basics", 
+         "minority", 
+         "black", 
+         "latinx")
 ```
 
 
@@ -94,9 +110,13 @@ trend_week_binary(variable = "anxiety",
 **Baseline model**
 
 ```{r, results = 'asis'}
-model = lmer(anxiety ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+model = lmer(anxiety ~ Week*lowincome + (1|CaregiverID), 
+             data = scored, control = control)
+
 broom::tidy(model) %>%
-  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  mutate(p.value = pt(abs(statistic), 
+                      df = nrow(model@frame)-2, 
+                      lower.tail = F)*2) %>%
   select(term, estimate, std.error, statistic, p.value) %>%
   kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
         digits = c(0,2,2,2,3)) %>%
@@ -115,6 +135,7 @@ model =
                                          (1|CaregiverID), 
                                        data = d, 
                                        control = control)))
+
 scored %>%
   gather("mediator", "m.value", all_of(meds)) %>%
   group_by(mediator) %>%
@@ -724,6 +745,80 @@ broom::tidy(model) %>%
 model =
   tibble(mediator = meds, 
          model = list(function(d) lmer(fussy ~ Week*lowincome + Week*m.value + 
+                                         (1|CaregiverID), 
+                                       data = d, 
+                                       control = control)))
+scored %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest() %>%
+  filter(grepl(":", term)) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         p.value = pt(abs(statistic), df = N-3, lower.tail = F)*2,
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate),
+         term = gsub("Week:", "",term)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+### Child Internalizing
+
+#### Plots
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+fear_plot = trend_date_binary(variable = "fear_current_some",
+                                 dataset = scored, 
+                                 label = "children are sometimes or often anxious or fearful",
+                                 groups = c("lowincome"),
+                                 group_labels = "Low income households")
+fear_plot$plot
+
+trend_week_binary(variable = "fear", 
+                  dataset = scored0,
+                  label =  "Child internalizing", 
+                  groups = "lowincome", 
+                  group_labels = c("Middle or high income","Low income"))
+
+```
+
+
+#### Test of slope {.tabset}
+
+##### Weeks 1+
+
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+model = lmer(fear ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+broom::tidy(model) %>%
+  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  select(term, estimate, std.error, statistic, p.value) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() %>%
+  group_rows("Fixed effects", 1, 4) %>%
+  group_rows("Random effects", 5, 6)
+```
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lmer(fear ~ Week*lowincome + Week*m.value + 
                                          (1|CaregiverID), 
                                        data = d, 
                                        control = control)))
