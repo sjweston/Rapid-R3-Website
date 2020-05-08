@@ -198,10 +198,13 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("LONE.001.b", data)){
     newdata$lonely_current_some = ifelse(data$LONE.001.b > 1, 1, 0)
     newdata$lonely_current_lots = ifelse(data$LONE.001.b > 2, 1, 0)
+    newdata$lonely = data$LONE.001.b
   }
   if(contains_items("LONE.001.a", data)){
     newdata$lonely_pre_some = ifelse(data$LONE.001.a > 1, 1, 0)
     newdata$lonely_pre_lots = ifelse(data$LONE.001.a > 2, 1, 0)
+    newdata$lonely_pre = data$LONE.001.a
+    
     lone_change = data$LONE.001.b - data$LONE.001.a
     newdata$lone_increase = ifelse(lone_change > 0, 1, 0)
   }

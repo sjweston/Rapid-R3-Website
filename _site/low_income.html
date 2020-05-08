@@ -441,108 +441,3081 @@ div.tocify {
 </div>
 
 
-<div id="well-being-during-shelter-in-place" class="section level1">
-<h1>Well-being during shelter-in-place</h1>
-<div id="compared-to-general-population" class="section level2 tabset">
-<h2>Compared to general population</h2>
+<div id="analyses-may-7" class="section level1">
+<h1>Analyses May 7</h1>
+<div id="well-being-during-shelter-in-place" class="section level2 tabset">
+<h2>Well-being during shelter-in-place</h2>
 <div id="caregiver-anxiety" class="section level3">
 <h3>Caregiver anxiety</h3>
-<p><img src="low_income_files/figure-html/anxiety-1.png" width="672" /></p>
+<div id="plots" class="section level4">
+<h4>Plots</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-4-1.png" width="50%" /><img src="low_income_files/figure-html/unnamed-chunk-4-2.png" width="50%" /></p>
+</div>
+<div id="test-of-slope" class="section level4 tabset">
+<h4>Test of slope</h4>
+<div id="weeks-1" class="section level5">
+<h5>Weeks 1+</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Fixed effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+(Intercept)
+</td>
+<td style="text-align:right;">
+1.31
+</td>
+<td style="text-align:right;">
+0.06
+</td>
+<td style="text-align:right;">
+21.67
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week
+</td>
+<td style="text-align:right;">
+-0.04
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-1.59
+</td>
+<td style="text-align:right;">
+0.113
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+lowincome
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+0.11
+</td>
+<td style="text-align:right;">
+0.31
+</td>
+<td style="text-align:right;">
+0.755
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week:lowincome
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+1.19
+</td>
+<td style="text-align:right;">
+0.234
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Random effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_(Intercept).CaregiverID
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_Observation.Residual
+</td>
+<td style="text-align:right;">
+0.48
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+<td style="text-align:left;">
+0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.09*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+-0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+0.06
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="week-0-to-first-response" class="section level5">
+<h5>Week 0 to first response</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.51
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+23.09
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lowincome
+</td>
+<td style="text-align:right;">
+-0.11
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+-2.84
+</td>
+<td style="text-align:right;">
+0.005
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="low_income_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+-0.10*
+</td>
+<td style="text-align:left;">
+0.13*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+-0.10*
+</td>
+<td style="text-align:left;">
+-0.18*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+0.12*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+-0.20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.13*
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+-0.15*
+</td>
+<td style="text-align:left;">
+0.12*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+-0.22*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+-0.10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+-0.10*
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.16*
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.21*
+</td>
+<td style="text-align:left;">
+-0.13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+-0.09*
+</td>
+<td style="text-align:left;">
+0.44*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+-0.11*
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="caregiver-depression" class="section level3">
 <h3>Caregiver depression</h3>
-<p><img src="low_income_files/figure-html/depress-1.png" width="672" /></p>
+<div id="plots-1" class="section level4">
+<h4>Plots</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-9-1.png" width="50%" /><img src="low_income_files/figure-html/unnamed-chunk-9-2.png" width="50%" /></p>
+</div>
+<div id="test-of-slope-1" class="section level4 tabset">
+<h4>Test of slope</h4>
+<div id="weeks-1-1" class="section level5">
+<h5>Weeks 1+</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Fixed effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+<td style="text-align:right;">
+0.06
+</td>
+<td style="text-align:right;">
+14.61
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+0.60
+</td>
+<td style="text-align:right;">
+0.549
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+lowincome
+</td>
+<td style="text-align:right;">
+0.17
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:right;">
+1.65
+</td>
+<td style="text-align:right;">
+0.099
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week:lowincome
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.94
+</td>
+<td style="text-align:right;">
+0.346
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Random effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_(Intercept).CaregiverID
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_Observation.Residual
+</td>
+<td style="text-align:right;">
+0.45
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+-0.15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="week-0-to-first-response-1" class="section level5">
+<h5>Week 0 to first response</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.37
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+18.97
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lowincome
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+-0.79
+</td>
+<td style="text-align:right;">
+0.43
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="low_income_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.11*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.14*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+-0.18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+0.15*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+0.17*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.13*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+-0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+<td style="text-align:left;">
+0.13*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.44*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="caregiver-stress" class="section level3">
 <h3>Caregiver stress</h3>
-<p><img src="low_income_files/figure-html/stress-1.png" width="672" /></p>
+<div id="plots-2" class="section level4">
+<h4>Plots</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-14-1.png" width="50%" /><img src="low_income_files/figure-html/unnamed-chunk-14-2.png" width="50%" /></p>
+</div>
+<div id="test-of-slope-2" class="section level4 tabset">
+<h4>Test of slope</h4>
+<div id="weeks-1-2" class="section level5">
+<h5>Weeks 1+</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Fixed effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+(Intercept)
+</td>
+<td style="text-align:right;">
+2.25
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+27.50
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week
+</td>
+<td style="text-align:right;">
+-0.05
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+-1.39
+</td>
+<td style="text-align:right;">
+0.166
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+lowincome
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.995
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week:lowincome
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+<td style="text-align:right;">
+0.06
+</td>
+<td style="text-align:right;">
+1.58
+</td>
+<td style="text-align:right;">
+0.114
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Random effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_(Intercept).CaregiverID
+</td>
+<td style="text-align:right;">
+1.13
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_Observation.Residual
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+0.09
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+0.09
+</td>
+<td style="text-align:left;">
+-0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+0.09
+</td>
+<td style="text-align:left;">
+0.18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+<td style="text-align:left;">
+0.16*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+0.11
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+0.09
+</td>
+<td style="text-align:left;">
+-0.18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+0.09
+</td>
+<td style="text-align:left;">
+-0.12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+<td style="text-align:left;">
+-0.24*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+<td style="text-align:left;">
+-0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.19
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+<td style="text-align:left;">
+-0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+0.12*
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="week-0-to-first-response-2" class="section level5">
+<h5>Week 0 to first response</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.92
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+27.94
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lowincome
+</td>
+<td style="text-align:right;">
+-0.11
+</td>
+<td style="text-align:right;">
+0.06
+</td>
+<td style="text-align:right;">
+-1.85
+</td>
+<td style="text-align:right;">
+0.064
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="low_income_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+-0.09
+</td>
+<td style="text-align:left;">
+0.17*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+-0.09
+</td>
+<td style="text-align:left;">
+-0.21*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+-0.10
+</td>
+<td style="text-align:left;">
+0.28*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+-0.10
+</td>
+<td style="text-align:left;">
+-0.65*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.16*
+</td>
+<td style="text-align:left;">
+0.23*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+-0.14*
+</td>
+<td style="text-align:left;">
+0.23*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+-0.10
+</td>
+<td style="text-align:left;">
+-0.35*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+<td style="text-align:left;">
+-0.22
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+-0.10
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+-0.10
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.28*
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+<td style="text-align:left;">
+0.83*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="caregiver-loneliness" class="section level3">
 <h3>Caregiver loneliness</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div id="plots-3" class="section level4">
+<h4>Plots</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-19-1.png" width="50%" /><img src="low_income_files/figure-html/unnamed-chunk-19-2.png" width="50%" /></p>
+</div>
+<div id="test-of-slope-3" class="section level4 tabset">
+<h4>Test of slope</h4>
+<div id="weeks-1-3" class="section level5">
+<h5>Weeks 1+</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Fixed effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+(Intercept)
+</td>
+<td style="text-align:right;">
+1.60
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+20.89
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+0.48
+</td>
+<td style="text-align:right;">
+0.629
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+lowincome
+</td>
+<td style="text-align:right;">
+0.32
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+<td style="text-align:right;">
+2.32
+</td>
+<td style="text-align:right;">
+0.021
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week:lowincome
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+0.06
+</td>
+<td style="text-align:right;">
+0.27
+</td>
+<td style="text-align:right;">
+0.789
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Random effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_(Intercept).CaregiverID
+</td>
+<td style="text-align:right;">
+1.06
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_Observation.Residual
+</td>
+<td style="text-align:right;">
+0.61
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+<td style="text-align:left;">
+-0.12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+0.06
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="week-0-to-first-response-3" class="section level5">
+<h5>Week 0 to first response</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.57
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+19.97
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lowincome
+</td>
+<td style="text-align:right;">
+-0.06
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+-1.12
+</td>
+<td style="text-align:right;">
+0.261
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="low_income_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+<td style="text-align:left;">
+0.13*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+-0.15*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+-0.50*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+-0.08
+</td>
+<td style="text-align:left;">
+0.15*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+0.15*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+-0.17*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+<td style="text-align:left;">
+0.27*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+-0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.74*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="child-externalizing" class="section level3">
-<h3>Child externalizing</h3>
+<h3>Child Externalizing</h3>
+<div id="plots-4" class="section level4">
+<h4>Plots</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-24-1.png" width="50%" /><img src="low_income_files/figure-html/unnamed-chunk-24-2.png" width="50%" /></p>
+</div>
+<div id="test-of-slope-4" class="section level4 tabset">
+<h4>Test of slope</h4>
+<div id="weeks-1-4" class="section level5">
+<h5>Weeks 1+</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Fixed effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+(Intercept)
+</td>
+<td style="text-align:right;">
+1.03
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+23.27
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-1.56
+</td>
+<td style="text-align:right;">
+0.120
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+lowincome
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+1.09
+</td>
+<td style="text-align:right;">
+0.276
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week:lowincome
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+0.20
+</td>
+<td style="text-align:right;">
+0.841
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Random effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_(Intercept).CaregiverID
+</td>
+<td style="text-align:right;">
+0.61
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_Observation.Residual
+</td>
+<td style="text-align:right;">
+0.35
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.10*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.09
+</td>
+<td style="text-align:left;">
+-0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+0.01
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="week-0-to-first-response-4" class="section level5">
+<h5>Week 0 to first response</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.30
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+18.21
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lowincome
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+-0.90
+</td>
+<td style="text-align:right;">
+0.368
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="low_income_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.08*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.14*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.10*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+-0.21*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+0.09*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+0.10*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.15*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+-0.11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.06*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.10*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.13
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.29*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="analyses-may-6" class="section level1">
+<h1>Analyses May 6</h1>
+<div id="well-being-during-shelter-in-place-1" class="section level2">
+<h2>Well-being during shelter-in-place</h2>
+<div id="compared-to-general-population" class="section level3 tabset">
+<h3>Compared to general population</h3>
+<div id="caregiver-anxiety-1" class="section level4">
+<h4>Caregiver anxiety</h4>
+<p><img src="low_income_files/figure-html/anxiety-1.png" width="672" /></p>
+</div>
+<div id="caregiver-depression-1" class="section level4">
+<h4>Caregiver depression</h4>
+<p><img src="low_income_files/figure-html/depress-1.png" width="672" /></p>
+</div>
+<div id="caregiver-stress-1" class="section level4">
+<h4>Caregiver stress</h4>
+<p><img src="low_income_files/figure-html/stress-1.png" width="672" /></p>
+</div>
+<div id="caregiver-loneliness-1" class="section level4">
+<h4>Caregiver loneliness</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+</div>
+<div id="child-externalizing-1" class="section level4">
+<h4>Child externalizing</h4>
 <p><img src="low_income_files/figure-html/fussy-1.png" width="672" /></p>
 </div>
-<div id="child-internalizing" class="section level3">
-<h3>Child internalizing</h3>
+<div id="child-internalizing" class="section level4">
+<h4>Child internalizing</h4>
 <p><img src="low_income_files/figure-html/fear-1.png" width="672" /></p>
 </div>
 </div>
-<div id="by-geographic-region" class="section level2 tabset">
-<h2>By geographic region</h2>
-<div id="caregiver-anxiety-1" class="section level3">
-<h3>Caregiver anxiety</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div id="by-geographic-region" class="section level3 tabset">
+<h3>By geographic region</h3>
+<div id="caregiver-anxiety-2" class="section level4">
+<h4>Caregiver anxiety</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
 <p><img src="low_income_files/figure-html/region%20anxiety-1.png" width="672" /></p>
 </div>
-<div id="caregiver-depression-1" class="section level3">
-<h3>Caregiver depression</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div id="caregiver-depression-2" class="section level4">
+<h4>Caregiver depression</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 <p><img src="low_income_files/figure-html/region%20depress-1.png" width="672" /></p>
 </div>
-<div id="caregiver-stress-1" class="section level3">
-<h3>Caregiver stress</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div id="caregiver-stress-2" class="section level4">
+<h4>Caregiver stress</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
 <p><img src="low_income_files/figure-html/region%20stress-1.png" width="672" /></p>
 </div>
-<div id="child-externalizing-1" class="section level3">
-<h3>Child externalizing</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<div id="child-externalizing-2" class="section level4">
+<h4>Child externalizing</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
 <p><img src="low_income_files/figure-html/region%20fussy-1.png" width="672" /></p>
 </div>
-<div id="child-internalizing-1" class="section level3">
-<h3>Child internalizing</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<div id="child-internalizing-1" class="section level4">
+<h4>Child internalizing</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
 <p><img src="low_income_files/figure-html/region%20fear-1.png" width="672" /></p>
 </div>
 </div>
-<div id="by-childcare" class="section level2">
-<h2>By childcare</h2>
+<div id="by-childcare" class="section level3">
+<h3>By childcare</h3>
 <p>Of these caregivers, 91 have non-family childcare and 554 do not.</p>
-<p><img src="low_income_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="low_income_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
 <p>Of these caregivers, 352 have family childcare and 293 do not.</p>
-<p><img src="low_income_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="low_income_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
 </div>
-<div id="by-use-of-online-resources" class="section level2">
-<h2>By use of online resources</h2>
-<p><img src="low_income_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<div id="by-use-of-online-resources" class="section level3">
+<h3>By use of online resources</h3>
+<p><img src="low_income_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 </div>
 </div>
-<div id="education" class="section level1">
-<h1>Education</h1>
-<div id="compared-to-general-population-1" class="section level2 tabset">
-<h2>Compared to general population</h2>
-<div id="parent-education-interrupted" class="section level3">
-<h3>Parent education interrupted</h3>
+<div id="education" class="section level2">
+<h2>Education</h2>
+<div id="compared-to-general-population-1" class="section level3 tabset">
+<h3>Compared to general population</h3>
+<div id="parent-education-interrupted" class="section level4">
+<h4>Parent education interrupted</h4>
 <p><img src="low_income_files/figure-html/parent%20edu-1.png" width="672" /></p>
 </div>
-<div id="child-education-interrupted" class="section level3">
-<h3>Child education interrupted</h3>
+<div id="child-education-interrupted" class="section level4">
+<h4>Child education interrupted</h4>
 <p><img src="low_income_files/figure-html/child%20edu-1.png" width="672" /></p>
 </div>
 </div>
-<div id="by-geographic-region-1" class="section level2">
-<h2>By geographic region</h2>
-<p><img src="low_income_files/figure-html/unnamed-chunk-14-1.png" width="50%" /></p>
+<div id="by-geographic-region-1" class="section level3">
+<h3>By geographic region</h3>
+<p><img src="low_income_files/figure-html/unnamed-chunk-41-1.png" width="50%" /></p>
 </div>
-<div id="by-childcare-1" class="section level2">
-<h2>By childcare</h2>
+<div id="by-childcare-1" class="section level3">
+<h3>By childcare</h3>
 <p>Of these caregivers, 91 have non-family childcare and 554 do not.</p>
-<p><img src="low_income_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="low_income_files/figure-html/unnamed-chunk-43-1.png" width="672" /></p>
 <p>Of these caregivers, 352 have family childcare and 293 do not.</p>
-<p><img src="low_income_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="low_income_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
 </div>
-<div id="by-use-of-online-resources-1" class="section level2">
-<h2>By use of online resources</h2>
-<p><img src="low_income_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<div id="by-use-of-online-resources-1" class="section level3">
+<h3>By use of online resources</h3>
+<p><img src="low_income_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
 </div>
 </div>
-<div id="differences" class="section level1 tabset">
-<h1>Differences</h1>
-<div id="lost-income" class="section level2">
-<h2>Lost income</h2>
+<div id="differences" class="section level2 tabset">
+<h2>Differences</h2>
+<div id="lost-income" class="section level3">
+<h3>Lost income</h3>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -554,8 +3527,8 @@ div.tocify {
 ## 1         0  1375              399   0.290
 ## 2         1   645              160   0.248</code></pre>
 </div>
-<div id="lost-non-family-childcare" class="section level2">
-<h2>Lost non-family childcare</h2>
+<div id="lost-non-family-childcare" class="section level3">
+<h3>Lost non-family childcare</h3>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -567,8 +3540,8 @@ div.tocify {
 ## 1         0  1375                  745   0.542
 ## 2         1   645                  242   0.375</code></pre>
 </div>
-<div id="trouble-paying-for-basics" class="section level2">
-<h2>Trouble paying for basics</h2>
+<div id="trouble-paying-for-basics" class="section level3">
+<h3>Trouble paying for basics</h3>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -580,8 +3553,8 @@ div.tocify {
 ## 1         0  1375               157   0.114
 ## 2         1   645               221   0.343</code></pre>
 </div>
-<div id="delayed-healthcare" class="section level2">
-<h2>Delayed healthcare</h2>
+<div id="delayed-healthcare" class="section level3">
+<h3>Delayed healthcare</h3>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -594,8 +3567,8 @@ div.tocify {
 ## 2         1   645              439   0.681</code></pre>
 </div>
 </div>
-<div id="testing-predictors-of-well-being-in-this-demo" class="section level1">
-<h1>Testing predictors of well-being in this demo</h1>
+<div id="testing-predictors-of-well-being-in-this-demo" class="section level2">
+<h2>Testing predictors of well-being in this demo</h2>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1981,27 +4954,621 @@ Child internalizing
 </tr>
 </tfoot>
 </table>
-<div id="trends-by-income" class="section level2 tabset">
-<h2>Trends by income</h2>
-<div id="caregiver-anxiety-2" class="section level3">
-<h3>Caregiver anxiety</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<div id="trends-by-income" class="section level3 tabset">
+<h3>Trends by income</h3>
+<div id="caregiver-anxiety-3" class="section level4">
+<h4>Caregiver anxiety</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-55-1.png" width="672" /></p>
 </div>
-<div id="caregiver-depression-2" class="section level3">
-<h3>Caregiver depression</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<div id="caregiver-depression-3" class="section level4">
+<h4>Caregiver depression</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
 </div>
-<div id="caregiver-stress-2" class="section level3">
-<h3>Caregiver stress</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<div id="caregiver-stress-3" class="section level4">
+<h4>Caregiver stress</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
 </div>
-<div id="child-externalizing-2" class="section level3">
-<h3>Child externalizing</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<div id="child-externalizing-3" class="section level4">
+<h4>Child externalizing</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
 </div>
-<div id="child-internalizing-2" class="section level3">
-<h3>Child internalizing</h3>
-<p><img src="low_income_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<div id="child-internalizing-2" class="section level4">
+<h4>Child internalizing</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+</div>
+</div>
+<div id="child-internalizing-3" class="section level3">
+<h3>Child Internalizing</h3>
+<div id="plots-5" class="section level4">
+<h4>Plots</h4>
+<p><img src="low_income_files/figure-html/unnamed-chunk-60-1.png" width="50%" /><img src="low_income_files/figure-html/unnamed-chunk-60-2.png" width="50%" /></p>
+</div>
+<div id="test-of-slope-5" class="section level4 tabset">
+<h4>Test of slope</h4>
+<div id="weeks-1-5" class="section level5">
+<h5>Weeks 1+</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Fixed effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+(Intercept)
+</td>
+<td style="text-align:right;">
+0.50
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+11.50
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+0.61
+</td>
+<td style="text-align:right;">
+0.540
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+lowincome
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+<td style="text-align:right;">
+0.08
+</td>
+<td style="text-align:right;">
+1.80
+</td>
+<td style="text-align:right;">
+0.072
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Week:lowincome
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+-0.67
+</td>
+<td style="text-align:right;">
+0.504
+</td>
+</tr>
+<tr grouplength="2">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong>Random effects</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_(Intercept).CaregiverID
+</td>
+<td style="text-align:right;">
+0.60
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+sd_Observation.Residual
+</td>
+<td style="text-align:right;">
+0.34
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+<td style="text-align:right;">
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.28*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+0.10*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.02
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.07
+</td>
+<td style="text-align:left;">
+0.10*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="week-0-to-first-response-5" class="section level5">
+<h5>Week 0 to first response</h5>
+<p><strong>Baseline model</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Term
+</th>
+<th style="text-align:right;">
+Coef
+</th>
+<th style="text-align:right;">
+SE
+</th>
+<th style="text-align:right;">
+t
+</th>
+<th style="text-align:right;">
+p
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+-0.45
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-22.34
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lowincome
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+-0.43
+</td>
+<td style="text-align:right;">
+0.67
+</td>
+</tr>
+</tbody>
+</table>
+<p><img src="low_income_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+<p><strong>Can we explain the effect?</strong></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Mediator
+</th>
+<th style="text-align:left;">
+Coefficient (Income)
+</th>
+<th style="text-align:left;">
+Coefficient of mediator
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+access_online
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+0.18*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+child_insurance
+</td>
+<td style="text-align:left;">
+-0.03
+</td>
+<td style="text-align:left;">
+-0.22*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+diagnosed_covid
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.46*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+difficulty_basics
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+<td style="text-align:left;">
+0.16*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+employment_decreased
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+hospital_covid
+</td>
+<td style="text-align:left;">
+-0.01
+</td>
+<td style="text-align:left;">
+-0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+income_decreaed
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+insurance
+</td>
+<td style="text-align:left;">
+-0.04
+</td>
+<td style="text-align:left;">
+-0.23*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+losejob_sickleave
+</td>
+<td style="text-align:left;">
+-0.06
+</td>
+<td style="text-align:left;">
+0.24*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+lost_free_lunch
+</td>
+<td style="text-align:left;">
+0.04
+</td>
+<td style="text-align:left;">
+0.22*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+minority
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.07
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+support_decrease
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+-0.14*
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suspected_covid
+</td>
+<td style="text-align:left;">
+-0.02
+</td>
+<td style="text-align:left;">
+0.10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 </div>

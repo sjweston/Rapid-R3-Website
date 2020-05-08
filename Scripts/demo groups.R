@@ -9,7 +9,8 @@ demos = c(
   "region",
   "latinx",
   "black",
-  "poverty"
+  "poverty",
+  "lowincome"
 )
 
 binary_demos = c(
@@ -20,7 +21,8 @@ binary_demos = c(
   "minority",
   "latinx",
   "black",
-  "poverty"
+  "poverty",
+  "lowincome"
 )
 
 demo_labels = c(
@@ -34,7 +36,8 @@ demo_labels = c(
   "Geographic region",
   "Latinx parents",
   "African American parents",
-  "Families below the poverty threshold"
+  "Families below the poverty threshold",
+  "Low income (< $40K) households"
 )
 
 binary_labels = c(
@@ -45,5 +48,6 @@ binary_labels = c(
   "Non-white parents",
   "Latinx parents",
   "African American parents",
-  "Families below the poverty threshold"
+  "Families below the poverty threshold",
+  "Low income (< $40K) households"
 )

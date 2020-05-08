@@ -19,8 +19,8 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 library(haven)
-# require(devtools)
-# install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+## require(devtools)
+## install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
 library(zipcode)
 library(ggthemr)
 library(corx)
@@ -32,8 +32,9 @@ library(lme4)
 
 
 ```{r score datafile, echo = F, warning = F, message = F}
-# score master --------------------------------------------------------
+## score master --------------------------------------------------------
 source(here("Scripts/score data.R"))
+scored0 = scored
 scored = scored %>%
   filter(Week > 0)
 ```
@@ -41,11 +42,22 @@ scored = scored %>%
 ```{rchunk 2}
 total_weeks = max(scored$Week, na.rm=T)
 ```
-
-# Well-being during shelter-in-place 
+# Analyses May 7
 
 ```{r}
-source(here("Functions/trend_days_sheltering_rolling.R"))
+control = lmerControl(check.nobs.vs.nlev = "ignore", 
+                      check.nobs.vs.nRE = "ignore")
+
+meds = c("insurance", "child_insurance", "access_online", "suspected_covid", "diagnosed_covid", "hospital", "hospital_covid", "support_decrease", "lost_free_lunch", "employment_decreased", "losejob_sickleave", "income_decreaed", "difficulty_basics", "minority", "black", "latinx")
+
+```
+
+
+## Well-being during shelter-in-place {.tabset}
+```{r}
+source(here("Functions/trend_date_rolling.R"))
+source(here("Functions/trend_week.R"))
+
 ```
 
 ```{r}
@@ -53,9 +65,783 @@ lowincome = scored %>%
   filter(lowincome == 1) 
 ```
 
-## Compared to general population {.tabset}
-
 ### Caregiver anxiety
+
+#### Plots
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+anxiety_plot = trend_date_binary(variable = "anxiety_current_some",
+                                     dataset = scored, 
+                                     label = "some or a lot of anxiety",
+                                     groups = c("lowincome"),
+                                     group_labels = "Low income households")
+anxiety_plot$plot
+
+trend_week_binary(variable = "anxiety", 
+                  dataset = scored0,
+                  label =  "Caregiver Anxiety", 
+                  groups = "lowincome", 
+                  group_labels = c("Middle or high income","Low income"))
+
+```
+
+
+#### Test of slope {.tabset}
+
+##### Weeks 1+
+
+
+**Baseline model**
+
+```{r, results = 'asis'}
+model = lmer(anxiety ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+broom::tidy(model) %>%
+  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  select(term, estimate, std.error, statistic, p.value) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() %>%
+  group_rows("Fixed effects", 1, 4) %>%
+  group_rows("Random effects", 5, 6)
+```
+
+**Can we explain the effect?**
+
+```{r, results = 'asis'}
+
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lmer(anxiety ~ Week*lowincome + Week*m.value + 
+                                         (1|CaregiverID), 
+                                       data = d, 
+                                       control = control)))
+scored %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest() %>%
+  filter(grepl(":", term)) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         p.value = pt(abs(statistic), df = N-3, lower.tail = F)*2,
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate),
+         term = gsub("Week:", "",term)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+
+##### Week 0 to first response
+
+**Baseline model**
+
+```{r, results = 'asis'}
+
+demo.med = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+    select(CaregiverID, lowincome, all_of(meds))
+
+change = scored0 %>%
+  select(CaregiverID, Week, anxiety) %>%
+  group_by(CaregiverID) %>%
+  arrange(Week) %>%
+  filter(row_number() %in% c(1,2)) %>%
+  mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
+  ungroup() %>%
+  spread(Week, anxiety) %>%
+  mutate(Change = After-Before) %>%
+  full_join(demo.med)
+
+
+model = lm(Change ~ lowincome, data = change)
+broom::tidy(model) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() 
+
+change %>%
+  filter(!is.na(lowincome)) %>%
+  group_by(lowincome) %>%
+  summarize(m = mean(Change,na.rm=T),
+         sd = sd(Change,na.rm=T),
+         n = n(),
+         se = sd/sqrt(n),
+         cv = qt(p = .975, df = n-1),
+         moe = se*cv) %>%
+  mutate(lowincome = factor(lowincome, labels = c("Middle to high income", "Low income"))) %>%
+  ggplot(aes(x = lowincome, y = m)) +
+  geom_bar(aes(fill = lowincome), stat = "identity") +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .5) +
+  labs(x = "", y = "Change in anxiety") +
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F) +
+  theme_minimal()
+```
+
+
+**Can we explain the effect?**
+
+```{r, results = 'asis'}
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lm(Change ~ lowincome + m.value, 
+                                       data = d)))
+change %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest(cols = c(fit)) %>%
+  filter(term %in% c("lowincome", "m.value")) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+### Caregiver depression
+
+#### Plots
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+depress_plot = trend_date_binary(variable = "depress_current_some",
+                                 dataset = scored, 
+                                 label = "some or a lot of depression",
+                                 groups = c("lowincome"),
+                                 group_labels = "Low income households")
+depress_plot$plot
+
+trend_week_binary(variable = "depress", 
+                  dataset = scored0,
+                  label =  "Caregiver depression", 
+                  groups = "lowincome", 
+                  group_labels = c("Middle or high income","Low income"))
+
+```
+
+
+#### Test of slope {.tabset}
+
+##### Weeks 1+
+
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+model = lmer(depress ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+broom::tidy(model) %>%
+  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  select(term, estimate, std.error, statistic, p.value) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() %>%
+  group_rows("Fixed effects", 1, 4) %>%
+  group_rows("Random effects", 5, 6)
+```
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lmer(depress ~ Week*lowincome + Week*m.value + 
+                                         (1|CaregiverID), 
+                                       data = d, 
+                                       control = control)))
+scored %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest() %>%
+  filter(grepl(":", term)) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         p.value = pt(abs(statistic), df = N-3, lower.tail = F)*2,
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate),
+         term = gsub("Week:", "",term)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+
+##### Week 0 to first response
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+
+demo.med = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, lowincome, all_of(meds))
+
+change = scored0 %>%
+  select(CaregiverID, Week, depress) %>%
+  group_by(CaregiverID) %>%
+  arrange(Week) %>%
+  filter(row_number() %in% c(1,2)) %>%
+  mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
+  ungroup() %>%
+  spread(Week, depress) %>%
+  mutate(Change = After-Before) %>%
+  full_join(demo.med)
+
+
+model = lm(Change ~ lowincome, data = change)
+broom::tidy(model) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() 
+
+change %>%
+  filter(!is.na(lowincome)) %>%
+  group_by(lowincome) %>%
+  summarize(m = mean(Change,na.rm=T),
+            sd = sd(Change,na.rm=T),
+            n = n(),
+            se = sd/sqrt(n),
+            cv = qt(p = .975, df = n-1),
+            moe = se*cv) %>%
+  mutate(lowincome = factor(lowincome, labels = c("Middle to high income", "Low income"))) %>%
+  ggplot(aes(x = lowincome, y = m)) +
+  geom_bar(aes(fill = lowincome), stat = "identity") +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .5) +
+  labs(x = "", y = "Change in depression") +
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F) +
+  theme_minimal()
+```
+
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lm(Change ~ lowincome + m.value, 
+                                     data = d)))
+change %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest(cols = c(fit)) %>%
+  filter(term %in% c("lowincome", "m.value")) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+### Caregiver stress
+
+#### Plots
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+stress_plot = trend_date_binary(variable = "stress_current_some",
+                                 dataset = scored, 
+                                 label = "some or a lot of stress",
+                                 groups = c("lowincome"),
+                                 group_labels = "Low income households")
+stress_plot$plot
+
+trend_week_binary(variable = "stress", 
+                  dataset = scored0,
+                  label =  "Caregiver stress", 
+                  groups = "lowincome", 
+                  group_labels = c("Middle or high income","Low income"))
+
+```
+
+
+#### Test of slope {.tabset}
+
+##### Weeks 1+
+
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+model = lmer(stress ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+broom::tidy(model) %>%
+  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  select(term, estimate, std.error, statistic, p.value) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() %>%
+  group_rows("Fixed effects", 1, 4) %>%
+  group_rows("Random effects", 5, 6)
+```
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lmer(stress ~ Week*lowincome + Week*m.value + 
+                                         (1|CaregiverID), 
+                                       data = d, 
+                                       control = control)))
+scored %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest() %>%
+  filter(grepl(":", term)) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         p.value = pt(abs(statistic), df = N-3, lower.tail = F)*2,
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate),
+         term = gsub("Week:", "",term)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+
+##### Week 0 to first response
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+
+demo.med = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, lowincome, all_of(meds))
+
+change = scored0 %>%
+  select(CaregiverID, Week, stress) %>%
+  group_by(CaregiverID) %>%
+  arrange(Week) %>%
+  filter(row_number() %in% c(1,2)) %>%
+  mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
+  ungroup() %>%
+  spread(Week, stress) %>%
+  mutate(Change = After-Before) %>%
+  full_join(demo.med)
+
+
+model = lm(Change ~ lowincome, data = change)
+broom::tidy(model) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() 
+
+change %>%
+  filter(!is.na(lowincome)) %>%
+  group_by(lowincome) %>%
+  summarize(m = mean(Change,na.rm=T),
+            sd = sd(Change,na.rm=T),
+            n = n(),
+            se = sd/sqrt(n),
+            cv = qt(p = .975, df = n-1),
+            moe = se*cv) %>%
+  mutate(lowincome = factor(lowincome, labels = c("Middle to high income", "Low income"))) %>%
+  ggplot(aes(x = lowincome, y = m)) +
+  geom_bar(aes(fill = lowincome), stat = "identity") +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .5) +
+  labs(x = "", y = "Change in stress") +
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F) +
+  theme_minimal()
+```
+
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lm(Change ~ lowincome + m.value, 
+                                     data = d)))
+change %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest(cols = c(fit)) %>%
+  filter(term %in% c("lowincome", "m.value")) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+### Caregiver loneliness
+
+#### Plots
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+lonely_plot = trend_date_binary(variable = "lonely_current_some",
+                                 dataset = scored, 
+                                 label = "some or a lot of loneliness",
+                                 groups = c("lowincome"),
+                                 group_labels = "Low income households")
+lonely_plot$plot
+
+trend_week_binary(variable = "lonely", 
+                  dataset = scored0,
+                  label =  "Caregiver lonely", 
+                  groups = "lowincome", 
+                  group_labels = c("Middle or high income","Low income"))
+
+```
+
+
+#### Test of slope {.tabset}
+
+##### Weeks 1+
+
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+model = lmer(lonely ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+broom::tidy(model) %>%
+  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  select(term, estimate, std.error, statistic, p.value) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() %>%
+  group_rows("Fixed effects", 1, 4) %>%
+  group_rows("Random effects", 5, 6)
+```
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lmer(lonely ~ Week*lowincome + Week*m.value + 
+                                         (1|CaregiverID), 
+                                       data = d, 
+                                       control = control)))
+scored %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest() %>%
+  filter(grepl(":", term)) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         p.value = pt(abs(statistic), df = N-3, lower.tail = F)*2,
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate),
+         term = gsub("Week:", "",term)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+
+##### Week 0 to first response
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+
+demo.med = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, lowincome, all_of(meds))
+
+change = scored0 %>%
+  select(CaregiverID, Week, lonely) %>%
+  group_by(CaregiverID) %>%
+  arrange(Week) %>%
+  filter(row_number() %in% c(1,2)) %>%
+  mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
+  ungroup() %>%
+  spread(Week, lonely) %>%
+  mutate(Change = After-Before) %>%
+  full_join(demo.med)
+
+
+model = lm(Change ~ lowincome, data = change)
+broom::tidy(model) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() 
+
+change %>%
+  filter(!is.na(lowincome)) %>%
+  group_by(lowincome) %>%
+  summarize(m = mean(Change,na.rm=T),
+            sd = sd(Change,na.rm=T),
+            n = n(),
+            se = sd/sqrt(n),
+            cv = qt(p = .975, df = n-1),
+            moe = se*cv) %>%
+  mutate(lowincome = factor(lowincome, labels = c("Middle to high income", "Low income"))) %>%
+  ggplot(aes(x = lowincome, y = m)) +
+  geom_bar(aes(fill = lowincome), stat = "identity") +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .5) +
+  labs(x = "", y = "Change in lonely") +
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F) +
+  theme_minimal()
+```
+
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lm(Change ~ lowincome + m.value, 
+                                     data = d)))
+change %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest(cols = c(fit)) %>%
+  filter(term %in% c("lowincome", "m.value")) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+### Child Externalizing
+
+#### Plots
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+fussy_plot = trend_date_binary(variable = "fussy_current_some",
+                                 dataset = scored, 
+                                 label = "children are sometimes or often fussy or defiant",
+                                 groups = c("lowincome"),
+                                 group_labels = "Low income households")
+fussy_plot$plot
+
+trend_week_binary(variable = "fussy", 
+                  dataset = scored0,
+                  label =  "Child externalizing", 
+                  groups = "lowincome", 
+                  group_labels = c("Middle or high income","Low income"))
+
+```
+
+
+#### Test of slope {.tabset}
+
+##### Weeks 1+
+
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+model = lmer(fussy ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+broom::tidy(model) %>%
+  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  select(term, estimate, std.error, statistic, p.value) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() %>%
+  group_rows("Fixed effects", 1, 4) %>%
+  group_rows("Random effects", 5, 6)
+```
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lmer(fussy ~ Week*lowincome + Week*m.value + 
+                                         (1|CaregiverID), 
+                                       data = d, 
+                                       control = control)))
+scored %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest() %>%
+  filter(grepl(":", term)) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         p.value = pt(abs(statistic), df = N-3, lower.tail = F)*2,
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate),
+         term = gsub("Week:", "",term)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+
+##### Week 0 to first response
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+
+demo.med = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, lowincome, all_of(meds))
+
+change = scored0 %>%
+  select(CaregiverID, Week, fussy) %>%
+  group_by(CaregiverID) %>%
+  arrange(Week) %>%
+  filter(row_number() %in% c(1,2)) %>%
+  mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
+  ungroup() %>%
+  spread(Week, fussy) %>%
+  mutate(Change = After-Before) %>%
+  full_join(demo.med)
+
+
+model = lm(Change ~ lowincome, data = change)
+broom::tidy(model) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() 
+
+change %>%
+  filter(!is.na(lowincome)) %>%
+  group_by(lowincome) %>%
+  summarize(m = mean(Change,na.rm=T),
+            sd = sd(Change,na.rm=T),
+            n = n(),
+            se = sd/sqrt(n),
+            cv = qt(p = .975, df = n-1),
+            moe = se*cv) %>%
+  mutate(lowincome = factor(lowincome, labels = c("Middle to high income", "Low income"))) %>%
+  ggplot(aes(x = lowincome, y = m)) +
+  geom_bar(aes(fill = lowincome), stat = "identity") +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .5) +
+  labs(x = "", y = "Change in fussy") +
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F) +
+  theme_minimal()
+```
+
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lm(Change ~ lowincome + m.value, 
+                                     data = d)))
+change %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest(cols = c(fit)) %>%
+  filter(term %in% c("lowincome", "m.value")) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+# Analyses May 6
+
+## Well-being during shelter-in-place 
+
+```{r}
+source(here("Functions/trend_days_sheltering_rolling.R"))
+```
+
+
+### Compared to general population {.tabset}
+
+#### Caregiver anxiety
 
 ```{r anxiety}
 anxiety_plot = trend_days_sheltering_binary(variable = "anxiety_current_some",
@@ -66,7 +852,7 @@ anxiety_plot = trend_days_sheltering_binary(variable = "anxiety_current_some",
 anxiety_plot$plot
 ```
 
-### Caregiver depression
+#### Caregiver depression
 
 ```{r depress}
 depress_plot = trend_days_sheltering_binary(variable = "depress_current_some",
@@ -77,7 +863,7 @@ depress_plot = trend_days_sheltering_binary(variable = "depress_current_some",
 depress_plot$plot
 ```
 
-### Caregiver stress
+#### Caregiver stress
 
 ```{r stress}
 stress_plot = trend_days_sheltering_binary(variable = "stress_current_some",
@@ -89,7 +875,7 @@ stress_plot$plot
 ```
 
 
-### Caregiver loneliness
+#### Caregiver loneliness
 
 ```{r }
 lonely_plot = trend_days_sheltering_binary(variable = "lonely_current_some",
@@ -100,7 +886,7 @@ lonely_plot = trend_days_sheltering_binary(variable = "lonely_current_some",
 lonely_plot$plot
 ```
 
-### Child externalizing
+#### Child externalizing
 
 ```{r fussy}
 fussy_plot = trend_days_sheltering_binary(variable = "fussy_current_some",
@@ -113,7 +899,7 @@ fussy_plot$plot
 
 
 
-### Child internalizing
+#### Child internalizing
 
 ```{r fear}
 fear_plot = trend_days_sheltering_binary(variable = "fear_current_some",
@@ -125,10 +911,10 @@ fear_plot$plot
 ```
 
 
-## By geographic region {.tabset}
+### By geographic region {.tabset}
 
 
-### Caregiver anxiety
+#### Caregiver anxiety
 
 ```{r}
 lowincome %>%
@@ -149,7 +935,7 @@ anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
 anxiety_plot$plot
 ```
 
-### Caregiver depression
+#### Caregiver depression
 
 ```{r}
 lowincome %>%
@@ -170,7 +956,7 @@ depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
 depress_plot$plot
 ```
 
-### Caregiver stress
+#### Caregiver stress
 
 ```{r}
 lowincome %>%
@@ -192,7 +978,7 @@ stress_plot$plot
 ```
 
 
-### Child externalizing
+#### Child externalizing
 
 ```{r}
 lowincome %>%
@@ -213,7 +999,7 @@ fussy_plot = trend_days_sheltering_cat(variable = "fussy_current_some",
 fussy_plot$plot
 ```
 
-### Child internalizing
+#### Child internalizing
 
 ```{r}
 lowincome %>%
@@ -234,7 +1020,7 @@ fear_plot = trend_days_sheltering_cat(variable = "fear_current_some",
 fear_plot$plot
 ```
 
-## By childcare
+### By childcare
 
 ```{r}
 lowincome = lowincome %>%
@@ -279,7 +1065,7 @@ lowincome %>%
           desc_stat = "mean_ci")
 ```
 
-## By use of online resources
+### By use of online resources
 
 ```{r}
 lowincome %>%
@@ -296,11 +1082,11 @@ lowincome %>%
 
 
 
-# Education 
+## Education 
 
-## Compared to general population {.tabset}
+### Compared to general population {.tabset}
 
-### Parent education interrupted
+#### Parent education interrupted
 
 ```{r parent edu}
 parent_edu_plot = trend_days_sheltering_binary(variable = "parent_edu_interrupt",
@@ -311,7 +1097,7 @@ parent_edu_plot = trend_days_sheltering_binary(variable = "parent_edu_interrupt"
 parent_edu_plot$plot
 ```
 
-### Child education interrupted
+#### Child education interrupted
 
 ```{r child edu}
 child_edu_plot = trend_days_sheltering_binary(variable = "child_edu_interrupt",
@@ -323,7 +1109,7 @@ child_edu_plot$plot
 ```
 
 
-## By geographic region
+### By geographic region
 
 
 ```{r out.width=c('50%', '50%'), fig.show='hold'}
@@ -346,7 +1132,7 @@ lowincome %>%
 
 
 
-## By childcare
+### By childcare
 
 ```{r}
 lowincome = lowincome %>%
@@ -399,7 +1185,7 @@ lowincome %>%
           desc_stat = "mean_ci")
 ```
 
-## By use of online resources
+### By use of online resources
 
 ```{r}
 lowincome %>%
@@ -417,9 +1203,9 @@ lowincome %>%
           desc_stat = "mean_ci")
 ```
 
-# Differences {.tabset}
+## Differences {.tabset}
 
-## Lost income
+### Lost income
 
 ```{r}
 week1 = scored %>%
@@ -438,7 +1224,7 @@ week1 %>%
             percent = decreased_income/n)
 ```
 
-## Lost non-family childcare
+### Lost non-family childcare
 
 ```{r}
 chisq.test(week1$lowincome, week1$decrease_nonfamilyCC)
@@ -451,7 +1237,7 @@ week1 %>%
             percent = decrease_nonfamilyCC/n)
 ```
 
-## Trouble paying for basics
+### Trouble paying for basics
 
 ```{r}
 chisq.test(week1$lowincome, week1$difficulty_basics)
@@ -464,7 +1250,7 @@ week1 %>%
             percent = difficulty_basics/n)
 ```
 
-## Delayed healthcare
+### Delayed healthcare
 
 ```{r}
 chisq.test(week1$lowincome, week1$delay_healthcare)
@@ -477,7 +1263,7 @@ week1 %>%
             percent = delay_healthcare/n)
 ```
 
-# Testing predictors of well-being in this demo
+## Testing predictors of well-being in this demo
 
 ```{r}
 
@@ -596,9 +1382,9 @@ eval(parse(text = paste0(beginning, each_string)))
 ```
 
 
-## Trends by income {.tabset}
+### Trends by income {.tabset}
 
-### Caregiver anxiety
+#### Caregiver anxiety
 
 ```{r }
 anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
@@ -611,7 +1397,7 @@ anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
 anxiety_plot$plot
 ```
 
-### Caregiver depression
+#### Caregiver depression
 
 ```{r }
 depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
@@ -624,7 +1410,7 @@ depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
 depress_plot$plot
 ```
 
-### Caregiver stress
+#### Caregiver stress
 
 ```{r }
 stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
@@ -637,7 +1423,7 @@ stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
 stress_plot$plot
 ```
 
-### Child externalizing
+#### Child externalizing
 
 ```{r }
 fussy_plot = trend_days_sheltering_cat(variable = "fussy_current_some",
@@ -650,7 +1436,7 @@ fussy_plot = trend_days_sheltering_cat(variable = "fussy_current_some",
 fussy_plot$plot
 ```
 
-### Child internalizing
+#### Child internalizing
 
 ```{r }
 fear_plot = trend_days_sheltering_cat(variable = "fear_current_some",
@@ -661,4 +1447,157 @@ fear_plot = trend_days_sheltering_cat(variable = "fear_current_some",
                                      group_labels = c("No difficulty",
                                                       "Difficulty paying for basic necessities"))
 fear_plot$plot
+```
+
+### Child Internalizing
+
+#### Plots
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+fear_plot = trend_date_binary(variable = "fear_current_some",
+                                 dataset = scored, 
+                                 label = "children are sometimes or often too fearful or anxious",
+                                 groups = c("lowincome"),
+                                 group_labels = "Low income households")
+fear_plot$plot
+
+trend_week_binary(variable = "fear", 
+                  dataset = scored0,
+                  label =  "Child Internalizing", 
+                  groups = "lowincome", 
+                  group_labels = c("Middle or high income","Low income"))
+
+```
+
+
+#### Test of slope {.tabset}
+
+##### Weeks 1+
+
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+model = lmer(fear ~ Week*lowincome + (1|CaregiverID), data = scored, control = control)
+broom::tidy(model) %>%
+  mutate(p.value = pt(abs(statistic), df = nrow(model@frame)-2, lower.tail = F)*2) %>%
+  select(term, estimate, std.error, statistic, p.value) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() %>%
+  group_rows("Fixed effects", 1, 4) %>%
+  group_rows("Random effects", 5, 6)
+```
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lmer(fear ~ Week*lowincome + Week*m.value + 
+                                         (1|CaregiverID), 
+                                       data = d, 
+                                       control = control)))
+scored %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest() %>%
+  filter(grepl(":", term)) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         p.value = pt(abs(statistic), df = N-3, lower.tail = F)*2,
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate),
+         term = gsub("Week:", "",term)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
+
+##### Week 0 to first response
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+
+demo.med = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, lowincome, all_of(meds))
+
+change = scored0 %>%
+  select(CaregiverID, Week, fear) %>%
+  group_by(CaregiverID) %>%
+  arrange(Week) %>%
+  filter(row_number() %in% c(1,2)) %>%
+  mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
+  ungroup() %>%
+  spread(Week, fear) %>%
+  mutate(Change = After-Before) %>%
+  full_join(demo.med)
+
+
+model = lm(Change ~ lowincome, data = change)
+broom::tidy(model) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() 
+
+change %>%
+  filter(!is.na(lowincome)) %>%
+  group_by(lowincome) %>%
+  summarize(m = mean(Change,na.rm=T),
+            sd = sd(Change,na.rm=T),
+            n = n(),
+            se = sd/sqrt(n),
+            cv = qt(p = .975, df = n-1),
+            moe = se*cv) %>%
+  mutate(lowincome = factor(lowincome, labels = c("Middle to high income", "Low income"))) %>%
+  ggplot(aes(x = lowincome, y = m)) +
+  geom_bar(aes(fill = lowincome), stat = "identity") +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .5) +
+  labs(x = "", y = "Change in fear") +
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F) +
+  theme_minimal()
+```
+
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lm(Change ~ lowincome + m.value, 
+                                     data = d)))
+change %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest(cols = c(fit)) %>%
+  filter(term %in% c("lowincome", "m.value")) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
 ```
