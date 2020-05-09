@@ -1,11 +1,13 @@
 ---
-title: "Below poverty threshold households"
+title: "Low income households"
 output: 
   html_document:
     toc: TRUE
     toc_float: TRUE
   
 ---
+
+In these analyses, families are considered to be a low-income household if their reported annual income is less than 2 times the Federal Poverty Level for a household of their size. Household size is calculated as the number of children in the household plus one (if the caregiver reports being singled, divorced, widowed, romantically involved but living papart, or not in any kind of relationship) or plus two otherwise. 
 
 
 ```{r chunk 1, echo = F}
@@ -34,7 +36,7 @@ library(lme4)
 ```{r score datafile, echo = F, warning = F, message = F}
 ## score master --------------------------------------------------------
 source(here("Scripts/score data.R"))
-scored0 = scored
+scored0 = scored %>% filter(Week < 4)
 scored = scored %>%
   filter(Week > 0) %>%
   filter(Week < 4)
@@ -114,8 +116,7 @@ model = lmer(anxiety ~ Week*poverty + (1|CaregiverID),
 
 broom::tidy(model) %>%
   mutate(p.value = pt(abs(statistic), 
-                      df = nrow(model@frame)-2, 
-                      lower.tail = F)*2) %>%
+                      df = nrow(model@frame)-2, lower.tail = F)*2) %>%
   select(term, estimate, std.error, statistic, p.value) %>%
   kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
         digits = c(0,2,2,2,3)) %>%
@@ -771,6 +772,84 @@ scored %>%
   kable_styling()
 ```
 
+##### Week 0 to first response
+
+**Baseline model**
+  
+```{r, results = 'asis'}
+
+demo.med = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, poverty, all_of(meds))
+
+change = scored0 %>%
+  select(CaregiverID, Week, fussy) %>%
+  group_by(CaregiverID) %>%
+  arrange(Week) %>%
+  filter(row_number() %in% c(1,2)) %>%
+  mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
+  ungroup() %>%
+  spread(Week, fussy) %>%
+  mutate(Change = After-Before) %>%
+  full_join(demo.med)
+
+
+model = lm(Change ~ poverty, data = change)
+broom::tidy(model) %>%
+  kable(., col.names = c("Term", "Coef", "SE", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling() 
+
+change %>%
+  filter(!is.na(poverty)) %>%
+  group_by(poverty) %>%
+  summarize(m = mean(Change,na.rm=T),
+            sd = sd(Change,na.rm=T),
+            n = n(),
+            se = sd/sqrt(n),
+            cv = qt(p = .975, df = n-1),
+            moe = se*cv) %>%
+  mutate(poverty = factor(poverty, labels = c("Middle to high income", "Low income"))) %>%
+  ggplot(aes(x = poverty, y = m)) +
+  geom_bar(aes(fill = poverty), stat = "identity") +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .5) +
+  labs(x = "", y = "Change in fussy") +
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F) +
+  theme_minimal()
+```
+
+
+**Can we explain the effect?**
+  
+```{r, results = 'asis'}
+model =
+  tibble(mediator = meds, 
+         model = list(function(d) lm(Change ~ poverty + m.value, 
+                                     data = d)))
+change %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(N = purrr::map_dbl(data, nrow)) %>%
+  left_join(model) %>%
+  rowwise() %>%
+  summarize(mediator = mediator, 
+            N = N,
+            fit = list(model(data)),
+            fit = list(broom::tidy(fit))) %>%
+  select(mediator, N, fit) %>%
+  unnest(cols = c(fit)) %>%
+  filter(term %in% c("poverty", "m.value")) %>%
+  mutate(estimate = papaja::printnum(estimate),
+         estimate = ifelse(p.value < .05, paste0(estimate,"*"), estimate)) %>%
+  select(mediator, term, estimate) %>%
+  spread(term, estimate) %>%
+  kable(., col.names = c("Mediator", "Coefficient (Income)", "Coefficient of mediator")) %>%
+  kable_styling()
+```
+
 ### Child Internalizing
 
 #### Plots
@@ -858,13 +937,13 @@ demo.med = scored %>%
   select(CaregiverID, poverty, all_of(meds))
 
 change = scored0 %>%
-  select(CaregiverID, Week, fussy) %>%
+  select(CaregiverID, Week, fear) %>%
   group_by(CaregiverID) %>%
   arrange(Week) %>%
   filter(row_number() %in% c(1,2)) %>%
   mutate(Week = ifelse(Week == 0, "Before", "After")) %>%
   ungroup() %>%
-  spread(Week, fussy) %>%
+  spread(Week, fear) %>%
   mutate(Change = After-Before) %>%
   full_join(demo.med)
 

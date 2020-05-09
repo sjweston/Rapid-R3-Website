@@ -38,7 +38,7 @@ scored = scored %>%
   select(CaregiverID, Week, BaselineWeek, income, 
          household_size, num_children_raw) %>%
   left_join(census) %>%
-  mutate(poverty = ifelse(income < poverty_threshold,1,0)) %>%
+  mutate(poverty = ifelse(income < poverty_threshold*2,1,0)) %>%
   select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty) %>%
   full_join(scored)
 
