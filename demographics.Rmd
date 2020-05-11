@@ -48,6 +48,30 @@ end_dates = format(end_dates, format = "%B %d")
 all_dates = paste(start_dates, "-", end_dates)
 ```
 
+# Across all parents sampled
+
+```{r, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  select(all_of(binary_demos)) %>%
+  gather("Demographic", "value") %>%
+  group_by(Demographic) %>%
+  summarize(Count = sum(value,na.rm=T),
+            total = n()) %>%
+  mutate(Demographic = factor(Demographic, 
+                              levels = binary_demos, 
+                              labels = binary_labels),
+         Percent = 100*Count/total) %>%
+  select(Demographic, Count, Percent) %>%
+  kable(., col.names = c("Demographic", "Count", "Percent of sample"),
+        digits = c(0,0,1)) %>%
+  kable_styling() %>%
+  scroll_box(width = "650px")
+```
+
 
 # Numbers by the week
 

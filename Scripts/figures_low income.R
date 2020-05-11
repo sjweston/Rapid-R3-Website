@@ -10,7 +10,7 @@ library(ggthemr)
 
 source(here("Scripts/score data.R"))
 
-outcomes = c("anxiety", "depress", "stress", "lonely", "fussy", "fear")
+outcomes = c("anxiety", "depress", "stress", "fussy", "fear")
 
 
 # immediate change --------------------------------------------------------
@@ -62,3 +62,25 @@ first3 = scored %>%
   
 write.csv(first3, here("figure data/0509_weekly_emotion_by_income.csv"))
 
+
+# pre-pandemic ------------------------------------------------------------
+
+prepan = scored0 %>%
+  filter(Week == 0) %>%
+  filter(!is.na(poverty)) %>%
+  select(poverty, anxiety, depress, stress, lonely, fussy, fear) %>%
+  gather("emotion", "value", -poverty) %>%
+  filter(!is.na(value)) %>%
+  group_by(poverty, emotion) %>%
+  summarize(mean = mean(value),
+            sd = sd(value),
+            n = n(),
+            sem = sd/sqrt(n),
+            cv = qt(.975, df = n-1),
+            moe = cv*sem, 
+            upper = mean + moe, 
+            lower = mean - moe) %>%
+  mutate(income = ifelse(poverty == 0, "Middle- to high-income families", "Low-income families")) %>%
+  select(income, emotion, mean, upper, lower)
+
+write.csv(prepan, here("figure data/0509_prepandemic_emotion_by_income.csv"))

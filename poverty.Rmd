@@ -53,13 +53,17 @@ control = lmerControl(check.nobs.vs.nlev = "ignore",
 
 meds = c("insurance", 
          "child_insurance", 
-         #"access_online", 
+         "access_online", 
+         #"access_telehealth",
          #"suspected_covid", 
          #"diagnosed_covid", 
          #"hospital", 
          #"hospital_covid", 
+         #"delayed_healthcare",
          "support_decrease", 
+         "decrease_nonfamilyCC",
          "lost_free_lunch", 
+         "free_food",
          "employment_decreased", 
          "losejob_sickleave", 
          "income_decreaed", 
@@ -68,9 +72,31 @@ meds = c("insurance",
          "black", 
          "latinx")
 ```
+## Pre-panedemic well-being
+
+** Comparison of income groups at baseline** 
+
+```{r, results = 'asis'}
+prepandemic = scored0 %>%
+  filter(Week == 0) %>%
+  filter(!is.na(poverty)) %>%
+  select(poverty, anxiety, depress, stress, lonely, fussy, fear) 
+
+prepandemic %>%
+  gather("emotion", "value", -poverty) %>%
+  group_by(emotion) %>%
+  nest() %>%
+  mutate(test = map(data, function(x) t.test(value~poverty, data = x))) %>%
+  mutate(test = map(test, broom::tidy)) %>%
+  select(-data) %>%
+  unnest(cols = c(test)) %>%
+  kable(., digits = c(0, 2,2,2,2,3,2,2,2,0,0))
+```
 
 
 ## Well-being during shelter-in-place {.tabset}
+
+
 ```{r}
 source(here("Functions/trend_date_rolling.R"))
 source(here("Functions/trend_week.R"))
@@ -1435,6 +1461,61 @@ week1 %>%
             delay_healthcare = sum(delay_healthcare,na.rm = T),
             percent = delay_healthcare/n)
 ```
+
+### Lost free lunch
+
+```{r}
+chisq.test(week1$poverty, week1$lost_free_lunch)
+week1 %>%
+  ungroup()%>%
+  select(poverty, lost_free_lunch) %>%
+  group_by(poverty) %>%
+  summarize(n = n(),
+            lost_free_lunch = sum(lost_free_lunch,na.rm = T),
+            percent = lost_free_lunch/n)
+```
+
+
+### Access to telehealth
+
+```{r}
+chisq.test(week1$poverty, week1$access_telehealth)
+week1 %>%
+  ungroup()%>%
+  select(poverty, access_telehealth) %>%
+  group_by(poverty) %>%
+  summarize(n = n(),
+            access_telehealth = sum(access_telehealth,na.rm = T),
+            percent = access_telehealth/n)
+```
+
+### Caregiver insurance
+
+```{r}
+chisq.test(week1$poverty, week1$insurance)
+week1 %>%
+  ungroup()%>%
+  select(poverty, insurance) %>%
+  group_by(poverty) %>%
+  summarize(n = n(),
+            insurance = sum(insurance,na.rm = T),
+            percent = insurance/n)
+```
+
+### Child insurance
+
+```{r}
+chisq.test(week1$poverty, week1$child_insurance)
+week1 %>%
+  ungroup()%>%
+  select(poverty, child_insurance) %>%
+  group_by(poverty) %>%
+  summarize(n = n(),
+            child_insurance = sum(child_insurance,na.rm = T),
+            percent = child_insurance/n)
+```
+
+
 
 ## Testing predictors of well-being in this demo
 

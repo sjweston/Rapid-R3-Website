@@ -248,10 +248,12 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        newvar.name = "Job.006_cat")
     free_lunch_pre = ifelse(grepl("2",data$Job.006_cat), 1, 0)
     
-    newdata$lost_free_lunch = case_when(free_lunch_pre == 1 & free_lunch_current == 1 ~ 0,
+    newdata$lost_free_lunch = case_when(free_lunch_pre == 0 ~ 0,
+                                        free_lunch_pre == 1 & free_lunch_current == 1 ~ 0,
                                         free_lunch_pre == 1 & free_lunch_current == 0 ~ 1,
                                         TRUE ~ NA_real_)
-    newdata$gained_free_lunch = case_when(free_lunch_pre == 0 & free_lunch_current == 1 ~ 1,
+    newdata$gained_free_lunch = case_when(free_lunch_pre == 1 ~ 0,
+                                          free_lunch_pre == 0 & free_lunch_current == 1 ~ 1,
                                           free_lunch_pre == 0 & free_lunch_current == 0 ~ 0,
                                           TRUE ~ NA_real_)
   }
