@@ -86,8 +86,8 @@ prepandemic %>%
   gather("emotion", "value", -poverty) %>%
   group_by(emotion) %>%
   nest() %>%
-  mutate(test = map(data, function(x) t.test(value~poverty, data = x))) %>%
-  mutate(test = map(test, broom::tidy)) %>%
+  mutate(test = purrr::map(data, function(x) t.test(value~poverty, data = x))) %>%
+  mutate(test = purrr::map(test, broom::tidy)) %>%
   select(-data) %>%
   unnest(cols = c(test)) %>%
   kable(., digits = c(0, 2,2,2,2,3,2,2,2,0,0))
