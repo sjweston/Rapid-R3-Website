@@ -36,7 +36,7 @@ demo_labels = c(
   "Geographic region",
   "Latinx parents",
   "African American parents",
-  "Families below the poverty threshold",
+  "Families below the poverty threshold x 1.5",
   "Low income (< $40K) households"
 )
 

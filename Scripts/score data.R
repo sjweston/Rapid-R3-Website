@@ -59,6 +59,19 @@ scored = scored %>%
   select(-contains("_pre")) %>%
   full_join(pre_pandemic)
 
+# new baseline week
+
+baseline = scored %>%
+  filter(Week != 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, Week) %>%
+  ungroup() %>%
+  rename(BaselineWeek = Week)
+
+scored = scored %>%
+  select(-BaselineWeek) %>%
+  full_join(baseline)
 # days sheltering in place ------------------------------------------------
 
 

@@ -67,11 +67,29 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$utility_online = rowMeans(data[,find_items("POLICY.002_[1-7]$", data)], na.rm=T)
   }
   
-  if(contains_items("POLICY.004_[a-k]$", data)){
+  if(contains_items("POLICY.004\\.[a-k]$", data)){
     hours_familyCC_current = rowSums(data[,find_items("POLICY.004.[a-d]$", data)],na.rm=T)
     hours_nonfamilyCC_current = rowSums(data[,find_items("POLICY.004.[e-k]$", data)],na.rm=T)
     newdata$familyCC_current = hours_familyCC_current
     newdata$nonfamilyCC_current = hours_nonfamilyCC_current
+    
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.004_.{1,2}$", data),
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.004_cat")
+    
+    newdata$cc_parent = ifelse(grepl("1$",data$POLICY.004_cat) | grepl("1,",data$POLICY.004_cat), 
+                                       1, 0)
+    newdata$cc_sibling = ifelse(grepl("2$",data$POLICY.004_cat) | grepl("2,",data$POLICY.004_cat), 
+                                       1, 0)
+    newdata$cc_grandparent = ifelse(grepl("3",data$POLICY.004_cat), 1, 0)
+    newdata$cc_othRelative = ifelse(grepl("4",data$POLICY.004_cat), 1, 0)
+    newdata$cc_familydaycare = ifelse(grepl("5",data$POLICY.004_cat), 1, 0)
+    newdata$cc_childCareCenter = ifelse(grepl("7",data$POLICY.004_cat), 1, 0)
+    newdata$cc_HeadStart = ifelse(grepl("8",data$POLICY.004_cat), 1, 0)
+    newdata$cc_nursery = ifelse(grepl("9",data$POLICY.004_cat), 1, 0)
+    newdata$cc_BefAfSchool = ifelse(grepl("10",data$POLICY.004_cat), 1, 0)
+    newdata$cc_childSelfCare = ifelse(grepl("11",data$POLICY.004_cat), 1, 0)
   }
   
   if(contains_items("POLICY.003.[a-k]$", data)){
@@ -94,6 +112,24 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     change_nonfamilyCC = hours_nonfamilyCC_current-hours_nonfamilyCC_pre
     newdata$increase_nonfamilyCC = ifelse(change_nonfamilyCC > 0, 1, 0)
     newdata$decrease_nonfamilyCC = ifelse(change_nonfamilyCC < 0, 1, 0)
+    
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.003_.{1,2}$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.003_cat")
+    
+    newdata$cc_parent_pre = ifelse(grepl("1$",data$POLICY.003_cat) | grepl("1,",data$POLICY.003_cat), 
+                                       1, 0)
+    newdata$cc_sibling_pre = ifelse(grepl("2$",data$POLICY.003_cat) | grepl("2,",data$POLICY.003_cat), 
+                                        1, 0)
+    newdata$cc_grandparent_pre = ifelse(grepl("3",data$POLICY.003_cat), 1, 0)
+    newdata$cc_othRelative_pre = ifelse(grepl("4",data$POLICY.003_cat), 1, 0)
+    newdata$cc_familydaycare_pre = ifelse(grepl("5",data$POLICY.003_cat), 1, 0)
+    newdata$cc_childCareCenter_pre = ifelse(grepl("7",data$POLICY.003_cat), 1, 0)
+    newdata$cc_HeadStart_pre = ifelse(grepl("8",data$POLICY.003_cat), 1, 0)
+    newdata$cc_nursery_pre = ifelse(grepl("9",data$POLICY.003_cat), 1, 0)
+    newdata$cc_BefAfSchool_pre = ifelse(grepl("10",data$POLICY.003_cat), 1, 0)
+    newdata$cc_childSelfCare_pre = ifelse(grepl("11",data$POLICY.003_cat), 1, 0)
   }
   
   if(contains_items("POLICY.006_[1-7]$", data)){
@@ -112,11 +148,43 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$child_edu_interrupt = ifelse(grepl("[1,3,5]",data$POLICY.008_cat), 1, 0)
   }
   
-  if(contains_items("HEALTH.001", data)) newdata$insurance = ifelse(data$HEALTH.001 == 1, 1, 0)
-  if(contains_items("HEALTH.002", data)) newdata$child_insurance = ifelse(data$HEALTH.002 == 1, 1, 0)
+  if(contains_items("HEALTH.001", data)){
+    newdata$insurance = ifelse(data$HEALTH.001 == 1, 1, 0)
+    #caregiver has insurance through private company
+    newdata$HI_private = ifelse(data$HEALTH.001.a_1 == 1, 1, newdata$HI_private)
+    newdata$HI_private[is.na(newdata$HI_private) & !is.na(data$HEALTH.001)] = 0
+    #caregiver has insurance through medi-something
+    newdata$HI_medi = ifelse(is.na(data$HEALTH.001), NA, 0)
+    newdata$HI_medi = ifelse(data$HEALTH.001.a_2 == 1, 1, newdata$HI_medi)
+    newdata$HI_medi = ifelse(data$HEALTH.001.a_3 == 1, 1, newdata$HI_medi)
+    newdata$HI_medi = ifelse(data$HEALTH.001.a_2 == 4, 1, newdata$HI_medi)
+    newdata$HI_medi[is.na(newdata$HI_medi) & !is.na(data$HEALTH.001)] = 0
+    }
+  if(contains_items("HEALTH.002", data)){
+    newdata$child_insurance = ifelse(data$HEALTH.002 == 1, 1, 0)
+    #child has insurance through private company
+    newdata$child_HI_private = ifelse(is.na(data$HEALTH.002), NA, 0)
+    newdata$child_HI_private = ifelse(data$HEALTH.002.a_1 == 1, 1, newdata$child_HI_private)
+    newdata$child_HI_private[is.na(newdata$child_HI_private) & !is.na(data$HEALTH.002)] = 0
+    #child has insurance through medi-something
+    newdata$child_HI_medi = ifelse(is.na(data$HEALTH.002), NA, 0)
+    newdata$child_HI_medi = ifelse(data$HEALTH.002.a_2 == 1, 1, newdata$child_HI_medi)
+    newdata$child_HI_medi = ifelse(data$HEALTH.002.a_3 == 1, 1, newdata$child_HI_medi)
+    newdata$child_HI_medi = ifelse(data$HEALTH.002.a_2 == 4, 1, newdata$child_HI_medi)
+    newdata$child_HI_medi[is.na(newdata$child_HI_medi) & !is.na(data$HEALTH.002)] = 0
+    
+    }
+  
+  
+  
   if(contains_items("HEALTH.003", data)) {
     num_delay_healthcare = rowSums(data[,find_items("HEALTH.003.[a-f]$", data)],na.rm=T)
     newdata$delay_healthcare = ifelse(num_delay_healthcare > 0, 1, 0)
+  }
+  
+  if(contains_items("HEALTH.004", data)) {
+    missed_wellbaby = ifelse(data$HEALTH.004 == 1, 1, 0)
+    newdata$missed_wellbaby = missed_wellbaby
   }
   
   if(contains_items("COVID.001", data)){

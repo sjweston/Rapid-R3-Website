@@ -1,0 +1,409 @@
+---
+title: "Childcare"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+  
+---
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(haven)
+## require(devtools)
+## install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(zipcode)
+library(ggthemr)
+library(corx)
+library(papaja)
+library(zoo)
+library(ggpubr)
+library(lme4)
+```
+
+```{r childcare-1}
+source(here("Scripts/score data.R"))
+
+outcomes = c("anxiety", "depress", "lonely", "stress", "fussy", "fear")
+outcomes_p = paste0(outcomes, "_current_lots")
+
+source(here("Functions/pomp.R"))
+
+scored = scored %>%
+  mutate_at(vars("anxiety","depress"), pomp_ad) %>%
+  mutate_at("stress", pomp_stress) %>%
+  mutate_at("lonely", pomp_lonely) %>%
+  mutate_at(vars("fussy", "fear"), pomp_child) 
+
+source(here("Scripts/demo groups.R"))
+
+binary_demos = binary_demos[!grepl("working", binary_demos)]
+binary_labels = binary_labels[!grepl("Working", binary_labels)]
+
+cc_binary = find_items("^cc", scored)
+cc_binary_labels = c("Other parent/step parent",
+                     "Sibling 15 yrs or older",
+                     "Grandparent",
+                     "Other relative",
+                     "Family day care provider",
+                     "Child care center",
+                     "Head Start program",
+                     "Nursery or preschool",
+                     "Before/after school program",
+                     "Child(ren) care for themselves")
+
+source(here("Functions/summarizing_report.R"))
+```
+
+# Pre- vs post- changes in childcare
+
+These analyses include retrospective reports of pre-pandemic childcare and the current experience reported the first time a caregiver participates in the RAPID survey.
+
+## Types of childcare used{.tabset}
+
+### Total sample
+
+```{r childcare-2, results = 'asis'}
+BefAft = scored %>%
+  filter(Week == 0 | Week == max(Week)) %>%
+  mutate(Week = ifelse(Week == 0, "Bef", "During"))
+
+BefAft = BefAft %>%
+  select(Week, all_of(cc_binary)) %>%
+  gather("Variable", "value", -Week) %>%
+  filter(!is.na(value)) %>%
+  group_by(Week, Variable) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n()) 
+
+BefAft %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  mutate(Variable = factor(Variable, levels = cc_binary, labels = cc_binary_labels),
+         Change_count = During_Count - Bef_Count, 
+         Change_percent = During_Percent - Bef_Percent) %>%
+  arrange(Variable) %>%
+  kable(., digits = c(0, 0, 1, 0, 1, 0, 1),
+        col.names = c("Type of childcare", "Count", "Percent", "Count", "Percent", "Count", "Percent")) %>%
+  kable_styling() %>%
+  add_header_above(c(" ", "Pre-pandemic" = 2, "During pandemic" = 2, "Change" = 2))
+```
+
+```{r childcare-3, out.width=c('50%', '50%'), fig.show='hold'}
+BefAft %>%
+  ungroup() %>%
+  mutate(Variable = factor(Variable, 
+                           levels = cc_binary, 
+                           labels = cc_binary_labels),
+         Week = factor(Week, 
+                       levels = c("Bef", "During"), 
+                       labels = c("Pre-pandemic", "During pandemic"))) %>%
+  ggplot(aes(x = Variable, y = Percent, fill = Week)) +
+    geom_bar(stat = "identity", position = "dodge") +
+  coord_flip() +
+  theme(legend.position = "top")
+
+BefAft %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  mutate(Variable = factor(Variable, 
+                           levels = cc_binary, 
+                           labels = cc_binary_labels),
+         Change_percent = During_Percent - Bef_Percent) %>%
+  ggplot(aes(x = Variable, y = Change_percent)) +
+    geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous("Change in percent (not percent change)") +
+  coord_flip() +
+  theme(legend.position = "top")
+```
+
+### By demographic
+
+```{r childcare-4, results = 'asis'}
+BefAft = scored %>%
+  filter(Week == 0 | Week == max(Week)) %>%
+  mutate(Week = ifelse(Week == 0, "Bef", "During"))
+
+BefAft = BefAft %>%
+  select(Week, all_of(cc_binary), all_of(binary_demos)) %>%
+  gather("Variable", "value", all_of(cc_binary)) %>%
+  gather("Demo", "group", all_of(binary_demos)) %>%
+  filter(!is.na(value)) %>%
+  filter(group == 1) %>%
+  group_by(Demo, Week, Variable) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n()) 
+
+table = BefAft %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  ungroup() %>%
+  mutate(Variable = factor(Variable, levels = cc_binary, labels = cc_binary_labels),
+         Demo = factor(Demo, levels = binary_demos),
+         Change_count = During_Count - Bef_Count, 
+         Change_percent = During_Percent - Bef_Percent) %>%
+  arrange(Demo, Variable) 
+
+#build groupings
+
+first.row = sapply(binary_demos, first_instance, string = table$Demo)
+last.row = sapply(binary_demos, last_instance, string = table$Demo)
+
+each_string = paste0("group_rows(group_label = \" ", 
+                     binary_labels, 
+                     "\" , start_row = ", 
+                     first.row, 
+                     ", end_row = ", 
+                     last.row, 
+                     ")")
+each_string = paste(each_string, collapse = " %>% ")
+
+# table code
+beginning = "table %>% 
+  select(-Demo) %>% 
+  kable(., digits = c(0, 0, 1, 0, 1, 0, 1),
+        col.names = c(\"Type of childcare\", \"Count\", \"Percent\", \"Count\", \"Percent\", \"Count\", \"Percent\")) %>%
+  kable_styling() %>%
+  add_header_above(c(\" \", \"Pre-pandemic\" = 2, \"During pandemic\" = 2, \"Change\" = 2)) %>%"
+
+eval(parse(text = paste0(beginning, each_string)))
+```
+
+```{r childcare-5, out.width=c('50%', '50%'), fig.show='hold'}
+
+BefAft %>%
+  ungroup() %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  mutate(Variable = factor(Variable, 
+                           levels = cc_binary, 
+                           labels = cc_binary_labels),
+         Demo = factor(Demo, levels = binary_demos, labels = binary_labels),
+         Change_percent = During_Percent - Bef_Percent) %>%
+  ggplot(aes(x = Variable, y = Change_percent, fill = Demo)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white") +
+  scale_y_continuous("Change in percent (not percent change)") +
+  scale_x_discrete("", breaks = NULL) +
+  coord_flip() +
+  facet_wrap(~Variable, scales = "free") +
+  theme(legend.position = "top")
+
+BefAft %>%
+  ungroup() %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  mutate(Variable = factor(Variable, 
+                           levels = cc_binary, 
+                           labels = cc_binary_labels),
+         Demo = factor(Demo, levels = binary_demos, labels = binary_labels),
+         Change_percent = During_Percent - Bef_Percent) %>%
+  ggplot(aes(x = Demo, y = Change_percent, fill = Variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white") +
+  scale_y_continuous("Change in percent (not percent change)") +
+  scale_x_discrete("", breaks = NULL) +
+  coord_flip() + 
+  facet_wrap(~Demo, scales = "free") +
+  theme(legend.position = "top")
+```
+
+# Changes in childcare since the pandemic started
+
+```{r childcare-6}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(cc_binary)) %>%
+  gather("var", "value", all_of(cc_binary)) %>%
+  filter(!is.na(value)) %>%
+  group_by(Week, var) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(var = factor(var, levels = cc_binary, labels = cc_binary_labels)) %>%
+  ggplot(aes(x = Week, y = Percent, color = var)) +
+  geom_point() +
+  geom_line() +
+  theme_minimal() + 
+  theme(legend.position = "top")
+```
+
+```{r childcare-7}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(cc_binary), all_of(binary_demos)) %>%
+  gather("var", "value", all_of(cc_binary)) %>%
+  gather("Demo", "group", all_of(binary_demos)) %>%
+  filter(!is.na(value)) %>%
+  filter(group == 1) %>%
+  group_by(Demo, Week, var) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(var = factor(var, levels = cc_binary, labels = cc_binary_labels),
+         Demo = factor(Demo, levels = binary_demos, labels = binary_labels)) %>%
+  ggplot(aes(x = Week, y = Percent, color = var)) +
+  geom_point() +
+  geom_line() +
+  theme_minimal() + 
+  facet_wrap(~Demo) +
+  theme(legend.position = "top")
+```
+
+```{r childcare-8}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(cc_binary), all_of(binary_demos)) %>%
+  gather("var", "value", all_of(cc_binary)) %>%
+  gather("Demo", "group", all_of(binary_demos)) %>%
+  filter(!is.na(value)) %>%
+  filter(group == 1) %>%
+  group_by(Demo, Week, var) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(var = factor(var, levels = cc_binary, labels = cc_binary_labels),
+         Demo = factor(Demo, levels = binary_demos, labels = binary_labels)) %>%
+  ggplot(aes(x = Week, y = Percent, color = Demo)) +
+  geom_point() +
+  geom_line() +
+  theme_minimal() + 
+  facet_wrap(~var) +
+  theme(legend.position = "top")
+```
+
+
+# Effect on well-being {.tabset}
+
+All mental health variables have been POMP scored for ease of interpretation and combination. Scores range from 0 to 100, with low scores indicating better mental health and high scores indicating more mental health problems. 
+
+```{r}
+
+# means by change
+affect_by_change = function(x){
+  x %>%
+  filter(!is.na(e.value)) %>%
+  group_by(change) %>%
+  summarize(mean = mean(e.value),
+            n = n(),
+            cv = qt(.975, df = n-1),
+            sem = sd(e.value)/sqrt(n),
+            lower = mean-(cv*sem),
+            upper = mean+(cv*sem)) %>%
+  mutate(change = factor(change, levels = c(-1, 0, 1),
+                         labels = c("Lost care", "No change", "Gained care"))) %>%
+  select(change, mean, lower, upper)
+  }
+
+
+BefAft = scored %>%
+  filter(Week == 0 | Week == BaselineWeek) %>%
+  mutate(Week = ifelse(Week == 0, "Bef", "During"))
+
+change_care = BefAft %>%
+  select(CaregiverID, Week, all_of(cc_binary)) %>%
+  gather(var, value, all_of(cc_binary)) %>%
+  spread(Week, value) %>%
+  mutate(change = During-Bef)
+
+changes = BefAft %>%
+  filter(Week == "During") %>%
+  select(CaregiverID, all_of(outcomes)) %>%
+  full_join(change_care) %>%
+  gather("emotion", "e.value", all_of(outcomes)) %>%
+  group_by(emotion, var) %>%
+  nest() %>%
+  mutate(output = purrr::map(data, affect_by_change)) %>%
+  select(emotion, var, output) %>%
+  unnest() 
+```
+
+## Anxiety
+
+```{r anxiety}
+changes %>%
+  filter(emotion == "anxiety") %>%
+  ggplot(aes(x = change, y = mean, fill = change)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  facet_wrap(~var) +
+  theme_minimal() +
+  guides(fill = F)
+```
+
+## Depression
+
+```{r depress}
+changes %>%
+  filter(emotion == "depress") %>%
+  ggplot(aes(x = change, y = mean, fill = change)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  facet_wrap(~var) +
+  theme_minimal() +
+  guides(fill = F)
+```
+
+## Stress
+
+```{r stress}
+changes %>%
+  filter(emotion == "stress") %>%
+  ggplot(aes(x = change, y = mean, fill = change)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  facet_wrap(~var) +
+  theme_minimal() +
+  guides(fill = F)
+```
+
+## Loneliness
+```{r lonely}
+changes %>%
+  filter(emotion == "lonely") %>%
+  ggplot(aes(x = change, y = mean, fill = change)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  facet_wrap(~var) +
+  theme_minimal() +
+  guides(fill = F)
+```
+
+## Child externalizing
+
+```{r fussy}
+changes %>%
+  filter(emotion == "fussy") %>%
+  ggplot(aes(x = change, y = mean, fill = change)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  facet_wrap(~var) +
+  theme_minimal() +
+  guides(fill = F)
+```
+
+## Child internalizing
+
+```{r fear}
+changes %>%
+  filter(emotion == "fear") %>%
+  ggplot(aes(x = change, y = mean, fill = change)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  facet_wrap(~var) +
+  theme_minimal() +
+  guides(fill = F)
+```
+
