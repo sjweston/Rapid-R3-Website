@@ -32,6 +32,8 @@ library(lme4)
 
 ```{r childcare-1}
 source(here("Scripts/score data.R"))
+scored = scored %>%
+  filter(Week < 5)
 
 outcomes = c("anxiety", "depress", "lonely", "stress", "fussy", "fear")
 outcomes_p = paste0(outcomes, "_current_lots")
@@ -66,7 +68,7 @@ source(here("Functions/summarizing_report.R"))
 
 # Pre- vs post- changes in childcare
 
-These analyses include retrospective reports of pre-pandemic childcare and the current experience reported the first time a caregiver participates in the RAPID survey.
+These analyses include retrospective reports of pre-pandemic childcare and the current experience reported the most recent time a caregiver participates in the RAPID survey.
 
 ## Types of childcare used{.tabset}
 
