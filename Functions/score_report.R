@@ -132,6 +132,45 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$cc_childSelfCare_pre = ifelse(grepl("11",data$POLICY.003_cat), 1, 0)
   }
   
+  if(contains_items("POLICY.009", data)){
+    newdata$cc2_nonparental_pre = ifelse(data$POLICY.009.a == 1, 1, 0)
+    newdata$cc2_nonparental = ifelse(data$POLICY.009.b == 1, 1, 0)
+  }
+  if(contains_items("POLICY.010", data)){
+    newdata$cc2_expected_change = case_when(
+      data$POLICY.010 == 1 ~ 5,
+      data$POLICY.010 == 2 ~ 1,
+      data$POLICY.010 == 3 ~ 4,
+      data$POLICY.010 == 4 ~ 2,
+      data$POLICY.010 == 5 ~ 3,
+      data$POLICY.010 == 6 ~ NA_real_)
+  }
+  if(contains_items("POLICY.015", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.015_", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.015_cat")
+    data$POLICY.015_cat[data$POLICY.009.a != 1] = "0"
+    newdata$cc2_centerbased_pre = ifelse(grepl("1",data$POLICY.015_cat), 1, 0)
+    newdata$cc2_unpaid_pre = ifelse(grepl("2",data$POLICY.015_cat), 1, 0)
+    newdata$cc2_paid_pre = ifelse(grepl("3",data$POLICY.015_cat), 1, 0)
+    newdata$cc2_homebased_pre = ifelse(grepl("4",data$POLICY.015_cat), 1, 0)
+    
+    
+  }
+  
+  if(contains_items("POLICY.016", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.016_", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.016_cat")
+    data$POLICY.016_cat[data$POLICY.009.b != 1] = "0"
+    newdata$cc2_centerbased = ifelse(grepl("1",data$POLICY.016_cat), 1, 0)
+    newdata$cc2_unpaid = ifelse(grepl("2",data$POLICY.016_cat), 1, 0)
+    newdata$cc2_paid = ifelse(grepl("3",data$POLICY.016_cat), 1, 0)
+    newdata$cc2_homebased = ifelse(grepl("4",data$POLICY.016_cat), 1, 0)
+  }
+  
   if(contains_items("POLICY.006_[1-7]$", data)){
     data = combine.cat(x = data, 
                        cols = find_items("POLICY.006_[1-7]$", data), 
