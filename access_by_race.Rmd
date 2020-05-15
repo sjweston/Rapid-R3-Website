@@ -47,21 +47,43 @@ scored = scored %>%
 source(here("Scripts/demo groups.R"))
 
 source(here("Functions/summarizing_report.R"))
+# 
+# demo_groups = c( "native", 
+#   "asian", 
+#   "black", 
+#   "hawaii", 
+#   "white", 
+#   "other_race", 
+#   "latinx")
+# 
+# demo_labels = demo_labels[which(demo_groups %in% demo_groups)]
+# demo_groups = demo_groups[which(demo_groups %in% demo_groups)]
 
-demo_groups = c( "native", 
-  "asian", 
-  "black", 
-  "hawaii", 
-  "white", 
-  "other_race", 
-  "latinx")
+scored = scored %>%
+  mutate(
+    poc_lowincome = ifelse((white == 0 | latinx == 1) & poverty == 1, 1,0),
+    poc_hghincome = ifelse((white == 0 | latinx == 1) & poverty == 0, 1,0),
+    white_hghincome = ifelse((white == 1 & latinx == 0) & poverty == 0, 1,0),
+    white_lowincome = ifelse((white == 1 & latinx == 0) & poverty == 1, 1,0),
+    black_lowincome = ifelse(black == 1 & poverty == 1, 1, 0),
+    black_hghincome = ifelse(black == 1 & poverty == 0, 1, 0),
+    latinx_lowincome = ifelse(latinx == 1 & poverty == 1, 1, 0),
+    latinx_hghincome = ifelse(latinx == 1 & poverty == 0, 1, 0)
+  )
 
-demo_labels = binary_labels[which(binary_demos %in% demo_groups)]
-demo_groups = binary_demos[which(binary_demos %in% demo_groups)]
+demo_groups = c("white_hghincome", "white_lowincome", 
+                "poc_hghincome", "poc_lowincome",  
+                "black_hghincome", "black_lowincome",
+                "latinx_hghincome", "latinx_lowincome")
+demo_labels = c("White, high income", "White, low income", 
+                "POC, high income", "POC, low income", 
+                "African American, high income", "African American, low income",
+                "Latinx, high income", "Latinx, low income")
+
 
 
 cc_binary = c("cc2_centerbased","cc2_unpaid","cc2_paid","cc2_homebased")
-cc_binary_labels = c("Center-based care",
+cc_demo_labels = c("Center-based care",
                      "Unpaid care by relative/friend/neighbor",
                      "Paid care by relative/friend/neighbor",
                      "Home-based paid childcare")
@@ -173,6 +195,28 @@ scored %>%
   theme(plot.title.position = "plot")
 ```
 
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  filter(!is.na(missed_wellbaby)) %>%
+  summarize(Count = sum(missed_wellbaby),
+            Percent = 100*Count/n()) %>%
+  ggplot(aes(x = Week, y = Percent)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "__ of caregivers report missing a well-baby visit") +
+  scale_y_continuous(limits = c(10,50))+
+  theme_minimal()
+```
+
+
+<!-- ## Barriers to healthcare -->
+
+<!-- ```{r} -->
+
+<!-- ``` -->
+
 
 # Access to childcare
 
@@ -195,7 +239,7 @@ table = BefAft %>%
   unite(Week, Week, stat, sep = "_") %>%
   spread(Week, value) %>%
   ungroup() %>%
-  mutate(Variable = factor(Variable, levels = cc_binary, labels = cc_binary_labels),
+  mutate(Variable = factor(Variable, levels = cc_binary, labels = cc_demo_labels),
          Change_count = During_Count - Bef_Count, 
          Change_percent = During_Percent - Bef_Percent) %>%
   arrange(Demo, Variable) 
@@ -234,7 +278,7 @@ BefAft %>%
   spread(Week, value) %>%
   mutate(Variable = factor(Variable, 
                            levels = cc_binary, 
-                           labels = cc_binary_labels),
+                           labels = cc_demo_labels),
          Demo = factor(Demo, levels = demo_groups, labels = demo_labels),
          Change_percent = During_Percent - Bef_Percent) %>%
   ggplot(aes(x = Variable, y = Change_percent, fill = Demo)) +
@@ -252,8 +296,8 @@ BefAft %>%
   spread(Week, value) %>%
   mutate(Variable = factor(Variable, 
                            levels = cc_binary, 
-                           labels = cc_binary_labels),
-         Demo = factor(Demo, levels = binary_demos, labels = binary_labels),
+                           labels = cc_demo_labels),
+         Demo = factor(Demo, levels = demo_groups, labels = demo_labels),
          Change_percent = During_Percent - Bef_Percent) %>%
   ggplot(aes(x = Demo, y = Change_percent, fill = Variable)) +
   geom_bar(stat = "identity", position = "dodge", color = "white") +
@@ -439,3 +483,214 @@ scored_all %>%
 <!-- Expect JOB.017.a -->
 <!-- Why not JOB.017b -->
 
+# Mental health/ emotional well-being {.tabset}
+
+## Anxiety
+```{r}
+anxiety_date_demo = scored %>%
+  select(CaregiverID, Week, all_of(demo_groups), anxiety_current_some) %>%
+  gather("demo", "value", all_of(demo_groups)) %>%
+  filter(value == 1) %>%
+  group_by(demo, Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(anxiety_current_some, na.rm=T)/total) %>%
+  ungroup() %>% 
+  mutate(demo = factor(demo, 
+                       levels = demo_groups, 
+                       labels = demo_labels))
+
+anxiety_date_all = scored %>%
+  select(CaregiverID, Week, anxiety_current_some) %>%
+  group_by(Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(anxiety_current_some, na.rm=T)/total) 
+
+anxiety_date_demo %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_point(aes(color = demo)) + 
+  geom_line(aes(color = demo)) +
+  geom_point(data = anxiety_date_all)+
+  geom_line(data = anxiety_date_all, linetype = "dashed") +
+  labs(x = "Week",
+       y = "Percent of demographic group",
+       title = "__ Percent of caregivers report some or a lot of anxiety",
+       color = "Key demographics", 
+       caption = "Entire sample is represented by the black, dashed line.") +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+## Depression
+```{r}
+depress_date_demo = scored %>%
+  select(CaregiverID, Week, all_of(demo_groups), depress_current_some) %>%
+  gather("demo", "value", all_of(demo_groups)) %>%
+  filter(value == 1) %>%
+  group_by(demo, Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(depress_current_some, na.rm=T)/total) %>%
+  ungroup() %>% 
+  mutate(demo = factor(demo, 
+                       levels = demo_groups, 
+                       labels = demo_labels))
+
+depress_date_all = scored %>%
+  select(CaregiverID, Week, depress_current_some) %>%
+  group_by(Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(depress_current_some, na.rm=T)/total) 
+
+depress_date_demo %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_point(aes(color = demo)) + 
+  geom_line(aes(color = demo)) +
+  geom_point(data = depress_date_all)+
+  geom_line(data = depress_date_all, linetype = "dashed") +
+  labs(x = "Week",
+       y = "Percent of demographic group",
+       title = "__ Percent of caregivers report some or a lot of depression",
+       color = "Key demographics", 
+       caption = "Entire sample is represented by the black, dashed line.") +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+## Stress
+```{r}
+stress_date_demo = scored %>%
+  select(CaregiverID, Week, all_of(demo_groups), stress_current_some) %>%
+  gather("demo", "value", all_of(demo_groups)) %>%
+  filter(value == 1) %>%
+  group_by(demo, Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(stress_current_some, na.rm=T)/total) %>%
+  ungroup() %>% 
+  mutate(demo = factor(demo, 
+                       levels = demo_groups, 
+                       labels = demo_labels))
+
+stress_date_all = scored %>%
+  select(CaregiverID, Week, stress_current_some) %>%
+  group_by(Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(stress_current_some, na.rm=T)/total) 
+
+stress_date_demo %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_point(aes(color = demo)) + 
+  geom_line(aes(color = demo)) +
+  geom_point(data = stress_date_all)+
+  geom_line(data = stress_date_all, linetype = "dashed") +
+  labs(x = "Week",
+       y = "Percent of demographic group",
+       title = "__ Percent of caregivers report some or a lot of stress",
+       color = "Key demographics", 
+       caption = "Entire sample is represented by the black, dashed line.") +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+## Loneliness
+```{r}
+lonely_date_demo = scored %>%
+  select(CaregiverID, Week, all_of(demo_groups), lonely_current_some) %>%
+  gather("demo", "value", all_of(demo_groups)) %>%
+  filter(value == 1) %>%
+  group_by(demo, Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(lonely_current_some, na.rm=T)/total) %>%
+  ungroup() %>% 
+  mutate(demo = factor(demo, 
+                       levels = demo_groups, 
+                       labels = demo_labels))
+
+lonely_date_all = scored %>%
+  select(CaregiverID, Week, lonely_current_some) %>%
+  group_by(Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(lonely_current_some, na.rm=T)/total) 
+
+lonely_date_demo %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_point(aes(color = demo)) + 
+  geom_line(aes(color = demo)) +
+  geom_point(data = lonely_date_all)+
+  geom_line(data = lonely_date_all, linetype = "dashed") +
+  labs(x = "Week",
+       y = "Percent of demographic group",
+       title = "__ Percent of caregivers report some or a lot of loneliness",
+       color = "Key demographics", 
+       caption = "Entire sample is represented by the black, dashed line.") +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+## Child Externalizing
+```{r}
+fussy_date_demo = scored %>%
+  select(CaregiverID, Week, all_of(demo_groups), fussy_current_some) %>%
+  gather("demo", "value", all_of(demo_groups)) %>%
+  filter(value == 1) %>%
+  group_by(demo, Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(fussy_current_some, na.rm=T)/total) %>%
+  ungroup() %>% 
+  mutate(demo = factor(demo, 
+                       levels = demo_groups, 
+                       labels = demo_labels))
+
+fussy_date_all = scored %>%
+  select(CaregiverID, Week, fussy_current_some) %>%
+  group_by(Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(fussy_current_some, na.rm=T)/total) 
+
+fussy_date_demo %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_point(aes(color = demo)) + 
+  geom_line(aes(color = demo)) +
+  geom_point(data = fussy_date_all)+
+  geom_line(data = fussy_date_all, linetype = "dashed") +
+  labs(x = "Week",
+       y = "Percent of demographic group",
+       title = "__ Percent of caregivers report children are sometimes or often fussy or defiant",
+       color = "Key demographics", 
+       caption = "Entire sample is represented by the black, dashed line.") +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+## Child Internalizing
+```{r}
+fear_date_demo = scored %>%
+  select(CaregiverID, Week, all_of(demo_groups), fear_current_some) %>%
+  gather("demo", "value", all_of(demo_groups)) %>%
+  filter(value == 1) %>%
+  group_by(demo, Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(fear_current_some, na.rm=T)/total) %>%
+  ungroup() %>% 
+  mutate(demo = factor(demo, 
+                       levels = demo_groups, 
+                       labels = demo_labels))
+
+fear_date_all = scored %>%
+  select(CaregiverID, Week, fear_current_some) %>%
+  group_by(Week) %>%
+  summarize(total = n(),
+            percent = 100*sum(fear_current_some, na.rm=T)/total) 
+
+fear_date_demo %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_point(aes(color = demo)) + 
+  geom_line(aes(color = demo)) +
+  geom_point(data = fear_date_all)+
+  geom_line(data = fear_date_all, linetype = "dashed") +
+  labs(x = "Week",
+       y = "Percent of demographic group",
+       title = "__ Percent of caregivers report children are sometimes or often too fearful or anxious",
+       color = "Key demographics", 
+       caption = "Entire sample is represented by the black, dashed line.") +
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
