@@ -13,7 +13,7 @@ library(readr)
 library(zoo) # for rolling averages and sums!
 
 data(zipcode)
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
 master = filter(master, CaregiverID != "") 
 #master = unique(master)
@@ -38,7 +38,8 @@ scored = scored %>%
   select(CaregiverID, Week, BaselineWeek, income, 
          household_size, num_children_raw) %>%
   left_join(census) %>%
-  mutate(poverty = ifelse(income < poverty_threshold*1.5,1,0)) %>%
+  mutate(poverty = ifelse(income < poverty_threshold*1.5,1,0),
+         poverty2x = ifelse(income < poverty_threshold*2,1,0)) %>%
   select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty) %>%
   full_join(scored)
 

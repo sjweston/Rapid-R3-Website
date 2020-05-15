@@ -7,8 +7,13 @@ demos = c(
   "num_children",
   "minority",
   "region",
+  "native", 
+  "asian", 
+  "black", 
+  "hawaii", 
+  "white", 
+  "other_race", 
   "latinx",
-  "black",
   "poverty",
   "lowincome"
 )
@@ -19,8 +24,13 @@ binary_demos = c(
   "essential",
   "single",
   "minority",
+  "native", 
+  "asian", 
+  "black", 
+  "hawaii", 
+  "white", 
+  "other_race", 
   "latinx",
-  "black",
   "poverty",
   "lowincome"
 )
@@ -34,8 +44,13 @@ demo_labels = c(
   "Number of children in household",
   "Non-white parents",
   "Geographic region",
-  "Latinx parents",
+  "American Indian/ Alaska Native parents", 
+  "Asian parents",  
   "African American parents",
+  "Native Hawaiian/ Pacific Islander parents", 
+  "White/ Caucasian parents", 
+  "Other race (not indicated) parents",
+  "Latinx parents",
   "Families below the poverty threshold x 1.5",
   "Low income (< $40K) households"
 )
@@ -46,8 +61,13 @@ binary_labels = c(
   "Essential employees",
   "Single parents",
   "Non-white parents",
-  "Latinx parents",
+  "American Indian/ Alaska Native parents", 
+  "Asian parents",  
   "African American parents",
+  "Native Hawaiian/ Pacific Islander parents", 
+  "White/ Caucasian parents", 
+  "Other race (not indicated) parents",
+  "Latinx parents",
   "Families below the poverty threshold",
   "Low income (< $40K) households"
 )

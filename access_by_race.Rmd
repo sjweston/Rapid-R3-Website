@@ -1,0 +1,441 @@
+---
+title: "Income and race/ethnicity"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(haven)
+## require(devtools)
+## install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(zipcode)
+library(ggthemr)
+library(corx)
+library(papaja)
+library(zoo)
+library(ggpubr)
+library(lme4)
+```
+
+```{r childcare-1}
+source(here("Scripts/score data.R"))
+
+outcomes = c("anxiety", "depress", "lonely", "stress", "fussy", "fear")
+outcomes_p = paste0(outcomes, "_current_lots")
+
+source(here("Functions/pomp.R"))
+
+scored = scored %>%
+  mutate_at(vars("anxiety","depress"), pomp_ad) %>%
+  mutate_at("stress", pomp_stress) %>%
+  mutate_at("lonely", pomp_lonely) %>%
+  mutate_at(vars("fussy", "fear"), pomp_child) 
+
+source(here("Scripts/demo groups.R"))
+
+source(here("Functions/summarizing_report.R"))
+
+demo_groups = c( "native", 
+  "asian", 
+  "black", 
+  "hawaii", 
+  "white", 
+  "other_race", 
+  "latinx")
+
+demo_labels = binary_labels[which(binary_demos %in% demo_groups)]
+demo_groups = binary_demos[which(binary_demos %in% demo_groups)]
+
+
+cc_binary = c("cc2_centerbased","cc2_unpaid","cc2_paid","cc2_homebased")
+cc_binary_labels = c("Center-based care",
+                     "Unpaid care by relative/friend/neighbor",
+                     "Paid care by relative/friend/neighbor",
+                     "Home-based paid childcare")
+
+```
+
+```{r}
+scored_all = scored
+max_weeks = max(scored$Week)
+scored = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == 0 | Week == max(Week)) %>%
+  ungroup()
+```
+
+# Some numbers
+
+```{r, results = 'asis'}
+nums = scored %>%
+  filter(Week > 0) %>%
+  gather(demo, group, all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  group_by(Week, demo) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Week = paste("Week", Week)) %>%
+  spread(Week, Count) 
+nums$Total = apply(nums[,-1], 1, sum)
+nums %>%
+  mutate(demo = factor(demo, levels = demo_groups, labels = demo_labels)) %>%
+  kable(.)
+```
+
+
+# Access to health care
+
+```{r}
+healthcare = scored %>%
+  mutate(access_telehealth = ifelse(access_telehealth == 1 | access_mentalhealth == 1, 1, 0)) %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(demo_groups), contains("access_telehealth"), contains("mentalhealth")) %>%
+  gather(demo, group, all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  gather(health, response, -Week, -demo) %>%
+  filter(!is.na(response)) %>%
+  mutate(health = factor(health, 
+                         levels = c("access_telehealth", 
+                                    "access_telehealth_self", 
+                                    "access_telehealth_child", 
+                                    "access_mentalhealth"),
+                         labels = c("Access healthcare", 
+                                    "For self", "For child", "Mental health"))) %>%
+  mutate(demo = factor(demo, levels = demo_groups, labels = demo_labels))
+
+healthcare %>%
+  group_by(demo,health) %>%
+  summarize(Count = sum(response),
+            Percent = 100*Count/n()) %>%
+  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~health, nrow = 4) +
+  guides(fill = F) +
+  labs(x = "") +
+  coord_flip()+
+  theme_minimal()
+```
+
+```{r}
+
+powered = nums$demo[which(nums$Total > 200)]
+powered = demo_labels[demo_groups %in% powered]
+
+healthcare %>%
+  filter(demo %in% powered) %>%
+  group_by(Week, demo, health) %>%
+  summarize(Count = sum(response),
+            Percent = 100*Count/n()) %>%
+  ggplot(aes(x = Week, y = Percent, color = demo)) +
+  geom_point()+
+  geom_line() +
+  scale_x_continuous(breaks= c(1:max_weeks)) +
+  facet_wrap(~health, ncol = 4) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+## Missesd well-baby
+
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  select(missed_wellbaby, all_of(demo_groups)) %>%
+  gather(demo, group, all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  filter(!is.na(missed_wellbaby)) %>%
+  group_by(demo) %>%
+  summarize(Count = sum(missed_wellbaby),
+         Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo, levels = demo_groups,labels = demo_labels))%>%
+  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  guides(fill = F)+
+  labs(title = "___ Percent of caregivers report missing a well-baby visit")+
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+
+# Access to childcare
+
+```{r childcare-4, results = 'asis'}
+BefAft = scored %>%
+  mutate(Week = ifelse(Week == 0, "Bef", "During"))
+
+BefAft = BefAft %>%
+  select(Week, all_of(cc_binary), all_of(demo_groups)) %>%
+  gather("Variable", "value", all_of(cc_binary)) %>%
+  gather("Demo", "group", all_of(demo_groups)) %>%
+  filter(!is.na(value)) %>%
+  filter(group == 1) %>%
+  group_by(Demo, Week, Variable) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n()) 
+
+table = BefAft %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  ungroup() %>%
+  mutate(Variable = factor(Variable, levels = cc_binary, labels = cc_binary_labels),
+         Change_count = During_Count - Bef_Count, 
+         Change_percent = During_Percent - Bef_Percent) %>%
+  arrange(Demo, Variable) 
+
+#build groupings
+
+first.row = sapply(demo_groups, first_instance, string = table$Demo)
+last.row = sapply(demo_groups, last_instance, string = table$Demo)
+
+each_string = paste0("group_rows(group_label = \" ", 
+                     demo_labels, 
+                     "\" , start_row = ", 
+                     first.row, 
+                     ", end_row = ", 
+                     last.row, 
+                     ")")
+each_string = paste(each_string, collapse = " %>% ")
+
+# table code
+beginning = "table %>% 
+  select(-Demo) %>% 
+  kable(., digits = c(0, 0, 1, 0, 1, 0, 1),
+        col.names = c(\"Type of childcare\", \"Count\", \"Percent\", \"Count\", \"Percent\", \"Count\", \"Percent\")) %>%
+  kable_styling() %>%
+  add_header_above(c(\" \", \"Pre-pandemic\" = 2, \"During pandemic\" = 2, \"Change\" = 2)) %>%"
+
+eval(parse(text = paste0(beginning, each_string)))
+```
+
+```{r childcare-5, out.width=c('50%', '50%'), fig.show='hold'}
+
+BefAft %>%
+  ungroup() %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  mutate(Variable = factor(Variable, 
+                           levels = cc_binary, 
+                           labels = cc_binary_labels),
+         Demo = factor(Demo, levels = demo_groups, labels = demo_labels),
+         Change_percent = During_Percent - Bef_Percent) %>%
+  ggplot(aes(x = Variable, y = Change_percent, fill = Demo)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white") +
+  scale_y_continuous("Change in percent (not percent change)") +
+  scale_x_discrete("", breaks = NULL) +
+  coord_flip() +
+  facet_wrap(~Variable, scales = "free") +
+  theme(legend.position = "top")
+
+BefAft %>%
+  ungroup() %>%
+  gather("stat", "value", Count, Percent) %>%
+  unite(Week, Week, stat, sep = "_") %>%
+  spread(Week, value) %>%
+  mutate(Variable = factor(Variable, 
+                           levels = cc_binary, 
+                           labels = cc_binary_labels),
+         Demo = factor(Demo, levels = binary_demos, labels = binary_labels),
+         Change_percent = During_Percent - Bef_Percent) %>%
+  ggplot(aes(x = Demo, y = Change_percent, fill = Variable)) +
+  geom_bar(stat = "identity", position = "dodge", color = "white") +
+  scale_y_continuous("Change in percent (not percent change)") +
+  scale_x_discrete("", breaks = NULL) +
+  coord_flip() + 
+  facet_wrap(~Demo, scales = "free") +
+  theme(legend.position = "top")
+```
+
+# Access to other services or support
+
+```{r}
+othersupport = scored %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(demo_groups), access_parenting, access_fitness, access_education) %>%
+  gather(demo, group, all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  gather(services, response, -Week, -demo) %>%
+  filter(!is.na(response)) %>%
+  mutate(services = factor(services, 
+                         levels = c("access_parenting", 
+                                    "access_fitness", 
+                                    "access_education"),
+                         labels = c("Parenting support", 
+                                    "Fitness classes", "Educational classes"))) %>%
+  mutate(demo = factor(demo, levels = demo_groups, labels = demo_labels))
+
+othersupport %>%
+  group_by(demo,services) %>%
+  summarize(Count = sum(response),
+            Percent = 100*Count/n()) %>%
+  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~services, nrow = 4) +
+  guides(fill = F) +
+  labs(x = "") +
+  coord_flip()+
+  theme_minimal()
+```
+
+```{r}
+
+
+othersupport %>%
+  filter(demo %in% powered) %>%
+  group_by(Week, demo, services) %>%
+  summarize(Count = sum(response),
+            Percent = 100*Count/n()) %>%
+  ggplot(aes(x = Week, y = Percent, color = demo)) +
+  geom_point()+
+  geom_line() +
+  scale_x_continuous(breaks= c(1:max_weeks)) +
+  facet_wrap(~services, ncol = 3) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+# Insurance
+
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  select(all_of(demo_groups), insurance, child_insurance) %>%
+  gather("demo", "group", -insurance, -child_insurance) %>%
+  filter(group == 1) %>%
+  gather("type", "insurance", contains("insur")) %>%
+  group_by(demo, type) %>%
+  filter(!is.na(insurance)) %>%
+  summarise(Count = sum(insurance),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo, levels = demo_groups,labels = demo_labels),
+         type = factor(type, levels =c("insurance", "child_insurance"), labels = c("Self", "Child"))) %>%
+  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~type) +
+  coord_flip()+
+  guides(fill = F)+
+  theme_minimal()
+```
+
+
+# Income
+
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  select(income_decreaed, all_of(demo_groups)) %>%
+  gather(demo, group, all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  filter(!is.na(income_decreaed)) %>%
+  group_by(demo) %>%
+  summarize(Count = sum(income_decreaed),
+         Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo, levels = demo_groups,labels = demo_labels))%>%
+  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  guides(fill = F)+
+  labs(title = "___ Percent of caregivers report decreased income since start of pandemic")+
+  theme_minimal() +
+  theme(plot.title.position = "plot")
+```
+
+
+## Difficulty paying for basic necessities
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  select(all_of(demo_groups), contains("diff_pay")) %>%
+  gather("demo", "group", all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  gather(category, value, contains("diff_pay")) %>%
+  mutate(category = gsub("diff_pay_", "", category)) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, category) %>%
+  summarise(Count = sum(value),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  guides(fill = F)+
+  facet_wrap(~category) +
+  theme_minimal()
+```
+
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  select(all_of(demo_groups), contains("diff_pay")) %>%
+  gather("demo", "group", all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  gather(category, value, contains("diff_pay")) %>%
+  mutate(category = gsub("diff_pay_", "", category)) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, category) %>%
+  summarise(Count = sum(value),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  ggplot(aes(x = category, y = Percent, fill = category)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  guides(fill = F)+
+  facet_wrap(~demo) +
+  theme_minimal()
+```
+
+```{r}
+scored_all %>%
+  select(Week, all_of(demo_groups), contains("diff_pay")) %>%
+  gather("demo", "group", all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  gather(category, value, contains("diff_pay")) %>%
+  mutate(category = gsub("diff_pay_", "", category)) %>%
+  filter(!is.na(value)) %>%
+  group_by(Week, demo, category) %>%
+  summarise(Count = sum(value),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo, 
+                       levels = demo_groups,
+                       labels = demo_labels)) %>%
+  filter(demo %in% powered) %>%
+  ggplot(aes(x = Week, y = Percent, color = demo)) +
+  geom_point()+
+  geom_line()+
+  facet_wrap(~category) +
+  theme_minimal()+
+  theme(legend.position = "top")
+```
+
+
+<!-- ## Federal stimulus check -->
+<!-- Received JOB.016 -->
+<!-- Expect JOB.017.a -->
+<!-- Why not JOB.017b -->
+

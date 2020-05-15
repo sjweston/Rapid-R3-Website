@@ -15,19 +15,6 @@ options(knitr.kable.NA = '')
 
 ```{r packages}
 library(here)
-library(tidyverse)
-library(knitr)
-library(kableExtra)
-library(haven)
-## require(devtools)
-## install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
-library(zipcode)
-library(ggthemr)
-library(corx)
-library(papaja)
-library(zoo)
-library(ggpubr)
-library(lme4)
 ```
 
 ```{r childcare-1}
@@ -69,7 +56,7 @@ These analyses include retrospective reports of pre-pandemic childcare and the c
 
 ```{r childcare-2, results = 'asis'}
 BefAft = scored %>%
-  filter(Week == 0 | Week == 5) %>%
+  filter(Week == 0 | Week == 6) %>%
   mutate(Week = ifelse(Week == 0, "Bef", "During"))
 
 BefAft = BefAft %>%

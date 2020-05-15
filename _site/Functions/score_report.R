@@ -56,7 +56,30 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   
   if(contains_items("POLICY.001_[1-7]$", data)){
-    newdata$access_telehealth = ifelse(rowSums(data[,find_items("POLICY.001_[1-2]", data)], na.rm=T) > 0, 1, 0)
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.001\\_.{1}$", data),
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.001_cat")
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.012\\_.{1}$", data),
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.012_cat")
+    newdata$POLICY.001_cat = data$POLICY.001_cat
+    newdata$access_telehealth = ifelse(grepl("1", data$POLICY.001_cat) | 
+                                         grepl("2", data$POLICY.001_cat) | 
+                                         grepl("1", data$POLICY.012_cat) | 
+                                         grepl("2", data$POLICY.012_cat), 
+                                       1, 0)
+    newdata$access_telehealth_self = ifelse(grepl("1", data$POLICY.001_cat) | 
+                                         grepl("1", data$POLICY.012_cat), 
+                                       1, 0)
+    newdata$access_telehealth_child = ifelse(grepl("2", data$POLICY.001_cat) | 
+                                              grepl("2", data$POLICY.012_cat), 
+                                            1, 0)
+    newdata$access_mentalhealth = ifelse(grepl("3", data$POLICY.001_cat) | grepl("3", data$POLICY.012_cat), 1, 0)
+    newdata$access_parenting = ifelse(grepl("4", data$POLICY.001_cat) | grepl("4", data$POLICY.012_cat), 1, 0)
+    newdata$access_fitness = ifelse(grepl("5", data$POLICY.001_cat) | grepl("5", data$POLICY.012_cat), 1, 0)
+    newdata$access_education = ifelse(grepl("6", data$POLICY.001_cat) | grepl("6", data$POLICY.012_cat), 1, 0)
     newdata$access_social = ifelse(rowSums(data[,find_items("POLICY.001_[3-4]", data)], na.rm=T) > 0, 1, 0)
     newdata$access_online = ifelse(rowSums(data[,find_items("POLICY.001_[1-7]$", data)], na.rm=T) > 0, 1, 0)  
   }
@@ -145,6 +168,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       data$POLICY.010 == 5 ~ 3,
       data$POLICY.010 == 6 ~ NA_real_)
   }
+
+  
   if(contains_items("POLICY.015", data)){
     data = combine.cat(x = data, 
                        cols = find_items("POLICY.015_", data), 
@@ -190,6 +215,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("HEALTH.001", data)){
     newdata$insurance = ifelse(data$HEALTH.001 == 1, 1, 0)
     #caregiver has insurance through private company
+    newdata$HI_private = ifelse(is.na(data$HEALTH.001), NA, 0)
     newdata$HI_private = ifelse(data$HEALTH.001.a_1 == 1, 1, newdata$HI_private)
     newdata$HI_private[is.na(newdata$HI_private) & !is.na(data$HEALTH.001)] = 0
     #caregiver has insurance through medi-something
@@ -198,6 +224,26 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$HI_medi = ifelse(data$HEALTH.001.a_3 == 1, 1, newdata$HI_medi)
     newdata$HI_medi = ifelse(data$HEALTH.001.a_2 == 4, 1, newdata$HI_medi)
     newdata$HI_medi[is.na(newdata$HI_medi) & !is.na(data$HEALTH.001)] = 0
+    # children's health insurance program
+    newdata$HI_CHIP = ifelse(is.na(data$HEALTH.001), NA, 0)
+    newdata$HI_CHIP = ifelse(data$HEALTH.001.a_5 == 1, 1, newdata$HI_CHIP)
+    newdata$HI_CHIP[is.na(newdata$HI_CHIP) & !is.na(data$HEALTH.001)] = 0
+    #military related
+    newdata$HI_military = ifelse(is.na(data$HEALTH.001), NA, 0)
+    newdata$HI_military = ifelse(data$HEALTH.001.a_6 == 1, 1, newdata$HI_military)
+    newdata$HI_military[is.na(newdata$HI_military) & !is.na(data$HEALTH.001)] = 0
+    #indian health related
+    newdata$HI_IHS = ifelse(is.na(data$HEALTH.001), NA, 0)
+    newdata$HI_IHS = ifelse(data$HEALTH.001.a_7 == 1, 1, newdata$HI_IHS)
+    newdata$HI_IHS[is.na(newdata$HI_IHS) & !is.na(data$HEALTH.001)] = 0
+    #state related
+    newdata$HI_state = ifelse(is.na(data$HEALTH.001), NA, 0)
+    newdata$HI_state = ifelse(data$HEALTH.001.a_8 == 1, 1, newdata$HI_state)
+    newdata$HI_state[is.na(newdata$HI_state) & !is.na(data$HEALTH.001)] = 0
+    #other gov related
+    newdata$HI_othergov = ifelse(is.na(data$HEALTH.001), NA, 0)
+    newdata$HI_othergov = ifelse(data$HEALTH.001.a_9 == 1, 1, newdata$HI_othergov)
+    newdata$HI_othergov[is.na(newdata$HI_othergov) & !is.na(data$HEALTH.001)] = 0
     }
   if(contains_items("HEALTH.002", data)){
     newdata$child_insurance = ifelse(data$HEALTH.002 == 1, 1, 0)
@@ -211,7 +257,26 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$child_HI_medi = ifelse(data$HEALTH.002.a_3 == 1, 1, newdata$child_HI_medi)
     newdata$child_HI_medi = ifelse(data$HEALTH.002.a_2 == 4, 1, newdata$child_HI_medi)
     newdata$child_HI_medi[is.na(newdata$child_HI_medi) & !is.na(data$HEALTH.002)] = 0
-    
+    # cchild_HIldren's health insurance program
+    newdata$child_HI_Cchild_HIP = ifelse(is.na(data$HEALTH.002), NA, 0)
+    newdata$child_HI_Cchild_HIP = ifelse(data$HEALTH.002.a_5 == 1, 1, newdata$child_HI_Cchild_HIP)
+    newdata$child_HI_Cchild_HIP[is.na(newdata$child_HI_Cchild_HIP) & !is.na(data$HEALTH.002)] = 0
+    #military related
+    newdata$child_HI_military = ifelse(is.na(data$HEALTH.002), NA, 0)
+    newdata$child_HI_military = ifelse(data$HEALTH.002.a_6 == 1, 1, newdata$child_HI_military)
+    newdata$child_HI_military[is.na(newdata$child_HI_military) & !is.na(data$HEALTH.002)] = 0
+    #indian health related
+    newdata$child_HI_IHS = ifelse(is.na(data$HEALTH.002), NA, 0)
+    newdata$child_HI_IHS = ifelse(data$HEALTH.002.a_7 == 1, 1, newdata$child_HI_IHS)
+    newdata$child_HI_IHS[is.na(newdata$child_HI_IHS) & !is.na(data$HEALTH.002)] = 0
+    #state related
+    newdata$child_HI_state = ifelse(is.na(data$HEALTH.002), NA, 0)
+    newdata$child_HI_state = ifelse(data$HEALTH.002.a_8 == 1, 1, newdata$child_HI_state)
+    newdata$child_HI_state[is.na(newdata$child_HI_state) & !is.na(data$HEALTH.002)] = 0
+    #other gov related
+    newdata$child_HI_othergov = ifelse(is.na(data$HEALTH.002), NA, 0)
+    newdata$child_HI_othergov = ifelse(data$HEALTH.002.a_9 == 1, 1, newdata$child_HI_othergov)
+    newdata$child_HI_othergov[is.na(newdata$child_HI_othergov) & !is.na(data$HEALTH.002)] = 0
     }
   
   
@@ -377,7 +442,10 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   if(contains_items("JOB.015", data)) newdata$unemployment = ifelse(data$JOB.015 == 1, 1, 0)
   
-  if(contains_items("EHQ.001", data)) newdata$income_decreaed = ifelse(data$EHQ.001 == 1, 1, 0)
+  if(contains_items("EHQ.001", data)){
+    newdata$income_change = data$EHQ.001
+    newdata$income_decreaed = ifelse(data$EHQ.001 == 1, 1, 0)
+    }
   
   if(contains_items("EHQ.002", data)){
     newdata$financial_prob  = ifelse(data$EHQ.002 == 0, 0, 1)
@@ -385,7 +453,44 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   }
   
   if(contains_items("FSTR.001", data))newdata$difficulty_basics  = ifelse(data$FSTR.001 %in% c(3,2), 1, 0)
-  
+  if(contains_items("FSTR.002", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("FSTR.002_.{1}$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "FSTR.002_cat")
+    newdata$diff_pay_food = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("1", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+    newdata$diff_pay_house = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("2", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+    newdata$diff_pay_utilities = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("3", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+    newdata$diff_pay_healthcare = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("4", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+    newdata$diff_pay_social = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("5", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+    newdata$diff_pay_emotional = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("6", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+    newdata$diff_pay_childcare = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("7", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+    newdata$diff_pay_other = case_when(
+      data$FSTR.001 == 0 ~ 0, 
+      grepl("8", data$FSTR.002_cat) ~ 1,
+      TRUE ~ NA_real_)
+  }
   if(contains_items("CBCL.002.a", data)){
     newdata$fussy_current_some = ifelse(data$CBCL.002.a > 0, 1, 0)
     newdata$fussy_current_lots = ifelse(data$CBCL.002.a > 1, 1, 0)
@@ -451,7 +556,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       data$DEMO.003 == 3 ~ "3 Children",
       data$DEMO.003 >= 4 ~ "4+ Children")
       newdata$num_children_raw = data$DEMO.003
-      newdata$household_size = data$DEMO.003 + (2-newdata$single)
+      newdata$household_size = data$DEMO.005
     }
   
   if(contains_items("DEMO.007_.{1}$", data)){
@@ -461,6 +566,11 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        newvar.name = "DEMO.007_cat")
     newdata$minority = ifelse(grepl("[^5]", data$DEMO.007_cat), 1, 0)
     newdata$black = ifelse(grepl("3", data$DEMO.007_cat), 1, 0)
+    newdata$native = ifelse(grepl("1", data$DEMO.007_cat), 1, 0)
+    newdata$asian = ifelse(grepl("2", data$DEMO.007_cat), 1, 0)
+    newdata$hawaii = ifelse(grepl("4", data$DEMO.007_cat), 1, 0)
+    newdata$white = ifelse(grepl("5", data$DEMO.007_cat), 1, 0)
+    newdata$other_race = ifelse(grepl("6", data$DEMO.007_cat), 1, 0)
     }
   
   if(contains_items("DEMO.008", data)) newdata$latinx = as.numeric(data$DEMO.008)
