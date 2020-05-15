@@ -158,7 +158,7 @@ powered = nums$demo[which(nums$Total > 200)]
 powered = demo_labels[demo_groups %in% powered]
 
 healthcare %>%
-  filter(demo %in% powered) %>%
+#  # filter(demo %in% powered) %>%
   group_by(Week, demo, health) %>%
   summarize(Count = sum(response),
             Percent = 100*Count/n()) %>%
@@ -344,7 +344,7 @@ othersupport %>%
 
 
 othersupport %>%
-  filter(demo %in% powered) %>%
+  # filter(demo %in% powered) %>%
   group_by(Week, demo, services) %>%
   summarize(Count = sum(response),
             Percent = 100*Count/n()) %>%
@@ -468,7 +468,7 @@ scored_all %>%
   mutate(demo = factor(demo, 
                        levels = demo_groups,
                        labels = demo_labels)) %>%
-  filter(demo %in% powered) %>%
+  # filter(demo %in% powered) %>%
   ggplot(aes(x = Week, y = Percent, color = demo)) +
   geom_point()+
   geom_line()+
