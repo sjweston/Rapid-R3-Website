@@ -29,7 +29,8 @@ scored = scored %>%
   mutate_at(vars("anxiety","depress"), pomp_ad) %>%
   mutate_at("stress", pomp_stress) %>%
   mutate_at("lonely", pomp_lonely) %>%
-  mutate_at(vars("fussy", "fear"), pomp_child) 
+  mutate_at(vars("fussy", "fear"), pomp_child)  %>%
+  mutate(everyone = 1)
 
 source(here("Scripts/demo groups.R"))
 
@@ -58,11 +59,13 @@ scored = scored %>%
     latinx_hghincome = ifelse(latinx == 1 & poverty200 == 0, 1, 0)
   )
 
-demo_groups = c("white_hghincome", "white_lowincome", 
+demo_groups = c("everyone",
+  "white_hghincome", "white_lowincome", 
                 "poc_hghincome", "poc_lowincome",  
                 "black_hghincome", "black_lowincome",
                 "latinx_hghincome", "latinx_lowincome")
-demo_labels = c("White, high income", "White, low income", 
+demo_labels = c("All caregivers",
+  "White, high income", "White, low income", 
                 "POC, high income", "POC, low income", 
                 "African American, high income", "African American, low income",
                 "Latinx, high income", "Latinx, low income")
