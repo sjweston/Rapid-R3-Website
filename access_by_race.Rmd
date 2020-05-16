@@ -131,13 +131,12 @@ healthcare %>%
   group_by(demo,income,health) %>%
   summarize(Count = sum(response),
             Percent = 100*Count/n()) %>%
-  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  ggplot(aes(x = health, y = Percent, fill = health)) +
   geom_bar(stat = "identity") +
-  facet_wrap(~health, nrow = 4) +
   guides(fill = F) +
   labs(x = "") +
   coord_flip()+
-  facet_wrap(~income)+
+  facet_grid(demo~income)+
   theme_minimal()
 ```
 
