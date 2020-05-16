@@ -284,11 +284,34 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("HEALTH.003", data)) {
     num_delay_healthcare = rowSums(data[,find_items("HEALTH.003.[a-f]$", data)],na.rm=T)
     newdata$delay_healthcare = ifelse(num_delay_healthcare > 0, 1, 0)
+    newdata$hc_barrier_cost = ifelse(data$HEALTH.003.a > 0, 1, 0)
+    newdata$hc_barrier_time = ifelse(data$HEALTH.003.b > 0, 1, 0)
+    newdata$hc_barrier_childcare = ifelse(data$HEALTH.003.c > 0, 1, 0)
+    newdata$hc_barrier_covid = ifelse(data$HEALTH.003.d > 0, 1, 0)
+    newdata$hc_barrier_family = ifelse(data$HEALTH.003.e > 0, 1, 0)
+    newdata$hc_barrier_other = ifelse(data$HEALTH.003.f > 0, 1, 0)
   }
   
   if(contains_items("HEALTH.004", data)) {
     missed_wellbaby = ifelse(data$HEALTH.004 == 1, 1, 0)
     newdata$missed_wellbaby = missed_wellbaby
+    newdata$which_wellbaby_missed.1 = data$HEALTH.009.a
+    newdata$which_wellbaby_missed.2 = data$HEALTH.010.a
+    newdata$which_wellbaby_missed.3 = data$HEALTH.011.a
+    newdata$which_wellbaby_missed.4 = data$HEALTH.012.a
+    newdata$which_wellbaby_missed.5 = data$HEALTH.013.a
+    
+    newdata$miss_vaccine.1 = case_when(
+      data$HEALTH.004 != 1 ~ 0,
+      data$HEALTH.009.a == 1 ~ 1, 
+      data$HEALTH.009.a == 0 ~ 0, 
+      TRUE ~ NA_real_)
+
+    newdata$miss_vaccine.2 = data$HEALTH.010.b
+    newdata$miss_vaccine.3 = data$HEALTH.011.b
+    newdata$miss_vaccine.4 = data$HEALTH.012.b
+    newdata$miss_vaccine.5 = data$HEALTH.013.b
+
   }
   
   if(contains_items("COVID.001", data)){
@@ -590,7 +613,13 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       state %in% c("MT", "ID", "WY", "CO", "NM", "AZ",
                    "UT", "NV", "CA", "OR", "WA", "AK",
                    "HI") ~ "West")
-    }
+  }
+  
+  newdata$poverty = data$FPL.150
+  newdata$poverty100 = data$FPL.100
+  newdata$poverty125 = data$FPL.125
+  newdata$poverty150 = data$FPL.150
+  newdata$poverty200 = data$FPL.200
   
   return(newdata)
 }

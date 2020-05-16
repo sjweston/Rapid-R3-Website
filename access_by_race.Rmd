@@ -15,19 +15,6 @@ options(knitr.kable.NA = '')
 
 ```{r packages}
 library(here)
-library(tidyverse)
-library(knitr)
-library(kableExtra)
-library(haven)
-## require(devtools)
-## install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
-library(zipcode)
-library(ggthemr)
-library(corx)
-library(papaja)
-library(zoo)
-library(ggpubr)
-library(lme4)
 ```
 
 ```{r childcare-1}
@@ -61,14 +48,14 @@ source(here("Functions/summarizing_report.R"))
 
 scored = scored %>%
   mutate(
-    poc_lowincome = ifelse((white == 0 | latinx == 1) & poverty == 1, 1,0),
-    poc_hghincome = ifelse((white == 0 | latinx == 1) & poverty == 0, 1,0),
-    white_hghincome = ifelse((white == 1 & latinx == 0) & poverty == 0, 1,0),
-    white_lowincome = ifelse((white == 1 & latinx == 0) & poverty == 1, 1,0),
-    black_lowincome = ifelse(black == 1 & poverty == 1, 1, 0),
-    black_hghincome = ifelse(black == 1 & poverty == 0, 1, 0),
-    latinx_lowincome = ifelse(latinx == 1 & poverty == 1, 1, 0),
-    latinx_hghincome = ifelse(latinx == 1 & poverty == 0, 1, 0)
+    poc_lowincome = ifelse((white == 0 | latinx == 1) & poverty200 == 1, 1,0),
+    poc_hghincome = ifelse((white == 0 | latinx == 1) & poverty200 == 0, 1,0),
+    white_hghincome = ifelse((white == 1 & latinx == 0) & poverty200 == 0, 1,0),
+    white_lowincome = ifelse((white == 1 & latinx == 0) & poverty200 == 1, 1,0),
+    black_lowincome = ifelse(black == 1 & poverty200 == 1, 1, 0),
+    black_hghincome = ifelse(black == 1 & poverty200 == 0, 1, 0),
+    latinx_lowincome = ifelse(latinx == 1 & poverty200 == 1, 1, 0),
+    latinx_hghincome = ifelse(latinx == 1 & poverty200 == 0, 1, 0)
   )
 
 demo_groups = c("white_hghincome", "white_lowincome", 
@@ -90,7 +77,7 @@ cc_demo_labels = c("Center-based care",
 
 ```
 
-```{r}
+```{r access-by-race-1}
 scored_all = scored
 max_weeks = max(scored$Week)
 scored = scored %>%
@@ -101,7 +88,7 @@ scored = scored %>%
 
 # Some numbers
 
-```{r, results = 'asis'}
+```{r access-by-race-2, results = 'asis'}
 nums = scored %>%
   filter(Week > 0) %>%
   gather(demo, group, all_of(demo_groups)) %>%
@@ -120,7 +107,7 @@ nums %>%
 
 # Access to health care
 
-```{r}
+```{r access-by-race-3}
 healthcare = scored %>%
   mutate(access_telehealth = ifelse(access_telehealth == 1 | access_mentalhealth == 1, 1, 0)) %>%
   filter(Week > 0) %>%
@@ -140,7 +127,8 @@ healthcare = scored %>%
   mutate(demo = factor(demo, levels = demo_groups, labels = demo_labels))
 
 healthcare %>%
-  group_by(demo,health) %>%
+  separate(demo, into =c("demo", "income"), sep =",") %>%
+  group_by(demo,income,health) %>%
   summarize(Count = sum(response),
             Percent = 100*Count/n()) %>%
   ggplot(aes(x = demo, y = Percent, fill = demo)) +
@@ -149,31 +137,33 @@ healthcare %>%
   guides(fill = F) +
   labs(x = "") +
   coord_flip()+
+  facet_wrap(~income)+
   theme_minimal()
 ```
 
-```{r}
+```{r access-by-race-4}
 
 powered = nums$demo[which(nums$Total > 200)]
 powered = demo_labels[demo_groups %in% powered]
 
 healthcare %>%
 #  # filter(demo %in% powered) %>%
-  group_by(Week, demo, health) %>%
+  separate(demo, into =c("demo", "income"), sep =",") %>%
+  group_by(Week, demo,income, health) %>%
   summarize(Count = sum(response),
             Percent = 100*Count/n()) %>%
   ggplot(aes(x = Week, y = Percent, color = demo)) +
   geom_point()+
   geom_line() +
   scale_x_continuous(breaks= c(1:max_weeks)) +
-  facet_wrap(~health, ncol = 4) +
+  facet_grid(income~health) +
   theme_minimal() +
   theme(legend.position = "top")
 ```
 
 ## Missesd well-baby
 
-```{r}
+```{r access-by-race-5}
 scored %>%
   filter(Week > 0) %>%
   select(missed_wellbaby, all_of(demo_groups)) %>%
@@ -186,36 +176,136 @@ scored %>%
          Percent = 100*Count/n()) %>%
   ungroup() %>%
   mutate(demo = factor(demo, levels = demo_groups,labels = demo_labels))%>%
+  separate(demo, into =c("demo", "income"), sep =",") %>%
   ggplot(aes(x = demo, y = Percent, fill = demo)) +
   geom_bar(stat = "identity") +
   coord_flip()+
   guides(fill = F)+
   labs(title = "___ Percent of caregivers report missing a well-baby visit")+
+  facet_wrap(~income)+
   theme_minimal() +
   theme(plot.title.position = "plot")
 ```
 
-```{r}
+```{r access-by-race-6}
 scored %>%
   filter(Week > 0) %>%
-  group_by(Week) %>%
+  select(Week, missed_wellbaby, all_of(demo_groups)) %>%
+  gather(demo, group, all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
   filter(!is.na(missed_wellbaby)) %>%
+  group_by(demo, Week) %>%
   summarize(Count = sum(missed_wellbaby),
             Percent = 100*Count/n()) %>%
-  ggplot(aes(x = Week, y = Percent)) +
+  ungroup() %>%
+    mutate(demo = factor(demo, levels = demo_groups,labels = demo_labels))%>%
+  separate(demo, into =c("demo", "income"), sep =",") %>%
+  ggplot(aes(x = Week, y = Percent, color = demo)) +
   geom_point() +
   geom_line() +
   labs(title = "__ of caregivers report missing a well-baby visit") +
-  scale_y_continuous(limits = c(10,50))+
+  facet_wrap(~income, nrow = 2)+
+  scale_y_continuous()+
   theme_minimal()
 ```
 
+### Which visit missed?
 
-<!-- ## Barriers to healthcare -->
+```{r access-by-race-7}
+scored %>%
+  filter(Week > 0) %>%
+  filter(missed_wellbaby == 1) %>%
+  select(CaregiverID, all_of(demo_groups), 
+         contains("which_wellbaby")) %>%
+  gather("demo", "groups", all_of(demo_groups)) %>%
+  filter(groups == 1) %>%
+  select(-groups) %>%
+  gather("which", "age", contains("which")) %>%
+  filter(!is.na(age)) %>%
+  mutate(age = factor(age, levels = c(1:14),
+                      labels = c("3-5 days",
+                                 "1 month",
+                                 "2 months",
+                                 "4 months",
+                                 "6 months",
+                                 "9 months",
+                                 "12 months",
+                                 "15 months",
+                                 "18 months",
+                                 "24 months",
+                                 "2.5 years",
+                                 "3 years",
+                                 "4 years",
+                                 "5 years"))) %>%
+group_by(demo, age) %>%
+  summarize(Count = n()) %>%
+  group_by(demo) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo, levels = demo_groups,
+                       labels = demo_labels)) %>%
+  separate(demo, into =c("demo", "income"), sep =",") %>%
+  ggplot(aes(x = age, y = Count)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  facet_grid(demo~income)
+  
+```
 
-<!-- ```{r} -->
+### Miss vaccine when miss well-baby
 
-<!-- ``` -->
+```{r access-by-race-8}
+scored %>%
+  filter(Week > 0) %>%
+mutate(vacc_mean = rowMeans(select(., starts_with("miss_v")), 
+                            na.rm = TRUE),
+       vaccine_missed = ceiling(vacc_mean),
+       vaccine_missed = factor(vaccine_missed, 
+                               levels = c(0,1, NaN),
+                               labels = c("Did not miss", "Missed vaccine", "No information"))) %>%
+  group_by(vaccine_missed) %>%
+  summarize(Count = n()) %>%
+  ggplot(aes(y = Count, x = vaccine_missed)) +
+  geom_bar(stat = "identity")+
+  labs(x = "" )+
+  coord_flip()
+```
+
+
+## Barriers to healthcare
+
+```{r access-by-race-9}
+barriers = find_items("hc_barrier", scored)
+barrier_labels = c("Cost", "Time away from work", "Childcare", "Concerned about COVID-19", "Caring for family members", "Other")
+
+scored %>%
+  filter(Week > 0) %>%
+  select(all_of(demo_groups), all_of(barriers)) %>%
+  gather(demo, group, all_of(demo_groups)) %>%
+  filter(group == 1) %>%
+  select(-group) %>%
+  gather("Barrier", "value", -demo) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, Barrier) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n()) %>%
+  ungroup() %>%
+  mutate(Barrier = factor(Barrier, 
+                          levels = barriers,
+                          labels = barrier_labels),
+         demo = factor(demo, levels = demo_groups,
+                       labels = demo_labels)) %>%
+  separate(demo, into =c("demo", "income"), sep =",") %>%
+  group_by(demo, income) %>%
+  mutate(Barrier = fct_reorder(Barrier, Percent, .fun='identity')) %>%
+  ggplot(aes(x = Barrier, y = Percent, fill = Barrier))+
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  guides(fill = F)+
+  facet_grid(demo~income)
+
+```
 
 
 # Access to childcare
@@ -269,7 +359,7 @@ beginning = "table %>%
 eval(parse(text = paste0(beginning, each_string)))
 ```
 
-```{r childcare-5, out.width=c('50%', '50%'), fig.show='hold'}
+```{r childcare-5}
 
 BefAft %>%
   ungroup() %>%
@@ -289,28 +379,28 @@ BefAft %>%
   facet_wrap(~Variable, scales = "free") +
   theme(legend.position = "top")
 
-BefAft %>%
-  ungroup() %>%
-  gather("stat", "value", Count, Percent) %>%
-  unite(Week, Week, stat, sep = "_") %>%
-  spread(Week, value) %>%
-  mutate(Variable = factor(Variable, 
-                           levels = cc_binary, 
-                           labels = cc_demo_labels),
-         Demo = factor(Demo, levels = demo_groups, labels = demo_labels),
-         Change_percent = During_Percent - Bef_Percent) %>%
-  ggplot(aes(x = Demo, y = Change_percent, fill = Variable)) +
-  geom_bar(stat = "identity", position = "dodge", color = "white") +
-  scale_y_continuous("Change in percent (not percent change)") +
-  scale_x_discrete("", breaks = NULL) +
-  coord_flip() + 
-  facet_wrap(~Demo, scales = "free") +
-  theme(legend.position = "top")
+# BefAft %>%
+#   ungroup() %>%
+#   gather("stat", "value", Count, Percent) %>%
+#   unite(Week, Week, stat, sep = "_") %>%
+#   spread(Week, value) %>%
+#   mutate(Variable = factor(Variable, 
+#                            levels = cc_binary, 
+#                            labels = cc_demo_labels),
+#          Demo = factor(Demo, levels = demo_groups, labels = demo_labels),
+#          Change_percent = During_Percent - Bef_Percent) %>%
+#   ggplot(aes(x = Demo, y = Change_percent, fill = Variable)) +
+#   geom_bar(stat = "identity", position = "dodge", color = "white") +
+#   scale_y_continuous("Change in percent (not percent change)") +
+#   scale_x_discrete("", breaks = NULL) +
+#   coord_flip() + 
+#   facet_wrap(~Demo, scales = "free") +
+#   theme(legend.position = "top")
 ```
 
 # Access to other services or support
 
-```{r}
+```{r access-by-race-10, eval = T}
 othersupport = scored %>%
   filter(Week > 0) %>%
   select(Week, all_of(demo_groups), access_parenting, access_fitness, access_education) %>%
@@ -325,24 +415,25 @@ othersupport = scored %>%
                                     "access_education"),
                          labels = c("Parenting support", 
                                     "Fitness classes", "Educational classes"))) %>%
-  mutate(demo = factor(demo, levels = demo_groups, labels = demo_labels))
+  mutate(demo = factor(demo, levels = demo_groups, labels = demo_labels)) %>%
+  separate(demo, into =c("demo", "income"), sep =",")
+```
 
+```{r eval = F}
 othersupport %>%
-  group_by(demo,services) %>%
+  group_by(demo,services, income) %>%
   summarize(Count = sum(response),
             Percent = 100*Count/n()) %>%
-  ggplot(aes(x = demo, y = Percent, fill = demo)) +
+  ggplot(aes(x = services, y = Percent, fill = services)) +
   geom_bar(stat = "identity") +
-  facet_wrap(~services, nrow = 4) +
   guides(fill = F) +
   labs(x = "") +
+  facet_grid(demo~income)+
   coord_flip()+
   theme_minimal()
 ```
 
-```{r}
-
-
+```{r access-by-race-11}
 othersupport %>%
   # filter(demo %in% powered) %>%
   group_by(Week, demo, services) %>%
@@ -359,7 +450,7 @@ othersupport %>%
 
 # Insurance
 
-```{r}
+```{r access-by-race-12}
 scored %>%
   filter(Week > 0) %>%
   select(all_of(demo_groups), insurance, child_insurance) %>%
@@ -371,11 +462,16 @@ scored %>%
   summarise(Count = sum(insurance),
             Percent = 100*Count/n()) %>%
   ungroup() %>%
-  mutate(demo = factor(demo, levels = demo_groups,labels = demo_labels),
-         type = factor(type, levels =c("insurance", "child_insurance"), labels = c("Self", "Child"))) %>%
+  mutate(demo = factor(demo, 
+                       levels = demo_groups,
+                       labels = demo_labels),
+         type = factor(type, 
+                       levels =c("insurance", "child_insurance"), 
+                       labels = c("Self", "Child"))) %>%
+   separate(demo, into =c("demo", "income"), sep =",") %>%
   ggplot(aes(x = demo, y = Percent, fill = demo)) +
   geom_bar(stat = "identity") +
-  facet_wrap(~type) +
+  facet_grid(income~type) +
   coord_flip()+
   guides(fill = F)+
   theme_minimal()
@@ -384,7 +480,7 @@ scored %>%
 
 # Income
 
-```{r}
+```{r access-by-race-13}
 scored %>%
   filter(Week > 0) %>%
   select(income_decreaed, all_of(demo_groups)) %>%
@@ -408,7 +504,7 @@ scored %>%
 
 
 ## Difficulty paying for basic necessities
-```{r}
+```{r access-by-race-14, eval = F}
 scored %>%
   filter(Week > 0) %>%
   select(all_of(demo_groups), contains("diff_pay")) %>%
@@ -421,16 +517,20 @@ scored %>%
   group_by(demo, category) %>%
   summarise(Count = sum(value),
             Percent = 100*Count/n()) %>%
-  ungroup() %>%
+  ungroup() %>%  
+  mutate(category = fct_reorder(category, Percent, .fun='mean'),
+         demo =factor(demo, levels = demo_groups, 
+                       labels = demo_labels)) %>%
+  #separate(demo, into =c("demo", "income"), sep =",")%>%
   ggplot(aes(x = demo, y = Percent, fill = demo)) +
   geom_bar(stat = "identity") +
   coord_flip()+
   guides(fill = F)+
-  facet_wrap(~category) +
+  facet_grid(~category) +
   theme_minimal()
 ```
 
-```{r}
+```{r access-by-race-15}
 scored %>%
   filter(Week > 0) %>%
   select(all_of(demo_groups), contains("diff_pay")) %>%
@@ -444,15 +544,19 @@ scored %>%
   summarise(Count = sum(value),
             Percent = 100*Count/n()) %>%
   ungroup() %>%
+  mutate(category = fct_reorder(category, Percent, .fun='mean'),
+         demo = factor(demo, levels = demo_groups, 
+                       labels = demo_labels)) %>%
+  separate(demo, into =c("demo", "income"), sep =",") %>%
   ggplot(aes(x = category, y = Percent, fill = category)) +
   geom_bar(stat = "identity") +
   coord_flip()+
   guides(fill = F)+
-  facet_wrap(~demo) +
+  facet_grid(income~demo) +
   theme_minimal()
 ```
 
-```{r}
+```{r access-by-race-16}
 scored_all %>%
   select(Week, all_of(demo_groups), contains("diff_pay")) %>%
   gather("demo", "group", all_of(demo_groups)) %>%
@@ -468,11 +572,12 @@ scored_all %>%
   mutate(demo = factor(demo, 
                        levels = demo_groups,
                        labels = demo_labels)) %>%
+   separate(demo, into =c("demo", "income"), sep =",") %>%
   # filter(demo %in% powered) %>%
-  ggplot(aes(x = Week, y = Percent, color = demo)) +
+  ggplot(aes(x = Week, y = Percent, color = category)) +
   geom_point()+
   geom_line()+
-  facet_wrap(~category) +
+  facet_grid(demo~income) +
   theme_minimal()+
   theme(legend.position = "top")
 ```
@@ -486,7 +591,7 @@ scored_all %>%
 # Mental health/ emotional well-being {.tabset}
 
 ## Anxiety
-```{r}
+```{r access-by-race-17}
 anxiety_date_demo = scored %>%
   select(CaregiverID, Week, all_of(demo_groups), anxiety_current_some) %>%
   gather("demo", "value", all_of(demo_groups)) %>%
@@ -497,7 +602,8 @@ anxiety_date_demo = scored %>%
   ungroup() %>% 
   mutate(demo = factor(demo, 
                        levels = demo_groups, 
-                       labels = demo_labels))
+                       labels = demo_labels))  %>%
+   separate(demo, into =c("demo", "income"), sep =",") 
 
 anxiety_date_all = scored %>%
   select(CaregiverID, Week, anxiety_current_some) %>%
@@ -516,12 +622,13 @@ anxiety_date_demo %>%
        title = "__ Percent of caregivers report some or a lot of anxiety",
        color = "Key demographics", 
        caption = "Entire sample is represented by the black, dashed line.") +
+  facet_grid(demo~income)+
   theme_minimal() +
   theme(plot.title.position = "plot")
 ```
 
 ## Depression
-```{r}
+```{r access-by-race-18}
 depress_date_demo = scored %>%
   select(CaregiverID, Week, all_of(demo_groups), depress_current_some) %>%
   gather("demo", "value", all_of(demo_groups)) %>%
@@ -532,7 +639,8 @@ depress_date_demo = scored %>%
   ungroup() %>% 
   mutate(demo = factor(demo, 
                        levels = demo_groups, 
-                       labels = demo_labels))
+                       labels = demo_labels)) %>%
+   separate(demo, into =c("demo", "income"), sep =",") 
 
 depress_date_all = scored %>%
   select(CaregiverID, Week, depress_current_some) %>%
@@ -551,12 +659,13 @@ depress_date_demo %>%
        title = "__ Percent of caregivers report some or a lot of depression",
        color = "Key demographics", 
        caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
+    facet_grid(demo~income)+
+theme_minimal() +
   theme(plot.title.position = "plot")
 ```
 
 ## Stress
-```{r}
+```{r access-by-race-19}
 stress_date_demo = scored %>%
   select(CaregiverID, Week, all_of(demo_groups), stress_current_some) %>%
   gather("demo", "value", all_of(demo_groups)) %>%
@@ -567,7 +676,8 @@ stress_date_demo = scored %>%
   ungroup() %>% 
   mutate(demo = factor(demo, 
                        levels = demo_groups, 
-                       labels = demo_labels))
+                       labels = demo_labels)) %>%
+   separate(demo, into =c("demo", "income"), sep =",") 
 
 stress_date_all = scored %>%
   select(CaregiverID, Week, stress_current_some) %>%
@@ -586,12 +696,13 @@ stress_date_demo %>%
        title = "__ Percent of caregivers report some or a lot of stress",
        color = "Key demographics", 
        caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
+    facet_grid(demo~income)+
+theme_minimal() +
   theme(plot.title.position = "plot")
 ```
 
 ## Loneliness
-```{r}
+```{r access-by-race-20}
 lonely_date_demo = scored %>%
   select(CaregiverID, Week, all_of(demo_groups), lonely_current_some) %>%
   gather("demo", "value", all_of(demo_groups)) %>%
@@ -602,7 +713,8 @@ lonely_date_demo = scored %>%
   ungroup() %>% 
   mutate(demo = factor(demo, 
                        levels = demo_groups, 
-                       labels = demo_labels))
+                       labels = demo_labels)) %>%
+   separate(demo, into =c("demo", "income"), sep =",") 
 
 lonely_date_all = scored %>%
   select(CaregiverID, Week, lonely_current_some) %>%
@@ -621,12 +733,13 @@ lonely_date_demo %>%
        title = "__ Percent of caregivers report some or a lot of loneliness",
        color = "Key demographics", 
        caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
+    facet_grid(demo~income)+
+theme_minimal() +
   theme(plot.title.position = "plot")
 ```
 
 ## Child Externalizing
-```{r}
+```{r access-by-race-21}
 fussy_date_demo = scored %>%
   select(CaregiverID, Week, all_of(demo_groups), fussy_current_some) %>%
   gather("demo", "value", all_of(demo_groups)) %>%
@@ -637,7 +750,8 @@ fussy_date_demo = scored %>%
   ungroup() %>% 
   mutate(demo = factor(demo, 
                        levels = demo_groups, 
-                       labels = demo_labels))
+                       labels = demo_labels)) %>%
+   separate(demo, into =c("demo", "income"), sep =",") 
 
 fussy_date_all = scored %>%
   select(CaregiverID, Week, fussy_current_some) %>%
@@ -656,12 +770,13 @@ fussy_date_demo %>%
        title = "__ Percent of caregivers report children are sometimes or often fussy or defiant",
        color = "Key demographics", 
        caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
+    facet_grid(demo~income)+
+theme_minimal() +
   theme(plot.title.position = "plot")
 ```
 
 ## Child Internalizing
-```{r}
+```{r access-by-race-22}
 fear_date_demo = scored %>%
   select(CaregiverID, Week, all_of(demo_groups), fear_current_some) %>%
   gather("demo", "value", all_of(demo_groups)) %>%
@@ -672,7 +787,8 @@ fear_date_demo = scored %>%
   ungroup() %>% 
   mutate(demo = factor(demo, 
                        levels = demo_groups, 
-                       labels = demo_labels))
+                       labels = demo_labels)) %>%
+   separate(demo, into =c("demo", "income"), sep =",") 
 
 fear_date_all = scored %>%
   select(CaregiverID, Week, fear_current_some) %>%
@@ -691,6 +807,7 @@ fear_date_demo %>%
        title = "__ Percent of caregivers report children are sometimes or often too fearful or anxious",
        color = "Key demographics", 
        caption = "Entire sample is represented by the black, dashed line.") +
-  theme_minimal() +
+    facet_grid(demo~income)+
+theme_minimal() +
   theme(plot.title.position = "plot")
 ```

@@ -32,22 +32,21 @@ scored = score_report(data = master, master = T)
 
 # poverty threshold --------------------------------------------------------------
 
-census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
-
-scored = scored %>%
-  select(CaregiverID, Week, BaselineWeek, income, 
-         household_size, num_children_raw) %>%
-  left_join(census) %>%
-  mutate(poverty = ifelse(income < poverty_threshold*1.5,1,0),
-         poverty2x = ifelse(income < poverty_threshold*2,1,0)) %>%
-  select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty) %>%
-  full_join(scored)
+# census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
+# 
+# scored = scored %>%
+#   select(CaregiverID, Week, BaselineWeek, income, 
+#          household_size, num_children_raw) %>%
+#   left_join(census) %>%
+#   #mutate(poverty = ifelse(income < poverty_threshold*1.5,1,0)) %>%
+#   select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty) %>%
+#   full_join(scored)
 
 # baseline week -----------------------------------------------------------
 
 pre_pandemic = scored %>%
-  select(CaregiverID, Week, BaselineWeek, all_of(demos), income, state, 
-         contains("_pre")) %>%
+  select(CaregiverID, Week, BaselineWeek, all_of(demos), contains("poverty"), 
+         income, state, contains("_pre")) %>%
   select(-working_current) %>%
   group_by(CaregiverID) %>%
   filter(Week == min(Week)) %>%
