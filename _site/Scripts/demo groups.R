@@ -14,7 +14,7 @@ demos = c(
   "white", 
   "other_race", 
   "latinx",
-  "poverty",
+  "poverty100",
   "lowincome",
   "returner"
 )
@@ -32,7 +32,7 @@ binary_demos = c(
   "white", 
   "other_race", 
   "latinx",
-  "poverty",
+  "poverty100",
   "lowincome",
   "returner"
 )
@@ -53,7 +53,7 @@ demo_labels = c(
   "White/ Caucasian parents", 
   "Other race (not indicated) parents",
   "Latinx parents",
-  "Families below the poverty threshold x 1.5",
+  "Families below the poverty threshold",
   "Low income (< $40K) households",
   "Has participated in RAPID more than once"
 )
