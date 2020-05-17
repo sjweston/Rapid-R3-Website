@@ -14,17 +14,6 @@ options(knitr.kable.NA = '')
 
 ```{r packages}
 library(here)
-library(tidyverse)
-library(knitr)
-library(kableExtra)
-library(haven)
-# require(devtools)
-# install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
-library(zipcode)
-library(ggthemr)
-library(maps)
-library(usmap)
-library(ggsn)
 library(tsibble)
 library(brolgar)
 ```
@@ -159,6 +148,8 @@ scored %>%
   scroll_box(width = "650px")
 ```
 
+
+
 ## Income
 
 ```{r, results = 'asis'}
@@ -275,3 +266,29 @@ scored %>%
   geom_line()
 ```
 
+# Percentages by the week
+
+```{r, results = 'asis'}
+total = scored %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  summarize(Total = n())
+
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(binary_demos)) %>%
+  gather("Demographic", value, -Week) %>%
+  group_by(Week, Demographic) %>%
+  summarize(Count = sum(value,na.rm=T)) %>%
+  mutate(Demographic = factor(Demographic, 
+                              levels = binary_demos, 
+                              labels = binary_labels)) %>%
+  ungroup() %>%
+  full_join(total) %>%
+  mutate(Count = 100*Count/Total) %>%
+  select(-Total) %>%
+  spread("Week", "Count") %>%
+  kable(., col.names = c("Demographic", all_dates), digits = 1) %>%
+  kable_styling() %>%
+  scroll_box(width = "650px")
+```

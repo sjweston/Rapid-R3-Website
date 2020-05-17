@@ -27,8 +27,14 @@ source(here("Scripts/demo groups.R"))
 
 scored = score_report(data = master, master = T)
 
+# repeat ------------------------------------------------
 
-
+scored = scored %>%
+  group_by(CaregiverID) %>%
+  summarize(returner = n(),
+            returner = ifelse(returner > 1, 1, 0)) %>%
+  ungroup()%>%
+  full_join(scored)
 
 # poverty threshold --------------------------------------------------------------
 
@@ -72,6 +78,8 @@ baseline = scored %>%
 scored = scored %>%
   select(-BaselineWeek) %>%
   full_join(baseline)
+
+
 # days sheltering in place ------------------------------------------------
 
 
