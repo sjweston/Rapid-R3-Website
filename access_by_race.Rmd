@@ -277,6 +277,17 @@ mutate(vacc_mean = rowMeans(select(., starts_with("miss_v")),
 
 ## Barriers to healthcare
 
+```{r, eval = F}
+scored %>%
+  filter(Week > 0) %>%
+  gather(barrier, value, barriers) %>%
+  filter(!is.na(value)) %>%
+  group_by(barrier) %>%
+  summarize(Count = sum(value),
+            Percent = 100*Count/n())
+```
+
+
 ```{r access-by-race-9}
 barriers = find_items("hc_barrier", scored)
 barrier_labels = c("Cost", "Time away from work", "Childcare", "Concerned about COVID-19", "Caring for family members", "Other")

@@ -51,7 +51,9 @@ scored = scored %>%
 # baseline week -----------------------------------------------------------
 
 pre_pandemic = scored %>%
-  select(CaregiverID, Week, BaselineWeek, all_of(demos), contains("poverty"), 
+  select(CaregiverID, Week, BaselineWeek, all_of(demos), 
+         contains("poverty"), 
+         gender,
          income, state, contains("_pre")) %>%
   select(-working_current) %>%
   group_by(CaregiverID) %>%
@@ -163,4 +165,3 @@ after0 = scored %>%
 scored = scored %>%
   filter(Week == 0) %>%
   full_join(after0)
-

@@ -34,6 +34,7 @@ identify_state = function(ZC, zipcode.dataset = zipcode){
   return(state)
 }
 
+source(here("Functions/state_abbr.R"))
 
 score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FALSE){
   
@@ -580,7 +581,16 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       data$DEMO.003 >= 4 ~ "4+ Children")
       newdata$num_children_raw = data$DEMO.003
       newdata$household_size = data$DEMO.005
-    }
+  }
+  
+  if(contains_items("DEMO.006", data)){
+    newdata$gender = case_when(
+      data$DEMO.006 == 0 ~ "Male",
+      data$DEMO.006 == 1 ~ "Female",
+      data$DEMO.006 %in% c(3, 4, 5, 6) ~ "Other",
+      TRUE ~ NA_character_
+      )
+  }
   
   if(contains_items("DEMO.007_.{1}$", data)){
     data = combine.cat(x = data, 
@@ -602,12 +612,14 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     state = unlist(sapply(data$DEMO.001, identify_state))
     newdata$zip = data$DEMO.001
     newdata$state = state
+    data$state = state_abr(data$DEMO.001.a)
+    newdata$state[is.na(newdata$state)] = data$state[is.na(newdata$state)]
     newdata$region = case_when(
       state %in% c("ME", "NH", "VT", "MA", "RI", "CT",
                    "NY", "NJ", "PA") ~ "Northeast",
       state %in% c("OH", "MI", "IL", "IN", "WI", "MN", "IA",
                    "MO", "ND", "SD", "NE", "KS") ~ "Midwest",
-      state %in% c("DE", "MD", "VA", "WV", "KY", "NC", "SC",
+      state %in% c("DC","DE", "MD", "VA", "WV", "KY", "NC", "SC",
                    "TN", "GA", "FL", "AL", "MS", "AR", "LA",
                    "TX", "OK") ~ "South",
       state %in% c("MT", "ID", "WY", "CO", "NM", "AZ",
