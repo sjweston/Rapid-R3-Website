@@ -604,6 +604,15 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$hawaii = ifelse(grepl("4", data$DEMO.007_cat), 1, 0)
     newdata$white = ifelse(grepl("5", data$DEMO.007_cat), 1, 0)
     newdata$other_race = ifelse(grepl("6", data$DEMO.007_cat), 1, 0)
+    newdata$race_cat = case_when(
+      data$DEMO.007_cat == "1" ~ "American Indian/Alaska Native",
+      data$DEMO.007_cat == "2" ~ "Asian",
+      data$DEMO.007_cat == "3" ~ "Black/African American",
+      data$DEMO.007_cat == "4" ~ "Native Hawaiian/Pacific Islander",
+      data$DEMO.007_cat == "5" ~ "White/Caucasian",
+      data$DEMO.007_cat == "6" ~ "Other race",
+      !is.na(data$DEMO.007_cat) ~ "Multiple races",
+      TRUE ~ NA_character_)
     }
   
   if(contains_items("DEMO.008", data)) newdata$latinx = as.numeric(data$DEMO.008)

@@ -1,7 +1,9 @@
 ---
-title: "Week 2 Summary"
+title: "Week 2 (April 14 - April 20) Summary"
 output: 
-  html_document
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
   
 ---
 
@@ -275,4 +277,211 @@ financial_labels = binary_vars_labels[match(financial, binary_vars)]
 financial_beginning= "perc.all %>% select(group, N, financial) %>% kable(., col.names = c(\"Group\", \"Sample Size\", financial_labels)) %>% kable_styling() %>% "
 
 eval(parse(text = paste0(financial_beginning, each_string)))
+```
+
+# Comparisons with national demographics {.tabset}
+
+```{r}
+pop = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Population_Estimates.sav"))
+pop = pop %>%
+  mutate(region = case_when(
+    Region == 1 ~ "Northeast",
+    Region == 2 ~ "Midwest",
+    Region == 3 ~ "South",
+    Region == 4 ~ "West"
+  ))
+```
+
+## Gender
+
+```{r, out.width='100%'}
+sample_gender = scored %>%
+  filter(!is.na(gender) & !is.na(region)) %>%
+  group_by(gender, region) %>%
+  summarize(Count = n()) %>%
+  group_by(region) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  mutate(group = "RAPID")
+
+#pop_gender = 
+  
+pop %>%
+    filter(!is.na(region)) %>%
+  select(region, TotalPop.Count, Male.Count, Female.Count) %>%
+  gather(gender, count, -region) %>%
+    group_by(region, gender) %>%
+    summarize(count = sum(count)) %>%
+    spread(gender, count) %>%
+    mutate(Female.Percent = 100*Female.Count/TotalPop.Count,
+           Male.Percent = 100*Male.Count/TotalPop.Count,
+           Other.Percent = 100*(TotalPop.Count - Female.Count - Male.Count)/TotalPop.Count) %>%
+    select(region, contains("Percent")) %>%
+    gather("gender", "Percent", contains("Percent")) %>%
+    mutate(gender = gsub("\\.Percent", "", gender)) %>%
+    mutate(group = "US Population") %>%
+    full_join(sample_gender) %>%
+  ggplot(aes(x = region, y = Percent, group = group)) +
+  geom_bar(aes(fill = group),
+           stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(Percent, 1), y = Percent + 5), position = position_dodge(1)) +
+  facet_grid(.~gender) +
+  labs(x = "", fill = "")+
+  theme_minimal(base_size = 10)+
+  theme(legend.position = "top")
+```
+
+## Nationality
+
+```{r, out.width='100%'}
+nation = c(
+"native",
+"asian",
+"black",
+"hawaii",
+"white",
+"other",
+"multiple")
+
+nation_labels = c(
+"American Indian/Alaska Native",
+"Asian",
+"Black/African American",
+"Native Hawaiian/Pacific Islander",
+"White/Caucasian",
+"Other race",
+"Multiple races")
+
+nation_labels_breaks = c(
+"American Indian/\nAlaska Native",
+"Asian",
+"Black/\nAfrican American",
+"Native Hawaiian/\nPacific Islander",
+"White\nCaucasian",
+"Other\nrace",
+"Multiple\nraces")
+
+
+sample_nation = scored %>%
+  filter(!is.na(race_cat))%>%
+  group_by(race_cat) %>%
+  summarize(Count = n()) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  mutate(group = "RAPID")
+
+pop %>%
+  select(TotalPop.Count, 
+         (contains("Race") & contains("Count"))) %>%
+  gather(demo, count) %>%
+    group_by(demo) %>%
+    summarize(count = sum(count)) %>%
+    spread(demo, count) %>%
+    mutate(native.Percent = 100*Race.Amer.Ind.Count/TotalPop.Count,
+           asian.Percent = 100*Race.Asian.Count/TotalPop.Count,
+           black.Percent = 100*Race.Black.Count/TotalPop.Count,
+           hawaii.Percent = 100*Race.Nat.HI.Count/TotalPop.Count,
+           white.Percent = 100*Race.White.Count/TotalPop.Count,
+           other.Percent = 100*Race.Other.Count/TotalPop.Count,
+           ) %>%
+    gather("demo", "Percent", contains("Percent")) %>%
+    mutate(demo = gsub("\\.Percent", "", demo),
+           race_cat = factor(demo, levels = nation, labels = nation_labels)) %>%
+  select(race_cat, Percent) %>%
+    mutate(group = "US Population") %>%
+    full_join(sample_nation) %>%
+  mutate(race_cat = factor(race_cat, 
+                           levels = nation_labels, 
+                           labels = nation_labels_breaks)) %>%
+  ggplot(aes(x = race_cat, y = Percent, group = group)) +
+  geom_bar(aes(fill = group),
+           stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(Percent, 1), y = Percent + 5), position = position_dodge(1)) +
+  labs(x = "", fill = "")+
+  theme_minimal(base_size = 10)+
+  theme(legend.position = "top") 
+```
+
+## Nationality by region
+
+```{r, out.width='100%'}
+
+sample_nation = scored %>%
+  filter(!is.na(race_cat) & !is.na(region)) %>%
+  group_by(race_cat, region) %>%
+  summarize(Count = n()) %>%
+  group_by(region) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  mutate(group = "RAPID")
+
+pop %>%
+  filter(!is.na(region)) %>%
+  select(region, TotalPop.Count, 
+         (contains("Race") & contains("Count"))) %>%
+  gather(demo, count, -region) %>%
+    group_by(region, demo) %>%
+    summarize(count = sum(count)) %>%
+    spread(demo, count) %>%
+    mutate(native.Percent = 100*Race.Amer.Ind.Count/TotalPop.Count,
+           asian.Percent = 100*Race.Asian.Count/TotalPop.Count,
+           black.Percent = 100*Race.Black.Count/TotalPop.Count,
+           hawaii.Percent = 100*Race.Nat.HI.Count/TotalPop.Count,
+           white.Percent = 100*Race.White.Count/TotalPop.Count,
+           other.Percent =100*Race.Other.Count/TotalPop.Count
+           ) %>%
+    select(region, contains("Percent")) %>%
+    gather("demo", "Percent", contains("Percent")) %>%
+    mutate(demo = gsub("\\.Percent", "", demo),
+           race_cat = factor(demo, 
+                             levels = nation, 
+                             labels = nation_labels)) %>%
+    mutate(group = "US Population") %>%
+    full_join(sample_nation) %>%
+    mutate(race_cat = factor(race_cat, levels = nation_labels, 
+                           labels = nation_labels_breaks)) %>%
+  filter(!is.na(region)) %>%
+  ggplot(aes(x = race_cat, y = Percent, group = group)) +
+  geom_bar(aes(fill = group),
+           stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(Percent, 1), y = Percent + 5), 
+            position = position_dodge(1), size= 2) +
+  facet_wrap(~region, scales = "free") +
+  labs(x = "", fill = "")+
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  theme_minimal(base_size = 8)+
+  theme(legend.position = "top") 
+```
+
+## Ethnicity by region
+
+```{r, out.width='100%'}
+
+sample_nation = scored %>%
+  filter(!is.na(latinx) & !is.na(region)) %>%
+  group_by(latinx, region) %>%
+  summarize(Count = n()) %>%
+  group_by(region) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  mutate(group = "RAPID") %>%
+  filter(latinx == 1)
+
+pop %>%
+  filter(!is.na(region)) %>%
+  select(region, TotalPop.Count, 
+         (contains("Race") & contains("Count"))) %>%
+  gather(demo, count, -region) %>%
+    group_by(region, demo) %>%
+    summarize(count = sum(count)) %>%
+    spread(demo, count) %>%
+    mutate(Percent = 100*Race.Hispanic.Count/TotalPop.Count) %>%
+    select(region, contains("Percent")) %>%
+    mutate(group = "US Population") %>%
+    full_join(sample_nation) %>%
+  ggplot(aes(x = region, y = Percent, group = group)) +
+  geom_bar(aes(fill = group),
+           stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(Percent, 1), y = Percent + 2), 
+            position = position_dodge(1), size= 2) +
+  labs(x = "", fill = "", 
+       title = "Representation of Hispanic/Latinx Caregivers by region")+
+  theme_minimal(base_size = 8)+
+  theme(legend.position = "top") 
 ```

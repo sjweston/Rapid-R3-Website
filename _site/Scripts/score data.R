@@ -51,7 +51,7 @@ scored = scored %>%
 # baseline week -----------------------------------------------------------
 
 pre_pandemic = scored %>%
-  select(CaregiverID, Week, BaselineWeek, all_of(demos), 
+  select(CaregiverID, Week, BaselineWeek, all_of(demos), race_cat, 
          contains("poverty"), 
          gender,
          income, state, contains("_pre")) %>%

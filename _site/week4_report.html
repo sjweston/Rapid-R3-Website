@@ -11,7 +11,7 @@
 
 
 
-<title>Week 4 Summary</title>
+<title>Week 4 (April 28 - May 04) Summary</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,6 +19,9 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -251,6 +254,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -258,6 +324,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -372,7 +448,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Week 4 Summary</h1>
+<h1 class="title toc-ignore">Week 4 (April 28 - May 04) Summary</h1>
 
 </div>
 
@@ -845,35 +921,35 @@ Decreased hours of non-family childcare
 </tr>
 <tr grouplength="1">
 <td colspan="9" style="border-bottom: 1px solid;">
-<strong> Families below the poverty threshold x 1.5</strong>
+<strong> Families below the poverty threshold</strong>
 </td>
 </tr>
 <tr>
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 </td>
 <td style="text-align:right;">
-69
+47
 </td>
 <td style="text-align:right;">
-44.9
+55.3
+</td>
+<td style="text-align:right;">
+38.3
+</td>
+<td style="text-align:right;">
+72.3
+</td>
+<td style="text-align:right;">
+29.8
+</td>
+<td style="text-align:right;">
+40.4
+</td>
+<td style="text-align:right;">
+12.8
 </td>
 <td style="text-align:right;">
 36.2
-</td>
-<td style="text-align:right;">
-71.0
-</td>
-<td style="text-align:right;">
-26.1
-</td>
-<td style="text-align:right;">
-42.0
-</td>
-<td style="text-align:right;">
-8.7
-</td>
-<td style="text-align:right;">
-37.7
 </td>
 </tr>
 <tr grouplength="1">
@@ -907,6 +983,39 @@ Decreased hours of non-family childcare
 </td>
 <td style="text-align:right;">
 41.4
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="9" style="border-bottom: 1px solid;">
+<strong> Has participated in RAPID more than once</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;">
+540
+</td>
+<td style="text-align:right;">
+64.8
+</td>
+<td style="text-align:right;">
+45.4
+</td>
+<td style="text-align:right;">
+80.7
+</td>
+<td style="text-align:right;">
+49.1
+</td>
+<td style="text-align:right;">
+5.9
+</td>
+<td style="text-align:right;">
+9.8
+</td>
+<td style="text-align:right;">
+11.1
 </td>
 </tr>
 <tr grouplength="8">
@@ -1731,26 +1840,26 @@ Gained free lunch for child
 </tr>
 <tr grouplength="1">
 <td colspan="6" style="border-bottom: 1px solid;">
-<strong> Families below the poverty threshold x 1.5</strong>
+<strong> Families below the poverty threshold</strong>
 </td>
 </tr>
 <tr>
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 </td>
 <td style="text-align:right;">
-69
+47
 </td>
 <td style="text-align:right;">
-5.8
+10.6
 </td>
 <td style="text-align:right;">
-31.9
+34.0
 </td>
 <td style="text-align:right;">
-1.4
+0.0
 </td>
 <td style="text-align:right;">
-17.4
+10.6
 </td>
 </tr>
 <tr grouplength="1">
@@ -1775,6 +1884,30 @@ Gained free lunch for child
 </td>
 <td style="text-align:right;">
 16.1
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="6" style="border-bottom: 1px solid;">
+<strong> Has participated in RAPID more than once</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;">
+540
+</td>
+<td style="text-align:right;">
+44.4
+</td>
+<td style="text-align:right;">
+73.5
+</td>
+<td style="text-align:right;">
+1.1
+</td>
+<td style="text-align:right;">
+26.1
 </td>
 </tr>
 <tr grouplength="8">
@@ -2581,35 +2714,35 @@ Hospitalized with COVID-19
 </tr>
 <tr grouplength="1">
 <td colspan="9" style="border-bottom: 1px solid;">
-<strong> Families below the poverty threshold x 1.5</strong>
+<strong> Families below the poverty threshold</strong>
 </td>
 </tr>
 <tr>
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 </td>
 <td style="text-align:right;">
-69
+47
 </td>
 <td style="text-align:right;">
-85.5
+89.4
 </td>
 <td style="text-align:right;">
-87.0
+85.1
 </td>
 <td style="text-align:right;">
-69.6
+80.9
 </td>
 <td style="text-align:right;">
-13.0
+19.1
 </td>
 <td style="text-align:right;">
-5.8
+8.5
 </td>
 <td style="text-align:right;">
-7.2
+10.6
 </td>
 <td style="text-align:right;">
-1.4
+2.1
 </td>
 </tr>
 <tr grouplength="1">
@@ -2643,6 +2776,39 @@ Hospitalized with COVID-19
 </td>
 <td style="text-align:right;">
 1.1
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="9" style="border-bottom: 1px solid;">
+<strong> Has participated in RAPID more than once</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;">
+540
+</td>
+<td style="text-align:right;">
+93.6
+</td>
+<td style="text-align:right;">
+92.7
+</td>
+<td style="text-align:right;">
+63.7
+</td>
+<td style="text-align:right;">
+7.6
+</td>
+<td style="text-align:right;">
+0.7
+</td>
+<td style="text-align:right;">
+5.6
+</td>
+<td style="text-align:right;">
+5.4
 </td>
 </tr>
 <tr grouplength="8">
@@ -3593,32 +3759,32 @@ Report more fearful children
 </tr>
 <tr grouplength="1">
 <td colspan="9" style="border-bottom: 1px solid;">
-<strong> Families below the poverty threshold x 1.5</strong>
+<strong> Families below the poverty threshold</strong>
 </td>
 </tr>
 <tr>
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 </td>
 <td style="text-align:right;">
-69
+47
 </td>
 <td style="text-align:right;">
-76.8
-</td>
-<td style="text-align:right;">
-32.4
-</td>
-<td style="text-align:right;">
-49.3
+87.2
 </td>
 <td style="text-align:right;">
 31.9
 </td>
 <td style="text-align:right;">
-43.5
+46.8
 </td>
 <td style="text-align:right;">
-23.5
+23.4
+</td>
+<td style="text-align:right;">
+31.9
+</td>
+<td style="text-align:right;">
+21.3
 </td>
 <td style="text-align:right;">
 0
@@ -3652,6 +3818,39 @@ Report more fearful children
 </td>
 <td style="text-align:right;">
 22.1
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="9" style="border-bottom: 1px solid;">
+<strong> Has participated in RAPID more than once</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;">
+540
+</td>
+<td style="text-align:right;">
+71.2
+</td>
+<td style="text-align:right;">
+38.7
+</td>
+<td style="text-align:right;">
+54.6
+</td>
+<td style="text-align:right;">
+39.3
+</td>
+<td style="text-align:right;">
+45.0
+</td>
+<td style="text-align:right;">
+27.0
 </td>
 <td style="text-align:right;">
 0
@@ -4647,38 +4846,38 @@ Have difficulty paying for basic necessicites
 </tr>
 <tr grouplength="1">
 <td colspan="10" style="border-bottom: 1px solid;">
-<strong> Families below the poverty threshold x 1.5</strong>
+<strong> Families below the poverty threshold</strong>
 </td>
 </tr>
 <tr>
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
 </td>
 <td style="text-align:right;">
-69
+47
 </td>
 <td style="text-align:right;">
-55.4
+58.5
 </td>
 <td style="text-align:right;">
-32.1
+28.9
 </td>
 <td style="text-align:right;">
-26.2
+36.7
 </td>
 <td style="text-align:right;">
-43.5
+57.4
 </td>
 <td style="text-align:right;">
-21.7
+25.5
 </td>
 <td style="text-align:right;">
-79.7
+80.9
 </td>
 <td style="text-align:right;">
-29.0
+34.0
 </td>
 <td style="text-align:right;">
-33.3
+46.8
 </td>
 </tr>
 <tr grouplength="1">
@@ -4715,6 +4914,42 @@ Have difficulty paying for basic necessicites
 </td>
 <td style="text-align:right;">
 32.2
+</td>
+</tr>
+<tr grouplength="1">
+<td colspan="10" style="border-bottom: 1px solid;">
+<strong> Has participated in RAPID more than once</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+</td>
+<td style="text-align:right;">
+540
+</td>
+<td style="text-align:right;">
+38.1
+</td>
+<td style="text-align:right;">
+53.1
+</td>
+<td style="text-align:right;">
+12.2
+</td>
+<td style="text-align:right;">
+20.4
+</td>
+<td style="text-align:right;">
+32.7
+</td>
+<td style="text-align:right;">
+65.1
+</td>
+<td style="text-align:right;">
+15.2
+</td>
+<td style="text-align:right;">
+13.1
 </td>
 </tr>
 <tr grouplength="8">
@@ -5248,9 +5483,30 @@ West
 </table>
 </div>
 </div>
+<div id="comparisons-with-national-demographics" class="section level1 tabset">
+<h1>Comparisons with national demographics</h1>
+<div id="gender" class="section level2">
+<h2>Gender</h2>
+<p><img src="week4_report_files/figure-html/unnamed-chunk-4-1.png" width="100%" /></p>
+</div>
+<div id="nationality" class="section level2">
+<h2>Nationality</h2>
+<p><img src="week4_report_files/figure-html/unnamed-chunk-5-1.png" width="100%" /></p>
+</div>
+<div id="nationality-by-region" class="section level2">
+<h2>Nationality by region</h2>
+<p><img src="week4_report_files/figure-html/unnamed-chunk-6-1.png" width="100%" /></p>
+</div>
+<div id="ethnicity-by-region" class="section level2">
+<h2>Ethnicity by region</h2>
+<p><img src="week4_report_files/figure-html/unnamed-chunk-7-1.png" width="100%" /></p>
+</div>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -5283,6 +5539,32 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
