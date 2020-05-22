@@ -564,9 +564,29 @@ scored %>%
   theme_minimal()
 ```
 
-## Returning to work constrained by childcare
+## Returning to work constrained by childcare{.tabset}
 
 "Are you concerned that you may not be able to return to work because you lack appropriate childcare? "
+
+### Overall
+
+```{r}
+scored %>%
+  select(lack_cc) %>%
+  filter(!is.na(lack_cc)) %>%
+  group_by(lack_cc) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = lack_cc))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  labs(y = "")+
+  theme_minimal()
+```
+
+### By demographic
 
 ```{r}
 scored %>%
@@ -590,6 +610,7 @@ scored %>%
   labs(y = "")+
   theme_minimal()
 ```
+
 
 # Source of information{.tabset}
 
@@ -1051,6 +1072,246 @@ text_data %>%
         labs(title = "Word Network: Anything else?",
              x = "", y = "")
 ```
+
+
+# Analyses added May 22
+
+## Expected change in childcare{.tabset}
+
+```{r}
+scored = scored %>%
+  mutate(
+    lostcc_center = ifelse(priorcc_center == 1 & expect_center == 0, 1, 0),
+    lostcc_relativemyhome = ifelse(priorcc_relativemyhome == 1 & expect_relativemyhome == 0, 1, 0),
+    lostcc_relativetheirhome = ifelse(priorcc_relativetheirhome == 1 & expect_relativetheirhome == 0, 1, 0),
+    lostcc_promyhome = ifelse(priorcc_promyhome == 1 & expect_promyhome == 0, 1, 0),
+    lostcc_theirhome = ifelse(priorcc_theirhome == 1 & expect_theirhome == 0, 1, 0),
+    lostcc_parents = ifelse(priorcc_parents == 1 & expect_parents == 0, 1, 0))
+
+scored = scored %>%
+  select(CaregiverID, contains("lostcc")) %>%
+  gather(type, value, -CaregiverID) %>%
+  group_by(CaregiverID) %>%
+  filter(!is.na(value)) %>%
+  summarize(lostCC_sum = sum(value),
+            lostCC = ifelse(lostCC_sum > 0, 1, 0)) %>%
+  full_join(scored)
+```
+
+Using the caregiver type variables, we indicate, for each caregiver, whether they "lost" that type of childcare, meaning they were using it before and do not anticipate using it in the next month. 
+
+### By type
+```{r}
+scored %>%
+  select(contains("lostcc_", ignore.case = F)) %>%
+  gather(type, value) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>% 
+  summarize(count = sum(value)) %>%
+  ungroup() %>%
+  mutate(percent = 100*count/sum(count),
+         type = factor(type, 
+                       levels = c("lostcc_center",
+                                  "lostcc_relativemyhome",
+                                  "lostcc_relativetheirhome",
+                                  "lostcc_promyhome",
+                                  "lostcc_theirhome",
+                                  "lostcc_parents"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians"))) %>%
+  ggplot(aes(x = percent, y = type)) +
+  geom_bar(stat = "identity")+
+  geom_text(aes(label = count, x = percent + 5)) +
+  theme_minimal()
+```
+
+### Overall
+```{r}
+scored %>%
+  group_by(lostCC) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  mutate(percent = 100*count/sum(count),
+         lostCC = factor(lostCC, levels = c(0,1), labels = c("No loss", "Lost 1+ types of childcare"))) %>%
+  ggplot(aes(x = percent, y = lostCC)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = count, x = percent + 5)) +
+  theme_minimal()
+
+```
+
+## How does losing childcare option relate to mental health?{.tabset}
+
+### Composite scores
+
+```{r, fig.height=8}
+library(ggpubr)
+scored = scored %>% 
+  mutate(lostCC_group = factor(lostCC, 
+                               levels = c(0,1), 
+                               labels = c("No loss", "Lost 1+ types of childcare")))
+anxiety.plot = scored %>%
+  select(lostCC_group, anxiety) %>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "anxiety", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "", ylab = "", title = "Caregiver anxiety",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+depress.plot = scored %>%
+  select(lostCC_group, depress) %>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "depress", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "",  ylab = "", title = "Caregiver depression",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+stress.plot = scored %>%
+  select(lostCC_group, stress)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "stress", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "",  ylab = "", title = "Caregiver stress",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+lonely.plot = scored %>%
+  select(lostCC_group, lonely)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "lonely", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "",  ylab = "", title = "Caregiver loneliness",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+fussy.plot = scored %>%
+  select(lostCC_group, fussy)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "fussy", 
+          fill = "lostCC_group",
+          xlab = "",  ylab = "", title = "Child fussiness",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+fear.plot = scored %>%
+  select(lostCC_group, fear)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "fear", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "", ylab = "", title = "Child fear",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+ggarrange(anxiety.plot, depress.plot, stress.plot, lonely.plot, fussy.plot, fear.plot,
+          ncol = 2, nrow = 3)
+```
+
+
+### Proportion marking "a lot" or "very much"
+
+```{r, fig.height=8}
+library(ggpubr)
+scored = scored %>% 
+  mutate(lostCC_group = factor(lostCC, 
+                               levels = c(0,1), 
+                               labels = c("No loss", "Lost 1+ types of childcare")))
+anxiety.plot = scored %>%
+  select(lostCC_group, anxiety_current_lots) %>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "anxiety_current_lots", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "", ylab = "", title = "Caregiver anxiety",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+depress.plot = scored %>%
+  select(lostCC_group, depress_current_lots) %>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "depress_current_lots", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "",  ylab = "", title = "Caregiver depression",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+stress.plot = scored %>%
+  select(lostCC_group, stress_current_lots)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "stress_current_lots", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "",  ylab = "", title = "Caregiver stress",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+lonely.plot = scored %>%
+  select(lostCC_group, lonely_current_lots)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "lonely_current_lots", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "",  ylab = "", title = "Caregiver loneliness",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+fussy.plot = scored %>%
+  select(lostCC_group, fussy_current_lots)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "fussy_current_lots", 
+          fill = "lostCC_group",
+          xlab = "",  ylab = "", title = "Child fussiness",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+fear.plot = scored %>%
+  select(lostCC_group, fear_current_lots)%>%
+  ggbarplot(., 
+          x = "lostCC_group", 
+          y = "fear_current_lots", 
+          fill = "lostCC_group",
+          label = T,
+          lab.nb.digits = 2,
+          lab.vjust = -2,
+          xlab = "", ylab = "", title = "Child fear",
+          add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend")
+
+ggarrange(anxiety.plot, depress.plot, stress.plot, lonely.plot, fussy.plot, fear.plot,
+          ncol = 2, nrow = 3)
+```
+
+
+
+
 
 
 

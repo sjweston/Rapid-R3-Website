@@ -214,6 +214,20 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$child_edu_interrupt = ifelse(grepl("[1,3,5]",data$POLICY.008_cat), 1, 0)
   }
   
+  if(contains_items("POLICY.018\\_[0-9]$", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.018\\_[0-9]$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.018_cat")
+    newdata$priorcc_center = ifelse(grepl("1", data$POLICY.018_cat), 1, 0)
+    newdata$priorcc_relativemyhome = ifelse(grepl("2", data$POLICY.018_cat), 1, 0)
+    newdata$priorcc_relativetheirhome = ifelse(grepl("3", data$POLICY.018_cat), 1, 0)
+    newdata$priorcc_promyhome = ifelse(grepl("4", data$POLICY.018_cat), 1, 0)
+    newdata$priorcc_theirhome = ifelse(grepl("5", data$POLICY.018_cat), 1, 0)
+    newdata$priorcc_parents = ifelse(grepl("6", data$POLICY.018_cat), 1, 0)
+    newdata$priorcc_none = ifelse(grepl("7", data$POLICY.018_cat), 1, 0)
+  }
+  
   if(contains_items("POLICY.020\\.a_[0-9]$", data)){
     data = combine.cat(x = data, 
                        cols = find_items("POLICY.020\\.a_[0-9]$", data), 
