@@ -48,6 +48,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$CaregiverID[missing] = random_ID
     names(data) = gsub("R3.R..", "", names(data))
   }
+  
   if(master){
     newdata = data[,c("CaregiverID", "Week", "BaselineWeek")]
     newdata$Date = as.Date(data$StartDate)
@@ -213,6 +214,113 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$child_edu_interrupt = ifelse(grepl("[1,3,5]",data$POLICY.008_cat), 1, 0)
   }
   
+  if(contains_items("POLICY.020\\.a_[0-9]$", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.020\\.a_[0-9]$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.020a_cat")
+    newdata$expect_center = ifelse(grepl("1", data$POLICY.020a_cat), 1, 0)
+    newdata$expect_relativemyhome = ifelse(grepl("2", data$POLICY.020a_cat), 1, 0)
+    newdata$expect_relativetheirhome = ifelse(grepl("3", data$POLICY.020a_cat), 1, 0)
+    newdata$expect_promyhome = ifelse(grepl("4", data$POLICY.020a_cat), 1, 0)
+    newdata$expect_theirhome = ifelse(grepl("5", data$POLICY.020a_cat), 1, 0)
+    newdata$expect_parents = ifelse(grepl("6", data$POLICY.020a_cat), 1, 0)
+    newdata$expect_none = ifelse(grepl("7", data$POLICY.020a_cat), 1, 0)
+  }
+  
+  if(contains_items("POLICY.020\\.b_[0-9]$", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.020\\.b_[0-9]$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.020b_cat")
+    newdata$expect_age_5_12 = ifelse(grepl("1", data$POLICY.020b_cat), 1, 0)
+    newdata$expect_age_13_17 = ifelse(grepl("2", data$POLICY.020b_cat), 1, 0)
+    newdata$expect_age_18_29 = ifelse(grepl("3", data$POLICY.020b_cat), 1, 0)
+    newdata$expect_age_30_49 = ifelse(grepl("4", data$POLICY.020b_cat), 1, 0)
+    newdata$expect_age_50_64 = ifelse(grepl("5", data$POLICY.020b_cat), 1, 0)
+    newdata$expect_age_65up = ifelse(grepl("6", data$POLICY.020b_cat), 1, 0)
+    newdata$expect_age_unsure = ifelse(grepl("7", data$POLICY.020b_cat), 1, 0)
+  }
+  
+  if(contains_items("POLICY.020\\.c_[0-9]$", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.020\\.c_[0-9]$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.020c_cat")
+    newdata$expect_relation_sibling = ifelse(grepl("1", data$POLICY.020c_cat), 1, 0)
+    newdata$expect_relation_aunt = ifelse(grepl("2", data$POLICY.020c_cat), 1, 0)
+    newdata$expect_relation_grand = ifelse(grepl("3", data$POLICY.020c_cat), 1, 0)
+    newdata$expect_relation_relative = ifelse(grepl("4", data$POLICY.020c_cat), 1, 0)
+    newdata$expect_relation_friend = ifelse(grepl("5", data$POLICY.020c_cat), 1, 0)
+    newdata$expect_relation_neighbor = ifelse(grepl("6", data$POLICY.020c_cat), 1, 0)
+  }
+  
+  if(contains_items("POLICY.021", data)){
+    newdata$same_cc = case_when(
+      data$POLICY.021 == 1 ~ "Yes",
+      data$POLICY.021 == 0 ~ "No",
+      data$POLICY.021 == 2 ~ "Don't know")
+  }
+  if(contains_items("POLICY.022\\.a", data)){
+    newdata$willing_same_cc = case_when(
+      data$POLICY.022.a == 1 ~ "Yes",
+      data$POLICY.022.a == 0 ~ "No",
+      data$POLICY.022.a == 2 ~ "Don't know")
+  }
+  if(contains_items("POLICY.022\\.b_[0-9]$", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.022\\.b_[0-9]$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.022b_cat")
+    newdata$barrier_same_cc_cost = ifelse(grepl("1", data$POLICY.022b_cat), 1, 0)
+    newdata$barrier_same_cc_safe = ifelse(grepl("2", data$POLICY.022b_cat), 1, 0)
+    newdata$barrier_same_cc_need = ifelse(grepl("3", data$POLICY.022b_cat), 1, 0)
+  }
+  
+  if(contains_items("POLICY.023_", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.023_", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.023_cat")
+    newdata$comfort_return = case_when(
+      grepl("1", data$POLICY.023_cat) ~ "1",
+      grepl("2", data$POLICY.023_cat) ~ "2",
+      grepl("3", data$POLICY.023_cat) ~ "3",
+      grepl("4", data$POLICY.023_cat) ~ "4",
+      TRUE ~ NA_character_
+    )
+  }
+  
+  if(contains_items("POLICY.024_[0-9]$", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.024_[0-9]$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.024_cat")
+    newdata$know_cc_numchild = ifelse(grepl("1", data$POLICY.024_cat), 1, 0)
+    newdata$know_cc_numadult = ifelse(grepl("2", data$POLICY.024_cat), 1, 0)
+    newdata$know_cc_socialDis = ifelse(grepl("3", data$POLICY.024_cat), 1, 0)
+    newdata$know_cc_cleaning = ifelse(grepl("4", data$POLICY.024_cat), 1, 0)
+    newdata$know_cc_childHealth = ifelse(grepl("5", data$POLICY.024_cat), 1, 0)
+    newdata$know_cc_employeeHealth = ifelse(grepl("6", data$POLICY.024_cat), 1, 0)
+    newdata$know_cc_COVID = ifelse(grepl("7", data$POLICY.024_cat), 1, 0)
+    newdata$know_cc_enroll = ifelse(grepl("8", data$POLICY.024_cat), 1, 0)
+  }
+  
+  if(contains_items("POLICY.025", data)){
+    newdata$lack_cc = case_when(
+      data$POLICY.025 == 1 ~ "Yes",
+      data$POLICY.025 == 0 ~ "No",
+      data$POLICY.025 == 2 ~ "Don't know")
+  }
+  
+  if(contains_items("HEALTH.005", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("HEALTH.005", data), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.005_cat")
+    newdata$disability = ifelse(grepl("[1-4]", data$HEALTH.005_cat), 1, 0)
+  }
+  
   if(contains_items("HEALTH.001", data)){
     newdata$insurance = ifelse(data$HEALTH.001 == 1, 1, 0)
     #caregiver has insurance through private company
@@ -312,6 +420,26 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$miss_vaccine.3 = data$HEALTH.011.b
     newdata$miss_vaccine.4 = data$HEALTH.012.b
     newdata$miss_vaccine.5 = data$HEALTH.013.b
+
+  }
+  
+  if(contains_items("HEALTH\\.014", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("HEALTH\\.014_[0-9]{1,2}$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.014_cat")
+    newdata$source_trump = ifelse(grepl("1", data$HEALTH.014_cat), 1, 0)
+    newdata$source_uspublic = ifelse(grepl("2", data$HEALTH.014_cat), 1, 0)
+    newdata$source_congress = ifelse(grepl("3", data$HEALTH.014_cat), 1, 0)
+    newdata$source_gov = ifelse(grepl("4", data$HEALTH.014_cat), 1, 0)
+    newdata$source_state = ifelse(grepl("5", data$HEALTH.014_cat), 1, 0)
+    newdata$source_employ = ifelse(grepl("6", data$HEALTH.014_cat), 1, 0)
+    newdata$source_nonemploy = ifelse(grepl("7", data$HEALTH.014_cat), 1, 0)
+    newdata$source_child = ifelse(grepl("8", data$HEALTH.014_cat), 1, 0)
+    newdata$source_nonchild = ifelse(grepl("9", data$HEALTH.014_cat), 1, 0)
+    newdata$source_family = ifelse(grepl("10", data$HEALTH.014_cat), 1, 0)
+    newdata$source_friends = ifelse(grepl("11", data$HEALTH.014_cat), 1, 0)
+    newdata$source_other = ifelse(grepl("12", data$HEALTH.014_cat), 1, 0)
 
   }
   
@@ -544,7 +672,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   if(contains_items("HEALTH.005", data)){
     data = combine.cat(x = data, 
-                       cols = find_items("HEALTH.005", data), 
+                       cols = find_items("HEALTH.005_[0-9]{1}$", data), 
                        id = "CaregiverID",
                        newvar.name = "HEALTH.005_cat")
     newdata$disability = ifelse(grepl("[1-4]", data$HEALTH.005_cat), 1, 0)
@@ -581,6 +709,10 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       data$DEMO.003 >= 4 ~ "4+ Children")
       newdata$num_children_raw = data$DEMO.003
       newdata$household_size = data$DEMO.005
+  }
+  
+  if(contains_items("DEMO.011", data)){
+    newdata$living_arrange = data$DEMO.011
   }
   
   if(contains_items("DEMO.006", data)){

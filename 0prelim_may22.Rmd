@@ -1,0 +1,1031 @@
+---
+title: "Analyses for May 22"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+  
+---
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+# blw_poverty or race_cat
+which_demo = "blw_poverty"
+```
+
+```{r}
+library(here)
+library(tidytext)
+```
+
+
+```{r score datafile, echo = F, warning = F, message = F}
+## score master --------------------------------------------------------
+source(here("Scripts/score data.R"))
+scored = scored %>%
+  filter(Week == 7)
+```
+
+```{r, eval = (which_demo == "blw_poverty")}
+scored = scored %>%
+  mutate(
+    poc_lowincome = ifelse((white == 0 | latinx == 1) & poverty200 == 1, 1,0),
+    poc_hghincome = ifelse((white == 0 | latinx == 1) & poverty200 == 0, 1,0),
+    white_hghincome = ifelse((white == 1 & latinx == 0) & poverty200 == 0, 1,0),
+    white_lowincome = ifelse((white == 1 & latinx == 0) & poverty200 == 1, 1,0),
+    black_lowincome = ifelse(black == 1 & poverty200 == 1, 1, 0),
+    black_hghincome = ifelse(black == 1 & poverty200 == 0, 1, 0),
+    latinx_lowincome = ifelse(latinx == 1 & poverty200 == 1, 1, 0),
+    latinx_hghincome = ifelse(latinx == 1 & poverty200 == 0, 1, 0)
+  )
+
+demo_groups = c(
+  "white_hghincome", "white_lowincome", 
+                "black_hghincome", "black_lowincome",
+                "latinx_hghincome", "latinx_lowincome")
+demo_labels = c(
+  "White\nhigh income", "White\nlow income", 
+                "African American\nhigh income", "African American\nlow income",
+                "Latinx\nhigh income", "Latinx\nlow income")
+
+```
+
+```{r, eval = (which_demo == "race_cat")}
+demo_groups = c("native","asian","black","latinx","hawaii", "white", "other_race")
+demo_labels = c("Native American\n/Alaskan", "Asian", "Black\nAfrican American",
+                "Latinx/Hispanic","Native Hawaiian\n/Pacific Islander", "White/Caucasian",
+                "Other")
+```
+
+
+
+# Expectations for childcare
+
+## Type{.tabset}
+
+"Please think about your childcare plans for your child(ren) 0-5 years for the next month. What types of childcare do you expect to use? Select all that apply."
+
+### Overall
+
+```{r}
+scored %>%
+  select(contains("expect_")) %>%
+  select(-contains("age"), -contains("relation")) %>%
+  gather(type, value) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  summarize(Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("expect_center",
+                                  "expect_relativemyhome",
+                                  "expect_relativetheirhome",
+                                  "expect_promyhome",
+                                  "expect_theirhome",
+                                  "expect_parents",
+                                  "expect_none"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians", 
+                                  "None"))) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+
+### By demographics
+
+```{r, out.width='100%'}
+scored %>%
+  select(contains("expect_"), all_of(demo_groups)) %>%
+  select(-contains("age"), -contains("relation")) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  select(-dvalue)%>%
+  gather(type, value, -demo) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("expect_center",
+                                  "expect_relativemyhome",
+                                  "expect_relativetheirhome",
+                                  "expect_promyhome",
+                                  "expect_theirhome",
+                                  "expect_parents",
+                                  "expect_none"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians", 
+                                  "None"))) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+## Age of provider
+
+"Please tell us the age of the person(s) who you expect to provide childcare. Select all that apply."
+
+### Overall
+
+```{r}
+scored %>%
+  select(contains("expect_age")) %>%
+  gather(type, value) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  summarize(Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("expect_age_5_12",
+                                  "expect_age_13_17",
+                                  "expect_age_18_29",
+                                  "expect_age_30_49",
+                                  "expect_age_50_64" ,
+                                  "expect_age_65up",
+                                  "expect_age_unsure"),
+                       labels = c("5-12",
+                                  "13-17",
+                                  "18-29",
+                                  "30-49",
+                                  "50-64",
+                                  "65+",
+                                  "Unsure"))) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+
+### By demographics
+
+```{r, out.width='100%'}
+scored %>%
+  select(contains("expect_age"), all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  select(-dvalue)%>%
+  gather(type, value, -demo) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("expect_age_5_12",
+                                  "expect_age_13_17",
+                                  "expect_age_18_29",
+                                  "expect_age_30_49",
+                                  "expect_age_50_64" ,
+                                  "expect_age_65up",
+                                  "expect_age_unsure"),
+                       labels = c("5-12",
+                                  "13-17",
+                                  "18-29",
+                                  "30-49",
+                                  "50-64",
+                                  "65+",
+                                  "Unsure"))) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 5))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+## Relation of provider
+
+"What is your relation to the person(s) who you expect to provide childcare? Select all that apply.  "
+
+### Overall
+
+```{r}
+scored %>%
+  select(contains("expect_relation")) %>%
+  gather(type, value) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  summarize(Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("expect_relation_sibling",
+                                  "expect_relation_aunt",
+                                  "expect_relation_grand",
+                                  "expect_relation_relative",
+                                  "expect_relation_friend",
+                                  "expect_relation_neighbor"),
+                       labels = c("An older child in our family",
+                                  "A sibling of myself or of my partner/spouse",
+                                  "A parent of myself or of my partner/spouse ",
+                                  "Another relative of our family",
+                                  "A friend of our family",
+                                  "A neighbor of our family"))) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+
+### By demographics
+
+```{r, out.width='100%'}
+scored %>%
+  select(contains("expect_age"), all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  select(-dvalue)%>%
+  gather(type, value, -demo) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+   mutate(type = factor(type, 
+                       levels = c("expect_relation_sibling",
+                                  "expect_relation_aunt",
+                                  "expect_relation_grand",
+                                  "expect_relation_relative",
+                                  "expect_relation_friend",
+                                  "expect_relation_neighbor"),
+                       labels = c("An older child in our family",
+                                  "A sibling of myself or of my partner/spouse",
+                                  "A parent of myself or of my partner/spouse ",
+                                  "Another relative of our family",
+                                  "A friend of our family",
+                                  "A neighbor of our family"))) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 5))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+# Future childcare
+
+## Option to return?
+
+"If you had the option to return the same childcare you had prior to the coronavirus, are you able to do so (e.g., can you pay for child care, can you get your child there, etc.)?"
+
+```{r}
+scored %>%
+  select(same_cc, all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1 & !is.na(same_cc)) %>%
+  select(-dvalue) %>%
+  group_by(same_cc, demo) %>%
+  summarize(Count = n()) %>%
+  group_by(demo) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = same_cc))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+## Willing to return?
+
+"If you had the option to return to the same childcare you had prior to the coronavirus (COVID-19) pandemic, would you be willing to?"
+
+```{r}
+scored %>%
+  select(willing_same_cc, all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1 & !is.na(willing_same_cc)) %>%
+  select(-dvalue) %>%
+  group_by(willing_same_cc, demo) %>%
+  summarize(Count = n()) %>%
+  group_by(demo) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = willing_same_cc))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+## Barriers to returning
+
+### Overall
+
+```{r}
+scored %>%
+  select(contains("barrier_same_cc_")) %>%
+  gather(type, value) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  summarize(Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("barrier_same_cc_cost",
+                                  "barrier_same_cc_safe",
+                                  "barrier_same_cc_need"),
+                       labels = c("I can no longer afford this option",
+                                  "I no longer think this option is safe for my child and/or my family",
+                                  "I no longer need the same amount of child care"))) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+
+### By demographics
+
+```{r, out.width='100%'}
+scored %>%
+  select(contains("barrier_same_cc_"), all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  select(-dvalue)%>%
+  gather(type, value, -demo) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("barrier_same_cc_cost",
+                                  "barrier_same_cc_safe",
+                                  "barrier_same_cc_need"),
+                       labels = c("I can no longer afford this option",
+                                  "I no longer think this option is safe for my child and/or my family",
+                                  "I no longer need the same amount of child care"))) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+## Comfort returning
+
+"How comfortable would you feel about returning to the same childcare you had prior to the coronavirus (COVID-19) pandemic, if the option becomes available?  Select all that apply." (For these analyses, I selected the first option, or the most negative.)
+
+## Willing to return?{.tabset}
+
+"If you had the option to return to the same childcare you had prior to the coronavirus (COVID-19) pandemic, would you be willing to?"
+
+### Overall
+
+
+```{r}
+scored %>%
+  filter(!is.na(comfort_return)) %>%
+  group_by(comfort_return) %>%
+  summarize(Count = n()) %>%
+  mutate(Percent = 100*Count/sum(Count),
+         Count = ifelse(Count == 0, NA, Count),
+         comfort_return = factor(comfort_return, 
+                                 levels = as.character(c(4,3,2,1)),
+                                 labels = c(
+                                   "Very comfortable and not at all worried or anxious",
+                                       "Neither comfortable nor worried or anxious",
+                                   "A little comfortable and also a little worried or anxious",
+                                   "Not at all comfortable and very worried or anxious"))) %>%
+  ggplot(aes(x = Percent, y = comfort_return),)+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  labs(y = "")+
+  theme_minimal()
+```
+
+### By demographics
+
+
+```{r}
+scored %>%
+  select(comfort_return, all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1 & !is.na(comfort_return)) %>%
+  select(-dvalue) %>%
+  group_by(comfort_return, demo) %>%
+  summarize(Count = n()) %>%
+  group_by(demo) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count),
+         comfort_return = factor(comfort_return, 
+                                 levels = as.character(c(4,3,2,1)),
+                                 labels = c(
+                                   "Very comfortable and not at all worried or anxious",
+                                       "Neither comfortable nor worried or anxious",
+                                   "A little comfortable and also a little worried or anxious",
+                                   "Not at all comfortable and very worried or anxious"))) %>%
+  ggplot(aes(x = Percent, y = comfort_return))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+## What to know?
+
+### Overall
+
+```{r}
+scored %>%
+  select(contains("know_cc")) %>%
+  gather(type, value) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  summarize(Percent = 100*sum(value)/n()) %>%
+  ungroup() %>%
+  mutate(type = gsub("know_cc_", "", type),
+    type = factor(type,
+                  levels = c("numchild",
+                             "numadult",
+                             "socialDis",
+                             "cleaning",
+                             "childHealth",
+                             "employeeHealth",
+                             "COVID",
+                             "enroll"),
+                       labels = c("The number of children ",
+                             "The number of adults ",
+                             "Social distancing measures  ",
+                             "Plans for cleaning the physical space  ",
+                             "Plans for deciding if a child is healthy enough to attend child care  ",
+                             "Plans for deciding if a child care employee is healthy enough to work  ",
+                             "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
+                             "New and/or updated policies for enrollment, cost, etc"))) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+
+### By demographics
+
+```{r, out.width='100%'}
+scored %>%
+  select(contains("know_cc"), all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  select(-dvalue)%>%
+  gather(type, value, -demo) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+  ungroup() %>%
+  mutate(type = gsub("know_cc_", "", type),
+    type = factor(type,
+                  levels = c("numchild",
+                             "numadult",
+                             "socialDis",
+                             "cleaning",
+                             "childHealth",
+                             "employeeHealth",
+                             "COVID",
+                             "enroll"),
+                       labels = c("The number of children ",
+                             "The number of adults ",
+                             "Social distancing measures  ",
+                             "Plans for cleaning the physical space  ",
+                             "Plans for deciding if a child is healthy enough to attend child care  ",
+                             "Plans for deciding if a child care employee is healthy enough to work  ",
+                             "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
+                             "New and/or updated policies for enrollment, cost, etc"))) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+## Concerns about ability to return
+
+"Are you concerned that you may not be able to return to work because you lack appropriate childcare? "
+
+
+"If you had the option to return to the same childcare you had prior to the coronavirus (COVID-19) pandemic, would you be willing to?"
+
+```{r}
+scored %>%
+  select(lack_cc, all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1 & !is.na(lack_cc)) %>%
+  select(-dvalue) %>%
+  group_by(lack_cc, demo) %>%
+  summarize(Count = n()) %>%
+  group_by(demo) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = lack_cc))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+# Source of information
+
+What source(s) of information do you use and trust to make decisions for your family’s health and safety? Select all that apply.
+### Overall
+
+```{r}
+scored %>%
+  select(contains("source_")) %>%
+  gather(type, value) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  summarize(Percent = 100*sum(value)/n()) %>%
+  ungroup() %>%
+  mutate(
+    type = factor(type,
+                  levels = c("source_trump",
+                             "source_uspublic",
+                             "source_congress",
+                             "source_gov",
+                             "source_state",
+                             "source_employ",
+                             "source_nonemploy",
+                             "source_child","source_nonchild",
+                             "source_family",
+                             "source_friends",
+                             "source_other"),
+                       labels = c(
+                         "President Trump  ",
+                             "U.S. public health officials & organizations ",
+                             "Members of the U.S. Congress ",
+                             "My state’s governor  ",
+                             "My state’s health officials & organizations  ",
+                             "Administrators at my place of employment ",
+                             "Non-administrators at my place of employment ",
+                             "Administrators at my child’s child care / school ",
+                         "Non-administrators at my child’s child care / school ",
+                             "My family",
+                             "My friends",
+                             "Other"))) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  theme_minimal()
+```
+
+### By demographics
+
+```{r, out.width='100%'}
+scored %>%
+  select(contains("source_"), all_of(demo_groups)) %>%
+  gather("demo","dvalue", all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  select(-dvalue)%>%
+  gather(type, value, -demo) %>%
+  filter(!is.na(value)) %>%
+  group_by(demo, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+  ungroup() %>%
+  mutate(
+    type = factor(type,
+                  levels = c("source_trump",
+                             "source_uspublic",
+                             "source_congress",
+                             "source_gov",
+                             "source_state",
+                             "source_employ",
+                             "source_nonemploy",
+                             "source_child","source_nonchild",
+                             "source_family",
+                             "source_friends",
+                             "source_other"),
+                       labels = c(
+                         "President Trump  ",
+                             "U.S. public health officials & organizations ",
+                             "Members of the U.S. Congress ",
+                             "My state’s governor  ",
+                             "My state’s health officials & organizations  ",
+                             "Administrators at my place of employment ",
+                             "Non-administrators at my place of employment ",
+                             "Administrators at my child’s child care / school ",
+                         "Non-administrators at my child’s child care / school ",
+                             "My family",
+                             "My friends",
+                             "Other"))) %>%
+  ungroup() %>%
+  mutate(demo = factor(demo,
+                       levels = demo_groups,
+                       labels = demo_labels),
+         Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  facet_wrap(~demo)+
+  labs(y = "")+
+  theme_minimal()
+```
+
+# Open-ended questions
+
+```{r}
+text_data = cbind(scored[,c("CaregiverID", demo_groups)], master[master$Week == 7,find_items("OPEN", master)])
+```
+
+
+## Question 1{.tabset}
+
+"What are the biggest challenges and concerns for you and your family right now?"
+
+### Common words
+
+```{r}
+open1 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.001) %>%
+  unnest_tokens(word, OPEN.001) %>%
+  anti_join(stop_words) 
+
+open1 %>%
+  count(word, sort = T)%>%
+  filter(n > 50) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+### By demographic
+
+```{r}
+open1 %>%
+  gather(demo, dvalue, all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  group_by(demo, CaregiverID) %>%
+  count(word, sort = T) %>%
+  rename(times = n) %>%
+  group_by(demo) %>%
+  mutate(size = n()) %>%
+  group_by(demo, word) %>%
+  summarize(people=n(),
+            size = max(size)) %>%
+  mutate(Percent = 100*people/size) %>%
+  group_by(demo) %>%
+  filter(Percent > 1) %>%
+  ggplot(aes(x = word, y = Percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  facet_wrap(~demo, scales = "free")
+```
+
+
+### Network plot 
+```{r}
+library(widyr)
+
+library(igraph)
+library(ggraph)
+
+text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.001) %>%
+  unnest_tokens(paired_words, OPEN.001, token = "ngrams", n = 2) %>%
+  count(paired_words, sort = TRUE) %>%
+  separate(paired_words, c("word1", "word2"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+        filter(n >= 3) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_width = n), alpha = .3) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: Biggest challenges and concerns",
+             x = "", y = "")
+```
+
+
+## Question 2{.tabset}
+
+"What is helping you and your family the most right now?"
+
+### Common words
+
+```{r}
+open2 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
+  unnest_tokens(word, OPEN.002) %>%
+  anti_join(stop_words) 
+
+open2 %>%
+  count(word, sort = T)%>%
+  filter(n > 50) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+### By demographic
+
+```{r}
+open2 %>%
+  gather(demo, dvalue, all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  group_by(demo, CaregiverID) %>%
+  count(word, sort = T) %>%
+  rename(times = n) %>%
+  group_by(demo) %>%
+  mutate(size = n()) %>%
+  group_by(demo, word) %>%
+  summarize(people=n(),
+            size = max(size)) %>%
+  mutate(Percent = 100*people/size) %>%
+  group_by(demo) %>%
+  filter(Percent > 1) %>%
+  ggplot(aes(x = word, y = Percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  facet_wrap(~demo, scales = "free")
+```
+
+
+### Network plot 
+```{r}
+
+text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
+  unnest_tokens(paired_words, OPEN.002, token = "ngrams", n = 2) %>%
+  count(paired_words, sort = TRUE) %>%
+  separate(paired_words, c("word1", "word2"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+        filter(n >= 3) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_width = n), alpha = .3) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: What is helping you and your family",
+             x = "", y = "")
+```
+
+
+## Question 3{.tabset}
+
+"What is on your mind the most when you think about your community re-opening?"
+
+### Common words
+
+```{r}
+open3 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
+  unnest_tokens(word, OPEN.003) %>%
+  anti_join(stop_words) 
+
+open3 %>%
+  count(word, sort = T)%>%
+  filter(n > 50) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+### By demographic
+
+```{r}
+open3 %>%
+  gather(demo, dvalue, all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  group_by(demo, CaregiverID) %>%
+  count(word, sort = T) %>%
+  rename(times = n) %>%
+  group_by(demo) %>%
+  mutate(size = n()) %>%
+  group_by(demo, word) %>%
+  summarize(people=n(),
+            size = max(size)) %>%
+  mutate(Percent = 100*people/size) %>%
+  group_by(demo) %>%
+  filter(Percent > 1) %>%
+  ggplot(aes(x = word, y = Percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  facet_wrap(~demo, scales = "free")
+```
+
+
+### Network plot 
+```{r}
+
+text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
+  unnest_tokens(paired_words, OPEN.003, token = "ngrams", n = 2) %>%
+  count(paired_words, sort = TRUE) %>%
+  separate(paired_words, c("word1", "word2"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+        filter(n >= 3) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_width = n), alpha = .3) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: community re-opening",
+             x = "", y = "")
+```
+
+
+
+## Question 4{.tabset}
+
+"What concerns do you have about your place of employment and/or your child’s child care setting re-opening?"
+
+### Common words
+
+```{r}
+open4 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
+  unnest_tokens(word, OPEN.004) %>%
+  anti_join(stop_words) 
+
+open4 %>%
+  count(word, sort = T)%>%
+  filter(n > 50) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+### By demographic
+
+```{r}
+open4 %>%
+  gather(demo, dvalue, all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  group_by(demo, CaregiverID) %>%
+  count(word, sort = T) %>%
+  rename(times = n) %>%
+  group_by(demo) %>%
+  mutate(size = n()) %>%
+  group_by(demo, word) %>%
+  summarize(people=n(),
+            size = max(size)) %>%
+  mutate(Percent = 100*people/size) %>%
+  group_by(demo) %>%
+  filter(Percent > 1) %>%
+  ggplot(aes(x = word, y = Percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  facet_wrap(~demo, scales = "free")
+```
+
+
+### Network plot 
+```{r}
+
+text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
+  unnest_tokens(paired_words, OPEN.004, token = "ngrams", n = 2) %>%
+  count(paired_words, sort = TRUE) %>%
+  separate(paired_words, c("word1", "word2"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+        filter(n >= 3) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_width = n), alpha = .3) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: your place of employment and/or your child’s child care setting re-opening",
+             x = "", y = "")
+```
+
+
+
+## Question 5{.tabset}
+
+"Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?"
+
+### Common words
+
+```{r}
+open5 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
+  unnest_tokens(word, OPEN.005) %>%
+  anti_join(stop_words) 
+
+open5 %>%
+  count(word, sort = T)%>%
+  filter(n > 50) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+
+### By demographic
+
+```{r}
+open5 %>%
+  gather(demo, dvalue, all_of(demo_groups)) %>%
+  filter(dvalue == 1) %>%
+  group_by(demo, CaregiverID) %>%
+  count(word, sort = T) %>%
+  rename(times = n) %>%
+  group_by(demo) %>%
+  mutate(size = n()) %>%
+  group_by(demo, word) %>%
+  summarize(people=n(),
+            size = max(size)) %>%
+  mutate(Percent = 100*people/size) %>%
+  group_by(demo) %>%
+  filter(Percent > 1) %>%
+  ggplot(aes(x = word, y = Percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  facet_wrap(~demo, scales = "free")
+```
+
+
+### Network plot 
+```{r}
+
+text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
+  unnest_tokens(paired_words, OPEN.005, token = "ngrams", n = 2) %>%
+  count(paired_words, sort = TRUE) %>%
+  separate(paired_words, c("word1", "word2"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+        filter(n >= 3) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_width = n), alpha = .3) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: Anything else?",
+             x = "", y = "")
+```
+
+
+
+
+
+
+
+
