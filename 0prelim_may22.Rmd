@@ -576,6 +576,7 @@ scored %>%
 # Source of information
 
 What source(s) of information do you use and trust to make decisions for your family’s health and safety? Select all that apply.
+
 ### Overall
 
 ```{r}
@@ -716,7 +717,8 @@ open1 %>%
             size = max(size)) %>%
   mutate(Percent = 100*people/size) %>%
   group_by(demo) %>%
-  filter(Percent > 1) %>%
+  arrange(desc(Percent)) %>%
+  filter(row_number() <= 15 & Percent > 1) %>%
   ggplot(aes(x = word, y = Percent)) +
   geom_bar(stat = "identity") +
   coord_flip()+
@@ -788,6 +790,8 @@ open2 %>%
             size = max(size)) %>%
   mutate(Percent = 100*people/size) %>%
   group_by(demo) %>%
+    arrange(desc(Percent)) %>%
+  filter(row_number() <= 15) %>%
   filter(Percent > 1) %>%
   ggplot(aes(x = word, y = Percent)) +
   geom_bar(stat = "identity") +
@@ -856,6 +860,8 @@ open3 %>%
             size = max(size)) %>%
   mutate(Percent = 100*people/size) %>%
   group_by(demo) %>%
+    arrange(desc(Percent)) %>%
+  filter(row_number() <= 15) %>%
   filter(Percent > 1) %>%
   ggplot(aes(x = word, y = Percent)) +
   geom_bar(stat = "identity") +
@@ -926,6 +932,8 @@ open4 %>%
   mutate(Percent = 100*people/size) %>%
   group_by(demo) %>%
   filter(Percent > 1) %>%
+    arrange(desc(Percent)) %>%
+  filter(row_number() <= 15) %>%
   ggplot(aes(x = word, y = Percent)) +
   geom_bar(stat = "identity") +
   coord_flip()+
@@ -995,6 +1003,8 @@ open5 %>%
   mutate(Percent = 100*people/size) %>%
   group_by(demo) %>%
   filter(Percent > 1) %>%
+    arrange(desc(Percent)) %>%
+  filter(row_number() <= 15) %>%
   ggplot(aes(x = word, y = Percent)) +
   geom_bar(stat = "identity") +
   coord_flip()+
