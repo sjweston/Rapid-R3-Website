@@ -585,7 +585,8 @@ scored %>%
   gather(type, value) %>%
   filter(!is.na(value)) %>%
   group_by(type) %>%
-  summarize(Percent = 100*sum(value)/n()) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
   mutate(
     type = factor(type,
@@ -615,6 +616,7 @@ scored %>%
                              "Other"))) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
+    geom_text(aes(label = Count, x= Percent + 10))+
   theme_minimal()
 ```
 
