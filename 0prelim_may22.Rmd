@@ -15,7 +15,7 @@ options(knitr.kable.NA = '')
 
 ```{r}
 # blw_poverty or race_cat
-which_demo = "blw_poverty"
+which_demo = "race_cat"
 ```
 
 ```{r}
@@ -288,9 +288,29 @@ scored %>%
 
 # Future childcare
 
-## Option to return?
+## Option to return?{.tabset}
 
 "If you had the option to return the same childcare you had prior to the coronavirus, are you able to do so (e.g., can you pay for child care, can you get your child there, etc.)?"
+
+### Overall
+
+```{r}
+scored %>%
+  filter(!is.na(same_cc)) %>%
+  group_by(same_cc) %>%
+  summarize(Count = n()) %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  ungroup() %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = same_cc))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, x= Percent + 10))+
+  labs(y = "")+
+  theme_minimal()
+```
+
+
+### By demographics
 
 ```{r}
 scored %>%
@@ -342,7 +362,9 @@ scored %>%
   theme_minimal()
 ```
 
-## Barriers to returning
+## Barriers to returning{.tabset}
+
+What might make it hard for you to return to the same childcare you had prior to the coronavirus (COVID-19) pandemic?  Select all that apply. 
 
 ### Overall
 
@@ -398,13 +420,10 @@ scored %>%
   theme_minimal()
 ```
 
-## Comfort returning
+## Comfort with returning{.tabset}
 
 "How comfortable would you feel about returning to the same childcare you had prior to the coronavirus (COVID-19) pandemic, if the option becomes available?  Select all that apply." (For these analyses, I selected the first option, or the most negative.)
 
-## Willing to return?{.tabset}
-
-"If you had the option to return to the same childcare you had prior to the coronavirus (COVID-19) pandemic, would you be willing to?"
 
 ### Overall
 
@@ -463,7 +482,9 @@ scored %>%
   theme_minimal()
 ```
 
-## What to know?
+## What to know?{.tabset}
+
+"What would you want to know to feel comfortable using childcare? Select all that apply."
 
 ### Overall
 
@@ -543,12 +564,9 @@ scored %>%
   theme_minimal()
 ```
 
-## Concerns about ability to return
+## Returning to work constrained by childcare
 
 "Are you concerned that you may not be able to return to work because you lack appropriate childcare? "
-
-
-"If you had the option to return to the same childcare you had prior to the coronavirus (COVID-19) pandemic, would you be willing to?"
 
 ```{r}
 scored %>%
@@ -573,7 +591,7 @@ scored %>%
   theme_minimal()
 ```
 
-# Source of information
+# Source of information{.tabset}
 
 What source(s) of information do you use and trust to make decisions for your family’s health and safety? Select all that apply.
 
