@@ -15,7 +15,7 @@ options(knitr.kable.NA = '')
 
 ```{r 0prelim-may29-1}
 # blw or race_cat
-which_demo = "race_cat"
+which_demo = "blw"
 ```
 
 ```{r 0prelim-may29-2}
@@ -771,24 +771,24 @@ scored %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
-  mutate(type = gsub("know_cc_", "", type),
-    type = factor(type,
-                  levels = c("numchild",
-                             "numadult",
-                             "socialDis",
-                             "cleaning",
-                             "childHealth",
-                             "employeeHealth",
-                             "COVID",
-                             "enroll"),
-                       labels = c("The number of children ",
-                             "The number of adults ",
-                             "Social distancing measures  ",
-                             "Plans for cleaning the physical space  ",
-                             "Plans for deciding if a child is healthy enough to attend child care  ",
-                             "Plans for deciding if a child care employee is healthy enough to work  ",
-                             "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
-                             "New and/or updated policies for enrollment, cost, etc"))) %>%
+  # mutate(type = gsub("know_cc_", "", type),
+    # type = factor(type,
+    #               levels = c("numchild",
+    #                          "numadult",
+    #                          "socialDis",
+    #                          "cleaning",
+    #                          "childHealth",
+    #                          "employeeHealth",
+    #                          "COVID",
+    #                          "enroll"),
+    #                    labels = c("The number of children ",
+    #                          "The number of adults ",
+    #                          "Social distancing measures  ",
+    #                          "Plans for cleaning the physical space  ",
+    #                          "Plans for deciding if a child is healthy enough to attend child care  ",
+    #                          "Plans for deciding if a child care employee is healthy enough to work  ",
+    #                          "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
+    #                          "New and/or updated policies for enrollment, cost, etc"))) %>%
   ungroup() %>%
   mutate(demo = factor(demo,
                        levels = demo_groups,
@@ -819,24 +819,24 @@ scored %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
-  mutate(type = gsub("know_cc_", "", type),
-    type = factor(type,
-                  levels = c("numchild",
-                             "numadult",
-                             "socialDis",
-                             "cleaning",
-                             "childHealth",
-                             "employeeHealth",
-                             "COVID",
-                             "enroll"),
-                       labels = c("The number of children ",
-                             "The number of adults ",
-                             "Social distancing measures  ",
-                             "Plans for cleaning the physical space  ",
-                             "Plans for deciding if a child is healthy enough to attend child care  ",
-                             "Plans for deciding if a child care employee is healthy enough to work  ",
-                             "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
-                             "New and/or updated policies for enrollment, cost, etc"))) %>%
+  # mutate(type = gsub("know_cc_", "", type),
+  #   type = factor(type,
+  #                 levels = c("numchild",
+  #                            "numadult",
+  #                            "socialDis",
+  #                            "cleaning",
+  #                            "childHealth",
+  #                            "employeeHealth",
+  #                            "COVID",
+  #                            "enroll"),
+  #                      labels = c("The number of children ",
+  #                            "The number of adults ",
+  #                            "Social distancing measures  ",
+  #                            "Plans for cleaning the physical space  ",
+  #                            "Plans for deciding if a child is healthy enough to attend child care  ",
+  #                            "Plans for deciding if a child care employee is healthy enough to work  ",
+  #                            "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
+  #                            "New and/or updated policies for enrollment, cost, etc"))) %>%
   ungroup() %>%
   mutate(demo = factor(demo,
                        levels = demo_groups,
