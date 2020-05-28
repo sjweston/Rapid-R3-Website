@@ -82,7 +82,7 @@ cc_demo_labels = c("Center-based care",
 
 ```{r access-by-race-1}
 scored_all = scored
-max_weeks = max(scored$Week)
+max_weeks = max(scored$Week, na.rm = T)
 scored = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == 0 | Week == max(Week)) %>%

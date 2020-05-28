@@ -172,7 +172,7 @@ scored = scored %>%
 zipincome = read.csv(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Income_Data.csv"),
                      na.strings = "-")
 
-zipincome = select(zipincome, Zip_Code, Families_Median_Income)
+zipincome = select(zipincome, Zip_Code, Housholds_Median_Income)
 
 names(zipincome) = c("zip", "median_income")
 zipincome$median_income = as.numeric(as.character(zipincome$median_income))
