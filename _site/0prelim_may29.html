@@ -606,21 +606,137 @@ div.tocify {
 <p><img src="0prelim_may29_files/figure-html/0prelim-may29-30-1.png" width="672" /></p>
 </div>
 </div>
+<div id="expected-change-in-childcare" class="section level2 tabset">
+<h2>Expected change in childcare</h2>
+<p>Using the caregiver type variables, we indicate, for each caregiver, whether they “lost” that type of childcare, meaning they were using it before and do not anticipate using it in the next month.</p>
+<div id="self-reported-income-9" class="section level3">
+<h3>Self-reported income</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-51-1.png" width="672" /></p>
+</div>
+<div id="median-household-income-9" class="section level3">
+<h3>Median Household income</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-51b-1.png" width="672" /></p>
+</div>
+<div id="overall-7" class="section level3">
+<h3>Overall</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-52-1.png" width="672" /></p>
+</div>
+</div>
+<div id="how-does-losing-childcare-option-relate-to-mental-health" class="section level2 tabset">
+<h2>How does losing childcare option relate to mental health?</h2>
+<div id="anxiety" class="section level3">
+<h3>Anxiety</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-53-1.png" width="672" /></p>
+</div>
+<div id="depression" class="section level3">
+<h3>Depression</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-53a-1.png" width="672" /></p>
+</div>
+<div id="stress" class="section level3">
+<h3>Stress</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-53b-1.png" width="672" /></p>
+</div>
+<div id="loneliness" class="section level3">
+<h3>Loneliness</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-53c-1.png" width="672" /></p>
+</div>
+<div id="fussy" class="section level3">
+<h3>Fussy</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-53d-1.png" width="672" /></p>
+</div>
+<div id="fear" class="section level3">
+<h3>Fear</h3>
+<p><img src="0prelim_may29_files/figure-html/0prelim-may29-53e-1.png" width="672" /></p>
+</div>
+</div>
 </div>
 <div id="source-of-information" class="section level1 tabset">
 <h1>Source of information</h1>
 <p>What source(s) of information do you use and trust to make decisions for your family’s health and safety? Select all that apply.</p>
-<div id="self-reported-income-9" class="section level2">
+<div id="self-reported-income-10" class="section level2">
 <h2>Self-reported income</h2>
 <p><img src="0prelim_may29_files/figure-html/0prelim-may29-31-1.png" width="100%" /></p>
 </div>
-<div id="median-household-income-9" class="section level2">
+<div id="median-household-income-10" class="section level2">
 <h2>Median household income</h2>
 <p><img src="0prelim_may29_files/figure-html/0prelim-may29-32-1.png" width="100%" /></p>
 </div>
-<div id="overall-7" class="section level2">
+<div id="overall-8" class="section level2">
 <h2>Overall</h2>
 <p><img src="0prelim_may29_files/figure-html/0prelim-may29-33-1.png" width="672" /></p>
+<!-- ### Proportion marking "a lot" or "very much" -->
+<!-- ```{r 0prelim-may29-54, fig.height=8} -->
+<!-- library(ggpubr) -->
+<!-- scored = scored %>%  -->
+<!--   mutate(lostCC_group = factor(lostCC,  -->
+<!--                                levels = c(0,1),  -->
+<!--                                labels = c("No loss", "Lost 1+ types of childcare"))) -->
+<!-- anxiety.plot = scored %>% -->
+<!--   select(lostCC_group, anxiety_current_lots) %>% -->
+<!--   ggbarplot(.,  -->
+<!--           x = "lostCC_group",  -->
+<!--           y = "anxiety_current_lots",  -->
+<!--           fill = "lostCC_group", -->
+<!--           label = T, -->
+<!--           lab.nb.digits = 2, -->
+<!--           lab.vjust = -2, -->
+<!--           xlab = "", ylab = "", title = "Caregiver anxiety", -->
+<!--           add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend") -->
+<!-- depress.plot = scored %>% -->
+<!--   select(lostCC_group, depress_current_lots) %>% -->
+<!--   ggbarplot(.,  -->
+<!--           x = "lostCC_group",  -->
+<!--           y = "depress_current_lots",  -->
+<!--           fill = "lostCC_group", -->
+<!--           label = T, -->
+<!--           lab.nb.digits = 2, -->
+<!--           lab.vjust = -2, -->
+<!--           xlab = "",  ylab = "", title = "Caregiver depression", -->
+<!--           add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend") -->
+<!-- stress.plot = scored %>% -->
+<!--   select(lostCC_group, stress_current_lots)%>% -->
+<!--   ggbarplot(.,  -->
+<!--           x = "lostCC_group",  -->
+<!--           y = "stress_current_lots",  -->
+<!--           fill = "lostCC_group", -->
+<!--           label = T, -->
+<!--           lab.nb.digits = 2, -->
+<!--           lab.vjust = -2, -->
+<!--           xlab = "",  ylab = "", title = "Caregiver stress", -->
+<!--           add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend") -->
+<!-- lonely.plot = scored %>% -->
+<!--   select(lostCC_group, lonely_current_lots)%>% -->
+<!--   ggbarplot(.,  -->
+<!--           x = "lostCC_group",  -->
+<!--           y = "lonely_current_lots",  -->
+<!--           fill = "lostCC_group", -->
+<!--           label = T, -->
+<!--           lab.nb.digits = 2, -->
+<!--           lab.vjust = -2, -->
+<!--           xlab = "",  ylab = "", title = "Caregiver loneliness", -->
+<!--           add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend") -->
+<!-- fussy.plot = scored %>% -->
+<!--   select(lostCC_group, fussy_current_lots)%>% -->
+<!--   ggbarplot(.,  -->
+<!--           x = "lostCC_group",  -->
+<!--           y = "fussy_current_lots",  -->
+<!--           fill = "lostCC_group", -->
+<!--           xlab = "",  ylab = "", title = "Child fussiness", -->
+<!--           add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend") -->
+<!-- fear.plot = scored %>% -->
+<!--   select(lostCC_group, fear_current_lots)%>% -->
+<!--   ggbarplot(.,  -->
+<!--           x = "lostCC_group",  -->
+<!--           y = "fear_current_lots",  -->
+<!--           fill = "lostCC_group", -->
+<!--           label = T, -->
+<!--           lab.nb.digits = 2, -->
+<!--           lab.vjust = -2, -->
+<!--           xlab = "", ylab = "", title = "Child fear", -->
+<!--           add = "mean_ci") + stat_compare_means(method = "t.test") + rremove("legend") -->
+<!-- ggarrange(anxiety.plot, depress.plot, stress.plot, lonely.plot, fussy.plot, fear.plot, -->
+<!--           ncol = 2, nrow = 3) -->
+<!-- ``` -->
 </div>
 </div>
 <div id="open-ended-questions" class="section level1">
@@ -703,29 +819,6 @@ div.tocify {
 <div id="network-plot-4" class="section level3">
 <h3>Network plot</h3>
 <p><img src="0prelim_may29_files/figure-html/0prelim-may29-49-1.png" width="672" /></p>
-</div>
-</div>
-<div id="expected-change-in-childcare" class="section level2 tabset">
-<h2>Expected change in childcare</h2>
-<p>Using the caregiver type variables, we indicate, for each caregiver, whether they “lost” that type of childcare, meaning they were using it before and do not anticipate using it in the next month.</p>
-<div id="by-type" class="section level3">
-<h3>By type</h3>
-<p><img src="0prelim_may29_files/figure-html/0prelim-may29-51-1.png" width="672" /></p>
-</div>
-<div id="overall-8" class="section level3">
-<h3>Overall</h3>
-<p><img src="0prelim_may29_files/figure-html/0prelim-may29-52-1.png" width="672" /></p>
-</div>
-</div>
-<div id="how-does-losing-childcare-option-relate-to-mental-health" class="section level2 tabset">
-<h2>How does losing childcare option relate to mental health?</h2>
-<div id="composite-scores" class="section level3">
-<h3>Composite scores</h3>
-<p><img src="0prelim_may29_files/figure-html/0prelim-may29-53-1.png" width="672" /></p>
-</div>
-<div id="proportion-marking-a-lot-or-very-much" class="section level3">
-<h3>Proportion marking “a lot” or “very much”</h3>
-<p><img src="0prelim_may29_files/figure-html/0prelim-may29-54-1.png" width="672" /></p>
 </div>
 </div>
 </div>
