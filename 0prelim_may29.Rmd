@@ -14,7 +14,7 @@ options(knitr.kable.NA = '')
 ```
 
 ```{r 0prelim-may29-1}
-# blw or race_cat
+# blw or race_cat or everyone
 which_demo = "blw"
 ```
 
@@ -31,8 +31,17 @@ scored = scored %>%
   filter(Week %in% c(7,8)) %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(expected_binary = case_when(
+    (expect_center == 1 | expect_promyhome == 1 | expect_theirhome == 1) ~ "formal",
+    (expect_relativemyhome == 1 | expect_relativetheirhome == 1) ~ "informal",
+    TRUE ~ NA_character_),
+    expected_formal = ifelse(expected_binary == "formal", 1, 0),
+    expected_informal = ifelse(expected_binary == "informal", 1, 0))
 
+```
+
+```{r}
 reported_income_quantiles = quantile(scored$income/1000, probs = c(0, .25, .5, .75, 1), na.rm=T)
 med_household_quantiles = quantile(scored$median_income/1000, probs = c(0, .25, .5, .75, 1), na.rm=T)
 
@@ -42,6 +51,7 @@ scored = scored %>%
          median_income = median_income/1000,
          median_income = cut(median_income, breaks = med_household_quantiles))
 ```
+
 
 ```{r 0prelim-may29-3, eval = (which_demo == "blw")}
 scored = scored %>%
@@ -55,13 +65,12 @@ demo_groups = c("white", "black", "latinx")
 demo_labels = c("White", "African American","Latinx")
 ```
 
-```{r 0prelim-may29-4, eval = (which_demo == "race_cat")}
-demo_groups = c("native","asian","black","latinx","hawaii", "white", "other_race")
-demo_labels = c("Native American\n/Alaskan", "Asian", "Black\nAfrican American",
-                "Latinx/Hispanic","Native Hawaiian\n/Pacific Islander", "White/Caucasian",
-                "Other")
+```{r 0prelim-may29-4b}
+scored = scored %>%
+  mutate(everyone = 1)
+demo_groupse = c("everyone")
+demo_labelse = c("Everyone")
 ```
-
 
 # Expectations for childcare
 
@@ -73,14 +82,12 @@ demo_labels = c("Native American\n/Alaskan", "Asian", "Black\nAfrican American",
 
 ```{r 0prelim-may29-5, out.width='100%'}
 scored %>%
-  select(contains("expect_"), all_of(demo_groups), income) %>%
+  select(contains("expect_"), income) %>%
   select(-contains("age"), -contains("relation")) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
-  select(-dvalue)%>%
-  gather(type, value, -demo, -income) %>%
+  filter(!is.na(income)) %>%
+  gather(type, value,  -income) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(income, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -99,35 +106,30 @@ scored %>%
                                   "Parents/legal guardians", 
                                   "None"))) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity", position = position_dodge(width = 1)) +
   geom_text(aes(label = Count, x= Percent + 10), position = position_dodge(width = 1))+
   scale_fill_brewer(palette = "Dark2")+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   guides(fill = F) +
   labs(y = "")+
   theme_bw() +
   theme(legend.position = "top")
 ```
 
+### Race/ethnicity
 
-### Median household income
-
-```{r 0prelim-may29-6, out.width='100%'}
+```{r 0prelim-may29-5b, out.width='100%'}
 scored %>%
-  select(contains("expect_"), all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(contains("expect_"), all_of(demo_groups)) %>%
   select(-contains("age"), -contains("relation")) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
+  filter(dvalue == 1 ) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo, -income) %>%
+  gather(type, value, -demo) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(demo, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -150,11 +152,11 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = income))+
+  ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity", position = position_dodge(width = 1)) +
   geom_text(aes(label = Count, x= Percent + 10), position = position_dodge(width = 1))+
   scale_fill_brewer(palette = "Dark2")+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   guides(fill = F) +
   labs(y = "")+
   theme_bw() +
@@ -199,13 +201,11 @@ scored %>%
 
 ```{r 0prelim-may29-8, out.width='100%'}
 scored %>%
-  select(contains("expect_age"), all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 &!is.na(income)) %>%
-  select(-dvalue)%>%
-  gather(type, value, -demo, -income) %>%
+  select(contains("expect_age"), income) %>%
+  filter(!is.na(income)) %>%
+  gather(type, value,  -income) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(income, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -224,32 +224,28 @@ scored %>%
                                   "65+",
                                   "Unsure"))) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+           mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 5))+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   labs(y = "")+
   theme_bw()
 ```
 
-### Median household income
+### Race/ethnicity
 
-```{r 0prelim-may29-9, out.width='100%'}
+```{r 0prelim-may29-8b, out.width='100%'}
 scored %>%
-  select(contains("expect_age"), all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(contains("expect_age"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 &!is.na(income)) %>%
+  filter(dvalue == 1 ) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo, -income) %>%
+  gather(type, value, -demo) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(demo, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -272,15 +268,17 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = income))+
+  ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 5))+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   labs(y = "")+
   theme_bw()
 ```
+
+
 
 ### Overall
 
@@ -321,13 +319,11 @@ scored %>%
 
 ```{r 0prelim-may29-11, out.width='100%'}
 scored %>%
-  select(contains("expect_relation"), all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
-  select(-dvalue)%>%
-  gather(type, value, -demo, - income) %>%
+  select(contains("expect_relation"), income) %>%
+  filter(!is.na(income)) %>%
+  gather(type, value,  -income) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(income, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -344,32 +340,28 @@ scored %>%
                                   "A friend of our family",
                                   "A neighbor of our family"))) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 5))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
   theme_minimal()
 ```
 
-### Median household income
+### Race/ethnicity
 
-```{r 0prelim-may29-12, out.width='100%'}
+```{r 0prelim-may29-11b, out.width='100%'}
 scored %>%
-  select(contains("expect_relation"), all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(contains("expect_relation"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
+  filter(dvalue == 1 ) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo, - income) %>%
+  gather(type, value, -demo,) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(demo,  type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -390,10 +382,10 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = income))+
+  ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 5))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
@@ -438,53 +430,50 @@ scored %>%
 
 ```{r 0prelim-may29-14}
 scored %>%
-  select(same_cc, all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(same_cc) & !is.na(income) ) %>%
-  select(-dvalue) %>%
-  group_by(same_cc,income, demo) %>%
+  select(same_cc, income) %>%
+  filter(!is.na(same_cc) & !is.na(income) ) %>%
+  group_by(same_cc,income) %>%
   summarize(Count = n()) %>%
-  group_by(demo, income) %>%
+  group_by( income) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = same_cc, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+  labs(y = "")+
   theme_minimal()
 ```
 
-### Median household income
-```{r 0prelim-may29-15}
+### Race/ethnicity
+
+```{r 0prelim-may29-14b}
 scored %>%
-  select(same_cc, all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(same_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(same_cc) & !is.na(income) ) %>%
+  filter(dvalue == 1 & !is.na(same_cc)) %>%
   select(-dvalue) %>%
-  group_by(same_cc,income, demo) %>%
+  group_by(same_cc, demo) %>%
   summarize(Count = n()) %>%
-  group_by(demo, income) %>%
+  group_by(demo) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(demo = factor(demo,
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = same_cc, fill = income))+
+  ggplot(aes(x = Percent, y = same_cc, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+  labs(y = "")+
   theme_minimal()
 ```
+
+
 ### Overall
 
 ```{r 0prelim-may29-16}
@@ -512,38 +501,32 @@ scored %>%
 
 ```{r 0prelim-may29-17}
 scored %>%
-  select(willing_same_cc, all_of(demo_groups),income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(willing_same_cc)& !is.na(income)) %>%
-  select(-dvalue) %>%
-  group_by(willing_same_cc,income, demo) %>%
+  select(willing_same_cc, income) %>%
+  filter(!is.na(willing_same_cc)& !is.na(income)) %>%
+  group_by(willing_same_cc,income) %>%
   summarize(Count = n()) %>%
-  group_by(demo) %>%
+  group_by(income) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = willing_same_cc, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
-### Median Household income
+### Race/ethnicity
 
-```{r 0prelim-may29-18}
+```{r 0prelim-may29-17b}
 scored %>%
-  select(willing_same_cc, all_of(demo_groups),median_income) %>%
-  rename(income = median_income) %>%
+  select(willing_same_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(willing_same_cc)& !is.na(income)) %>%
+  filter(dvalue == 1 & !is.na(willing_same_cc)) %>%
   select(-dvalue) %>%
-  group_by(willing_same_cc,income, demo) %>%
+  group_by(willing_same_cc, demo) %>%
   summarize(Count = n()) %>%
   group_by(demo) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
@@ -552,14 +535,15 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = willing_same_cc, fill = income))+
+  ggplot(aes(x = Percent, y = willing_same_cc, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
+
 
 ## Barriers to returning{.tabset}
 
@@ -569,13 +553,11 @@ What might make it hard for you to return to the same childcare you had prior to
 
 ```{r 0prelim-may29-19, out.width='100%'}
 scored %>%
-  select(contains("barrier_same_cc_"), all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
-  select(-dvalue)%>%
-  gather(type, value, -demo, -income) %>%
+  select(contains("barrier_same_cc_"),  income) %>%
+  filter(!is.na(income)) %>%
+  gather(type, value,  -income) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(income, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -586,32 +568,27 @@ scored %>%
                                   "I no longer think this option is safe for my child and/or my family",
                                   "I no longer need the same amount of child care"))) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
+### Race/Ethnicity
 
-### Median household income
-
-```{r 0prelim-may29-20, out.width='100%'}
+```{r 0prelim-may29-19b, out.width='100%'}
 scored %>%
-  select(contains("barrier_same_cc_"), all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(contains("barrier_same_cc_"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
+  filter(dvalue == 1 ) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo, -income) %>%
+  gather(type, value, -demo) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(demo,  type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -626,14 +603,15 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = income))+
+  ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
+
 
 ### Overall
 
@@ -666,19 +644,14 @@ scored %>%
 
 ```{r 0prelim-may29-22}
 scored %>%
-  select(comfort_return, all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(comfort_return)& !is.na(income)) %>%
-  select(-dvalue) %>%
-  group_by(comfort_return, demo, income) %>%
+  select(comfort_return, income) %>%
+  filter(!is.na(comfort_return)& !is.na(income)) %>%
+  group_by(comfort_return, income) %>%
   summarize(Count = n()) %>%
-  group_by(demo, income) %>%
+  group_by(income) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count),
+  mutate(Count = ifelse(Count == 0, NA, Count),
          comfort_return = factor(comfort_return, 
                                  levels = as.character(c(4,3,2,1)),
                                  labels = c(
@@ -689,24 +662,23 @@ scored %>%
   ggplot(aes(x = Percent, y = comfort_return, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
-### Median household income
+### Race/ethnicity
 
-```{r 0prelim-may29-23}
+```{r 0prelim-may29-22b}
 scored %>%
-  select(comfort_return, all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(comfort_return, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(comfort_return)& !is.na(income)) %>%
+  filter(dvalue == 1 & !is.na(comfort_return)) %>%
   select(-dvalue) %>%
-  group_by(comfort_return, demo, income) %>%
+  group_by(comfort_return, demo) %>%
   summarize(Count = n()) %>%
-  group_by(demo, income) %>%
+  group_by(demo) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(demo = factor(demo,
@@ -720,10 +692,10 @@ scored %>%
                                        "Neither comfortable nor worried or anxious",
                                    "A little comfortable and also a little worried or anxious",
                                    "Not at all comfortable and very worried or anxious"))) %>%
-  ggplot(aes(x = Percent, y = comfort_return, fill = income))+
+  ggplot(aes(x = Percent, y = comfort_return, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
@@ -761,95 +733,89 @@ scored %>%
 
 ```{r 0prelim-may29-25, out.width='100%'}
 scored %>%
-  select(contains("know_cc"), all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
-  select(-dvalue)%>%
-  gather(type, value, -demo,-income) %>%
+  select(contains("know_cc"),  income) %>%
+  filter(!is.na(income)) %>%
+  gather(type, value, -income) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(income, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
-  # mutate(type = gsub("know_cc_", "", type),
-    # type = factor(type,
-    #               levels = c("numchild",
-    #                          "numadult",
-    #                          "socialDis",
-    #                          "cleaning",
-    #                          "childHealth",
-    #                          "employeeHealth",
-    #                          "COVID",
-    #                          "enroll"),
-    #                    labels = c("The number of children ",
-    #                          "The number of adults ",
-    #                          "Social distancing measures  ",
-    #                          "Plans for cleaning the physical space  ",
-    #                          "Plans for deciding if a child is healthy enough to attend child care  ",
-    #                          "Plans for deciding if a child care employee is healthy enough to work  ",
-    #                          "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
-    #                          "New and/or updated policies for enrollment, cost, etc"))) %>%
+  mutate(type = gsub("know_cc_", "", type),
+  type = factor(type,
+                levels = c("numchild",
+                           "numadult",
+                           "socialDis",
+                           "cleaning",
+                           "childHealth",
+                           "employeeHealth",
+                           "COVID",
+                           "enroll"),
+                     labels = c("The number of children ",
+                           "The number of adults ",
+                           "Social distancing measures  ",
+                           "Plans for cleaning the physical space  ",
+                           "Plans for deciding if a child is healthy enough to attend child care  ",
+                           "Plans for deciding if a child care employee is healthy enough to work  ",
+                           "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
+                           "New and/or updated policies for enrollment, cost, etc"))) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
+### Race/ethnicity
 
-### Median household income
-
-```{r 0prelim-may29-26, out.width='100%'}
+```{r 0prelim-may29-25b, out.width='100%'}
 scored %>%
-  select(contains("know_cc"), all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(contains("know_cc"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
+  filter(dvalue == 1 ) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo,-income) %>%
+  gather(type, value, -demo,) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
+  group_by(demo,  type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
-  # mutate(type = gsub("know_cc_", "", type),
-  #   type = factor(type,
-  #                 levels = c("numchild",
-  #                            "numadult",
-  #                            "socialDis",
-  #                            "cleaning",
-  #                            "childHealth",
-  #                            "employeeHealth",
-  #                            "COVID",
-  #                            "enroll"),
-  #                      labels = c("The number of children ",
-  #                            "The number of adults ",
-  #                            "Social distancing measures  ",
-  #                            "Plans for cleaning the physical space  ",
-  #                            "Plans for deciding if a child is healthy enough to attend child care  ",
-  #                            "Plans for deciding if a child care employee is healthy enough to work  ",
-  #                            "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
-  #                            "New and/or updated policies for enrollment, cost, etc"))) %>%
+  mutate(type = gsub("know_cc_", "", type),
+  type = factor(type,
+                levels = c("numchild",
+                           "numadult",
+                           "socialDis",
+                           "cleaning",
+                           "childHealth",
+                           "employeeHealth",
+                           "COVID",
+                           "enroll"),
+                     labels = c("The number of children ",
+                           "The number of adults ",
+                           "Social distancing measures  ",
+                           "Plans for cleaning the physical space  ",
+                           "Plans for deciding if a child is healthy enough to attend child care  ",
+                           "Plans for deciding if a child care employee is healthy enough to work  ",
+                           "Plans for if anyone affiliated with the child care gets a confirmed or suspected diagnosis of COVID",
+                           "New and/or updated policies for enrollment, cost, etc"))) %>%
   ungroup() %>%
   mutate(demo = factor(demo,
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = income))+
+  ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
+
 
 ### Overall
 
@@ -893,50 +859,44 @@ scored %>%
 
 ```{r 0prelim-may29-28}
 scored %>%
-  select(lack_cc, all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(lack_cc) & !is.na(income)) %>%
-  select(-dvalue) %>%
-  group_by(lack_cc, income, demo) %>%
+  select(lack_cc,  income) %>%
+  filter( !is.na(lack_cc) & !is.na(income)) %>%
+  group_by(lack_cc, income) %>%
   summarize(Count = n()) %>%
-  group_by(demo, income) %>%
+  group_by(income) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = lack_cc, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
-### Median Household income
+### Race/ethnicity
 
-```{r 0prelim-may29-29}
+```{r 0prelim-may29-28b}
 scored %>%
-  select(lack_cc, all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+  select(lack_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(lack_cc) & !is.na(income)) %>%
+  filter(dvalue == 1 & !is.na(lack_cc) ) %>%
   select(-dvalue) %>%
-  group_by(lack_cc, income, demo) %>%
+  group_by(lack_cc, demo) %>%
   summarize(Count = n()) %>%
-  group_by(demo, income) %>%
+  group_by(demo) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(demo = factor(demo,
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = lack_cc, fill = income))+
+  ggplot(aes(x = Percent, y = lack_cc, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
@@ -990,13 +950,11 @@ Using the caregiver type variables, we indicate, for each caregiver, whether the
 
 scored %>%
   select(contains("lostcc_", ignore.case = F), 
-         all_of(demo_groups), income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
-  select(-dvalue)%>%
-  gather(type, value, -demo, - income) %>%
+         income) %>%
+  filter(!is.na(income)) %>%
+  gather(type, value,  - income) %>%
   filter(!is.na(value) & !is.na(type)) %>%
-  group_by(demo, income, type) %>%
+  group_by(income, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -1013,14 +971,11 @@ scored %>%
                                   "Professional child care provider in their home",
                                   "Parents/legal guardians"))) %>%
   ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
+  mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 5))+
-  facet_grid(income~demo)+
+  facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
@@ -1028,20 +983,20 @@ scored %>%
 
 ```
 
-### Median Household income
+
+### Race/ethnicity
 
 ```{r 0prelim-may29-51b}
 
 scored %>%
   select(contains("lostcc_", ignore.case = F), 
-         all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
+         all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
+  filter(dvalue == 1 ) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo, - income) %>%
+  gather(type, value, -demo) %>%
   filter(!is.na(value) & !is.na(type)) %>%
-  group_by(demo, income, type) %>%
+  group_by(demo, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -1062,16 +1017,17 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = income))+
+  ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, x= Percent + 5))+
-  facet_grid(income~demo)+
+  facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
   theme_minimal()
 
 ```
+
 
 ### Overall
 ```{r 0prelim-may29-52}
@@ -1097,7 +1053,8 @@ library(ggpubr)
 scored = scored %>% 
   mutate(lostCC_group = factor(lostCC, 
                                levels = c(0,1), 
-                               labels = c("No loss", "Lost 1+ types of childcare")))
+                               labels = c("No loss", 
+                                          "Lost 1+ types of childcare")))
 
 plot_function = function(data, x,y){
   p = ggbarplot(data, 
@@ -1297,62 +1254,7 @@ scored %>%
 ```
 
 
-## Median household income
 
-```{r 0prelim-may29-32, out.width='100%'}
-scored %>%
-  select(contains("source_"), all_of(demo_groups), median_income) %>%
-  rename(income = median_income) %>%
-  gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(income)) %>%
-  select(-dvalue)%>%
-  gather(type, value, -demo, -income) %>%
-  filter(!is.na(value)) %>%
-  group_by(demo, income, type) %>%
-  summarize(Count = sum(value),
-    Percent = 100*sum(value)/n()) %>%
-  ungroup() %>%
-  mutate(
-    type = factor(type,
-                  levels = c("source_trump",
-                             "source_uspublic",
-                             "source_congress",
-                             "source_gov",
-                             "source_state",
-                             "source_employ",
-                             "source_nonemploy",
-                             "source_child","source_nonchild",
-                             "source_family",
-                             "source_friends",
-                             "source_other"),
-                       labels = c(
-                         "President Trump  ",
-                             "U.S. public health officials & organizations ",
-                             "Members of the U.S. Congress ",
-                             "My state’s governor  ",
-                             "My state’s health officials & organizations  ",
-                             "Administrators at my place of employment ",
-                             "Non-administrators at my place of employment ",
-                             "Administrators at my child’s child care / school ",
-                         "Non-administrators at my child’s child care / school ",
-                             "My family",
-                             "My friends",
-                             "Other"))) %>%
-  ungroup() %>%
-  mutate(demo = factor(demo,
-                       levels = demo_groups,
-                       labels = demo_labels),
-         Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = income))+
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
-  facet_grid(income~demo)+
-  scale_fill_brewer(palette = "Dark2")+
-  guides(fill = F) +   
-  labs(y = "")+
-  theme_minimal()
-
-```
 
 ## Overall
 
@@ -1510,14 +1412,41 @@ text_data = scored %>%
 
 "What are the biggest challenges and concerns for you and your family right now?"
 
-### Common words
-
 ```{r 0prelim-may29-35}
 open1 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.001) %>%
   unnest_tokens(word, OPEN.001) %>%
   anti_join(stop_words) 
+```
 
+
+### Network plot 
+```{r 0prelim-may29-37}
+library(widyr)
+
+library(igraph)
+library(ggraph)
+
+text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.001) %>%
+  unnest_tokens(paired_words, OPEN.001, token = "ngrams", n = 2) %>%
+  count(paired_words, sort = TRUE) %>%
+  separate(paired_words, c("word1", "word2"), sep = " ") %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+        filter(n >= 3) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_width = n), alpha = .3) +
+        geom_node_point(color = "darkslategray4", size = 3) +
+        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
+        labs(title = "Word Network: Biggest challenges and concerns",
+             x = "", y = "")
+```
+
+### Common words
+
+```{r}
 open1 %>%
   count(word, sort = T)%>%
   filter(n > 50) %>%
@@ -1554,16 +1483,26 @@ open1 %>%
 ```
 
 
-### Network plot 
-```{r 0prelim-may29-37}
-library(widyr)
 
-library(igraph)
-library(ggraph)
+
+## Question 2{.tabset}
+
+"What is helping you and your family the most right now?"
+
+
+```{r 0prelim-may29-38}
+open2 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
+  unnest_tokens(word, OPEN.002) %>%
+  anti_join(stop_words) 
+```
+
+### Network plot 
+```{r 0prelim-may29-40}
 
 text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.001) %>%
-  unnest_tokens(paired_words, OPEN.001, token = "ngrams", n = 2) %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
+  unnest_tokens(paired_words, OPEN.002, token = "ngrams", n = 2) %>%
   count(paired_words, sort = TRUE) %>%
   separate(paired_words, c("word1", "word2"), sep = " ") %>%
   filter(!word1 %in% stop_words$word) %>%
@@ -1574,23 +1513,15 @@ text_data %>%
         geom_edge_link(aes(edge_width = n), alpha = .3) +
         geom_node_point(color = "darkslategray4", size = 3) +
         geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-        labs(title = "Word Network: Biggest challenges and concerns",
+        labs(title = "Word Network: What is helping you and your family",
              x = "", y = "")
 ```
 
 
-## Question 2{.tabset}
-
-"What is helping you and your family the most right now?"
-
 ### Common words
 
-```{r 0prelim-may29-38}
-open2 = text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
-  unnest_tokens(word, OPEN.002) %>%
-  anti_join(stop_words) 
 
+```{r}
 open2 %>%
   count(word, sort = T)%>%
   filter(n > 50) %>%
@@ -1628,12 +1559,27 @@ open2 %>%
 ```
 
 
+
+
+## Question 3{.tabset}
+
+"What is on your mind the most when you think about your community re-opening?"
+
+
+
+```{r 0prelim-may29-41}
+open3 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
+  unnest_tokens(word, OPEN.003) %>%
+  anti_join(stop_words) 
+```
+
 ### Network plot 
-```{r 0prelim-may29-40}
+```{r 0prelim-may29-43}
 
 text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
-  unnest_tokens(paired_words, OPEN.002, token = "ngrams", n = 2) %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
+  unnest_tokens(paired_words, OPEN.003, token = "ngrams", n = 2) %>%
   count(paired_words, sort = TRUE) %>%
   separate(paired_words, c("word1", "word2"), sep = " ") %>%
   filter(!word1 %in% stop_words$word) %>%
@@ -1644,22 +1590,14 @@ text_data %>%
         geom_edge_link(aes(edge_width = n), alpha = .3) +
         geom_node_point(color = "darkslategray4", size = 3) +
         geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-        labs(title = "Word Network: What is helping you and your family",
+        labs(title = "Word Network: community re-opening",
              x = "", y = "")
 ```
 
 
-## Question 3{.tabset}
-
-"What is on your mind the most when you think about your community re-opening?"
-
 ### Common words
 
-```{r 0prelim-may29-41}
-open3 = text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
-  unnest_tokens(word, OPEN.003) %>%
-  anti_join(stop_words) 
+```{r}
 
 open3 %>%
   count(word, sort = T)%>%
@@ -1698,12 +1636,26 @@ open3 %>%
 ```
 
 
+
+
+
+## Question 4{.tabset}
+
+"What concerns do you have about your place of employment and/or your child’s child care setting re-opening?"
+
+```{r 0prelim-may29-44}
+open4 = text_data %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
+  unnest_tokens(word, OPEN.004) %>%
+  anti_join(stop_words) 
+```
+
 ### Network plot 
-```{r 0prelim-may29-43}
+```{r 0prelim-may29-46}
 
 text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
-  unnest_tokens(paired_words, OPEN.003, token = "ngrams", n = 2) %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
+  unnest_tokens(paired_words, OPEN.004, token = "ngrams", n = 2) %>%
   count(paired_words, sort = TRUE) %>%
   separate(paired_words, c("word1", "word2"), sep = " ") %>%
   filter(!word1 %in% stop_words$word) %>%
@@ -1714,23 +1666,13 @@ text_data %>%
         geom_edge_link(aes(edge_width = n), alpha = .3) +
         geom_node_point(color = "darkslategray4", size = 3) +
         geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-        labs(title = "Word Network: community re-opening",
+        labs(title = "Word Network: your place of employment and/or your child’s child care setting re-opening",
              x = "", y = "")
 ```
 
-
-
-## Question 4{.tabset}
-
-"What concerns do you have about your place of employment and/or your child’s child care setting re-opening?"
-
 ### Common words
 
-```{r 0prelim-may29-44}
-open4 = text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
-  unnest_tokens(word, OPEN.004) %>%
-  anti_join(stop_words) 
+```{r}
 
 open4 %>%
   count(word, sort = T)%>%
@@ -1769,12 +1711,20 @@ open4 %>%
 ```
 
 
+
+
+
+
+## Question 5{.tabset}
+
+"Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?"
+
 ### Network plot 
-```{r 0prelim-may29-46}
+```{r 0prelim-may29-49}
 
 text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
-  unnest_tokens(paired_words, OPEN.004, token = "ngrams", n = 2) %>%
+  select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
+  unnest_tokens(paired_words, OPEN.005, token = "ngrams", n = 2) %>%
   count(paired_words, sort = TRUE) %>%
   separate(paired_words, c("word1", "word2"), sep = " ") %>%
   filter(!word1 %in% stop_words$word) %>%
@@ -1785,23 +1735,20 @@ text_data %>%
         geom_edge_link(aes(edge_width = n), alpha = .3) +
         geom_node_point(color = "darkslategray4", size = 3) +
         geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-        labs(title = "Word Network: your place of employment and/or your child’s child care setting re-opening",
+        labs(title = "Word Network: Anything else?",
              x = "", y = "")
 ```
-
-
-
-## Question 5{.tabset}
-
-"Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?"
-
-### Common words
 
 ```{r 0prelim-may29-47}
 open5 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
   unnest_tokens(word, OPEN.005) %>%
   anti_join(stop_words) 
+```
+
+### Common words
+
+```{r}
 
 open5 %>%
   count(word, sort = T)%>%
@@ -1840,23 +1787,5 @@ open5 %>%
 ```
 
 
-### Network plot 
-```{r 0prelim-may29-49}
 
-text_data %>%
-  select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
-  unnest_tokens(paired_words, OPEN.005, token = "ngrams", n = 2) %>%
-  count(paired_words, sort = TRUE) %>%
-  separate(paired_words, c("word1", "word2"), sep = " ") %>%
-  filter(!word1 %in% stop_words$word) %>%
-  filter(!word2 %in% stop_words$word) %>%
-        filter(n >= 3) %>%
-        graph_from_data_frame() %>%
-        ggraph(layout = "fr") +
-        geom_edge_link(aes(edge_width = n), alpha = .3) +
-        geom_node_point(color = "darkslategray4", size = 3) +
-        geom_node_text(aes(label = name), vjust = 1.8, size = 3) +
-        labs(title = "Word Network: Anything else?",
-             x = "", y = "")
-```
 
