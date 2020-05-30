@@ -109,7 +109,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity", position = position_dodge(width = 1)) +
-  geom_text(aes(label = Count, x= Percent + 10), position = position_dodge(width = 1))+
+  geom_text(aes(label = round(Percent), x= Percent + 10), position = position_dodge(width = 1))+
   scale_fill_brewer(palette = "Dark2")+
   facet_grid(income~.)+
   guides(fill = F) +
@@ -154,7 +154,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity", position = position_dodge(width = 1)) +
-  geom_text(aes(label = Count, x= Percent + 10), position = position_dodge(width = 1))+
+  geom_text(aes(label = round(Percent), x= Percent + 10), position = position_dodge(width = 1))+
   scale_fill_brewer(palette = "Dark2")+
   facet_grid(demo~.)+
   guides(fill = F) +
@@ -227,7 +227,7 @@ scored %>%
            mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   facet_grid(income~.)+
@@ -270,7 +270,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   facet_grid(demo~.)+
@@ -343,7 +343,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
@@ -384,7 +384,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
@@ -440,7 +440,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = same_cc, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+  labs(y = "")+
@@ -466,7 +466,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = same_cc, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+  labs(y = "")+
@@ -486,7 +486,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = same_cc))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   labs(y = "")+
   theme_minimal()
 ```
@@ -511,7 +511,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = willing_same_cc, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -537,7 +537,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = willing_same_cc, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -571,7 +571,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -605,7 +605,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -661,7 +661,7 @@ scored %>%
                                    "Not at all comfortable and very worried or anxious"))) %>%
   ggplot(aes(x = Percent, y = comfort_return, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -694,7 +694,7 @@ scored %>%
                                    "Not at all comfortable and very worried or anxious"))) %>%
   ggplot(aes(x = Percent, y = comfort_return, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -719,7 +719,7 @@ scored %>%
                                    "Not at all comfortable and very worried or anxious"))) %>%
   ggplot(aes(x = Percent, y = comfort_return),)+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   labs(y = "")+
   theme_minimal()
 ```
@@ -763,7 +763,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -809,7 +809,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -869,7 +869,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = lack_cc, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -895,7 +895,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = lack_cc, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
@@ -915,7 +915,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = lack_cc))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   labs(y = "")+
   theme_minimal()
 ```
@@ -974,7 +974,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   facet_grid(income~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
@@ -1019,7 +1019,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = demo))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   facet_grid(demo~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
@@ -1039,7 +1039,7 @@ scored %>%
          lostCC = factor(lostCC, levels = c(0,1), labels = c("No loss", "Lost 1+ types of childcare"))) %>%
   ggplot(aes(x = percent, y = lostCC)) +
   geom_bar(stat = "identity") +
-  geom_text(aes(label = count, x = percent + 5)) +
+  geom_text(aes(label = round(percent), x = percent + 5)) +
   theme_minimal()
 
 ```
@@ -1244,7 +1244,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type, fill = income))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_grid(income~demo)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F) +   
@@ -1295,7 +1295,7 @@ scored %>%
                              "Other"))) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-    geom_text(aes(label = Count, x= Percent + 10))+
+    geom_text(aes(label = round(Percent), x= Percent + 10))+
   theme_minimal()
 ```
 
