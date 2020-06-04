@@ -631,6 +631,7 @@ scored %>%
                                   "I no longer need the same amount of child care"))) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
+    geom_text(aes(label = round(Percent), x= Percent + 10))+
   theme_minimal()
 ```
 

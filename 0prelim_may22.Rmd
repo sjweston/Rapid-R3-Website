@@ -13,12 +13,12 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 ```
 
-```{r}
+```{r 0prelim-may22-1}
 # blw_poverty or race_cat
-which_demo = "blw"
+which_demo = "blw_poverty"
 ```
 
-```{r}
+```{r 0prelim-may22-2}
 library(here)
 library(tidytext)
 ```
@@ -31,7 +31,7 @@ scored = scored %>%
   filter(Week == 7)
 ```
 
-```{r, eval = (which_demo == "blw_poverty")}
+```{r 0prelim-may22-3, eval = (which_demo == "blw_poverty")}
 scored = scored %>%
   mutate(
     poc_lowincome = ifelse((white == 0 | latinx == 1) & poverty200 == 1, 1,0),
@@ -55,7 +55,7 @@ demo_labels = c(
 
 ```
 
-```{r, eval = (which_demo == "race_cat")}
+```{r 0prelim-may22-4, eval = (which_demo == "race_cat")}
 demo_groups = c("native","asian","black","latinx","hawaii", "white", "other_race")
 demo_labels = c("Native American\n/Alaskan", "Asian", "Black\nAfrican American",
                 "Latinx/Hispanic","Native Hawaiian\n/Pacific Islander", "White/Caucasian",
@@ -72,7 +72,7 @@ demo_labels = c("Native American\n/Alaskan", "Asian", "Black\nAfrican American",
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-5}
 scored %>%
   select(contains("expect_")) %>%
   select(-contains("age"), -contains("relation")) %>%
@@ -97,12 +97,13 @@ scored %>%
                                   "None"))) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   theme_minimal()
 ```
 
 ### By demographics
 
-```{r, out.width='100%'}
+```{r 0prelim-may22-6, out.width='100%'}
 scored %>%
   select(contains("expect_"), all_of(demo_groups)) %>%
   select(-contains("age"), -contains("relation")) %>%
@@ -136,7 +137,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -148,7 +149,7 @@ scored %>%
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-7}
 scored %>%
   select(contains("expect_age")) %>%
   gather(type, value) %>%
@@ -172,12 +173,13 @@ scored %>%
                                   "Unsure"))) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   theme_minimal()
 ```
 
 ### By demographics
 
-```{r, out.width='100%'}
+```{r 0prelim-may22-8, out.width='100%'}
 scored %>%
   select(contains("expect_age"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -210,7 +212,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -222,7 +224,7 @@ scored %>%
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-9}
 scored %>%
   select(contains("expect_relation")) %>%
   gather(type, value) %>%
@@ -243,13 +245,14 @@ scored %>%
                                   "A friend of our family",
                                   "A neighbor of our family"))) %>%
   ggplot(aes(x = Percent, y = type))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   geom_bar(stat = "identity") +
   theme_minimal()
 ```
 
 ### By demographics
 
-```{r, out.width='100%'}
+```{r 0prelim-may22-10, out.width='100%'}
 scored %>%
   select(contains("expect_age"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -280,7 +283,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 5))+
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -294,7 +297,7 @@ scored %>%
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-11}
 scored %>%
   filter(!is.na(same_cc)) %>%
   group_by(same_cc) %>%
@@ -304,7 +307,7 @@ scored %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = same_cc))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   labs(y = "")+
   theme_minimal()
 ```
@@ -312,7 +315,7 @@ scored %>%
 
 ### By demographics
 
-```{r}
+```{r 0prelim-may22-12}
 scored %>%
   select(same_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -329,7 +332,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = same_cc))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -339,7 +342,7 @@ scored %>%
 
 "If you had the option to return to the same childcare you had prior to the coronavirus (COVID-19) pandemic, would you be willing to?"
 
-```{r}
+```{r 0prelim-may22-13}
 scored %>%
   select(willing_same_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -356,7 +359,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = willing_same_cc))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -368,7 +371,7 @@ What might make it hard for you to return to the same childcare you had prior to
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-14}
 scored %>%
   select(contains("barrier_same_cc_")) %>%
   gather(type, value) %>%
@@ -384,12 +387,13 @@ scored %>%
                                   "I no longer need the same amount of child care"))) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   theme_minimal()
 ```
 
 ### By demographics
 
-```{r, out.width='100%'}
+```{r 0prelim-may22-15, out.width='100%'}
 scored %>%
   select(contains("barrier_same_cc_"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -414,7 +418,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -428,7 +432,7 @@ scored %>%
 ### Overall
 
 
-```{r}
+```{r 0prelim-may22-16}
 scored %>%
   filter(!is.na(comfort_return)) %>%
   group_by(comfort_return) %>%
@@ -444,7 +448,7 @@ scored %>%
                                    "Not at all comfortable and very worried or anxious"))) %>%
   ggplot(aes(x = Percent, y = comfort_return),)+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   labs(y = "")+
   theme_minimal()
 ```
@@ -452,7 +456,7 @@ scored %>%
 ### By demographics
 
 
-```{r}
+```{r 0prelim-may22-17}
 scored %>%
   select(comfort_return, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -476,7 +480,7 @@ scored %>%
                                    "Not at all comfortable and very worried or anxious"))) %>%
   ggplot(aes(x = Percent, y = comfort_return))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -488,7 +492,7 @@ scored %>%
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-18}
 scored %>%
   select(contains("know_cc")) %>%
   gather(type, value) %>%
@@ -521,7 +525,7 @@ scored %>%
 
 ### By demographics
 
-```{r, out.width='100%'}
+```{r 0prelim-may22-19, out.width='100%'}
 scored %>%
   select(contains("know_cc"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -558,7 +562,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -570,7 +574,7 @@ scored %>%
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-20}
 scored %>%
   select(lack_cc) %>%
   filter(!is.na(lack_cc)) %>%
@@ -581,14 +585,14 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = lack_cc))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   labs(y = "")+
   theme_minimal()
 ```
 
 ### By demographic
 
-```{r}
+```{r 0prelim-may22-21}
 scored %>%
   select(lack_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -605,7 +609,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = lack_cc))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -618,7 +622,7 @@ What source(s) of information do you use and trust to make decisions for your fa
 
 ### Overall
 
-```{r}
+```{r 0prelim-may22-22}
 scored %>%
   select(contains("source_")) %>%
   gather(type, value) %>%
@@ -655,13 +659,13 @@ scored %>%
                              "Other"))) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-    geom_text(aes(label = Count, x= Percent + 10))+
+    geom_text(aes(label = round(Percent), x= Percent + 10))+
   theme_minimal()
 ```
 
 ### By demographics
 
-```{r, out.width='100%'}
+```{r 0prelim-may22-23, out.width='100%'}
 scored %>%
   select(contains("source_"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -706,7 +710,7 @@ scored %>%
          Count = ifelse(Count == 0, NA, Count)) %>%
   ggplot(aes(x = Percent, y = type))+
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, x= Percent + 10))+
+  geom_text(aes(label = round(Percent), x= Percent + 10))+
   facet_wrap(~demo)+
   labs(y = "")+
   theme_minimal()
@@ -714,7 +718,7 @@ scored %>%
 
 # Open-ended questions
 
-```{r}
+```{r 0prelim-may22-24}
 text_data = cbind(scored[,c("CaregiverID", demo_groups)], master[master$Week == 7,find_items("OPEN", master)])
 ```
 
@@ -725,7 +729,7 @@ text_data = cbind(scored[,c("CaregiverID", demo_groups)], master[master$Week == 
 
 ### Common words
 
-```{r}
+```{r 0prelim-may22-25}
 open1 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.001) %>%
   unnest_tokens(word, OPEN.001) %>%
@@ -744,7 +748,7 @@ open1 %>%
 
 ### By demographic
 
-```{r}
+```{r 0prelim-may22-26}
 open1 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -768,7 +772,7 @@ open1 %>%
 
 
 ### Network plot 
-```{r}
+```{r 0prelim-may22-27}
 library(widyr)
 
 library(igraph)
@@ -798,7 +802,7 @@ text_data %>%
 
 ### Common words
 
-```{r}
+```{r 0prelim-may22-28}
 open2 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
   unnest_tokens(word, OPEN.002) %>%
@@ -817,7 +821,7 @@ open2 %>%
 
 ### By demographic
 
-```{r}
+```{r 0prelim-may22-29}
 open2 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -842,7 +846,7 @@ open2 %>%
 
 
 ### Network plot 
-```{r}
+```{r 0prelim-may22-30}
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
@@ -868,7 +872,7 @@ text_data %>%
 
 ### Common words
 
-```{r}
+```{r 0prelim-may22-31}
 open3 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
   unnest_tokens(word, OPEN.003) %>%
@@ -887,7 +891,7 @@ open3 %>%
 
 ### By demographic
 
-```{r}
+```{r 0prelim-may22-32}
 open3 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -912,7 +916,7 @@ open3 %>%
 
 
 ### Network plot 
-```{r}
+```{r 0prelim-may22-33}
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
@@ -939,7 +943,7 @@ text_data %>%
 
 ### Common words
 
-```{r}
+```{r 0prelim-may22-34}
 open4 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
   unnest_tokens(word, OPEN.004) %>%
@@ -958,7 +962,7 @@ open4 %>%
 
 ### By demographic
 
-```{r}
+```{r 0prelim-may22-35}
 open4 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -983,7 +987,7 @@ open4 %>%
 
 
 ### Network plot 
-```{r}
+```{r 0prelim-may22-36}
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
@@ -1010,7 +1014,7 @@ text_data %>%
 
 ### Common words
 
-```{r}
+```{r 0prelim-may22-37}
 open5 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
   unnest_tokens(word, OPEN.005) %>%
@@ -1029,7 +1033,7 @@ open5 %>%
 
 ### By demographic
 
-```{r}
+```{r 0prelim-may22-38}
 open5 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -1054,7 +1058,7 @@ open5 %>%
 
 
 ### Network plot 
-```{r}
+```{r 0prelim-may22-39}
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
@@ -1078,7 +1082,7 @@ text_data %>%
 
 ## Expected change in childcare{.tabset}
 
-```{r}
+```{r 0prelim-may22-40}
 scored = scored %>%
   mutate(
     lostcc_center = ifelse(priorcc_center == 1 & expect_center == 0, 1, 0),
@@ -1101,7 +1105,7 @@ scored = scored %>%
 Using the caregiver type variables, we indicate, for each caregiver, whether they "lost" that type of childcare, meaning they were using it before and do not anticipate using it in the next month. 
 
 ### By type
-```{r}
+```{r 0prelim-may22-41}
 scored %>%
   select(contains("lostcc_", ignore.case = F)) %>%
   gather(type, value) %>%
@@ -1109,7 +1113,7 @@ scored %>%
   group_by(type) %>% 
   summarize(count = sum(value)) %>%
   ungroup() %>%
-  mutate(percent = 100*count/sum(count),
+  mutate(Percent = 100*count/sum(count),
          type = factor(type, 
                        levels = c("lostcc_center",
                                   "lostcc_relativemyhome",
@@ -1123,23 +1127,23 @@ scored %>%
                                   "Professional child care provider in my home",
                                   "Professional child care provider in their home",
                                   "Parents/legal guardians"))) %>%
-  ggplot(aes(x = percent, y = type)) +
+  ggplot(aes(x = Percent, y = type)) +
   geom_bar(stat = "identity")+
-  geom_text(aes(label = count, x = percent + 5)) +
+  geom_text(aes(label = round(Percent), x = Percent + 5)) +
   theme_minimal()
 ```
 
 ### Overall
-```{r}
+```{r 0prelim-may22-42}
 scored %>%
   group_by(lostCC) %>%
   summarize(count = n()) %>%
   ungroup() %>%
-  mutate(percent = 100*count/sum(count),
+  mutate(Percent = 100*count/sum(count),
          lostCC = factor(lostCC, levels = c(0,1), labels = c("No loss", "Lost 1+ types of childcare"))) %>%
-  ggplot(aes(x = percent, y = lostCC)) +
+  ggplot(aes(x = Percent, y = lostCC)) +
   geom_bar(stat = "identity") +
-  geom_text(aes(label = count, x = percent + 5)) +
+  geom_text(aes(label = round(Percent), x = Percent + 5)) +
   theme_minimal()
 
 ```
@@ -1148,7 +1152,7 @@ scored %>%
 
 ### Composite scores
 
-```{r, fig.height=8}
+```{r 0prelim-may22-43, fig.height=8}
 library(ggpubr)
 scored = scored %>% 
   mutate(lostCC_group = factor(lostCC, 
@@ -1230,7 +1234,7 @@ ggarrange(anxiety.plot, depress.plot, stress.plot, lonely.plot, fussy.plot, fear
 
 ### Proportion marking "a lot" or "very much"
 
-```{r, fig.height=8}
+```{r 0prelim-may22-44, fig.height=8}
 library(ggpubr)
 scored = scored %>% 
   mutate(lostCC_group = factor(lostCC, 

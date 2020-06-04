@@ -214,6 +214,37 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$child_edu_interrupt = ifelse(grepl("[1,3,5]",data$POLICY.008_cat), 1, 0)
   }
   
+  if(contains_items("POLICY.011_[1-4]$", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("POLICY.011_[1-4]$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "POLICY.011_cat")
+    data = data %>%
+      mutate(
+        POLICY.011_1 = 
+          case_when(!is.na(POLICY.011_1) ~ 1,
+                    !is.na(POLICY.011_cat) ~ 0,
+                    TRUE ~ NA_real_),
+        POLICY.011_2 = 
+          case_when(!is.na(POLICY.011_2) ~ 1,
+                    !is.na(POLICY.011_cat) ~ 0,
+                    TRUE ~ NA_real_),
+        POLICY.011_3 = 
+          case_when(!is.na(POLICY.011_3) ~ 1,
+                    !is.na(POLICY.011_cat) ~ 0,
+                    TRUE ~ NA_real_),
+        POLICY.011_4 = 
+          case_when(!is.na(POLICY.011_4) ~ 1,
+                    !is.na(POLICY.011_cat) ~ 0,
+                    TRUE ~ NA_real_))
+        
+        newdata$plan_cc_samenow = data$POLICY.011_1
+        newdata$plan_cc_differ = data$POLICY.011_2
+        newdata$plan_cc_sameCOVID = data$POLICY.011_3
+        newdata$plan_cc_dontknow = data$POLICY.011_4
+        
+  }
+  
   if(contains_items("POLICY.018\\_[0-9]$", data)){
     data = combine.cat(x = data, 
                        cols = find_items("POLICY.018\\_[0-9]$", data), 
@@ -577,7 +608,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        cols = find_items("JOB.007", data), 
                        id = "CaregiverID",
                        newvar.name = "Job.007_cat")
-    free_lunch_current = ifelse(grepl("2",data$Job.007_cat), 1, 0)}
+    free_lunch_current = ifelse(grepl("2",data$Job.007_cat), 1, 0)
+    newdata$free_lunch_current = free_lunch_current}
   
   if(contains_items("JOB.006", data)){
     data = combine.cat(x = data, 
@@ -585,6 +617,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        id = "CaregiverID",
                        newvar.name = "Job.006_cat")
     free_lunch_pre = ifelse(grepl("2",data$Job.006_cat), 1, 0)
+    
+    newdata$free_lunch_pre = free_lunch_pre
     
     newdata$lost_free_lunch = case_when(free_lunch_pre == 0 ~ 0,
                                         free_lunch_pre == 1 & free_lunch_current == 1 ~ 0,
@@ -595,6 +629,13 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                                           free_lunch_pre == 0 & free_lunch_current == 0 ~ 0,
                                           TRUE ~ NA_real_)
   }
+  if(contains_items("JOB.009", data)){
+    data = combine.cat(x = data, 
+                       cols = find_items("JOB.009", data), 
+                       id = "CaregiverID",
+                       newvar.name = "Job.009_cat")
+    newdata$unemployed = ifelse(grepl("5", data$Job.009_cat), 1, 0)
+    }
   
   if(contains_items("JOB.011", data)) newdata$employment_decreased = ifelse(data$JOB.011 == 2, NA, data$JOB.011)
   
