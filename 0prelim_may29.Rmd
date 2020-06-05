@@ -48,7 +48,7 @@ med_household_quantiles = quantile(scored$median_income/1000, probs = c(0, .25, 
 scored = scored %>%
   mutate(income = income/1000,
          income = cut(income, breaks = reported_income_quantiles),
-         income = as.factor(poverty200),
+         income = factor(poverty200, labels = c("high income","low income")),
          median_income = median_income/1000,
          median_income = cut(median_income, breaks = med_household_quantiles))
 ```
@@ -1052,21 +1052,21 @@ scored %>%
 
 ```{r 0prelim-may29-53, fig.height=8}
 library(ggpubr)
-scored = scored %>% 
-  mutate(lostCC_group = factor(lostCC, 
-                               levels = c(0,1), 
-                               labels = c("No loss", 
+scored = scored %>%
+  mutate(lostCC_group = factor(lostCC,
+                               levels = c(0,1),
+                               labels = c("No loss",
                                           "Lost 1+ types of childcare")))
 
 plot_function = function(data, x,y){
-  p = ggbarplot(data, 
-          x = x, 
-          y = y, 
+  p = ggbarplot(data,
+          x = x,
+          y = y,
           fill = x,
           label = T,
           lab.nb.digits = 2,
           lab.vjust = -2,
-          xlab = "", ylab = "", 
+          xlab = "", ylab = "",
           add = "mean_ci") + rremove("legend")
 }
 
@@ -1076,13 +1076,13 @@ test = scored %>%
   filter(dvalue == 1 & !is.na(income)) %>%
   group_by(demo, income) %>%
   nest() %>%
-  mutate(plot = map(data, plot_function, 
+  mutate(plot = map(data, plot_function,
                     x = "lostCC_group",
                     y = "anxiety"))
 
-ggarrange(plotlist = test$plot, 
+ggarrange(plotlist = test$plot,
            labels = paste(test$demo, test$income))
-  
+
 
 
 ```
@@ -1097,13 +1097,13 @@ test = scored %>%
   filter(dvalue == 1 & !is.na(income)) %>%
   group_by(demo, income) %>%
   nest() %>%
-  mutate(plot = map(data, plot_function, 
+  mutate(plot = map(data, plot_function,
                     x = "lostCC_group",
                     y = "depress"))
 
-ggarrange(plotlist = test$plot, 
+ggarrange(plotlist = test$plot,
            labels = paste(test$demo, test$income))
-  
+
 
 
 ```
@@ -1119,13 +1119,13 @@ test = scored %>%
   filter(dvalue == 1 & !is.na(income)) %>%
   group_by(demo, income) %>%
   nest() %>%
-  mutate(plot = map(data, plot_function, 
+  mutate(plot = map(data, plot_function,
                     x = "lostCC_group",
                     y = "stress"))
 
-ggarrange(plotlist = test$plot, 
+ggarrange(plotlist = test$plot,
            labels = paste(test$demo, test$income))
-  
+
 
 
 ```
@@ -1141,13 +1141,13 @@ test = scored %>%
   filter(dvalue == 1 & !is.na(income)) %>%
   group_by(demo, income) %>%
   nest() %>%
-  mutate(plot = map(data, plot_function, 
+  mutate(plot = map(data, plot_function,
                     x = "lostCC_group",
                     y = "lonely"))
 
-ggarrange(plotlist = test$plot, 
+ggarrange(plotlist = test$plot,
            labels = paste(test$demo, test$income))
-  
+
 
 
 ```
@@ -1163,13 +1163,13 @@ test = scored %>%
   filter(dvalue == 1 & !is.na(income)) %>%
   group_by(demo, income) %>%
   nest() %>%
-  mutate(plot = map(data, plot_function, 
+  mutate(plot = map(data, plot_function,
                     x = "lostCC_group",
                     y = "fussy"))
 
-ggarrange(plotlist = test$plot, 
+ggarrange(plotlist = test$plot,
            labels = paste(test$demo, test$income))
-  
+
 
 
 ```
@@ -1185,13 +1185,13 @@ test = scored %>%
   filter(dvalue == 1 & !is.na(income)) %>%
   group_by(demo, income) %>%
   nest() %>%
-  mutate(plot = map(data, plot_function, 
+  mutate(plot = map(data, plot_function,
                     x = "lostCC_group",
                     y = "fear"))
 
-ggarrange(plotlist = test$plot, 
+ggarrange(plotlist = test$plot,
            labels = paste(test$demo, test$income))
-  
+
 ```
 
 # Source of information{.tabset}
