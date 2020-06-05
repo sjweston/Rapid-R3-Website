@@ -454,7 +454,7 @@ nation_race = pop %>%
   mutate(demo = gsub("\\.Percent", "", demo),
          race_cat = factor(demo, 
                            levels = c(nation, "latinx"), 
-                           labels = c(nation_labels, "Hispanic/Latinx"))) %>%
+                           labels = c(nation_labels, "Hispanic/slackLatinx"))) %>%
   select(race_cat, Percent) 
 
 scored %>%

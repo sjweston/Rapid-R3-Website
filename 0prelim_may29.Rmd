@@ -28,7 +28,7 @@ library(tidytext)
 ## score master --------------------------------------------------------
 source(here("Scripts/score data.R"))
 scored = scored %>%
-  filter(Week %in% c(7,8)) %>%
+  filter(Week %in% c(7,8,9)) %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
   ungroup() %>%
