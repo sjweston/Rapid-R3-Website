@@ -48,6 +48,7 @@ med_household_quantiles = quantile(scored$median_income/1000, probs = c(0, .25, 
 scored = scored %>%
   mutate(income = income/1000,
          income = cut(income, breaks = reported_income_quantiles),
+         income = as.factor(poverty200),
          median_income = median_income/1000,
          median_income = cut(median_income, breaks = med_household_quantiles))
 ```
