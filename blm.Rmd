@@ -34,7 +34,7 @@ percent_by_group = function(data, outcome, group, weights, na.rm=T){
 
   cross = count(data, {{outcome}}, {{group}},
                 wt = {{weights}})
-  names(cross) = c("group", "outcome","n")
+  names(cross) = c("outcome","group","n")
   if(na.rm){
     cross = filter(cross, !is.na(group) & !is.na(outcome))
   }
@@ -186,7 +186,7 @@ labels5 = c("Midwest","Northeast", "South", "West")
 labels6 = c("Rural","Urban")
 ```
 
-```{r blm-9}
+```{r blm-9 }
 library(weights)
 library(ggpubr)
 library(dplyr)
@@ -1210,7 +1210,7 @@ percent_by_group(scored, sick_leave, region, weight) %>%
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
@@ -1396,7 +1396,7 @@ percent_by_group(scored, unemployed, region, weight) %>%
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("") +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
@@ -1578,7 +1578,7 @@ percent_by_group(scored, employment_decreased, region, weight) %>%
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("") +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
@@ -1775,9 +1775,34 @@ weights::wtd.chi.sq(unemployed$free_food,
                 weight = unemployed$weight)
 ```
 
-#### Rural/Urban
+#### Geographic Region
 
 ```{r blm-234 }
+percent_by_group(unemployed, free_food, region, weight) %>%
+  ggplot(aes(x = group, y = percent, fill = outcome)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(percent), group = outcome, y = 5),
+            position = position_dodge(.8),
+            color = "white")+
+  scale_x_discrete("", labels = labels5) +
+  scale_y_continuous("Frequency (%)")+
+  scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
+  theme_pubclean()
+```
+
+```{r blm-235, eval = !weighted}
+chisq.test(unemployed$free_food, unemployed$region)
+```
+
+```{r blm-236, eval = weighted}
+weights::wtd.chi.sq(unemployed$free_food,
+                unemployed$region,
+                weight = unemployed$weight)
+```
+
+#### Rural/Urban
+
+```{r blm-237 }
 percent_by_group(unemployed, free_food, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1790,11 +1815,11 @@ percent_by_group(unemployed, free_food, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-235, eval = !weighted}
+```{r blm-238, eval = !weighted}
 chisq.test(unemployed$free_food, unemployed$rural)
 ```
 
-```{r blm-236, eval = weighted}
+```{r blm-239, eval = weighted}
 weights::wtd.chi.sq(unemployed$free_food,
                 unemployed$rural,
                 weight = unemployed$weight)
@@ -1803,7 +1828,7 @@ weights::wtd.chi.sq(unemployed$free_food,
 
 #### Black
 
-```{r blm-237 }
+```{r blm-240 }
 percent_by_group(unemployed, lost_free_lunch, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1816,11 +1841,11 @@ percent_by_group(unemployed, lost_free_lunch, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-238, eval = !weighted}
+```{r blm-241, eval = !weighted}
 chisq.test(unemployed$lost_free_lunch, unemployed$compare1)
 ```
 
-```{r blm-239, eval = weighted}
+```{r blm-242, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
                 unemployed$compare1,
                 weight = unemployed$weight)
@@ -1828,7 +1853,7 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 
 #### Black + LatinX
 
-```{r blm-240 }
+```{r blm-243 }
 percent_by_group(unemployed, lost_free_lunch, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1841,11 +1866,11 @@ percent_by_group(unemployed, lost_free_lunch, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-241, eval = !weighted}
+```{r blm-244, eval = !weighted}
 chisq.test(unemployed$lost_free_lunch, unemployed$compare2)
 ```
 
-```{r blm-242, eval = weighted}
+```{r blm-245, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
                 unemployed$compare2,
                 weight = unemployed$weight)
@@ -1853,7 +1878,7 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 
 #### People of Color (minus Asian)
 
-```{r blm-243 }
+```{r blm-246 }
 percent_by_group(unemployed, lost_free_lunch, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1866,11 +1891,11 @@ percent_by_group(unemployed, lost_free_lunch, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-244, eval = !weighted}
+```{r blm-247, eval = !weighted}
 chisq.test(unemployed$lost_free_lunch, unemployed$compare3)
 ```
 
-```{r blm-245, eval = weighted}
+```{r blm-248, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
                 unemployed$compare3,
                 weight = unemployed$weight)
@@ -1879,7 +1904,7 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 
 #### People of Color
 
-```{r blm-246 }
+```{r blm-249 }
 percent_by_group(unemployed, lost_free_lunch, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1892,11 +1917,11 @@ percent_by_group(unemployed, lost_free_lunch, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-247, eval = !weighted}
+```{r blm-250, eval = !weighted}
 chisq.test(unemployed$lost_free_lunch, unemployed$compare4)
 ```
 
-```{r blm-248, eval = weighted}
+```{r blm-251, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
                 unemployed$compare4,
                 weight = unemployed$weight)
@@ -1904,7 +1929,7 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 
 #### By income
 
-```{r blm-249 }
+```{r blm-252 }
 percent_by_group(unemployed, lost_free_lunch, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1917,11 +1942,11 @@ percent_by_group(unemployed, lost_free_lunch, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-250, eval = !weighted}
+```{r blm-253, eval = !weighted}
 chisq.test(unemployed$lost_free_lunch, unemployed$income.cat)
 ```
 
-```{r blm-251, eval = weighted}
+```{r blm-254, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
                 unemployed$income.cat,
                 weight = unemployed$weight)
@@ -1929,24 +1954,24 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 
 #### Geographic Region
 
-```{r blm-252 }
+```{r blm-255 }
 percent_by_group(unemployed, lost_free_lunch, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-253, eval = !weighted}
+```{r blm-256, eval = !weighted}
 chisq.test(unemployed$lost_free_lunch, unemployed$v)
 ```
 
-```{r blm-254, eval = weighted}
+```{r blm-257, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
                 unemployed$region,
                 weight = unemployed$weight)
@@ -1954,7 +1979,7 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 
 #### Rural/Urban
 
-```{r blm-255 }
+```{r blm-258 }
 percent_by_group(unemployed, lost_free_lunch, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1967,11 +1992,11 @@ percent_by_group(unemployed, lost_free_lunch, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-256, eval = !weighted}
+```{r blm-259, eval = !weighted}
 chisq.test(unemployed$lost_free_lunch, unemployed$rural)
 ```
 
-```{r blm-257, eval = weighted}
+```{r blm-260, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
                 unemployed$rural,
                 weight = unemployed$weight)
@@ -1984,7 +2009,7 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 
 #### Black
 
-```{r blm-258 }
+```{r blm-261 }
 percent_by_group(scored, plan_cc_samenow, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -1997,11 +2022,11 @@ percent_by_group(scored, plan_cc_samenow, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-259, eval = !weighted}
+```{r blm-262, eval = !weighted}
 chisq.test(scored$plan_cc_samenow, scored$compare1)
 ```
 
-```{r blm-260, eval = weighted}
+```{r blm-263, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
                 scored$compare1,
                 weight = scored$weight)
@@ -2009,7 +2034,7 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 
 #### Black + LatinX
 
-```{r blm-261 }
+```{r blm-264 }
 percent_by_group(scored, plan_cc_samenow, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2022,11 +2047,11 @@ percent_by_group(scored, plan_cc_samenow, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-262, eval = !weighted}
+```{r blm-265, eval = !weighted}
 chisq.test(scored$plan_cc_samenow, scored$compare2)
 ```
 
-```{r blm-263, eval = weighted}
+```{r blm-266, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
                 scored$compare2,
                 weight = scored$weight)
@@ -2034,7 +2059,7 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 
 #### People of Color (minus Asian)
 
-```{r blm-264 }
+```{r blm-267 }
 percent_by_group(scored, plan_cc_samenow, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2047,11 +2072,11 @@ percent_by_group(scored, plan_cc_samenow, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-265, eval = !weighted}
+```{r blm-268, eval = !weighted}
 chisq.test(scored$plan_cc_samenow, scored$compare3)
 ```
 
-```{r blm-266, eval = weighted}
+```{r blm-269, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
                 scored$compare3,
                 weight = scored$weight)
@@ -2060,7 +2085,7 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 
 #### People of Color
 
-```{r blm-267 }
+```{r blm-270 }
 percent_by_group(scored, plan_cc_samenow, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2073,11 +2098,11 @@ percent_by_group(scored, plan_cc_samenow, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-268, eval = !weighted}
+```{r blm-271, eval = !weighted}
 chisq.test(scored$plan_cc_samenow, scored$compare4)
 ```
 
-```{r blm-269, eval = weighted}
+```{r blm-272, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
                 scored$compare4,
                 weight = scored$weight)
@@ -2085,7 +2110,7 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 
 #### By income
 
-```{r blm-270 }
+```{r blm-273 }
 percent_by_group(scored, plan_cc_samenow, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2098,11 +2123,11 @@ percent_by_group(scored, plan_cc_samenow, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-271, eval = !weighted}
+```{r blm-274, eval = !weighted}
 chisq.test(scored$plan_cc_samenow, scored$income.cat)
 ```
 
-```{r blm-272, eval = weighted}
+```{r blm-275, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
                 scored$income.cat,
                 weight = scored$weight)
@@ -2110,24 +2135,24 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 
 #### Geographic Region
 
-```{r blm-273 }
+```{r blm-276 }
 percent_by_group(scored, plan_cc_samenow, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-274, eval = !weighted}
+```{r blm-277, eval = !weighted}
 chisq.test(scored$plan_cc_samenow, scored$region)
 ```
 
-```{r blm-275, eval = weighted}
+```{r blm-278, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
                 scored$region,
                 weight = scored$weight)
@@ -2135,7 +2160,7 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 
 #### Rural/Urban
 
-```{r blm-276 }
+```{r blm-279 }
 percent_by_group(scored, plan_cc_samenow, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2148,11 +2173,11 @@ percent_by_group(scored, plan_cc_samenow, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-277, eval = !weighted}
+```{r blm-280, eval = !weighted}
 chisq.test(scored$plan_cc_samenow, scored$rural)
 ```
 
-```{r blm-278, eval = weighted}
+```{r blm-281, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
                 scored$rural,
                 weight = scored$weight)
@@ -2161,7 +2186,7 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 
 #### Black
 
-```{r blm-279 }
+```{r blm-282 }
 percent_by_group(scored, plan_cc_differ, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2174,11 +2199,11 @@ percent_by_group(scored, plan_cc_differ, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-280, eval = !weighted}
+```{r blm-283, eval = !weighted}
 chisq.test(scored$plan_cc_differ, scored$compare1)
 ```
 
-```{r blm-281, eval = weighted}
+```{r blm-284, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
                 scored$compare1,
                 weight = scored$weight)
@@ -2186,7 +2211,7 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 
 #### Black + LatinX
 
-```{r blm-282 }
+```{r blm-285 }
 percent_by_group(scored, plan_cc_differ, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2199,11 +2224,11 @@ percent_by_group(scored, plan_cc_differ, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-283, eval = !weighted}
+```{r blm-286, eval = !weighted}
 chisq.test(scored$plan_cc_differ, scored$compare2)
 ```
 
-```{r blm-284, eval = weighted}
+```{r blm-287, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
                 scored$compare2,
                 weight = scored$weight)
@@ -2211,7 +2236,7 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 
 #### People of Color (minus Asian)
 
-```{r blm-285 }
+```{r blm-288 }
 percent_by_group(scored, plan_cc_differ, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2224,11 +2249,11 @@ percent_by_group(scored, plan_cc_differ, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-286, eval = !weighted}
+```{r blm-289, eval = !weighted}
 chisq.test(scored$plan_cc_differ, scored$compare3)
 ```
 
-```{r blm-287, eval = weighted}
+```{r blm-290, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
                 scored$compare3,
                 weight = scored$weight)
@@ -2237,7 +2262,7 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 
 #### People of Color
 
-```{r blm-288 }
+```{r blm-291 }
 percent_by_group(scored, plan_cc_differ, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2250,11 +2275,11 @@ percent_by_group(scored, plan_cc_differ, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-289, eval = !weighted}
+```{r blm-292, eval = !weighted}
 chisq.test(scored$plan_cc_differ, scored$compare4)
 ```
 
-```{r blm-290, eval = weighted}
+```{r blm-293, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
                 scored$compare4,
                 weight = scored$weight)
@@ -2262,7 +2287,7 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 
 #### By income
 
-```{r blm-291 }
+```{r blm-294 }
 percent_by_group(scored, plan_cc_differ, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2275,11 +2300,11 @@ percent_by_group(scored, plan_cc_differ, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-292, eval = !weighted}
+```{r blm-295, eval = !weighted}
 chisq.test(scored$plan_cc_differ, scored$income.cat)
 ```
 
-```{r blm-293, eval = weighted}
+```{r blm-296, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
                 scored$income.cat,
                 weight = scored$weight)
@@ -2287,24 +2312,24 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 
 #### Geographic Region
 
-```{r blm-294 }
+```{r blm-297 }
 percent_by_group(scored, plan_cc_differ, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-295, eval = !weighted}
+```{r blm-298, eval = !weighted}
 chisq.test(scored$plan_cc_differ, scored$region)
 ```
 
-```{r blm-296, eval = weighted}
+```{r blm-299, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
                 scored$region,
                 weight = scored$weight)
@@ -2312,7 +2337,7 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 
 #### Rural/Urban
 
-```{r blm-297 }
+```{r blm-300 }
 percent_by_group(scored, plan_cc_differ, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2325,11 +2350,11 @@ percent_by_group(scored, plan_cc_differ, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-298, eval = !weighted}
+```{r blm-301, eval = !weighted}
 chisq.test(scored$plan_cc_differ, scored$rural)
 ```
 
-```{r blm-299, eval = weighted}
+```{r blm-302, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
                 scored$rural,
                 weight = scored$weight)
@@ -2339,7 +2364,7 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 
 #### Black
 
-```{r blm-300 }
+```{r blm-303 }
 percent_by_group(scored, plan_cc_sameCOVID, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2352,11 +2377,11 @@ percent_by_group(scored, plan_cc_sameCOVID, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-301, eval = !weighted}
+```{r blm-304, eval = !weighted}
 chisq.test(scored$plan_cc_sameCOVID, scored$compare1)
 ```
 
-```{r blm-302, eval = weighted}
+```{r blm-305, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
                 scored$compare1,
                 weight = scored$weight)
@@ -2364,7 +2389,7 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 
 #### Black + LatinX
 
-```{r blm-303 }
+```{r blm-306 }
 percent_by_group(scored, plan_cc_sameCOVID, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2377,11 +2402,11 @@ percent_by_group(scored, plan_cc_sameCOVID, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-304, eval = !weighted}
+```{r blm-307, eval = !weighted}
 chisq.test(scored$plan_cc_sameCOVID, scored$compare2)
 ```
 
-```{r blm-305, eval = weighted}
+```{r blm-308, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
                 scored$compare2,
                 weight = scored$weight)
@@ -2389,7 +2414,7 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 
 #### People of Color (minus Asian)
 
-```{r blm-306 }
+```{r blm-309 }
 percent_by_group(scored, plan_cc_sameCOVID, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2402,11 +2427,11 @@ percent_by_group(scored, plan_cc_sameCOVID, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-307, eval = !weighted}
+```{r blm-310, eval = !weighted}
 chisq.test(scored$plan_cc_sameCOVID, scored$compare3)
 ```
 
-```{r blm-308, eval = weighted}
+```{r blm-311, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
                 scored$compare3,
                 weight = scored$weight)
@@ -2415,7 +2440,7 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 
 #### People of Color
 
-```{r blm-309 }
+```{r blm-312 }
 percent_by_group(scored, plan_cc_sameCOVID, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2428,11 +2453,11 @@ percent_by_group(scored, plan_cc_sameCOVID, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-310, eval = !weighted}
+```{r blm-313, eval = !weighted}
 chisq.test(scored$plan_cc_sameCOVID, scored$compare4)
 ```
 
-```{r blm-311, eval = weighted}
+```{r blm-314, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
                 scored$compare4,
                 weight = scored$weight)
@@ -2440,7 +2465,7 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 
 #### By income
 
-```{r blm-312 }
+```{r blm-315 }
 percent_by_group(scored, plan_cc_sameCOVID, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2453,11 +2478,11 @@ percent_by_group(scored, plan_cc_sameCOVID, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-313, eval = !weighted}
+```{r blm-316, eval = !weighted}
 chisq.test(scored$plan_cc_sameCOVID, scored$income.cat)
 ```
 
-```{r blm-314, eval = weighted}
+```{r blm-317, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
                 scored$income.cat,
                 weight = scored$weight)
@@ -2465,24 +2490,24 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 
 #### Geographic Region
 
-```{r blm-315 }
+```{r blm-318 }
 percent_by_group(scored, plan_cc_sameCOVID, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-316, eval = !weighted}
+```{r blm-319, eval = !weighted}
 chisq.test(scored$plan_cc_sameCOVID, scored$region)
 ```
 
-```{r blm-317, eval = weighted}
+```{r blm-320, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
                 scored$region,
                 weight = scored$weight)
@@ -2490,7 +2515,7 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 
 #### Rural/Urban
 
-```{r blm-318 }
+```{r blm-321 }
 percent_by_group(scored, plan_cc_sameCOVID, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2503,11 +2528,11 @@ percent_by_group(scored, plan_cc_sameCOVID, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-319, eval = !weighted}
+```{r blm-322, eval = !weighted}
 chisq.test(scored$plan_cc_sameCOVID, scored$rural)
 ```
 
-```{r blm-320, eval = weighted}
+```{r blm-323, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
                 scored$rural,
                 weight = scored$weight)
@@ -2517,7 +2542,7 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 
 #### Black
 
-```{r blm-321 }
+```{r blm-324 }
 percent_by_group(scored, plan_cc_dontknow, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2530,11 +2555,11 @@ percent_by_group(scored, plan_cc_dontknow, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-322, eval = !weighted}
+```{r blm-325, eval = !weighted}
 chisq.test(scored$plan_cc_dontknow, scored$compare1)
 ```
 
-```{r blm-323, eval = weighted}
+```{r blm-326, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 scored$compare1,
                 weight = scored$weight)
@@ -2542,7 +2567,7 @@ weights::wtd.chi.sq(scored$plan_cc_dontknow,
 
 #### Black + LatinX
 
-```{r blm-324 }
+```{r blm-327 }
 percent_by_group(scored, plan_cc_dontknow, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2555,11 +2580,11 @@ percent_by_group(scored, plan_cc_dontknow, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-325, eval = !weighted}
+```{r blm-328, eval = !weighted}
 chisq.test(scored$plan_cc_dontknow, scored$compare2)
 ```
 
-```{r blm-326, eval = weighted}
+```{r blm-329, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 scored$compare2,
                 weight = scored$weight)
@@ -2567,7 +2592,7 @@ weights::wtd.chi.sq(scored$plan_cc_dontknow,
 
 #### People of Color (minus Asian)
 
-```{r blm-327 }
+```{r blm-330 }
 percent_by_group(scored, plan_cc_dontknow, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2580,11 +2605,11 @@ percent_by_group(scored, plan_cc_dontknow, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-328, eval = !weighted}
+```{r blm-331, eval = !weighted}
 chisq.test(scored$plan_cc_dontknow, scored$compare3)
 ```
 
-```{r blm-329, eval = weighted}
+```{r blm-332, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 scored$compare3,
                 weight = scored$weight)
@@ -2593,7 +2618,7 @@ weights::wtd.chi.sq(scored$plan_cc_dontknow,
 
 #### People of Color
 
-```{r blm-330 }
+```{r blm-333 }
 percent_by_group(scored, plan_cc_dontknow, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2606,42 +2631,17 @@ percent_by_group(scored, plan_cc_dontknow, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-331, eval = !weighted}
+```{r blm-334, eval = !weighted}
 chisq.test(scored$plan_cc_dontknow, scored$compare4)
 ```
 
-```{r blm-332, eval = weighted}
+```{r blm-335, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 scored$compare4,
                 weight = scored$weight)
 ```
 
 #### By income
-
-```{r blm-333 }
-percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
-  ggplot(aes(x = group, y = percent, fill = outcome)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  geom_text(aes(label = round(percent), group = outcome, y = 5),
-            position = position_dodge(.8),
-            color = "white")+
-  scale_x_discrete("", labels = labelsi) +
-  scale_y_continuous("Frequency (%)")+
-  scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
-  theme_pubclean()
-```
-
-```{r blm-334, eval = !weighted}
-chisq.test(scored$plan_cc_dontknow, scored$income.cat)
-```
-
-```{r blm-335, eval = weighted}
-weights::wtd.chi.sq(scored$plan_cc_dontknow,
-                scored$income.cat,
-                weight = scored$weight)
-```
-
-#### Geographic Region
 
 ```{r blm-336 }
 percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
@@ -2666,10 +2666,35 @@ weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 weight = scored$weight)
 ```
 
+#### Geographic Region
+
+```{r blm-339 }
+percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
+  ggplot(aes(x = group, y = percent, fill = outcome)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(percent), group = outcome, y = 5),
+            position = position_dodge(.8),
+            color = "white")+
+  scale_x_discrete("", labels = labels5) +
+  scale_y_continuous("Frequency (%)")+
+  scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
+  theme_pubclean()
+```
+
+```{r blm-340, eval = !weighted}
+chisq.test(scored$plan_cc_dontknow, scored$income.cat)
+```
+
+```{r blm-341, eval = weighted}
+weights::wtd.chi.sq(scored$plan_cc_dontknow,
+                scored$income.cat,
+                weight = scored$weight)
+```
+
 
 #### Rural/Urban
 
-```{r blm-339 }
+```{r blm-342 }
 percent_by_group(scored, plan_cc_dontknow, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2682,18 +2707,18 @@ percent_by_group(scored, plan_cc_dontknow, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-340, eval = !weighted}
+```{r blm-343, eval = !weighted}
 chisq.test(scored$plan_cc_dontknow, scored$rural)
 ```
 
-```{r blm-341, eval = weighted}
+```{r blm-344, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 scored$rural,
                 weight = scored$weight)
 ```
 ## Lost type of childcare{.tabset}
 
-```{r blm-342 }
+```{r blm-345 }
 scored = scored %>%
   mutate(
     lostcc_center = ifelse(priorcc_center == 1 & expect_center == 0, 1, 0),
@@ -2716,7 +2741,7 @@ scored = scored %>%
 
 ### Black
 
-```{r blm-343 }
+```{r blm-346 }
 percent_by_group(scored, lostCC, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2729,11 +2754,11 @@ percent_by_group(scored, lostCC, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-344, eval = !weighted}
+```{r blm-347, eval = !weighted}
 chisq.test(scored$lostCC, scored$compare1)
 ```
 
-```{r blm-345, eval = weighted}
+```{r blm-348, eval = weighted}
 weights::wtd.chi.sq(scored$lostCC,
                 scored$compare1,
                 weight = scored$weight)
@@ -2741,7 +2766,7 @@ weights::wtd.chi.sq(scored$lostCC,
 
 ### Black + LatinX
 
-```{r blm-346 }
+```{r blm-349 }
 percent_by_group(scored, lostCC, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2754,11 +2779,11 @@ percent_by_group(scored, lostCC, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-347, eval = !weighted}
+```{r blm-350, eval = !weighted}
 chisq.test(scored$lostCC, scored$compare2)
 ```
 
-```{r blm-348, eval = weighted}
+```{r blm-351, eval = weighted}
 weights::wtd.chi.sq(scored$lostCC,
                 scored$compare2,
                 weight = scored$weight)
@@ -2766,7 +2791,7 @@ weights::wtd.chi.sq(scored$lostCC,
 
 ### People of Color (minus Asian)
 
-```{r blm-349 }
+```{r blm-352 }
 percent_by_group(scored, lostCC, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2779,11 +2804,11 @@ percent_by_group(scored, lostCC, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-350, eval = !weighted}
+```{r blm-353, eval = !weighted}
 chisq.test(scored$lostCC, scored$compare3)
 ```
 
-```{r blm-351, eval = weighted}
+```{r blm-354, eval = weighted}
 weights::wtd.chi.sq(scored$lostCC,
                 scored$compare3,
                 weight = scored$weight)
@@ -2792,7 +2817,7 @@ weights::wtd.chi.sq(scored$lostCC,
 
 ### People of Color
 
-```{r blm-352 }
+```{r blm-355 }
 percent_by_group(scored, lostCC, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2805,11 +2830,11 @@ percent_by_group(scored, lostCC, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-353, eval = !weighted}
+```{r blm-356, eval = !weighted}
 chisq.test(scored$lostCC, scored$compare4)
 ```
 
-```{r blm-354, eval = weighted}
+```{r blm-357, eval = weighted}
 weights::wtd.chi.sq(scored$lostCC,
                 scored$compare4,
                 weight = scored$weight)
@@ -2817,7 +2842,7 @@ weights::wtd.chi.sq(scored$lostCC,
 
 ### By income
 
-```{r blm-355 }
+```{r blm-358 }
 percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2830,11 +2855,11 @@ percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-356, eval = !weighted}
+```{r blm-359, eval = !weighted}
 chisq.test(scored$plan_cc_dontknow, scored$income.cat)
 ```
 
-```{r blm-357, eval = weighted}
+```{r blm-360, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 scored$income.cat,
                 weight = scored$weight)
@@ -2843,24 +2868,24 @@ weights::wtd.chi.sq(scored$plan_cc_dontknow,
 
 ### Geographic Region
 
-```{r blm-358 }
+```{r blm-361 }
 percent_by_group(scored, plan_cc_dontknow, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-359, eval = !weighted}
+```{r blm-362, eval = !weighted}
 chisq.test(scored$plan_cc_dontknow, scored$region)
 ```
 
-```{r blm-360, eval = weighted}
+```{r blm-363, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
                 scored$region,
                 weight = scored$weight)
@@ -2870,7 +2895,7 @@ weights::wtd.chi.sq(scored$plan_cc_dontknow,
 
 ### Rural/Urban
 
-```{r blm-361 }
+```{r blm-364 }
 percent_by_group(scored, lostCC, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2883,11 +2908,11 @@ percent_by_group(scored, lostCC, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-362, eval = !weighted}
+```{r blm-365, eval = !weighted}
 chisq.test(scored$lostCC, scored$rural)
 ```
 
-```{r blm-363, eval = weighted}
+```{r blm-366, eval = weighted}
 weights::wtd.chi.sq(scored$lostCC,
                 scored$rural,
                 weight = scored$weight)
@@ -2899,7 +2924,7 @@ weights::wtd.chi.sq(scored$lostCC,
 
 #### Black
 
-```{r blm-364 }
+```{r blm-367 }
 percent_by_group(scored, expect_center, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2912,11 +2937,11 @@ percent_by_group(scored, expect_center, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-365, eval = !weighted}
+```{r blm-368, eval = !weighted}
 chisq.test(scored$expect_center, scored$compare1)
 ```
 
-```{r blm-366, eval = weighted}
+```{r blm-369, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
                 scored$compare1,
                 weight = scored$weight)
@@ -2924,7 +2949,7 @@ weights::wtd.chi.sq(scored$expect_center,
 
 #### Black + LatinX
 
-```{r blm-367 }
+```{r blm-370 }
 percent_by_group(scored, expect_center, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2937,11 +2962,11 @@ percent_by_group(scored, expect_center, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-368, eval = !weighted}
+```{r blm-371, eval = !weighted}
 chisq.test(scored$expect_center, scored$compare2)
 ```
 
-```{r blm-369, eval = weighted}
+```{r blm-372, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
                 scored$compare2,
                 weight = scored$weight)
@@ -2949,7 +2974,7 @@ weights::wtd.chi.sq(scored$expect_center,
 
 #### People of Color (minus Asian)
 
-```{r blm-370 }
+```{r blm-373 }
 percent_by_group(scored, expect_center, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2962,11 +2987,11 @@ percent_by_group(scored, expect_center, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-371, eval = !weighted}
+```{r blm-374, eval = !weighted}
 chisq.test(scored$expect_center, scored$compare3)
 ```
 
-```{r blm-372, eval = weighted}
+```{r blm-375, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
                 scored$compare3,
                 weight = scored$weight)
@@ -2975,7 +3000,7 @@ weights::wtd.chi.sq(scored$expect_center,
 
 #### People of Color
 
-```{r blm-373 }
+```{r blm-376 }
 percent_by_group(scored, expect_center, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -2988,11 +3013,11 @@ percent_by_group(scored, expect_center, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-374, eval = !weighted}
+```{r blm-377, eval = !weighted}
 chisq.test(scored$expect_center, scored$compare4)
 ```
 
-```{r blm-375, eval = weighted}
+```{r blm-378, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
                 scored$compare4,
                 weight = scored$weight)
@@ -3000,7 +3025,7 @@ weights::wtd.chi.sq(scored$expect_center,
 
 #### By income
 
-```{r blm-376 }
+```{r blm-379 }
 percent_by_group(scored, expect_center, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3013,11 +3038,11 @@ percent_by_group(scored, expect_center, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-377, eval = !weighted}
+```{r blm-380, eval = !weighted}
 chisq.test(scored$expect_center, scored$income.cat)
 ```
 
-```{r blm-378, eval = weighted}
+```{r blm-381, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
                 scored$income.cat,
                 weight = scored$weight)
@@ -3025,24 +3050,24 @@ weights::wtd.chi.sq(scored$expect_center,
 
 #### Geographic Region
 
-```{r blm-379 }
+```{r blm-382 }
 percent_by_group(scored, expect_center, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-380, eval = !weighted}
+```{r blm-383, eval = !weighted}
 chisq.test(scored$expect_center, scored$region)
 ```
 
-```{r blm-381, eval = weighted}
+```{r blm-384, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
                 scored$region,
                 weight = scored$weight)
@@ -3050,7 +3075,7 @@ weights::wtd.chi.sq(scored$expect_center,
 
 #### Rural/Urban
 
-```{r blm-382 }
+```{r blm-385 }
 percent_by_group(scored, expect_center, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3063,25 +3088,25 @@ percent_by_group(scored, expect_center, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-383, eval = !weighted}
+```{r blm-386, eval = !weighted}
 chisq.test(scored$expect_center, scored$rural)
 ```
 
-```{r blm-384, eval = weighted}
+```{r blm-387, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
                 scored$rural,
                 weight = scored$weight)
 ```
 ### Care by relatives{.tabset}
 
-```{r blm-385 }
+```{r blm-388 }
 scored = scored %>%
   mutate(expect_relative = ifelse(expect_relativemyhome == 1 | expect_relativetheirhome == 1, 1, 0))
 ```
 
 #### Black
 
-```{r blm-386 }
+```{r blm-389 }
 percent_by_group(scored, expect_relative, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3094,11 +3119,11 @@ percent_by_group(scored, expect_relative, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-387, eval = !weighted}
+```{r blm-390, eval = !weighted}
 chisq.test(scored$expect_relative, scored$compare1)
 ```
 
-```{r blm-388, eval = weighted}
+```{r blm-391, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
                 scored$compare1,
                 weight = scored$weight)
@@ -3106,7 +3131,7 @@ weights::wtd.chi.sq(scored$expect_relative,
 
 #### Black + LatinX
 
-```{r blm-389 }
+```{r blm-392 }
 percent_by_group(scored, expect_relative, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3119,11 +3144,11 @@ percent_by_group(scored, expect_relative, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-390, eval = !weighted}
+```{r blm-393, eval = !weighted}
 chisq.test(scored$expect_relative, scored$compare2)
 ```
 
-```{r blm-391, eval = weighted}
+```{r blm-394, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
                 scored$compare2,
                 weight = scored$weight)
@@ -3131,7 +3156,7 @@ weights::wtd.chi.sq(scored$expect_relative,
 
 #### People of Color (minus Asian)
 
-```{r blm-392 }
+```{r blm-395 }
 percent_by_group(scored, expect_relative, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3144,11 +3169,11 @@ percent_by_group(scored, expect_relative, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-393, eval = !weighted}
+```{r blm-396, eval = !weighted}
 chisq.test(scored$expect_relative, scored$compare3)
 ```
 
-```{r blm-394, eval = weighted}
+```{r blm-397, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
                 scored$compare3,
                 weight = scored$weight)
@@ -3157,7 +3182,7 @@ weights::wtd.chi.sq(scored$expect_relative,
 
 #### People of Color
 
-```{r blm-395 }
+```{r blm-398 }
 percent_by_group(scored, expect_relative, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3170,11 +3195,11 @@ percent_by_group(scored, expect_relative, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-396, eval = !weighted}
+```{r blm-399, eval = !weighted}
 chisq.test(scored$expect_relative, scored$compare4)
 ```
 
-```{r blm-397, eval = weighted}
+```{r blm-400, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
                 scored$compare4,
                 weight = scored$weight)
@@ -3182,7 +3207,7 @@ weights::wtd.chi.sq(scored$expect_relative,
 
 #### By income
 
-```{r blm-398 }
+```{r blm-401 }
 percent_by_group(scored, expect_relative, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3195,11 +3220,11 @@ percent_by_group(scored, expect_relative, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-399, eval = !weighted}
+```{r blm-402, eval = !weighted}
 chisq.test(scored$expect_relative, scored$income.cat)
 ```
 
-```{r blm-400, eval = weighted}
+```{r blm-403, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
                 scored$income.cat,
                 weight = scored$weight)
@@ -3207,24 +3232,24 @@ weights::wtd.chi.sq(scored$expect_relative,
 
 #### Geographic Region
 
-```{r blm-401 }
+```{r blm-404 }
 percent_by_group(scored, expect_relative, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-402, eval = !weighted}
+```{r blm-405, eval = !weighted}
 chisq.test(scored$expect_relative, scored$region)
 ```
 
-```{r blm-403, eval = weighted}
+```{r blm-406, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
                 scored$region,
                 weight = scored$weight)
@@ -3232,7 +3257,7 @@ weights::wtd.chi.sq(scored$expect_relative,
 
 #### Rural/Urban
 
-```{r blm-404 }
+```{r blm-407 }
 percent_by_group(scored, expect_relative, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3245,25 +3270,25 @@ percent_by_group(scored, expect_relative, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-405, eval = !weighted}
+```{r blm-408, eval = !weighted}
 chisq.test(scored$expect_relative, scored$rural)
 ```
 
-```{r blm-406, eval = weighted}
+```{r blm-409, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
                 scored$rural,
                 weight = scored$weight)
 ```
 ### Professional (non-centerbased){.tabset}
 
-```{r blm-407 }
+```{r blm-410 }
 scored = scored %>%
   mutate(expect_pro = ifelse(expect_promyhome == 1 | expect_theirhome == 1, 1, 0))
 ```
 
 #### Black
 
-```{r blm-408 }
+```{r blm-411 }
 percent_by_group(scored, expect_pro, compare1, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3276,11 +3301,11 @@ percent_by_group(scored, expect_pro, compare1, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-409, eval = !weighted}
+```{r blm-412, eval = !weighted}
 chisq.test(scored$expect_pro, scored$compare1)
 ```
 
-```{r blm-410, eval = weighted}
+```{r blm-413, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
                 scored$compare1,
                 weight = scored$weight)
@@ -3288,7 +3313,7 @@ weights::wtd.chi.sq(scored$expect_pro,
 
 #### Black + LatinX
 
-```{r blm-411 }
+```{r blm-414 }
 percent_by_group(scored, expect_pro, compare2, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3301,11 +3326,11 @@ percent_by_group(scored, expect_pro, compare2, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-412, eval = !weighted}
+```{r blm-415, eval = !weighted}
 chisq.test(scored$expect_pro, scored$compare2)
 ```
 
-```{r blm-413, eval = weighted}
+```{r blm-416, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
                 scored$compare2,
                 weight = scored$weight)
@@ -3313,7 +3338,7 @@ weights::wtd.chi.sq(scored$expect_pro,
 
 #### People of Color (minus Asian)
 
-```{r blm-414 }
+```{r blm-417 }
 percent_by_group(scored, expect_pro, compare3, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3326,11 +3351,11 @@ percent_by_group(scored, expect_pro, compare3, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-415, eval = !weighted}
+```{r blm-418, eval = !weighted}
 chisq.test(scored$expect_pro, scored$compare3)
 ```
 
-```{r blm-416, eval = weighted}
+```{r blm-419, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
                 scored$compare3,
                 weight = scored$weight)
@@ -3339,7 +3364,7 @@ weights::wtd.chi.sq(scored$expect_pro,
 
 #### People of Color
 
-```{r blm-417 }
+```{r blm-420 }
 percent_by_group(scored, expect_pro, compare4, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3352,11 +3377,11 @@ percent_by_group(scored, expect_pro, compare4, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-418, eval = !weighted}
+```{r blm-421, eval = !weighted}
 chisq.test(scored$expect_pro, scored$compare4)
 ```
 
-```{r blm-419, eval = weighted}
+```{r blm-422, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
                 scored$compare4,
                 weight = scored$weight)
@@ -3364,7 +3389,7 @@ weights::wtd.chi.sq(scored$expect_pro,
 
 #### By income
 
-```{r blm-420 }
+```{r blm-423 }
 percent_by_group(scored, expect_pro, income.cat, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3377,11 +3402,11 @@ percent_by_group(scored, expect_pro, income.cat, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-421, eval = !weighted}
+```{r blm-424, eval = !weighted}
 chisq.test(scored$expect_pro, scored$income.cat)
 ```
 
-```{r blm-422, eval = weighted}
+```{r blm-425, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
                 scored$income.cat,
                 weight = scored$weight)
@@ -3390,24 +3415,24 @@ weights::wtd.chi.sq(scored$expect_pro,
 
 #### Geographic Region
 
-```{r blm-423 }
+```{r blm-426 }
 percent_by_group(scored, expect_pro, region, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
             position = position_dodge(.8),
             color = "white")+
-  scale_x_discrete("", labels = labelsi) +
+  scale_x_discrete("", labels = labels5) +
   scale_y_continuous("Frequency (%)")+
   scale_fill_brewer(palette = "Dark2", labels = c("No", "Yes")) +
   theme_pubclean()
 ```
 
-```{r blm-424, eval = !weighted}
+```{r blm-427, eval = !weighted}
 chisq.test(scored$expect_pro, scored$region)
 ```
 
-```{r blm-425, eval = weighted}
+```{r blm-428, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
                 scored$region,
                 weight = scored$weight)
@@ -3415,7 +3440,7 @@ weights::wtd.chi.sq(scored$expect_pro,
 
 #### Rural/Urban
 
-```{r blm-426 }
+```{r blm-429 }
 percent_by_group(scored, expect_pro, rural, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -3428,11 +3453,11 @@ percent_by_group(scored, expect_pro, rural, weight) %>%
   theme_pubclean()
 ```
 
-```{r blm-427, eval = !weighted}
+```{r blm-430, eval = !weighted}
 chisq.test(scored$expect_pro, scored$rural)
 ```
 
-```{r blm-428, eval = weighted}
+```{r blm-431, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
                 scored$rural,
                 weight = scored$weight)
