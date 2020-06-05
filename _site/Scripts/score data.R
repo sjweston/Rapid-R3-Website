@@ -52,9 +52,7 @@ scored = scored %>%
 
 pre_pandemic = scored %>%
   select(CaregiverID, Week, BaselineWeek, all_of(demos), race_cat, 
-         contains("poverty"), 
-         gender,
-         income, state, contains("_pre")) %>%
+         contains("poverty"), gender, income, state, contains("_pre")) %>%
   select(-working_current) %>%
   group_by(CaregiverID) %>%
   filter(Week == min(Week)) %>%
@@ -152,11 +150,13 @@ nyt_data = nyt_data %>%
 
 county_crosswalk = read.csv(here("data/uszips.csv"), stringsAsFactors = F)
 county_crosswalk = county_crosswalk %>%
-  select(zip, county_fips) %>%
+  select(zip, county_fips, density, population) %>%
   rename(fips = county_fips) %>%
   mutate_all(as.character) %>%
   right_join(nyt_data) %>%
-  rename(Date = date)
+  rename(Date = date) %>%
+  filter(zip %in% scored$zip) %>%
+  filter(!is.na(zip))
 
 after0 = scored %>%
   filter(Week > 0) %>%
@@ -165,6 +165,14 @@ after0 = scored %>%
 scored = scored %>%
   filter(Week == 0) %>%
   full_join(after0)
+
+scored = scored %>%
+  mutate(density = as.numeric(as.character(density)),
+         rural = case_when(
+           density < 500 ~ "rural",
+           density >= 1000 ~ "urban", 
+           TRUE ~ NA_character_
+         ))
 
 
 # med income by zip -------------------------------------------------------
@@ -178,4 +186,6 @@ names(zipincome) = c("zip", "median_income")
 zipincome$median_income = as.numeric(as.character(zipincome$median_income))
 zipincome$zip = as.character(zipincome$zip)
 
-scored = full_join(scored, zipincome)
+zipincome = filter(zipincome, !is.na(zip))
+
+scored = left_join(scored, zipincome)

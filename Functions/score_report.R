@@ -589,7 +589,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     income[which(inc.missing == 3)] = NA
     newdata$income = income
     income = income/1000
-    newdata$income.cat = cut(income, breaks =  quantile(income, probs = seq(.1, .9, by = .1), na.rm=T))
+    newdata$income.cat = cut(income, breaks =  quantile(income, probs = c(0, .25, .5, .75, 1), na.rm=T))
     newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
   }
   
@@ -807,6 +807,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("DEMO.001", data)){
     state = unlist(sapply(data$DEMO.001, identify_state))
     newdata$zip = data$DEMO.001
+    newdata = mutate(newdata, zip = ifelse(zip == "", NA, zip))
     newdata$state = state
     data$state = state_abr(data$DEMO.001.a)
     newdata$state[is.na(newdata$state)] = data$state[is.na(newdata$state)]

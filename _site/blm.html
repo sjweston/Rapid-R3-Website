@@ -467,6 +467,8 @@ div.tocify {
 </div>
 
 
+<p>Responses ARE NOT WEIGHTED by race.</p>
+<p>Rural communities are defined as zipcodes with density smaller than 500 people per square mile. Urban areas are zipcodes with density greater than 1000 people per square mile. Zipcodes between these two extremes are omitted.</p>
 <div id="sample-sizes" class="section level1">
 <h1>Sample sizes</h1>
 <table>
@@ -527,7 +529,7 @@ div.tocify {
 <h2>Anxiety</h2>
 <div id="black" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-11-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -542,7 +544,7 @@ div.tocify {
 </div>
 <div id="black-latinx" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-14-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -557,7 +559,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-17-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -572,7 +574,7 @@ div.tocify {
 </div>
 <div id="people-of-color" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-20-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -585,12 +587,49 @@ div.tocify {
 ## mean in group 0 mean in group 1 
 ##        1.177694        1.144177</code></pre>
 </div>
+<div id="by-income" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-23-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: anxiety
+##              Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## income.cat    3   14.89  4.9632   5.451 0.0009889 ***
+## Residuals  1973 1796.42  0.9105                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="geographic-region" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-26-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: anxiety
+##             Df  Sum Sq Mean Sq F value Pr(&gt;F)
+## region       3    0.91 0.30492  0.3313 0.8027
+## Residuals 2444 2249.17 0.92028</code></pre>
+</div>
+<div id="ruralurban" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-29-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  anxiety by rural
+## t = 0.82924, df = 1154.7, p-value = 0.4071
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.06037939  0.14878029
+## sample estimates:
+## mean in group rural mean in group urban 
+##            1.289536            1.245336</code></pre>
+</div>
 </div>
 <div id="depression" class="section level2 tabset">
 <h2>Depression</h2>
 <div id="black-1" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-32-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -605,7 +644,7 @@ div.tocify {
 </div>
 <div id="black-latinx-1" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-35-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -620,7 +659,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-1" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-38-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -635,7 +674,7 @@ div.tocify {
 </div>
 <div id="people-of-color-1" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-41-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -648,12 +687,49 @@ div.tocify {
 ## mean in group 0 mean in group 1 
 ##       0.9146803       0.9302981</code></pre>
 </div>
+<div id="by-income-1" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-44-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: depress
+##              Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## income.cat    3   40.85 13.6171  16.391 1.601e-10 ***
+## Residuals  1970 1636.61  0.8308                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="geographic-region-1" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-47-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: depress
+##             Df  Sum Sq Mean Sq F value Pr(&gt;F)
+## region       3    3.19 1.06483  1.2623 0.2857
+## Residuals 2438 2056.54 0.84354</code></pre>
+</div>
+<div id="ruralurban-1" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-50-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  depress by rural
+## t = 0.82277, df = 1158, p-value = 0.4108
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.05717194  0.13975257
+## sample estimates:
+## mean in group rural mean in group urban 
+##           1.0244048           0.9831144</code></pre>
+</div>
 </div>
 <div id="stress" class="section level2 tabset">
 <h2>Stress</h2>
 <div id="black-2" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-53-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -668,7 +744,7 @@ div.tocify {
 </div>
 <div id="black-latinx-2" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-56-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -683,7 +759,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-2" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-59-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -698,7 +774,7 @@ div.tocify {
 </div>
 <div id="people-of-color-2" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-62-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -711,12 +787,49 @@ div.tocify {
 ## mean in group 0 mean in group 1 
 ##        2.104625        2.066720</code></pre>
 </div>
+<div id="by-income-2" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-65-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: stress
+##              Df Sum Sq Mean Sq F value   Pr(&gt;F)   
+## income.cat    3   27.0  8.9972  5.3208 0.001188 **
+## Residuals  1973 3336.3  1.6910                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="geographic-region-2" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-68-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: stress
+##             Df Sum Sq Mean Sq F value Pr(&gt;F)
+## region       3    7.8  2.6153  1.4944 0.2141
+## Residuals 2438 4266.8  1.7501</code></pre>
+</div>
+<div id="ruralurban-2" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-71-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  stress by rural
+## t = 0.82006, df = 1141.8, p-value = 0.4124
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.08274216  0.20157656
+## sample estimates:
+## mean in group rural mean in group urban 
+##            2.270238            2.210821</code></pre>
+</div>
 </div>
 <div id="loneliness" class="section level2 tabset">
 <h2>Loneliness</h2>
 <div id="black-3" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-74-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -731,7 +844,7 @@ div.tocify {
 </div>
 <div id="black-latinx-3" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-77-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -746,7 +859,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-3" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-80-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -761,7 +874,7 @@ div.tocify {
 </div>
 <div id="people-of-color-3" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-83-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -774,12 +887,49 @@ div.tocify {
 ## mean in group 0 mean in group 1 
 ##        1.775549        1.687047</code></pre>
 </div>
+<div id="by-income-3" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-86-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: lonely
+##              Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## income.cat    3   65.75 21.9182  15.233 8.435e-10 ***
+## Residuals  1973 2838.87  1.4389                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="geographic-region-3" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-89-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: lonely
+##             Df Sum Sq Mean Sq F value Pr(&gt;F)
+## region       3    8.9  2.9765  2.0107 0.1104
+## Residuals 2440 3612.1  1.4804</code></pre>
+</div>
+<div id="ruralurban-3" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-92-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  lonely by rural
+## t = 0.99639, df = 1118.7, p-value = 0.3193
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.06449062  0.19757218
+## sample estimates:
+## mean in group rural mean in group urban 
+##            1.860548            1.794007</code></pre>
+</div>
 </div>
 <div id="child-externalizing" class="section level2 tabset">
 <h2>Child Externalizing</h2>
 <div id="black-4" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-95-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -794,7 +944,7 @@ div.tocify {
 </div>
 <div id="black-latinx-4" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-98-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -809,7 +959,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-4" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-101-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -824,7 +974,7 @@ div.tocify {
 </div>
 <div id="people-of-color-4" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-104-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -837,12 +987,51 @@ div.tocify {
 ## mean in group 0 mean in group 1 
 ##       1.0197343       0.9529603</code></pre>
 </div>
+<div id="by-income-4" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-107-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: fussy
+##              Df  Sum Sq Mean Sq F value   Pr(&gt;F)   
+## income.cat    3    6.96 2.32080  4.5465 0.003511 **
+## Residuals  1959 1000.00 0.51046                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="geographic-region-4" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-110-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: fussy
+##              Df  Sum Sq Mean Sq F value   Pr(&gt;F)   
+## income.cat    3    6.96 2.32080  4.5465 0.003511 **
+## Residuals  1959 1000.00 0.51046                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="ruralurban-4" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-113-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  fussy by rural
+## t = 2.2477, df = 1146.2, p-value = 0.02478
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.0111051 0.1636315
+## sample estimates:
+## mean in group rural mean in group urban 
+##           1.0611511           0.9737828</code></pre>
+</div>
 </div>
 <div id="child-internalizing" class="section level2 tabset">
 <h2>Child Internalizing</h2>
 <div id="black-5" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-116-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -857,7 +1046,7 @@ div.tocify {
 </div>
 <div id="black-latinx-5" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-119-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -872,7 +1061,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-5" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-122-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -887,7 +1076,7 @@ div.tocify {
 </div>
 <div id="people-of-color-5" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-125-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -900,6 +1089,45 @@ div.tocify {
 ## mean in group 0 mean in group 1 
 ##       0.5526718       0.5793781</code></pre>
 </div>
+<div id="by-income-5" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-128-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: fear
+##              Df Sum Sq Mean Sq F value   Pr(&gt;F)   
+## income.cat    3   7.04 2.34715  4.8507 0.002296 **
+## Residuals  1951 944.04 0.48387                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="geographic-region-5" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-131-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: fear
+##              Df Sum Sq Mean Sq F value   Pr(&gt;F)   
+## income.cat    3   7.04 2.34715  4.8507 0.002296 **
+## Residuals  1951 944.04 0.48387                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="ruralurban-5" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-134-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  fear by rural
+## t = 0.53355, df = 1131.7, p-value = 0.5938
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.05550766  0.09697182
+## sample estimates:
+## mean in group rural mean in group urban 
+##           0.5832321           0.5625000</code></pre>
+</div>
 </div>
 </div>
 <div id="work-benefits" class="section level1">
@@ -908,7 +1136,7 @@ div.tocify {
 <h2>Income</h2>
 <div id="black-6" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-137-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -923,7 +1151,7 @@ div.tocify {
 </div>
 <div id="black-latinx-6" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-80-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-140-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -938,7 +1166,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-6" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-83-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-143-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -953,7 +1181,7 @@ div.tocify {
 </div>
 <div id="people-of-color-6" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-86-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-146-1.png" width="672" /></p>
 <pre><code>## 
 ##  Welch Two Sample t-test
 ## 
@@ -966,68 +1194,96 @@ div.tocify {
 ## mean in group 0 mean in group 1 
 ##        83690.92        82749.23</code></pre>
 </div>
+<div id="geographic-region-6" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-149-1.png" width="672" /></p>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: income
+##             Df     Sum Sq    Mean Sq F value Pr(&gt;F)
+## region       3 4.5192e+10 1.5064e+10  0.6872 0.5598
+## Residuals 1957 4.2900e+13 2.1921e+10</code></pre>
+</div>
+<div id="ruralurban-6" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-152-1.png" width="672" /></p>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  income by rural
+## t = -2.4163, df = 560.64, p-value = 0.016
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -51311.273  -5295.214
+## sample estimates:
+## mean in group rural mean in group urban 
+##            70075.55            98378.79</code></pre>
+</div>
 </div>
 <div id="sick-leave" class="section level2 tabset">
 <h2>Sick Leave</h2>
 <div id="black-7" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-89-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-155-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  sick_leave by compare1
-## t = -1.0573, df = 545.73, p-value = 0.2909
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.08035920  0.02412259
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.4791988       0.5073171</code></pre>
+## data:  scored$sick_leave and scored$compare1
+## X-squared = 1.0113, df = 1, p-value = 0.3146</code></pre>
 </div>
 <div id="black-latinx-7" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-92-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-158-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  sick_leave by compare2
-## t = -1.063, df = 1308.4, p-value = 0.288
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.06275996  0.01864819
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.4785926       0.5006485</code></pre>
+## data:  scored$sick_leave and scored$compare2
+## X-squared = 1.0453, df = 1, p-value = 0.3066</code></pre>
 </div>
 <div id="people-of-color-minus-asian-7" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-95-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-161-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  sick_leave by compare3
-## t = -1.1645, df = 1687.2, p-value = 0.2444
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.06092911  0.01553352
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.4773022       0.5000000</code></pre>
+## data:  scored$sick_leave and scored$compare3
+## X-squared = 1.2685, df = 1, p-value = 0.2601</code></pre>
 </div>
 <div id="people-of-color-7" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-98-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-164-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  sick_leave by compare4
-## t = -1.9557, df = 2151.8, p-value = 0.05063
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -7.191891e-02  9.923539e-05
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.4773322       0.5132420</code></pre>
+## data:  scored$sick_leave and scored$compare4
+## X-squared = 3.6827, df = 1, p-value = 0.05498</code></pre>
+</div>
+<div id="by-income-6" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-167-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$sick_leave and scored$income.cat
+## X-squared = 153.6, df = 3, p-value &lt; 2.2e-16</code></pre>
+</div>
+<div id="geographic-region-7" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-170-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$sick_leave and scored$region
+## X-squared = 20.42, df = 3, p-value = 0.0001389</code></pre>
+</div>
+<div id="ruralurban-7" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-173-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$sick_leave and scored$rural
+## X-squared = 9.1541, df = 1, p-value = 0.002482</code></pre>
 </div>
 </div>
 </div>
@@ -1037,63 +1293,66 @@ div.tocify {
 <h2>Unemployed</h2>
 <div id="black-8" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-101-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-176-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  unemployed by compare1
-## t = 0.83304, df = 602.59, p-value = 0.4051
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.02230041  0.05515532
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.2008719       0.1844444</code></pre>
+## data:  scored$unemployed and scored$compare1
+## X-squared = 0.56351, df = 1, p-value = 0.4529</code></pre>
 </div>
 <div id="black-latinx-8" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-179-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  unemployed by compare2
-## t = 2.6334, df = 1534.2, p-value = 0.008539
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  0.01005184 0.06874512
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.2068458       0.1674473</code></pre>
+## data:  scored$unemployed and scored$compare2
+## X-squared = 6.1193, df = 1, p-value = 0.01337</code></pre>
 </div>
 <div id="people-of-color-minus-asian-8" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-107-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-182-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  unemployed by compare3
-## t = 1.3844, df = 1945.6, p-value = 0.1664
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.008343556  0.048394130
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.2076462       0.1876209</code></pre>
+## data:  scored$unemployed and scored$compare3
+## X-squared = 1.7314, df = 1, p-value = 0.1882</code></pre>
 </div>
 <div id="people-of-color-8" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-110-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-185-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  unemployed by compare4
-## t = 1.6425, df = 2540.2, p-value = 0.1006
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.004322247  0.048914229
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.2089947       0.1866987</code></pre>
+## data:  scored$unemployed and scored$compare4
+## X-squared = 2.4801, df = 1, p-value = 0.1153</code></pre>
+</div>
+<div id="by-income-7" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-188-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$unemployed and scored$income.cat
+## X-squared = 66.015, df = 3, p-value = 3.042e-14</code></pre>
+</div>
+<div id="geographic-region-8" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-191-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$unemployed and scored$region
+## X-squared = 0.17511, df = 3, p-value = 0.9815</code></pre>
+</div>
+<div id="ruralurban-8" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-194-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$unemployed and scored$rural
+## X-squared = 4.8394, df = 1, p-value = 0.02782</code></pre>
 </div>
 </div>
 <div id="lost-employment" class="section level2 tabset">
@@ -1101,63 +1360,66 @@ div.tocify {
 <p>“Has your level of employment decreased due to the coronavirus (COVID-19) pandemic?”</p>
 <div id="black-9" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-113-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-197-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  employment_decreased by compare1
-## t = -4.2189, df = 515.77, p-value = 2.901e-05
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.16673765 -0.06078722
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.3900350       0.5037975</code></pre>
+## data:  scored$employment_decreased and scored$compare1
+## X-squared = 17.915, df = 1, p-value = 2.31e-05</code></pre>
 </div>
 <div id="black-latinx-9" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-116-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-200-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  employment_decreased by compare2
-## t = -6.1273, df = 1219.1, p-value = 1.205e-09
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.16910076 -0.08707514
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.3786325       0.5067204</code></pre>
+## data:  scored$employment_decreased and scored$compare2
+## X-squared = 37.773, df = 1, p-value = 7.948e-10</code></pre>
 </div>
 <div id="people-of-color-minus-asian-9" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-119-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-203-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  employment_decreased by compare3
-## t = -5.9092, df = 1562.3, p-value = 4.212e-09
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.15449851 -0.07749228
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.3789199       0.4949153</code></pre>
+## data:  scored$employment_decreased and scored$compare3
+## X-squared = 35.021, df = 1, p-value = 3.261e-09</code></pre>
 </div>
 <div id="people-of-color-9" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-122-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-206-1.png" width="672" /></p>
 <pre><code>## 
-##  Welch Two Sample t-test
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
-## data:  employment_decreased by compare4
-## t = -5.0012, df = 2018.3, p-value = 6.191e-07
-## alternative hypothesis: true difference in means is not equal to 0
-## 95 percent confidence interval:
-##  -0.12803291 -0.05590449
-## sample estimates:
-## mean in group 0 mean in group 1 
-##       0.3788411       0.4708098</code></pre>
+## data:  scored$employment_decreased and scored$compare4
+## X-squared = 24.984, df = 1, p-value = 5.781e-07</code></pre>
+</div>
+<div id="by-income-8" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-209-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$employment_decreased and scored$income.cat
+## X-squared = 82.151, df = 3, p-value &lt; 2.2e-16</code></pre>
+</div>
+<div id="geographic-region-9" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-212-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$employment_decreased and scored$region
+## X-squared = 2.3646, df = 3, p-value = 0.5002</code></pre>
+</div>
+<div id="ruralurban-9" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-215-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$employment_decreased and scored$rural
+## X-squared = 0.016208, df = 1, p-value = 0.8987</code></pre>
 </div>
 </div>
 <div id="among-unemployed" class="section level2">
@@ -1217,7 +1479,7 @@ div.tocify {
 <h3>Have access to free food</h3>
 <div id="black-10" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-219-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1226,7 +1488,7 @@ div.tocify {
 </div>
 <div id="black-latinx-10" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-129-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-222-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1235,7 +1497,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-10" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-132-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-225-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1244,19 +1506,37 @@ div.tocify {
 </div>
 <div id="people-of-color-10" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-135-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-228-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  unemployed$free_food and unemployed$compare4
 ## X-squared = 0.87842, df = 1, p-value = 0.3486</code></pre>
 </div>
+<div id="by-income-9" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-231-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  unemployed$free_food and unemployed$income.cat
+## X-squared = 37.32, df = 3, p-value = 3.936e-08</code></pre>
+</div>
+<div id="ruralurban-10" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-234-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  unemployed$free_food and unemployed$rural
+## X-squared = 1.4641, df = 1, p-value = 0.2263</code></pre>
+</div>
 </div>
 <div id="lost-free-lunch-for-children" class="section level3 tabset">
 <h3>Lost free lunch for child(ren)</h3>
 <div id="black-11" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-138-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-237-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1265,7 +1545,7 @@ div.tocify {
 </div>
 <div id="black-latinx-11" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-141-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-240-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1274,7 +1554,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-11" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-144-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-243-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1283,12 +1563,39 @@ div.tocify {
 </div>
 <div id="people-of-color-11" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-147-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-246-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  unemployed$lost_free_lunch and unemployed$compare4
 ## X-squared = 1.8146e-29, df = 1, p-value = 1</code></pre>
+</div>
+<div id="by-income-10" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-249-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  unemployed$lost_free_lunch and unemployed$income.cat
+## X-squared = 7.5241, df = 3, p-value = 0.05694</code></pre>
+</div>
+<div id="geographic-region-10" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-252-1.png" width="672" /></p>
+<pre><code>## 
+##  Chi-squared test for given probabilities
+## 
+## data:  unemployed$lost_free_lunch
+## X-squared = 774, df = 787, p-value = 0.6227</code></pre>
+</div>
+<div id="ruralurban-11" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-255-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  unemployed$lost_free_lunch and unemployed$rural
+## X-squared = 0.012789, df = 1, p-value = 0.91</code></pre>
 </div>
 </div>
 </div>
@@ -1301,7 +1608,7 @@ div.tocify {
 <h3>Same as right now</h3>
 <div id="black-12" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-150-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-258-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1310,7 +1617,7 @@ div.tocify {
 </div>
 <div id="black-latinx-12" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-153-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-261-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1319,7 +1626,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-12" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-156-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-264-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1328,19 +1635,46 @@ div.tocify {
 </div>
 <div id="people-of-color-12" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-159-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-267-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$plan_cc_samenow and scored$compare4
 ## X-squared = 6.4882, df = 1, p-value = 0.01086</code></pre>
 </div>
+<div id="by-income-11" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-270-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_samenow and scored$income.cat
+## X-squared = 6.7686, df = 3, p-value = 0.07965</code></pre>
+</div>
+<div id="geographic-region-11" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-273-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_samenow and scored$region
+## X-squared = 11.333, df = 3, p-value = 0.01005</code></pre>
+</div>
+<div id="ruralurban-12" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-276-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$plan_cc_samenow and scored$rural
+## X-squared = 1.0901e-30, df = 1, p-value = 1</code></pre>
+</div>
 </div>
 <div id="different-arrangement" class="section level3 tabset">
 <h3>Different arrangement</h3>
 <div id="black-13" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-162-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-279-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1349,7 +1683,7 @@ div.tocify {
 </div>
 <div id="black-latinx-13" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-165-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-282-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1358,7 +1692,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-13" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-168-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-285-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1367,19 +1701,46 @@ div.tocify {
 </div>
 <div id="people-of-color-13" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-171-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-288-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$plan_cc_differ and scored$compare4
 ## X-squared = 0.39051, df = 1, p-value = 0.532</code></pre>
 </div>
+<div id="by-income-12" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-291-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_differ and scored$income.cat
+## X-squared = 1.4747, df = 3, p-value = 0.6881</code></pre>
+</div>
+<div id="geographic-region-12" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-294-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_differ and scored$region
+## X-squared = 9.6077, df = 3, p-value = 0.02221</code></pre>
+</div>
+<div id="ruralurban-13" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-297-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$plan_cc_differ and scored$rural
+## X-squared = 0.87318, df = 1, p-value = 0.3501</code></pre>
+</div>
 </div>
 <div id="same-as-during-pandemic" class="section level3 tabset">
 <h3>Same as during pandemic</h3>
 <div id="black-14" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-174-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-300-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1388,7 +1749,7 @@ div.tocify {
 </div>
 <div id="black-latinx-14" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-177-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-303-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1397,7 +1758,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-14" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-180-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-306-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1406,19 +1767,46 @@ div.tocify {
 </div>
 <div id="people-of-color-14" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-183-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-309-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$plan_cc_sameCOVID and scored$compare4
 ## X-squared = 2.5817, df = 1, p-value = 0.1081</code></pre>
 </div>
+<div id="by-income-13" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-312-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_sameCOVID and scored$income.cat
+## X-squared = 2.7017, df = 3, p-value = 0.4399</code></pre>
+</div>
+<div id="geographic-region-13" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-315-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_sameCOVID and scored$region
+## X-squared = 4.7183, df = 3, p-value = 0.1936</code></pre>
+</div>
+<div id="ruralurban-14" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-318-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$plan_cc_sameCOVID and scored$rural
+## X-squared = 0.0056372, df = 1, p-value = 0.9402</code></pre>
+</div>
 </div>
 <div id="dont-know" class="section level3 tabset">
 <h3>Don’t know</h3>
 <div id="black-15" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-186-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-321-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1427,7 +1815,7 @@ div.tocify {
 </div>
 <div id="black-latinx-15" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-189-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-324-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1436,7 +1824,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-15" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-192-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-327-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1445,12 +1833,39 @@ div.tocify {
 </div>
 <div id="people-of-color-15" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-195-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-330-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$plan_cc_dontknow and scored$compare4
 ## X-squared = 4.3757, df = 1, p-value = 0.03645</code></pre>
+</div>
+<div id="by-income-14" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-333-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_dontknow and scored$income.cat
+## X-squared = 7.5245, df = 3, p-value = 0.05693</code></pre>
+</div>
+<div id="geographic-region-14" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-336-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_dontknow and scored$income.cat
+## X-squared = 7.5245, df = 3, p-value = 0.05693</code></pre>
+</div>
+<div id="ruralurban-15" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-339-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$plan_cc_dontknow and scored$rural
+## X-squared = 2.772, df = 1, p-value = 0.09593</code></pre>
 </div>
 </div>
 </div>
@@ -1458,7 +1873,7 @@ div.tocify {
 <h2>Lost type of childcare</h2>
 <div id="black-16" class="section level3">
 <h3>Black</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-199-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-343-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1467,7 +1882,7 @@ div.tocify {
 </div>
 <div id="black-latinx-16" class="section level3">
 <h3>Black + LatinX</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-202-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-346-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1476,7 +1891,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-16" class="section level3">
 <h3>People of Color (minus Asian)</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-205-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-349-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1485,12 +1900,39 @@ div.tocify {
 </div>
 <div id="people-of-color-16" class="section level3">
 <h3>People of Color</h3>
-<p><img src="blm_files/figure-html/unnamed-chunk-208-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-352-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$lostCC and scored$compare4
 ## X-squared = 4.6031, df = 1, p-value = 0.03191</code></pre>
+</div>
+<div id="by-income-15" class="section level3">
+<h3>By income</h3>
+<p><img src="blm_files/figure-html/blm-355-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_dontknow and scored$income.cat
+## X-squared = 7.5245, df = 3, p-value = 0.05693</code></pre>
+</div>
+<div id="geographic-region-15" class="section level3">
+<h3>Geographic Region</h3>
+<p><img src="blm_files/figure-html/blm-358-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$plan_cc_dontknow and scored$region
+## X-squared = 1.3174, df = 3, p-value = 0.725</code></pre>
+</div>
+<div id="ruralurban-16" class="section level3">
+<h3>Rural/Urban</h3>
+<p><img src="blm_files/figure-html/blm-361-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$lostCC and scored$rural
+## X-squared = 4.8478, df = 1, p-value = 0.02768</code></pre>
 </div>
 </div>
 <div id="type-of-care-for-the-next-month" class="section level2">
@@ -1499,7 +1941,7 @@ div.tocify {
 <h3>Center-based</h3>
 <div id="black-17" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-211-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-364-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1508,7 +1950,7 @@ div.tocify {
 </div>
 <div id="black-latinx-17" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-214-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-367-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1517,7 +1959,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-17" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-217-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-370-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1526,19 +1968,46 @@ div.tocify {
 </div>
 <div id="people-of-color-17" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-220-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-373-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$expect_center and scored$compare4
 ## X-squared = 0.025956, df = 1, p-value = 0.872</code></pre>
 </div>
+<div id="by-income-16" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-376-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$expect_center and scored$income.cat
+## X-squared = 3.3543, df = 3, p-value = 0.3402</code></pre>
+</div>
+<div id="geographic-region-16" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-379-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$expect_center and scored$region
+## X-squared = 2.6867, df = 3, p-value = 0.4425</code></pre>
+</div>
+<div id="ruralurban-17" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-382-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$expect_center and scored$rural
+## X-squared = 0.093949, df = 1, p-value = 0.7592</code></pre>
+</div>
 </div>
 <div id="care-by-relatives" class="section level3 tabset">
 <h3>Care by relatives</h3>
 <div id="black-18" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-224-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-386-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1547,7 +2016,7 @@ div.tocify {
 </div>
 <div id="black-latinx-18" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-227-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-389-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1556,7 +2025,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-18" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-230-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-392-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1565,19 +2034,46 @@ div.tocify {
 </div>
 <div id="people-of-color-18" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-233-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-395-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$expect_relative and scored$compare4
 ## X-squared = 4.0672, df = 1, p-value = 0.04372</code></pre>
 </div>
+<div id="by-income-17" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-398-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$expect_relative and scored$income.cat
+## X-squared = 0.44955, df = 3, p-value = 0.9298</code></pre>
+</div>
+<div id="geographic-region-17" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-401-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$expect_relative and scored$region
+## X-squared = 3.1689, df = 3, p-value = 0.3663</code></pre>
+</div>
+<div id="ruralurban-18" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-404-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$expect_relative and scored$rural
+## X-squared = 3.6615e-05, df = 1, p-value = 0.9952</code></pre>
+</div>
 </div>
 <div id="professional-non-centerbased" class="section level3 tabset">
 <h3>Professional (non-centerbased)</h3>
 <div id="black-19" class="section level4">
 <h4>Black</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-237-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-408-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1586,7 +2082,7 @@ div.tocify {
 </div>
 <div id="black-latinx-19" class="section level4">
 <h4>Black + LatinX</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-240-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-411-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1595,7 +2091,7 @@ div.tocify {
 </div>
 <div id="people-of-color-minus-asian-19" class="section level4">
 <h4>People of Color (minus Asian)</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-243-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-414-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
@@ -1604,12 +2100,39 @@ div.tocify {
 </div>
 <div id="people-of-color-19" class="section level4">
 <h4>People of Color</h4>
-<p><img src="blm_files/figure-html/unnamed-chunk-246-1.png" width="672" /></p>
+<p><img src="blm_files/figure-html/blm-417-1.png" width="672" /></p>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  scored$expect_pro and scored$compare4
 ## X-squared = 2.5514, df = 1, p-value = 0.1102</code></pre>
+</div>
+<div id="by-income-18" class="section level4">
+<h4>By income</h4>
+<p><img src="blm_files/figure-html/blm-420-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$expect_pro and scored$income.cat
+## X-squared = 0.70675, df = 3, p-value = 0.8716</code></pre>
+</div>
+<div id="geographic-region-18" class="section level4">
+<h4>Geographic Region</h4>
+<p><img src="blm_files/figure-html/blm-423-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  scored$expect_pro and scored$region
+## X-squared = 1.6409, df = 3, p-value = 0.6502</code></pre>
+</div>
+<div id="ruralurban-19" class="section level4">
+<h4>Rural/Urban</h4>
+<p><img src="blm_files/figure-html/blm-426-1.png" width="672" /></p>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+## 
+## data:  scored$expect_pro and scored$rural
+## X-squared = 0.060753, df = 1, p-value = 0.8053</code></pre>
 </div>
 </div>
 </div>
