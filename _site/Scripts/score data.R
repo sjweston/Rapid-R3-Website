@@ -36,6 +36,15 @@ scored = scored %>%
   ungroup()%>%
   full_join(scored)
 
+# variables assessed only at baseline
+
+scored = scored %>%
+  group_by(CaregiverID) %>%
+  mutate_at(.vars = c("income", "household_size", "num_children_raw", "gender", 
+                      "zip", "state", "region"), 
+            na.locf0) %>%
+  ungroup()
+  
 # poverty threshold --------------------------------------------------------------
 
 census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
@@ -53,7 +62,8 @@ scored = scored %>%
 
 pre_pandemic = scored %>%
   select(CaregiverID, Week, BaselineWeek, all_of(demos), race_cat, 
-         contains("poverty"), gender, income, state, contains("_pre")) %>%
+         contains("poverty"), gender, income, household_size, num_children_raw, state, 
+         gender, zip, state, region, contains("_pre")) %>%
   select(-working_current) %>%
   group_by(CaregiverID) %>%
   filter(Week == min(Week)) %>%
