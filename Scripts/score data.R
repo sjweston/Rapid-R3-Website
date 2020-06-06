@@ -38,15 +38,16 @@ scored = scored %>%
 
 # poverty threshold --------------------------------------------------------------
 
-# census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
-# 
-# scored = scored %>%
-#   select(CaregiverID, Week, BaselineWeek, income, 
-#          household_size, num_children_raw) %>%
-#   left_join(census) %>%
-#   #mutate(poverty = ifelse(income < poverty_threshold*1.5,1,0)) %>%
-#   select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty) %>%
-#   full_join(scored)
+census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
+
+scored = scored %>%
+  select(CaregiverID, Week, BaselineWeek, income,
+         household_size, num_children_raw) %>%
+  left_join(census) %>%
+  mutate(poverty150s = ifelse(income < poverty_threshold*1.5,1,0),
+         poverty200s = ifelse(income < poverty_threshold*2,1,0)) %>%
+  select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty150s, poverty200s) %>%
+  full_join(scored)
 
 # baseline week -----------------------------------------------------------
 

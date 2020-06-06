@@ -41,18 +41,18 @@ scored = scored %>%
 
 ```
 
-```{r 0prelim-may29-5}
+```{r 0prelim-may29-5 }
 reported_income_quantiles = quantile(scored$income/1000, probs = c(0, .25, .5, .75, 1), na.rm=T)
 med_household_quantiles = quantile(scored$median_income/1000, probs = c(0, .25, .5, .75, 1), na.rm=T)
 
 scored = scored %>%
   mutate(income = income/1000,
          income = cut(income, breaks = reported_income_quantiles),
-         #income = factor(poverty200, labels = c("high income","low income")),
+         #income = factor(poverty200s, labels = c("high income","low income")),
          median_income = median_income/1000,
          median_income = cut(median_income, breaks = med_household_quantiles),
-         poverty200 = factor(poverty200, labels = c("high income","low income")),
-         poverty150 = factor(poverty150, labels = c("high income","low income")))
+         poverty200s = factor(poverty200s, labels = c("high income","low income")),
+         poverty150s = factor(poverty150s, labels = c("high income","low income")))
 ```
 
 
@@ -85,12 +85,12 @@ demo_labelse = c("Everyone")
 
 ```{r 0prelim-may29-8, out.width='100%'}
 scored %>%
-  select(contains("expect_"), poverty200) %>%
+  select(contains("expect_"), poverty200s) %>%
   select(-contains("age"), -contains("relation")) %>%
-  filter(!is.na(poverty200)) %>%
-  gather(type, value,  -poverty200) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty200, type) %>%
+  group_by(poverty200s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -110,27 +110,63 @@ scored %>%
                                   "None"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty200))+
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
   geom_bar(stat = "identity", position = position_dodge(width = 1)) +
   geom_text(aes(label = round(Percent), x= Percent + 10), position = position_dodge(width = 1))+
   scale_fill_brewer(palette = "Dark2")+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   guides(fill = F) +
   labs(y = "")+
   theme_bw() +
   theme(legend.position = "top")
 ```
 
+```{r 0prelim-may29-9, results = 'asis'}
+scored %>%
+  select(contains("expect_"), poverty200s) %>%
+  select(-contains("age"), -contains("relation")) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty200s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+mutate(type = factor(type, 
+                       levels = c("expect_center",
+                                  "expect_relativemyhome",
+                                  "expect_relativetheirhome",
+                                  "expect_promyhome",
+                                  "expect_theirhome",
+                                  "expect_parents",
+                                  "expect_none"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians", 
+                                  "None"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
+```
+
+
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-9, out.width='100%'}
+```{r 0prelim-may29-10, out.width='100%'}
 scored %>%
-  select(contains("expect_"), poverty150) %>%
+  select(contains("expect_"), poverty150s) %>%
   select(-contains("age"), -contains("relation")) %>%
-  filter(!is.na(poverty150)) %>%
-  gather(type, value,  -poverty150) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty150, type) %>%
+  group_by(poverty150s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -150,20 +186,56 @@ scored %>%
                                   "None"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty150))+
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
   geom_bar(stat = "identity", position = position_dodge(width = 1)) +
   geom_text(aes(label = round(Percent), x= Percent + 10), position = position_dodge(width = 1))+
   scale_fill_brewer(palette = "Dark2")+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   guides(fill = F) +
   labs(y = "")+
   theme_bw() +
   theme(legend.position = "top")
+```
+
+
+```{r 0prelim-may29-11, results = 'asis'}
+scored %>%
+  select(contains("expect_"), poverty150s) %>%
+  select(-contains("age"), -contains("relation")) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty150s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+mutate(type = factor(type, 
+                       levels = c("expect_center",
+                                  "expect_relativemyhome",
+                                  "expect_relativetheirhome",
+                                  "expect_promyhome",
+                                  "expect_theirhome",
+                                  "expect_parents",
+                                  "expect_none"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians", 
+                                  "None"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
 ```
 
 ### Self-reported income
 
-```{r 0prelim-may29-10, out.width='100%'}
+```{r 0prelim-may29-12, out.width='100%'}
 scored %>%
   select(contains("expect_"), income) %>%
   select(-contains("age"), -contains("relation")) %>%
@@ -203,7 +275,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-11, out.width='100%'}
+```{r 0prelim-may29-13, out.width='100%'}
 scored %>%
   select(contains("expect_"), all_of(demo_groups)) %>%
   select(-contains("age"), -contains("relation")) %>%
@@ -248,7 +320,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-12 }
+```{r 0prelim-may29-14 }
 scored %>%
   select(contains("expect_")) %>%
   select(-contains("age"), -contains("relation")) %>%
@@ -282,13 +354,13 @@ scored %>%
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-13, out.width='100%'}
+```{r 0prelim-may29-15, out.width='100%'}
 scored %>%
-  select(contains("expect_age"), poverty200) %>%
-  filter(!is.na(poverty200)) %>%
-  gather(type, value,  -poverty200) %>%
+  select(contains("expect_age"), poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty200, type) %>%
+  group_by(poverty200s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -308,25 +380,60 @@ scored %>%
                                   "Unsure"))) %>%
   ungroup() %>%
            mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty200))+
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 5))+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   labs(y = "")+
   theme_bw()
 ```
 
+
+```{r 0prelim-may29-16, results = 'asis'}
+scored %>%
+  select(contains("expect_age"), poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty200s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+ mutate(type = factor(type, 
+                       levels = c("expect_age_5_12",
+                                  "expect_age_13_17",
+                                  "expect_age_18_29",
+                                  "expect_age_30_49",
+                                  "expect_age_50_64" ,
+                                  "expect_age_65up",
+                                  "expect_age_unsure"),
+                       labels = c("5-12",
+                                  "13-17",
+                                  "18-29",
+                                  "30-49",
+                                  "50-64",
+                                  "65+",
+                                  "Unsure"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
+```
+
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-14, out.width='100%'}
+```{r 0prelim-may29-17, out.width='100%'}
 scored %>%
-  select(contains("expect_age"), poverty150) %>%
-  filter(!is.na(poverty150)) %>%
-  gather(type, value,  -poverty150) %>%
+  select(contains("expect_age"), poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty150, type) %>%
+  group_by(poverty150s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -346,20 +453,54 @@ scored %>%
                                   "Unsure"))) %>%
   ungroup() %>%
            mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty150))+
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 5))+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   labs(y = "")+
   theme_bw()
+```
+
+```{r 0prelim-may29-18, results = 'asis'}
+scored %>%
+  select(contains("expect_age"), poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty150s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+ mutate(type = factor(type, 
+                       levels = c("expect_age_5_12",
+                                  "expect_age_13_17",
+                                  "expect_age_18_29",
+                                  "expect_age_30_49",
+                                  "expect_age_50_64" ,
+                                  "expect_age_65up",
+                                  "expect_age_unsure"),
+                       labels = c("5-12",
+                                  "13-17",
+                                  "18-29",
+                                  "30-49",
+                                  "50-64",
+                                  "65+",
+                                  "Unsure"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
 ```
 
 
 ### Self-reported income
 
-```{r 0prelim-may29-15, out.width='100%'}
+```{r 0prelim-may29-19, out.width='100%'}
 scored %>%
   select(contains("expect_age"), income) %>%
   filter(!is.na(income)) %>%
@@ -397,7 +538,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-16, out.width='100%'}
+```{r 0prelim-may29-20, out.width='100%'}
 scored %>%
   select(contains("expect_age"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -442,7 +583,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-17 }
+```{r 0prelim-may29-21 }
 scored %>%
   select(contains("expect_age")) %>%
   gather(type, value) %>%
@@ -476,13 +617,13 @@ scored %>%
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-18, out.width='100%'}
+```{r 0prelim-may29-22, out.width='100%'}
 scored %>%
-  select(contains("expect_relation"), poverty200) %>%
-  filter(!is.na(poverty200)) %>%
-  gather(type, value,  -poverty200) %>%
+  select(contains("expect_relation"), poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty200, type) %>%
+  group_by(poverty200s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -500,25 +641,57 @@ scored %>%
                                   "A neighbor of our family"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty200))+
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 5))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
   theme_minimal()
+```
+
+```{r 0prelim-may29-23, results = 'asis'}
+scored %>%
+  select(contains("expect_relation"), poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty200s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+ mutate(type = factor(type, 
+                       levels = c("expect_relation_sibling",
+                                  "expect_relation_aunt",
+                                  "expect_relation_grand",
+                                  "expect_relation_relative",
+                                  "expect_relation_friend",
+                                  "expect_relation_neighbor"),
+                       labels = c("An older child in our family",
+                                  "A sibling of myself or of my partner/spouse",
+                                  "A parent of myself or of my partner/spouse ",
+                                  "Another relative of our family",
+                                  "A friend of our family",
+                                  "A neighbor of our family"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
 ```
 
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-19, out.width='100%'}
+```{r 0prelim-may29-24, out.width='100%'}
 scored %>%
-  select(contains("expect_relation"), poverty150) %>%
-  filter(!is.na(poverty150)) %>%
-  gather(type, value,  -poverty150) %>%
+  select(contains("expect_relation"), poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty150, type) %>%
+  group_by(poverty150s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -536,19 +709,52 @@ scored %>%
                                   "A neighbor of our family"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty150))+
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 5))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
   theme_minimal()
 ```
 
+
+```{r 0prelim-may29-25, results = 'asis'}
+scored %>%
+  select(contains("expect_relation"), poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty150s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+ mutate(type = factor(type, 
+                       levels = c("expect_relation_sibling",
+                                  "expect_relation_aunt",
+                                  "expect_relation_grand",
+                                  "expect_relation_relative",
+                                  "expect_relation_friend",
+                                  "expect_relation_neighbor"),
+                       labels = c("An older child in our family",
+                                  "A sibling of myself or of my partner/spouse",
+                                  "A parent of myself or of my partner/spouse ",
+                                  "Another relative of our family",
+                                  "A friend of our family",
+                                  "A neighbor of our family"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
+```
+
 ### Self-reported income
 
-```{r 0prelim-may29-20, out.width='100%'}
+```{r 0prelim-may29-26, out.width='100%'}
 scored %>%
   select(contains("expect_relation"), income) %>%
   filter(!is.na(income)) %>%
@@ -584,7 +790,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-21, out.width='100%'}
+```{r 0prelim-may29-27, out.width='100%'}
 scored %>%
   select(contains("expect_relation"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -625,7 +831,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-22 }
+```{r 0prelim-may29-28 }
 scored %>%
   select(contains("expect_relation")) %>%
   gather(type, value) %>%
@@ -658,49 +864,66 @@ scored %>%
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-23 }
+```{r 0prelim-may29-29 }
 scored %>%
-  select(same_cc, poverty200) %>%
-  filter(!is.na(same_cc) & !is.na(poverty200) ) %>%
-  group_by(same_cc,poverty200) %>%
+  select(same_cc, poverty200s) %>%
+  filter(!is.na(same_cc) & !is.na(poverty200s) ) %>%
+  group_by(same_cc,poverty200s) %>%
   summarize(Count = n()) %>%
-  group_by( poverty200) %>%
+  group_by( poverty200s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = same_cc, fill = poverty200))+
+  ggplot(aes(x = Percent, y = same_cc, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+  labs(y = "")+
   theme_minimal()
+```
+
+```{r 0prelim-may29-30, results = 'asis'}
+stats::chisq.test(scored$poverty200s, scored$same_cc) %>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
 ```
 
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-24 }
+```{r 0prelim-may29-31 }
 scored %>%
-  select(same_cc, poverty150) %>%
-  filter(!is.na(same_cc) & !is.na(poverty150) ) %>%
-  group_by(same_cc,poverty150) %>%
+  select(same_cc, poverty150s) %>%
+  filter(!is.na(same_cc) & !is.na(poverty150s) ) %>%
+  group_by(same_cc,poverty150s) %>%
   summarize(Count = n()) %>%
-  group_by( poverty150) %>%
+  group_by( poverty150s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = same_cc, fill = poverty150))+
+  ggplot(aes(x = Percent, y = same_cc, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+  labs(y = "")+
   theme_minimal()
 ```
 
+```{r 0prelim-may29-32, results = 'asis'}
+stats::chisq.test(scored$poverty150s, scored$same_cc) %>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
+```
+
+
 ### Self-reported income
 
-```{r 0prelim-may29-25 }
+```{r 0prelim-may29-33 }
 scored %>%
   select(same_cc, income) %>%
   filter(!is.na(same_cc) & !is.na(income) ) %>%
@@ -721,7 +944,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-26 }
+```{r 0prelim-may29-34 }
 scored %>%
   select(same_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -748,7 +971,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-27 }
+```{r 0prelim-may29-35 }
 scored %>%
   filter(!is.na(same_cc)) %>%
   group_by(same_cc) %>%
@@ -771,50 +994,67 @@ scored %>%
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-28 }
+```{r 0prelim-may29-36 }
 scored %>%
-  select(willing_same_cc, poverty200) %>%
-  filter(!is.na(willing_same_cc)& !is.na(poverty200)) %>%
-  group_by(willing_same_cc,poverty200) %>%
+  select(willing_same_cc, poverty200s) %>%
+  filter(!is.na(willing_same_cc)& !is.na(poverty200s)) %>%
+  group_by(willing_same_cc,poverty200s) %>%
   summarize(Count = n()) %>%
-  group_by(poverty200) %>%
+  group_by(poverty200s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = willing_same_cc, fill = poverty200))+
+  ggplot(aes(x = Percent, y = willing_same_cc, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
+```{r 0prelim-may29-37, results = 'asis'}
+stats::chisq.test(scored$poverty200s, scored$willing_same_cc) %>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
+```
+
+
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-29 }
+```{r 0prelim-may29-38 }
 scored %>%
-  select(willing_same_cc, poverty150) %>%
-  filter(!is.na(willing_same_cc)& !is.na(poverty150)) %>%
-  group_by(willing_same_cc,poverty150) %>%
+  select(willing_same_cc, poverty150s) %>%
+  filter(!is.na(willing_same_cc)& !is.na(poverty150s)) %>%
+  group_by(willing_same_cc,poverty150s) %>%
   summarize(Count = n()) %>%
-  group_by(poverty150) %>%
+  group_by(poverty150s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = willing_same_cc, fill = poverty150))+
+  ggplot(aes(x = Percent, y = willing_same_cc, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
+```
+
+```{r 0prelim-may29-39, results = 'asis'}
+stats::chisq.test(scored$poverty150s, scored$willing_same_cc) %>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
 ```
 
 
 ### Self-reported income
 
-```{r 0prelim-may29-30 }
+```{r 0prelim-may29-40 }
 scored %>%
   select(willing_same_cc, income) %>%
   filter(!is.na(willing_same_cc)& !is.na(income)) %>%
@@ -835,7 +1075,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-31 }
+```{r 0prelim-may29-41 }
 scored %>%
   select(willing_same_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -866,13 +1106,13 @@ What might make it hard for you to return to the same childcare you had prior to
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-32, out.width='100%'}
+```{r 0prelim-may29-42, out.width='100%'}
 scored %>%
-  select(contains("barrier_same_cc_"),  poverty200) %>%
-  filter(!is.na(poverty200)) %>%
-  gather(type, value,  -poverty200) %>%
+  select(contains("barrier_same_cc_"),  poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty200, type) %>%
+  group_by(poverty200s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -884,24 +1124,51 @@ scored %>%
                                   "I no longer need the same amount of child care"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty200))+
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
+```
+
+
+```{r 0prelim-may29-43, results = 'asis'}
+scored %>%
+  select(contains("barrier_same_cc_"), poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty200s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+ mutate(type = factor(type, 
+                       levels = c("barrier_same_cc_cost",
+                                  "barrier_same_cc_safe",
+                                  "barrier_same_cc_need"),
+                       labels = c("I can no longer afford this option",
+                                  "I no longer think this option is safe for my child and/or my family",
+                                  "I no longer need the same amount of child care"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
 ```
 
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-33, out.width='100%'}
+```{r 0prelim-may29-44, out.width='100%'}
 scored %>%
-  select(contains("barrier_same_cc_"),  poverty150) %>%
-  filter(!is.na(poverty150)) %>%
-  gather(type, value,  -poverty150) %>%
+  select(contains("barrier_same_cc_"),  poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty150, type) %>%
+  group_by(poverty150s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   mutate(type = factor(type, 
@@ -913,18 +1180,45 @@ scored %>%
                                   "I no longer need the same amount of child care"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty150))+
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
+
+```{r 0prelim-may29-45, results = 'asis'}
+scored %>%
+  select(contains("barrier_same_cc_"), poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty150s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+ mutate(type = factor(type, 
+                       levels = c("barrier_same_cc_cost",
+                                  "barrier_same_cc_safe",
+                                  "barrier_same_cc_need"),
+                       labels = c("I can no longer afford this option",
+                                  "I no longer think this option is safe for my child and/or my family",
+                                  "I no longer need the same amount of child care"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
+
+```
+
 ### Self-reported income
 
-```{r 0prelim-may29-34, out.width='100%'}
+```{r 0prelim-may29-46, out.width='100%'}
 scored %>%
   select(contains("barrier_same_cc_"),  income) %>%
   filter(!is.na(income)) %>%
@@ -953,7 +1247,7 @@ scored %>%
 
 ### Race/Ethnicity
 
-```{r 0prelim-may29-35, out.width='100%'}
+```{r 0prelim-may29-47, out.width='100%'}
 scored %>%
   select(contains("barrier_same_cc_"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -988,7 +1282,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-36 }
+```{r 0prelim-may29-48 }
 scored %>%
   select(contains("barrier_same_cc_")) %>%
   gather(type, value) %>%
@@ -1016,13 +1310,13 @@ scored %>%
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-37 }
+```{r 0prelim-may29-49 }
 scored %>%
-  select(comfort_return, poverty200) %>%
-  filter(!is.na(comfort_return)& !is.na(poverty200)) %>%
-  group_by(comfort_return, poverty200) %>%
+  select(comfort_return, poverty200s) %>%
+  filter(!is.na(comfort_return)& !is.na(poverty200s)) %>%
+  group_by(comfort_return, poverty200s) %>%
   summarize(Count = n()) %>%
-  group_by(poverty200) %>%
+  group_by(poverty200s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count),
@@ -1033,24 +1327,34 @@ scored %>%
                                        "Neither comfortable nor worried or anxious",
                                    "A little comfortable and also a little worried or anxious",
                                    "Not at all comfortable and very worried or anxious"))) %>%
-  ggplot(aes(x = Percent, y = comfort_return, fill = poverty200))+
+  ggplot(aes(x = Percent, y = comfort_return, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
+
+
+```{r 0prelim-may29-50, results = 'asis'}
+stats::chisq.test(table(scored$poverty200s, scored$comfort_return))%>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
+```
+
 
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-38 }
+```{r 0prelim-may29-51 }
 scored %>%
-  select(comfort_return, poverty150) %>%
-  filter(!is.na(comfort_return)& !is.na(poverty150)) %>%
-  group_by(comfort_return, poverty150) %>%
+  select(comfort_return, poverty150s) %>%
+  filter(!is.na(comfort_return)& !is.na(poverty150s)) %>%
+  group_by(comfort_return, poverty150s) %>%
   summarize(Count = n()) %>%
-  group_by(poverty150) %>%
+  group_by(poverty150s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count),
@@ -1061,18 +1365,29 @@ scored %>%
                                        "Neither comfortable nor worried or anxious",
                                    "A little comfortable and also a little worried or anxious",
                                    "Not at all comfortable and very worried or anxious"))) %>%
-  ggplot(aes(x = Percent, y = comfort_return, fill = poverty150))+
+  ggplot(aes(x = Percent, y = comfort_return, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
+
+```{r 0prelim-may29-52, results = 'asis'}
+stats::chisq.test(table(scored$poverty150s, scored$comfort_return))%>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
+```
+
+
+
 ### Self-reported income
 
-```{r 0prelim-may29-39 }
+```{r 0prelim-may29-53 }
 scored %>%
   select(comfort_return, income) %>%
   filter(!is.na(comfort_return)& !is.na(income)) %>%
@@ -1100,7 +1415,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-40 }
+```{r 0prelim-may29-54 }
 scored %>%
   select(comfort_return, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -1133,7 +1448,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-41 }
+```{r 0prelim-may29-55 }
 scored %>%
   filter(!is.na(comfort_return)) %>%
   group_by(comfort_return) %>%
@@ -1161,13 +1476,13 @@ scored %>%
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-42, out.width='100%'}
+```{r 0prelim-may29-56, out.width='100%'}
 scored %>%
-  select(contains("know_cc"),  poverty200) %>%
-  filter(!is.na(poverty200)) %>%
-  gather(type, value, -poverty200) %>%
+  select(contains("know_cc"),  poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value, -poverty200s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty200, type) %>%
+  group_by(poverty200s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
@@ -1191,10 +1506,10 @@ scored %>%
                            "New and/or updated policies for enrollment, cost, etc"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty200))+
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
@@ -1202,13 +1517,13 @@ scored %>%
 
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-43, out.width='100%'}
+```{r 0prelim-may29-57, out.width='100%'}
 scored %>%
-  select(contains("know_cc"),  poverty150) %>%
-  filter(!is.na(poverty150)) %>%
-  gather(type, value, -poverty150) %>%
+  select(contains("know_cc"),  poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value, -poverty150s) %>%
   filter(!is.na(value)) %>%
-  group_by(poverty150, type) %>%
+  group_by(poverty150s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
@@ -1232,10 +1547,10 @@ scored %>%
                            "New and/or updated policies for enrollment, cost, etc"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty150))+
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
@@ -1243,7 +1558,7 @@ scored %>%
 
 ### Self-reported income
 
-```{r 0prelim-may29-44, out.width='100%'}
+```{r 0prelim-may29-58, out.width='100%'}
 scored %>%
   select(contains("know_cc"),  income) %>%
   filter(!is.na(income)) %>%
@@ -1284,7 +1599,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-45, out.width='100%'}
+```{r 0prelim-may29-59, out.width='100%'}
 scored %>%
   select(contains("know_cc"), all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -1331,7 +1646,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-46 }
+```{r 0prelim-may29-60 }
 scored %>%
   select(contains("know_cc")) %>%
   gather(type, value) %>%
@@ -1369,49 +1684,69 @@ scored %>%
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-47 }
+```{r 0prelim-may29-61 }
 scored %>%
-  select(lack_cc,  poverty200) %>%
-  filter( !is.na(lack_cc) & !is.na(poverty200)) %>%
-  group_by(lack_cc, poverty200) %>%
+  select(lack_cc,  poverty200s) %>%
+  filter( !is.na(lack_cc) & !is.na(poverty200s)) %>%
+  group_by(lack_cc, poverty200s) %>%
   summarize(Count = n()) %>%
-  group_by(poverty200) %>%
+  group_by(poverty200s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = lack_cc, fill = poverty200))+
+  ggplot(aes(x = Percent, y = lack_cc, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
+
+
+```{r 0prelim-may29-62, results = 'asis'}
+stats::chisq.test(table(scored$poverty200s, scored$lack_cc))%>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
+```
+
+
 
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-48 }
+```{r 0prelim-may29-63 }
 scored %>%
-  select(lack_cc,  poverty150) %>%
-  filter( !is.na(lack_cc) & !is.na(poverty150)) %>%
-  group_by(lack_cc, poverty150) %>%
+  select(lack_cc,  poverty150s) %>%
+  filter( !is.na(lack_cc) & !is.na(poverty150s)) %>%
+  group_by(lack_cc, poverty150s) %>%
   summarize(Count = n()) %>%
-  group_by(poverty150) %>%
+  group_by(poverty150s) %>%
   mutate(Percent = 100*Count/sum(Count)) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = lack_cc, fill = poverty150))+
+  ggplot(aes(x = Percent, y = lack_cc, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+   labs(y = "")+
   theme_minimal()
 ```
 
+```{r 0prelim-may29-64, results = 'asis'}
+stats::chisq.test(table(scored$poverty150s, scored$lack_cc))%>%
+  broom::tidy() %>%
+  kable(., col.names = c("Statistic", "p", "df", "Method"),
+        digits = c(2,3,0,0)) %>%
+  kable_styling(full_width = T)
+```
+
+
 ### Self-reported income
 
-```{r 0prelim-may29-49 }
+```{r 0prelim-may29-65 }
 scored %>%
   select(lack_cc,  income) %>%
   filter( !is.na(lack_cc) & !is.na(income)) %>%
@@ -1432,7 +1767,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-50 }
+```{r 0prelim-may29-66 }
 scored %>%
   select(lack_cc, all_of(demo_groups)) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -1458,7 +1793,7 @@ scored %>%
 
 ### Overall
 
-```{r 0prelim-may29-51 }
+```{r 0prelim-may29-67 }
 scored %>%
   select(lack_cc) %>%
   filter(!is.na(lack_cc)) %>%
@@ -1476,7 +1811,7 @@ scored %>%
 
 ## Expected change in childcare{.tabset}
 
-```{r 0prelim-may29-52 }
+```{r 0prelim-may29-68 }
 scored = scored %>%
   mutate(
     lostcc_center = ifelse(priorcc_center == 1 & expect_center == 0, 1, 0),
@@ -1500,15 +1835,15 @@ Using the caregiver type variables, we indicate, for each caregiver, whether the
 
 ### Poverty (200% FPL)
 
-```{r 0prelim-may29-53 }
+```{r 0prelim-may29-69 }
 
 scored %>%
   select(contains("lostcc_", ignore.case = F), 
-         poverty200) %>%
-  filter(!is.na(poverty200)) %>%
-  gather(type, value,  - poverty200) %>%
+         poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  - poverty200s) %>%
   filter(!is.na(value) & !is.na(type)) %>%
-  group_by(poverty200, type) %>%
+  group_by(poverty200s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -1526,28 +1861,96 @@ scored %>%
                                   "Parents/legal guardians"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty200))+
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 5))+
-  facet_grid(poverty200~.)+
+  facet_grid(poverty200s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
   theme_minimal()
+
+```
+
+
+```{r 0prelim-may29-70, out.width='100%'}
+scored %>%
+  select(contains("lostcc_", ignore.case = F), poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
+  filter(!is.na(value)) %>%
+  group_by(poverty200s, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("lostcc_center",
+                                  "lostcc_relativemyhome",
+                                  "lostcc_relativetheirhome",
+                                  "lostcc_promyhome",
+                                  "lostcc_theirhome",
+                                  "lostcc_parents"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians"))) %>%
+  ungroup() %>%
+           mutate(Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F)+
+  facet_grid(poverty200s~.)+
+  labs(y = "")+
+  theme_bw()
+```
+
+
+```{r 0prelim-may29-71, results = 'asis'}
+scored %>%
+  select(contains("lostcc_", ignore.case = F), poverty200s) %>%
+  filter(!is.na(poverty200s)) %>%
+  gather(type, value,  -poverty200s) %>%
+  filter(!is.na(value)) %>%
+  group_by(type) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) t.test(value~poverty200s, data = x)),
+         chisq = map(chisq, broom::tidy)) %>%
+  unnest(cols = chisq) %>%
+  select(type, estimate1, estimate2, statistic, p.value) %>%
+  ungroup() %>%
+   mutate(type = factor(type, 
+                       levels = c("lostcc_center",
+                                  "lostcc_relativemyhome",
+                                  "lostcc_relativetheirhome",
+                                  "lostcc_promyhome",
+                                  "lostcc_theirhome",
+                                  "lostcc_parents"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians"))) %>%
+  kable(., col.names = c("Type", "High Income", "Low Income", "t", "p"),
+        digits = c(0,2,2,2,3)) %>%
+  kable_styling(full_width = T)
 
 ```
 
 ### Poverty (150% FPL)
 
-```{r 0prelim-may29-54 }
+```{r 0prelim-may29-72 }
 
 scored %>%
   select(contains("lostcc_", ignore.case = F), 
-         poverty150) %>%
-  filter(!is.na(poverty150)) %>%
-  gather(type, value,  - poverty150) %>%
+         poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  - poverty150s) %>%
   filter(!is.na(value) & !is.na(type)) %>%
-  group_by(poverty150, type) %>%
+  group_by(poverty150s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
    mutate(type = factor(type, 
@@ -1565,10 +1968,10 @@ scored %>%
                                   "Parents/legal guardians"))) %>%
   ungroup() %>%
   mutate(Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty150))+
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 5))+
-  facet_grid(poverty150~.)+
+  facet_grid(poverty150s~.)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F)+
   labs(y = "")+
@@ -1576,9 +1979,43 @@ scored %>%
 
 ```
 
+```{r 0prelim-may29-73, out.width='100%'}
+scored %>%
+  select(contains("lostcc_", ignore.case = F), poverty150s) %>%
+  filter(!is.na(poverty150s)) %>%
+  gather(type, value,  -poverty150s) %>%
+  filter(!is.na(value)) %>%
+  group_by(poverty150s, type) %>%
+  summarize(Count = sum(value),
+    Percent = 100*sum(value)/n()) %>%
+  mutate(type = factor(type, 
+                       levels = c("lostcc_center",
+                                  "lostcc_relativemyhome",
+                                  "lostcc_relativetheirhome",
+                                  "lostcc_promyhome",
+                                  "lostcc_theirhome",
+                                  "lostcc_parents"),
+                       labels = c("Center-based care",
+                                  "Care by a relative, friend or neighbor in my home",
+                                  "Care by a relative, friend or neighbor in their home",
+                                  "Professional child care provider in my home",
+                                  "Professional child care provider in their home",
+                                  "Parents/legal guardians"))) %>%
+  ungroup() %>%
+           mutate(Count = ifelse(Count == 0, NA, Count)) %>%
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(Percent), x= Percent + 5))+
+  scale_fill_brewer(palette = "Dark2")+
+  guides(fill = F)+
+  facet_grid(poverty150s~.)+
+  labs(y = "")+
+  theme_bw()
+```
+
 ### Self-reported income 
 
-```{r 0prelim-may29-55 }
+```{r 0prelim-may29-74 }
 
 scored %>%
   select(contains("lostcc_", ignore.case = F), 
@@ -1618,7 +2055,7 @@ scored %>%
 
 ### Race/ethnicity
 
-```{r 0prelim-may29-56 }
+```{r 0prelim-may29-75 }
 
 scored %>%
   select(contains("lostcc_", ignore.case = F), 
@@ -1662,7 +2099,7 @@ scored %>%
 
 
 ### Overall
-```{r 0prelim-may29-57 }
+```{r 0prelim-may29-76 }
 scored %>%
   group_by(lostCC) %>%
   summarize(count = n()) %>%
@@ -1680,7 +2117,7 @@ scored %>%
 
 ### Anxiety
 
-```{r 0prelim-may29-58, fig.height=8}
+```{r 0prelim-may29-77, fig.height=8}
 library(ggpubr)
 scored = scored %>%
   mutate(lostCC_group = factor(lostCC,
@@ -1717,7 +2154,7 @@ ggarrange(plotlist = test$plot,
 
 ### Depression
 
-```{r 0prelim-may29-59, fig.height=8}
+```{r 0prelim-may29-78, fig.height=8}
 
 test = scored %>%
   select(lostCC_group, depress, all_of(demo_groups), income) %>%
@@ -1739,7 +2176,7 @@ ggarrange(plotlist = test$plot,
 
 ### Stress
 
-```{r 0prelim-may29-60, fig.height=8}
+```{r 0prelim-may29-79, fig.height=8}
 
 test = scored %>%
   select(lostCC_group, stress, all_of(demo_groups), income) %>%
@@ -1761,7 +2198,7 @@ ggarrange(plotlist = test$plot,
 
 ### Loneliness
 
-```{r 0prelim-may29-61, fig.height=8}
+```{r 0prelim-may29-80, fig.height=8}
 
 test = scored %>%
   select(lostCC_group, lonely, all_of(demo_groups), income) %>%
@@ -1783,7 +2220,7 @@ ggarrange(plotlist = test$plot,
 
 ### Fussy
 
-```{r 0prelim-may29-62, fig.height=8}
+```{r 0prelim-may29-81, fig.height=8}
 
 test = scored %>%
   select(lostCC_group, fussy, all_of(demo_groups), income) %>%
@@ -1805,7 +2242,7 @@ ggarrange(plotlist = test$plot,
 
 ### Fear
 
-```{r 0prelim-may29-63, fig.height=8}
+```{r 0prelim-may29-82, fig.height=8}
 
 test = scored %>%
   select(lostCC_group, fear, all_of(demo_groups), income) %>%
@@ -1828,15 +2265,15 @@ What source(s) of information do you use and trust to make decisions for your fa
 
 ## Poverty (200% FPL)
 
-```{r 0prelim-may29-64, out.width='100%'}
+```{r 0prelim-may29-83, out.width='100%'}
 scored %>%
-  select(contains("source_"), all_of(demo_groups), poverty200) %>%
+  select(contains("source_"), all_of(demo_groups), poverty200s) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(poverty200)) %>%
+  filter(dvalue == 1 & !is.na(poverty200s)) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo, -poverty200) %>%
+  gather(type, value, -demo, -poverty200s) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, poverty200, type) %>%
+  group_by(demo, poverty200s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
@@ -1871,10 +2308,10 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty200))+
+  ggplot(aes(x = Percent, y = type, fill = poverty200s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty200~demo)+
+  facet_grid(poverty200s~demo)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F) +   
   labs(y = "")+
@@ -1884,15 +2321,15 @@ scored %>%
 
 ## Poverty (150% FPL)
 
-```{r 0prelim-may29-65, out.width='100%'}
+```{r 0prelim-may29-84, out.width='100%'}
 scored %>%
-  select(contains("source_"), all_of(demo_groups), poverty150) %>%
+  select(contains("source_"), all_of(demo_groups), poverty150s) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
-  filter(dvalue == 1 & !is.na(poverty150)) %>%
+  filter(dvalue == 1 & !is.na(poverty150s)) %>%
   select(-dvalue)%>%
-  gather(type, value, -demo, -poverty150) %>%
+  gather(type, value, -demo, -poverty150s) %>%
   filter(!is.na(value)) %>%
-  group_by(demo, poverty150, type) %>%
+  group_by(demo, poverty150s, type) %>%
   summarize(Count = sum(value),
     Percent = 100*sum(value)/n()) %>%
   ungroup() %>%
@@ -1927,10 +2364,10 @@ scored %>%
                        levels = demo_groups,
                        labels = demo_labels),
          Count = ifelse(Count == 0, NA, Count)) %>%
-  ggplot(aes(x = Percent, y = type, fill = poverty150))+
+  ggplot(aes(x = Percent, y = type, fill = poverty150s))+
   geom_bar(stat = "identity") +
   geom_text(aes(label = round(Percent), x= Percent + 10))+
-  facet_grid(poverty150~demo)+
+  facet_grid(poverty150s~demo)+
   scale_fill_brewer(palette = "Dark2")+
   guides(fill = F) +   
   labs(y = "")+
@@ -1940,7 +2377,7 @@ scored %>%
 
 ## Self-reported income
 
-```{r 0prelim-may29-66, out.width='100%'}
+```{r 0prelim-may29-85, out.width='100%'}
 scored %>%
   select(contains("source_"), all_of(demo_groups), income) %>%
   gather("demo","dvalue", all_of(demo_groups)) %>%
@@ -1999,7 +2436,7 @@ scored %>%
 
 ## Overall
 
-```{r 0prelim-may29-67 }
+```{r 0prelim-may29-86 }
 scored %>%
   select(contains("source_")) %>%
   gather(type, value) %>%
@@ -2138,7 +2575,7 @@ scored %>%
 
 # Open-ended questions
 
-```{r 0prelim-may29-68 }
+```{r 0prelim-may29-87 }
 text_data = master %>%
   filter(Week %in% c(7,8)) %>%
   select(CaregiverID, Week, contains("OPEN")) 
@@ -2153,7 +2590,7 @@ text_data = scored %>%
 
 "What are the biggest challenges and concerns for you and your family right now?"
 
-```{r 0prelim-may29-69 }
+```{r 0prelim-may29-88 }
 open1 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.001) %>%
   unnest_tokens(word, OPEN.001) %>%
@@ -2162,7 +2599,7 @@ open1 = text_data %>%
 
 
 ### Network plot 
-```{r 0prelim-may29-70 }
+```{r 0prelim-may29-89 }
 library(widyr)
 
 library(igraph)
@@ -2187,7 +2624,7 @@ text_data %>%
 
 ### Common words
 
-```{r 0prelim-may29-71}
+```{r 0prelim-may29-90 }
 open1 %>%
   count(word, sort = T)%>%
   filter(n > 50) %>%
@@ -2201,7 +2638,7 @@ open1 %>%
 
 ### By demographic
 
-```{r 0prelim-may29-72 }
+```{r 0prelim-may29-91 }
 open1 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -2231,7 +2668,7 @@ open1 %>%
 "What is helping you and your family the most right now?"
 
 
-```{r 0prelim-may29-73 }
+```{r 0prelim-may29-92 }
 open2 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
   unnest_tokens(word, OPEN.002) %>%
@@ -2239,7 +2676,7 @@ open2 = text_data %>%
 ```
 
 ### Network plot 
-```{r 0prelim-may29-74 }
+```{r 0prelim-may29-93 }
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.002) %>%
@@ -2262,7 +2699,7 @@ text_data %>%
 ### Common words
 
 
-```{r 0prelim-may29-75}
+```{r 0prelim-may29-94 }
 open2 %>%
   count(word, sort = T)%>%
   filter(n > 50) %>%
@@ -2276,7 +2713,7 @@ open2 %>%
 
 ### By demographic
 
-```{r 0prelim-may29-76 }
+```{r 0prelim-may29-95 }
 open2 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -2308,7 +2745,7 @@ open2 %>%
 
 
 
-```{r 0prelim-may29-77 }
+```{r 0prelim-may29-96 }
 open3 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
   unnest_tokens(word, OPEN.003) %>%
@@ -2316,7 +2753,7 @@ open3 = text_data %>%
 ```
 
 ### Network plot 
-```{r 0prelim-may29-78 }
+```{r 0prelim-may29-97 }
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.003) %>%
@@ -2338,7 +2775,7 @@ text_data %>%
 
 ### Common words
 
-```{r 0prelim-may29-79}
+```{r 0prelim-may29-98 }
 
 open3 %>%
   count(word, sort = T)%>%
@@ -2353,7 +2790,7 @@ open3 %>%
 
 ### By demographic
 
-```{r 0prelim-may29-80 }
+```{r 0prelim-may29-99 }
 open3 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -2384,7 +2821,7 @@ open3 %>%
 
 "What concerns do you have about your place of employment and/or your child’s child care setting re-opening?"
 
-```{r 0prelim-may29-81 }
+```{r 0prelim-may29-100 }
 open4 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
   unnest_tokens(word, OPEN.004) %>%
@@ -2392,7 +2829,7 @@ open4 = text_data %>%
 ```
 
 ### Network plot 
-```{r 0prelim-may29-82 }
+```{r 0prelim-may29-101 }
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.004) %>%
@@ -2413,7 +2850,7 @@ text_data %>%
 
 ### Common words
 
-```{r 0prelim-may29-83}
+```{r 0prelim-may29-102 }
 
 open4 %>%
   count(word, sort = T)%>%
@@ -2428,7 +2865,7 @@ open4 %>%
 
 ### By demographic
 
-```{r 0prelim-may29-84 }
+```{r 0prelim-may29-103 }
 open4 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
@@ -2461,7 +2898,7 @@ open4 %>%
 "Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?"
 
 ### Network plot 
-```{r 0prelim-may29-85 }
+```{r 0prelim-may29-104 }
 
 text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
@@ -2480,7 +2917,7 @@ text_data %>%
              x = "", y = "")
 ```
 
-```{r 0prelim-may29-86 }
+```{r 0prelim-may29-105 }
 open5 = text_data %>%
   select(CaregiverID, all_of(demo_groups), OPEN.005) %>%
   unnest_tokens(word, OPEN.005) %>%
@@ -2489,7 +2926,7 @@ open5 = text_data %>%
 
 ### Common words
 
-```{r 0prelim-may29-87}
+```{r 0prelim-may29-106 }
 
 open5 %>%
   count(word, sort = T)%>%
@@ -2504,7 +2941,7 @@ open5 %>%
 
 ### By demographic
 
-```{r 0prelim-may29-88 }
+```{r 0prelim-may29-107 }
 open5 %>%
   gather(demo, dvalue, all_of(demo_groups)) %>%
   filter(dvalue == 1) %>%
