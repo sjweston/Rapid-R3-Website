@@ -1,0 +1,485 @@
+---
+title: "Canary in the coal mine"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(ggpubr)
+```
+
+```{r childcare-1}
+source(here("Scripts/score data.R")) 
+
+completedWeek9 = scored %>%
+  filter(Week == 9)
+completedWeek9 = completedWeek9$CaregiverID
+
+scored = scored %>%
+  filter(
+    CaregiverID %in% completedWeek9,
+    Week %in% c(0,9))
+
+# groups
+scored = scored %>%
+  mutate(
+    poc = case_when(
+      race_cat == "White/Caucasian" ~ "White",
+      race_cat == "Asian" ~ NA_character_,
+      !is.na(race_cat) ~ "POC (non Asian)",
+      TRUE ~ NA_character_),
+    pocA = case_when(
+      race_cat == "White/Caucasian" ~ "White",
+      race_cat == "Asian" ~ "POC",
+      !is.na(race_cat) ~ "POC",
+      TRUE ~ NA_character_),
+    whiteO = case_when(
+      race_cat == "White/Caucasian" ~ "White",
+      !is.na(race_cat) ~ "Non-white",
+      TRUE ~ NA_character_),
+    poverty150 = factor(poverty150s, labels = c("High Income", "Low Income")),
+    conflictSource = factor(conflictSource, 
+                            labels = c("Being confident that my family has health insurance",
+                                       "Not being so socially isolated",
+                                       "Having lower levels of worry and stress ",
+                                       "Knowing we can pay for food ",
+                                       "Knowing we can pay my rent/mortgage/housing expenses",
+                                       "Knowing my/our job is secure",
+                                       "Being able to meet my child's social and emotional needs",
+                                       "Knowing we have access to childcare"))) %>%
+  select(CaregiverID, Week, contains("conflict"), contains("cohesive"), poc, pocA, whiteO, poverty150)
+```
+
+```{r}
+scored_prepost = scored %>%
+  select(-contains("Source")) %>%
+  gather("key", "value", contains("conflict"), contains("cohesive")) %>%
+  mutate(Week = ifelse(Week == 0, "pre", "post")) %>%
+  spread(Week, value) %>%
+  mutate(change = post-pre) %>%
+  select(-pre, -post) %>%
+  spread(key, change)
+```
+
+# Descriptives
+
+```{r, results = 'asis'}
+test = scored %>%
+  select_if(function(col)  is.character(col)| is.factor(col)) %>%
+  select(-CaregiverID) 
+
+apply(test, 2, table) %>%
+  kable(.) %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+```
+
+
+```{r, results = 'asis'}
+scored %>%
+  select_if(is.numeric) %>%
+  psych::describe( fast = T) %>%
+  kable(., caption = "Descriptives of numeric variables", digits = 2) %>%
+  kable_styling(full_width = T)
+```
+
+```{r}
+scored %>%
+  select_if(is.numeric) %>%
+  cor(., use = "pairwise") %>%
+  corrplot::corrplot(, method = "number")
+```
+
+```{r}
+scored = scored %>%
+  mutate(Week = ifelse(Week == 0, "Pre", "Post"),
+         Week = factor(Week, levels = c("Pre", "Post")))
+```
+
+
+```{r functions}
+pre_post = function(data, group, outcome){
+  
+  newdata = data %>%
+    select({{group}}, {{outcome}}, Week) %>%
+    filter(!is.na({{group}}))
+  
+  outcome.label = deparse(substitute(outcome))
+  outcome.label = str_to_title(gsub(".+_", "", outcome.label))
+  
+  plot = ggbarplot(newdata, 
+          x = deparse(substitute(group)), 
+          y = deparse(substitute(outcome)), 
+          fill = "Week", 
+          add = "mean_ci",
+          position = position_dodge(), 
+          label = TRUE, 
+          lab.nb.digits = 2, 
+          lab.vjust = 3,
+          xlab = "", 
+          ylab = outcome.label)
+  
+  newdata = newdata %>%
+    unite(group, {{group}}, Week) %>%
+    rename(outcome = {{outcome}})
+  
+  pairwise = pairwise.t.test(newdata$outcome, newdata$group, p.adjust.method = "holm") %>%
+    broom::tidy() %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(digits = 2) %>%
+    kable_styling()
+    
+  
+  return(list(plot = plot, 
+              pairwise = pairwise))
+}
+change = function(data, group, outcome){
+ 
+  newdata = data %>%
+    select({{group}}, {{outcome}}) %>%
+    filter(!is.na({{group}}))
+  
+  outcome.label = deparse(substitute(outcome))
+  outcome.label = str_to_title(gsub(".+_", "", outcome.label))
+  
+  plot = ggbarplot(newdata, 
+          x = deparse(substitute(group)), 
+          y = deparse(substitute(outcome)), 
+          fill = deparse(substitute(group)), 
+          add = "mean_ci",
+          position = position_dodge(), 
+          label = TRUE, 
+          lab.nb.digits = 2, 
+          lab.vjust = 3,
+          xlab = "", 
+          ylab = paste("Change in", outcome.label))
+  
+  newdata = newdata %>%
+    rename(outcome = {{outcome}},
+           group = {{group}})
+  
+  ttest = t.test(outcome~group, data = newdata) %>%
+    broom::tidy() %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(digits = 2) %>%
+    kable_styling()
+  
+  return(list(plot = plot,
+              ttest = ttest))
+}
+```
+
+
+# Total Conflict
+
+## Pre-post{.tabset}
+
+
+### POC
+
+```{r}
+test = pre_post(scored, poc, conflict_total)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### POC including Asian
+
+```{r}
+test = pre_post(scored, pocA, conflict_total)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### Poverty line
+
+```{r}
+test = pre_post(scored, poverty150, conflict_total)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+## Change{.tabset}
+
+
+### POC
+
+```{r}
+test = change(scored_prepost, poc, conflict_total)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### POC including Asian
+
+```{r}
+test = change(scored_prepost, pocA, conflict_total)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### Poverty line
+
+```{r}
+test = change(scored_prepost, poverty150, conflict_total)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+# Spousal Conflict
+
+## Pre-post{.tabset}
+
+
+### POC
+
+```{r}
+test = pre_post(scored, poc, conflict_parent)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### POC including Asian
+
+```{r}
+test = pre_post(scored, pocA, conflict_parent)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### Poverty line
+
+```{r}
+test = pre_post(scored, poverty150, conflict_parent)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+## Change{.tabset}
+
+
+### POC
+
+```{r}
+test = change(scored_prepost, poc, conflict_parent)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### POC including Asian
+
+```{r}
+test = change(scored_prepost, pocA, conflict_parent)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### Poverty line
+
+```{r}
+test = change(scored_prepost, poverty150, conflict_parent)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+# Child-parent Conflict
+
+## Pre-post{.tabset}
+
+
+### POC
+
+```{r}
+test = pre_post(scored, poc, conflict_child)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### POC including Asian
+
+```{r}
+test = pre_post(scored, pocA, conflict_child)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### Poverty line
+
+```{r}
+test = pre_post(scored, poverty150, conflict_child)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+## Change{.tabset}
+
+
+### POC
+
+```{r}
+test = change(scored_prepost, poc, conflict_child)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### POC including Asian
+
+```{r}
+test = change(scored_prepost, pocA, conflict_child)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### Poverty line
+
+```{r}
+test = change(scored_prepost, poverty150, conflict_child)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+# Cohesiveness
+
+## Pre-post{.tabset}
+
+
+### POC
+
+```{r}
+test = pre_post(scored, poc, cohesive)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### POC including Asian
+
+```{r}
+test = pre_post(scored, pocA, cohesive)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+### Poverty line
+
+```{r}
+test = pre_post(scored, poverty150, cohesive)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$pairwise
+```
+
+## Change{.tabset}
+
+
+### POC
+
+```{r}
+test = change(scored_prepost, poc, cohesive)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### POC including Asian
+
+```{r}
+test = change(scored_prepost, pocA, cohesive)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```
+
+
+### Poverty line
+
+```{r}
+test = change(scored_prepost, poverty150, cohesive)
+test$plot
+```
+
+```{r, results = 'asis'}
+test$ttest
+```

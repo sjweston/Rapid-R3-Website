@@ -41,8 +41,10 @@ scored = scored %>%
 scored = scored %>%
   group_by(CaregiverID) %>%
   mutate_at(.vars = c("income", "household_size", "num_children_raw", "gender", 
+                      "race_cat", "black", "white", "minority", "native", "asian",
+                      "hawaii", "other_race", "latinx",
                       "zip", "state", "region"), 
-            na.locf0) %>%
+            na.locf0) %>% # carry these variables down through NA's
   ungroup()
   
 # poverty threshold --------------------------------------------------------------
@@ -55,7 +57,8 @@ scored = scored %>%
   left_join(census) %>%
   mutate(poverty150s = ifelse(income < poverty_threshold*1.5,1,0),
          poverty200s = ifelse(income < poverty_threshold*2,1,0)) %>%
-  select(CaregiverID, Week, BaselineWeek, income, household_size, num_children_raw, poverty150s, poverty200s) %>%
+  select(CaregiverID, Week, BaselineWeek, income, household_size, 
+         num_children_raw, poverty150s, poverty200s) %>%
   full_join(scored)
 
 # baseline week -----------------------------------------------------------
@@ -65,10 +68,11 @@ pre_pandemic = scored %>%
          contains("poverty"), gender, income, household_size, num_children_raw, state, 
          gender, zip, state, region, contains("_pre")) %>%
   select(-working_current) %>%
-  group_by(CaregiverID) %>%
+  group_by(CaregiverID) %>% 
+  mutate_at(vars(-CaregiverID, -Week, -BaselineWeek), select_first) %>% 
   filter(Week == min(Week)) %>%
   ungroup() %>%
-  mutate(Week = 0)
+  mutate(Week = 0) 
 
 names(pre_pandemic) = gsub("_pre", "_current", names(pre_pandemic))
 names(pre_pandemic) = gsub("_current$", "", names(pre_pandemic))

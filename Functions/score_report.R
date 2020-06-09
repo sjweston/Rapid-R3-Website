@@ -34,6 +34,13 @@ identify_state = function(ZC, zipcode.dataset = zipcode){
   return(state)
 }
 
+select_first = function(x){
+  x = x[!is.na(x) & !is.nan(x)]
+  x[1]
+}
+
+
+
 source(here("Functions/state_abbr.R"))
 
 score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FALSE){
@@ -753,6 +760,31 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   
   if(contains_items("JOB.012", data)) newdata$essential = ifelse(data$JOB.012 == 1, 1, 0)
+  
+  if(contains_items("FamCon", data)){
+    #scrub 6s
+    FamCon_items = find_items("FamCon", data)
+    FamCon_items = FamCon_items[FamCon_items != "FamCon.015"]
+    data = psych::scrub(data, where = FamCon_items, isvalue = 6)
+    # total conflict
+    total_conflict_items = c(find_items("FamCon.00.", data), find_items("FamCon.010", data))
+    newdata$conflict_total = rowMeans(data[,str_subset(total_conflict_items, "a$")], na.rm=T)
+    newdata$conflict_total_pre = rowMeans(data[,str_subset(total_conflict_items, "b$")], na.rm=T)
+    # parent conflict
+    parent_conflict_items = find_items("FamCon.00[1,5]", data)
+    newdata$conflict_parent = rowMeans(data[,str_subset(parent_conflict_items, "a$")], na.rm=T)
+    newdata$conflict_parent_pre = rowMeans(data[,str_subset(parent_conflict_items, "b$")], na.rm=T)
+    # child conflict
+    child_conflict_items = c(find_items("FamCon.00[^145]", data), find_items("FamCon.010", data))
+    newdata$conflict_child = rowMeans(data[,str_subset(child_conflict_items, "a$")], na.rm=T)
+    newdata$conflict_child_pre = rowMeans(data[,str_subset(child_conflict_items, "b$")], na.rm=T)
+    #cohesivness
+    cohesive_items = find_items("FamCon.01[1-4]", data)
+    newdata$cohesive = rowMeans(data[,str_subset(cohesive_items, "a$")], na.rm=T)
+    newdata$cohesive_pre = rowMeans(data[,str_subset(cohesive_items, "b$")], na.rm=T)
+    
+    newdata$conflictSource = data$FamCon.015
+  }  
   
   if(contains_items("DEMO.002", data))newdata$single = ifelse(data$DEMO.002 %in% c(3,4,5,7,8), 1, 0)
   
