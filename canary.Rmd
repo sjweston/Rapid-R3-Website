@@ -136,9 +136,14 @@ pre_post = function(data, group, outcome){
   pairwise = pairwise.t.test(newdata$outcome, newdata$group, p.adjust.method = "holm") %>%
     broom::tidy() %>%
     mutate(p.value = papaja::printp(p.value)) %>%
+  separate(group1, into = c("group1_group", "group1_time"), sep = "_")%>%
+  separate(group2, into = c("group2_group", "group2_time"), sep = "_") %>%
+  filter(group1_group == group2_group | group1_time == group2_time) %>%
+  unite(group1, group1_group, group1_time) %>%
+  unite(group2, group2_group, group2_time)  %>%
     kable(digits = 2) %>%
     kable_styling()
-    
+
   
   return(list(plot = plot, 
               pairwise = pairwise))
@@ -188,17 +193,6 @@ change = function(data, group, outcome){
 ### POC
 
 ```{r}
-test = pre_post(scored, poc, conflict_total)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$pairwise
-```
-
-### POC including Asian
-
-```{r}
 test = pre_post(scored, pocA, conflict_total)
 test$plot
 ```
@@ -206,6 +200,7 @@ test$plot
 ```{r, results = 'asis'}
 test$pairwise
 ```
+
 
 ### Poverty line
 
@@ -222,18 +217,6 @@ test$pairwise
 
 
 ### POC
-
-```{r}
-test = change(scored_prepost, poc, conflict_total)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$ttest
-```
-
-
-### POC including Asian
 
 ```{r}
 test = change(scored_prepost, pocA, conflict_total)
@@ -264,17 +247,6 @@ test$ttest
 ### POC
 
 ```{r}
-test = pre_post(scored, poc, conflict_parent)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$pairwise
-```
-
-### POC including Asian
-
-```{r}
 test = pre_post(scored, pocA, conflict_parent)
 test$plot
 ```
@@ -282,6 +254,7 @@ test$plot
 ```{r, results = 'asis'}
 test$pairwise
 ```
+
 
 ### Poverty line
 
@@ -300,18 +273,6 @@ test$pairwise
 ### POC
 
 ```{r}
-test = change(scored_prepost, poc, conflict_parent)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$ttest
-```
-
-
-### POC including Asian
-
-```{r}
 test = change(scored_prepost, pocA, conflict_parent)
 test$plot
 ```
@@ -319,7 +280,6 @@ test$plot
 ```{r, results = 'asis'}
 test$ttest
 ```
-
 
 ### Poverty line
 
@@ -340,17 +300,6 @@ test$ttest
 ### POC
 
 ```{r}
-test = pre_post(scored, poc, conflict_child)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$pairwise
-```
-
-### POC including Asian
-
-```{r}
 test = pre_post(scored, pocA, conflict_child)
 test$plot
 ```
@@ -358,6 +307,7 @@ test$plot
 ```{r, results = 'asis'}
 test$pairwise
 ```
+
 
 ### Poverty line
 
@@ -376,18 +326,6 @@ test$pairwise
 ### POC
 
 ```{r}
-test = change(scored_prepost, poc, conflict_child)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$ttest
-```
-
-
-### POC including Asian
-
-```{r}
 test = change(scored_prepost, pocA, conflict_child)
 test$plot
 ```
@@ -395,6 +333,7 @@ test$plot
 ```{r, results = 'asis'}
 test$ttest
 ```
+
 
 
 ### Poverty line
@@ -416,17 +355,6 @@ test$ttest
 ### POC
 
 ```{r}
-test = pre_post(scored, poc, cohesive)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$pairwise
-```
-
-### POC including Asian
-
-```{r}
 test = pre_post(scored, pocA, cohesive)
 test$plot
 ```
@@ -434,6 +362,7 @@ test$plot
 ```{r, results = 'asis'}
 test$pairwise
 ```
+
 
 ### Poverty line
 
@@ -450,18 +379,6 @@ test$pairwise
 
 
 ### POC
-
-```{r}
-test = change(scored_prepost, poc, cohesive)
-test$plot
-```
-
-```{r, results = 'asis'}
-test$ttest
-```
-
-
-### POC including Asian
 
 ```{r}
 test = change(scored_prepost, pocA, cohesive)
