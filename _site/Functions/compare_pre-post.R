@@ -1,3 +1,17 @@
+percent_moe = function(p,n, prop = FALSE){
+  
+  if(p > 1) prop = TRUE
+  if(prop) p = p/100
+  
+  num = p*(1-0)
+  frac = num/n
+  right = sqrt(frac)
+  moe = 1.96*right
+  
+  if(prop) moe = moe*100
+  return(moe)
+}
+
 pre_post_overall = function(data, outcome){
   
   newdata = data %>%

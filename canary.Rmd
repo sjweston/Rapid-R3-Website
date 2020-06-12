@@ -22,16 +22,12 @@ library(ggpubr)
 source(here("Scripts/score data.R")) 
 
 completedWeek9 = scored %>%
-  filter(Week >= 9) 
+  filter(Week == 9) 
 completedWeek9 = completedWeek9$CaregiverID
 
 scored = scored %>%
-  filter(
-    CaregiverID %in% completedWeek9,
-    (Week == 0 | Week >= 9)) %>%
-  group_by(CaregiverID) %>%
-  filter(Week == 0 | Week == max(Week)) %>%
-  ungroup()
+  filter(CaregiverID %in% completedWeek9) %>%
+  filter(Week %in% c(0,9))
 
 # groups
 scored = scored %>%
@@ -67,7 +63,8 @@ scored = scored %>%
 ```{r canary-1}
 scored_prepost = scored %>%
   select(-contains("Source")) %>%
-  gather("key", "value", contains("conflict"), contains("cohesive")) %>%
+  gather("key", "value", 
+         contains("conflict"), contains("cohesive")) %>%
   mutate(Week = ifelse(Week == 0, "pre", "post")) %>%
   spread(Week, value) %>%
   mutate(change = post-pre) %>%
@@ -103,7 +100,7 @@ scored %>%
 scored %>%
   select_if(is.numeric) %>%
   cor(., use = "pairwise") %>%
-  corrplot::corrplot(, method = "number")
+  corrplot::corrplot(method = "number")
 ```
 
 ```{r canary-5}
@@ -379,6 +376,7 @@ When you and your child have spent time together, how often did you do the follo
 - I was loving and affectionate toward my child 
 - I was supportive and understanding toward my child 
 - I told my child I love them 
+
 ## Pre-post{.tabset}
 
 
@@ -452,11 +450,13 @@ test$plot
 test$ttest
 ```
 
-# Source of conflict{.tabset}
+# Source of conflict
+
+## Separated{.tabset}
 
 Think about the sources of conflict for your family. Which of the following would help decrease conflict the most right now? [Only select one]
 
-## Overall
+### Overall
 
 ```{r}
 scored %>%
@@ -464,10 +464,15 @@ scored %>%
   group_by(conflictSource) %>%
   summarize(Count = n()) %>%
   ungroup() %>%
-  mutate(Percent = 100*Count/sum(Count)) %>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
   ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = round(Percent)), color = "white", y = 1) +
+  geom_bar(stat = "identity", alpha = .8) +
+  geom_errorbar(aes(ymin = Percent - MOE, ymax = Percent + MOE), width = .5) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 1) +
   labs(x = "",
        y = "Percent",
        title = "Overall sample") +
@@ -476,7 +481,7 @@ scored %>%
   theme(plot.title.position = "plot")
 ```
 
-## POC
+### POC
 
 ```{r, out.width="100%"}
 scored %>%
@@ -485,11 +490,120 @@ scored %>%
   summarize(Count = n()) %>%
   ungroup() %>%
   group_by(pocA)%>%
-  mutate(Percent = 100*Count/sum(Count)) %>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
   ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = Count, y = Percent + 5), color = "black", size = 3) +
-  geom_text(aes(label = round(Percent)), color = "white", y = 1.5, size = 3) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 1.5, size = 3) +
+  labs(x = "",
+       y = "Percent",
+       title = "By Ethnicity") +
+  coord_flip() +
+  facet_wrap(~pocA) +
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+
+### Poverty line
+
+```{r, out.width="100%"}
+scored %>%
+  filter(!is.na(conflictSource) & !is.na(poverty150)) %>%
+  group_by(conflictSource, poverty150) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  group_by(poverty150)%>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, y = Percent + 5), color = "black", size = 3) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 1.5, size = 3) +
+  labs(x = "",
+       y = "Percent",
+       title = "By Income") +
+  coord_flip() +
+  facet_wrap(~poverty150) +
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+## Aggregated{.tabset}
+
+Financial
+- Being confident that my family has health insurance
+- Knowing we can pay for food
+- Knowing we can pay my rent/mortgage/housing expenses
+- Knowing my/our job is secure
+Socio/Emotional
+- Not being so socially isolated
+- Having lower levels of worry and stress
+- Being able to meet my child's social and emotional needs
+
+```{r}
+scored = scored %>%
+  mutate(conflictSource_agg = case_when(
+    conflictSource %in% c("Being confident that my family has health insurance", 
+                          "Knowing we can pay for food", 
+                          "Knowing we can pay my rent/mortgage/housing expenses", 
+                          "Knowing my/our job is secure") ~ "Financial",
+    conflictSource %in% c("Not being so socially isolated", 
+                          "Having lower levels of worry and stress", 
+                          "Being able to meet my child's social and emotional needs") ~ "Socio/Emotional",
+  ))
+```
+
+
+### Overall
+
+```{r}
+scored %>%
+  filter(!is.na(conflictSource_agg)) %>%
+  group_by(conflictSource_agg) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 10) +
+  labs(x = "",
+       y = "Percent",
+       title = "Overall sample") +
+  coord_flip() +
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+### POC
+
+```{r, out.width="100%"}
+scored %>%
+  filter(!is.na(conflictSource_agg) & !is.na(pocA)) %>%
+  group_by(conflictSource_agg, pocA) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  group_by(pocA)%>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, y = Percent + 10), color = "black", size = 3) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 5, size = 3) +
   labs(x = "",
        y = "Percent",
        title = "Overall sample") +
@@ -500,20 +614,24 @@ scored %>%
 ```
 
 
-## Poverty line
+### Poverty line
 
 ```{r, out.width="100%"}
 scored %>%
-  filter(!is.na(conflictSource) & !is.na(poverty150)) %>%
-  group_by(conflictSource, poverty150) %>%
+  filter(!is.na(conflictSource_agg) & !is.na(poverty150)) %>%
+  group_by(conflictSource_agg, poverty150) %>%
   summarize(Count = n()) %>%
   ungroup() %>%
   group_by(poverty150)%>%
-  mutate(Percent = 100*Count/sum(Count)) %>%
-  ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) +
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) +
   geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, y = Percent + 5), color = "black", size = 3) +
-  geom_text(aes(label = round(Percent)), color = "white", y = 1.5, size = 3) +
+  geom_text(aes(label = Count, y = Percent + 10), color = "black", size = 3) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 5, size = 3) +
   labs(x = "",
        y = "Percent",
        title = "Overall sample") +
@@ -522,4 +640,3 @@ scored %>%
   theme_pubclean() +
   theme(plot.title.position = "plot")
 ```
-
