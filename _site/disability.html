@@ -411,6 +411,9 @@ div.tocify {
     <li>
       <a href="week9_report.html">Week 9 (June 2 - June 8)</a>
     </li>
+    <li>
+      <a href="week15_report.html">Week 10 (June 7 - June 15)</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -446,6 +449,9 @@ div.tocify {
     </li>
     <li>
       <a href="blm.html">BLM</a>
+    </li>
+    <li>
+      <a href="canary.html">Canary</a>
     </li>
   </ul>
 </li>
@@ -503,7 +509,7 @@ div.tocify {
 </div>
 <div id="by-poverty-level" class="section level2 tabset">
 <h2>By poverty level</h2>
-<p>Of the 1236 caregivers of children with a disability, 116 report an income below the poverty threshold for their household size and 175 report an income above the threshold.</p>
+<p>Of the 1385 caregivers of children with a disability, 128 report an income below the poverty threshold for their household size and 216 report an income above the threshold.</p>
 <p><img src="disability_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="by-geographic-region" class="section level2 tabset">
@@ -536,9 +542,9 @@ div.tocify {
 </div>
 <div id="by-childcare" class="section level2">
 <h2>By childcare</h2>
-<p>Of these caregivers, 109 have non-family childcare and 1127 do not.</p>
+<p>Of these caregivers, 109 have non-family childcare and 1276 do not.</p>
 <p><img src="disability_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p>Of these caregivers, 325 have family childcare and 911 do not.</p>
+<p>Of these caregivers, 325 have family childcare and 1060 do not.</p>
 <p><img src="disability_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="by-use-of-online-resources" class="section level2">
@@ -561,7 +567,7 @@ div.tocify {
 </div>
 <div id="by-poverty-level-1" class="section level2 tabset">
 <h2>By poverty level</h2>
-<p>Of the 1236 caregivers of children with a disability, 116 report an income below the poverty threshold for their household size and 175 report an income above the threshold.</p>
+<p>Of the 1385 caregivers of children with a disability, 128 report an income below the poverty threshold for their household size and 216 report an income above the threshold.</p>
 <p><img src="disability_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 </div>
 <div id="by-geographic-region-1" class="section level2">
@@ -570,9 +576,9 @@ div.tocify {
 </div>
 <div id="by-childcare-1" class="section level2">
 <h2>By childcare</h2>
-<p>Of these caregivers, 109 have non-family childcare and 1127 do not.</p>
+<p>Of these caregivers, 109 have non-family childcare and 1276 do not.</p>
 <p><img src="disability_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
-<p>Of these caregivers, 325 have family childcare and 911 do not.</p>
+<p>Of these caregivers, 325 have family childcare and 1060 do not.</p>
 <p><img src="disability_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 </div>
 <div id="by-use-of-online-resources-1" class="section level2">
@@ -588,12 +594,12 @@ div.tocify {
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  week1$disability and week1$income_decreaed
-## X-squared = 18.455, df = 1, p-value = 1.74e-05</code></pre>
+## X-squared = 14.93, df = 1, p-value = 0.0001116</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   disability     n decreased_income percent
 ##        &lt;dbl&gt; &lt;int&gt;            &lt;dbl&gt;   &lt;dbl&gt;
-## 1          0  3723              799   0.215
-## 2          1   607               95   0.157</code></pre>
+## 1          0  3955              843   0.213
+## 2          1   631              102   0.162</code></pre>
 </div>
 <div id="non-family-childcare" class="section level2">
 <h2>Non-family childcare</h2>
@@ -601,12 +607,12 @@ div.tocify {
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  week1$disability and week1$decrease_nonfamilyCC
-## X-squared = 0.57422, df = 1, p-value = 0.4486</code></pre>
+## X-squared = 0.21051, df = 1, p-value = 0.6464</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   disability     n decrease_nonfamilyCC percent
 ##        &lt;dbl&gt; &lt;int&gt;                &lt;dbl&gt;   &lt;dbl&gt;
-## 1          0  3723                 1009   0.271
-## 2          1   607                  155   0.255</code></pre>
+## 1          0  3955                 1009   0.255
+## 2          1   631                  155   0.246</code></pre>
 </div>
 </div>
 <div id="testing-predictors-of-well-being-in-this-demo" class="section level1">
@@ -634,7 +640,7 @@ Corrected p-value
 <tbody>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Lost income since pandemic (N = 95)</strong>
+<strong> Lost income since pandemic (N = 102)</strong>
 </td>
 </tr>
 <tr>
@@ -642,13 +648,13 @@ Corrected p-value
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
--0.12
+-0.08
 </td>
 <td style="text-align:right;">
-0.08
+0.07
 </td>
 <td style="text-align:right;">
-0.120
+0.256
 </td>
 <td style="text-align:right;">
 1.000
@@ -659,13 +665,13 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
--0.10
+-0.02
 </td>
 <td style="text-align:right;">
-0.07
+0.06
 </td>
 <td style="text-align:right;">
-0.154
+0.757
 </td>
 <td style="text-align:right;">
 1.000
@@ -676,13 +682,13 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
--0.05
+0.08
 </td>
 <td style="text-align:right;">
-0.11
+0.09
 </td>
 <td style="text-align:right;">
-0.624
+0.394
 </td>
 <td style="text-align:right;">
 1.000
@@ -693,13 +699,13 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
--0.07
+-0.01
 </td>
 <td style="text-align:right;">
-0.06
+0.05
 </td>
 <td style="text-align:right;">
-0.182
+0.821
 </td>
 <td style="text-align:right;">
 1.000
@@ -710,21 +716,21 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
--0.17
+-0.10
 </td>
 <td style="text-align:right;">
 0.06
 </td>
 <td style="text-align:right;">
-0.008
+0.064
 </td>
 <td style="text-align:right;">
-0.438
+1.000
 </td>
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Lost employment since pandemic (N = 300)</strong>
+<strong> Lost employment since pandemic (N = 315)</strong>
 </td>
 </tr>
 <tr>
@@ -741,7 +747,7 @@ Caregiver anxiety
 0.000
 </td>
 <td style="text-align:right;">
-0.010
+0.006
 </td>
 </tr>
 <tr>
@@ -749,10 +755,10 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
-0.29
+0.28
 </td>
 <td style="text-align:right;">
-0.06
+0.05
 </td>
 <td style="text-align:right;">
 0.000
@@ -766,16 +772,16 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.25
+0.26
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
-0.003
+0.002
 </td>
 <td style="text-align:right;">
-0.174
+0.092
 </td>
 </tr>
 <tr>
@@ -783,10 +789,83 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
--0.09
+-0.08
 </td>
 <td style="text-align:right;">
 0.04
+</td>
+<td style="text-align:right;">
+0.078
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Child internalizing
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+0.054
+</td>
+<td style="text-align:right;">
+1.000
+</td>
+</tr>
+<tr grouplength="5">
+<td colspan="5" style="border-bottom: 1px solid;">
+<strong> Have difficulty paying for basics (N = 253)</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Caregiver anxiety
+</td>
+<td style="text-align:right;">
+0.21
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.010
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Careviver depression
+</td>
+<td style="text-align:right;">
+0.28
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+<td style="text-align:right;">
+0.000
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Caregver stress
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.08
 </td>
 <td style="text-align:right;">
 0.047
@@ -797,89 +876,16 @@ Child externalzing
 </tr>
 <tr>
 <td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Child internalizing
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-<td style="text-align:right;">
-0.05
-</td>
-<td style="text-align:right;">
-0.103
-</td>
-<td style="text-align:right;">
-1.000
-</td>
-</tr>
-<tr grouplength="5">
-<td colspan="5" style="border-bottom: 1px solid;">
-<strong> Have difficulty paying for basics (N = 247)</strong>
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Caregiver anxiety
-</td>
-<td style="text-align:right;">
-0.22
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.011
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Careviver depression
-</td>
-<td style="text-align:right;">
-0.30
-</td>
-<td style="text-align:right;">
-0.05
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-<td style="text-align:right;">
-0.000
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Caregver stress
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-<td style="text-align:right;">
-0.135
-</td>
-<td style="text-align:right;">
-1.000
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
-0.03
+0.02
 </td>
 <td style="text-align:right;">
 0.04
 </td>
 <td style="text-align:right;">
-0.444
+0.576
 </td>
 <td style="text-align:right;">
 1.000
@@ -890,10 +896,10 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-0.26
+0.27
 </td>
 <td style="text-align:right;">
-0.05
+0.04
 </td>
 <td style="text-align:right;">
 0.000
@@ -904,7 +910,7 @@ Child internalizing
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Two or more children in household (N = 338)</strong>
+<strong> Two or more children in household (N = 355)</strong>
 </td>
 </tr>
 <tr>
@@ -912,13 +918,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
-0.00
+0.04
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
-0.969
+0.555
 </td>
 <td style="text-align:right;">
 1.000
@@ -929,13 +935,13 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
--0.08
+-0.09
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
-0.235
+0.218
 </td>
 <td style="text-align:right;">
 1.000
@@ -946,16 +952,16 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.30
+0.40
 </td>
 <td style="text-align:right;">
-0.09
+0.10
 </td>
 <td style="text-align:right;">
-0.001
+0.000
 </td>
 <td style="text-align:right;">
-0.093
+0.004
 </td>
 </tr>
 <tr>
@@ -963,16 +969,16 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
-0.13
+0.14
 </td>
 <td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
-0.012
+0.007
 </td>
 <td style="text-align:right;">
-0.669
+0.372
 </td>
 </tr>
 <tr>
@@ -980,13 +986,13 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
--0.03
+-0.02
 </td>
 <td style="text-align:right;">
 0.06
 </td>
 <td style="text-align:right;">
-0.585
+0.774
 </td>
 <td style="text-align:right;">
 1.000
@@ -994,7 +1000,7 @@ Child internalizing
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Three or more children in household (N = 173)</strong>
+<strong> Three or more children in household (N = 182)</strong>
 </td>
 </tr>
 <tr>
@@ -1008,7 +1014,7 @@ Caregiver anxiety
 0.08
 </td>
 <td style="text-align:right;">
-0.713
+0.683
 </td>
 <td style="text-align:right;">
 1.000
@@ -1019,13 +1025,13 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
-0.03
+0.02
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
-0.689
+0.771
 </td>
 <td style="text-align:right;">
 1.000
@@ -1036,16 +1042,16 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.29
+0.33
 </td>
 <td style="text-align:right;">
-0.10
+0.11
 </td>
 <td style="text-align:right;">
-0.004
+0.002
 </td>
 <td style="text-align:right;">
-0.262
+0.115
 </td>
 </tr>
 <tr>
@@ -1056,10 +1062,10 @@ Child externalzing
 0.11
 </td>
 <td style="text-align:right;">
-0.05
+0.06
 </td>
 <td style="text-align:right;">
-0.039
+0.053
 </td>
 <td style="text-align:right;">
 1.000
@@ -1073,10 +1079,10 @@ Child internalizing
 0.07
 </td>
 <td style="text-align:right;">
-0.06
+0.07
 </td>
 <td style="text-align:right;">
-0.277
+0.302
 </td>
 <td style="text-align:right;">
 1.000
@@ -1095,7 +1101,7 @@ Caregiver anxiety
 0.23
 </td>
 <td style="text-align:right;">
-0.05
+0.04
 </td>
 <td style="text-align:right;">
 0.000
@@ -1126,16 +1132,16 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.20
+0.22
 </td>
 <td style="text-align:right;">
 0.06
 </td>
 <td style="text-align:right;">
-0.002
+0.001
 </td>
 <td style="text-align:right;">
-0.114
+0.033
 </td>
 </tr>
 <tr>
@@ -1143,13 +1149,13 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
-0.05
+0.06
 </td>
 <td style="text-align:right;">
 0.03
 </td>
 <td style="text-align:right;">
-0.152
+0.051
 </td>
 <td style="text-align:right;">
 1.000
@@ -1160,16 +1166,16 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-0.10
+0.12
 </td>
 <td style="text-align:right;">
 0.04
 </td>
 <td style="text-align:right;">
-0.006
+0.001
 </td>
 <td style="text-align:right;">
-0.352
+0.069
 </td>
 </tr>
 <tr grouplength="5">
@@ -1182,16 +1188,16 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
-0.20
+0.19
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
-0.004
+0.005
 </td>
 <td style="text-align:right;">
-0.268
+0.305
 </td>
 </tr>
 <tr>
@@ -1199,7 +1205,7 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
-0.28
+0.27
 </td>
 <td style="text-align:right;">
 0.07
@@ -1208,7 +1214,7 @@ Careviver depression
 0.000
 </td>
 <td style="text-align:right;">
-0.010
+0.008
 </td>
 </tr>
 <tr>
@@ -1216,13 +1222,13 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.11
+0.08
 </td>
 <td style="text-align:right;">
-0.10
+0.09
 </td>
 <td style="text-align:right;">
-0.258
+0.413
 </td>
 <td style="text-align:right;">
 1.000
@@ -1233,13 +1239,13 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
--0.08
+-0.07
 </td>
 <td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
-0.140
+0.132
 </td>
 <td style="text-align:right;">
 1.000
@@ -1256,7 +1262,7 @@ Child internalizing
 0.06
 </td>
 <td style="text-align:right;">
-0.075
+0.061
 </td>
 <td style="text-align:right;">
 1.000
@@ -1264,7 +1270,7 @@ Child internalizing
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Below the poverty threshold (N = 116)</strong>
+<strong> Below the poverty threshold (N = 128)</strong>
 </td>
 </tr>
 <tr>
@@ -1272,13 +1278,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
+0.09
+</td>
+<td style="text-align:right;">
 0.10
 </td>
 <td style="text-align:right;">
-0.11
-</td>
-<td style="text-align:right;">
-0.350
+0.369
 </td>
 <td style="text-align:right;">
 1.000
@@ -1289,16 +1295,16 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
-0.26
+0.32
 </td>
 <td style="text-align:right;">
-0.11
+0.10
 </td>
 <td style="text-align:right;">
-0.015
+0.001
 </td>
 <td style="text-align:right;">
-0.777
+0.091
 </td>
 </tr>
 <tr>
@@ -1306,13 +1312,13 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.19
+0.12
 </td>
 <td style="text-align:right;">
-0.14
+0.13
 </td>
 <td style="text-align:right;">
-0.187
+0.379
 </td>
 <td style="text-align:right;">
 1.000
@@ -1323,13 +1329,13 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
-0.13
+0.11
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
-0.117
+0.168
 </td>
 <td style="text-align:right;">
 1.000
@@ -1340,16 +1346,16 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-0.21
+0.24
 </td>
 <td style="text-align:right;">
-0.09
+0.08
 </td>
 <td style="text-align:right;">
-0.020
+0.004
 </td>
 <td style="text-align:right;">
-1.000
+0.241
 </td>
 </tr>
 <tr grouplength="5">
@@ -1362,13 +1368,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
-0.06
+0.07
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
-0.393
+0.320
 </td>
 <td style="text-align:right;">
 1.000
@@ -1379,13 +1385,13 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
-0.09
+0.10
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
-0.215
+0.166
 </td>
 <td style="text-align:right;">
 1.000
@@ -1396,13 +1402,13 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.03
+0.00
 </td>
 <td style="text-align:right;">
 0.09
 </td>
 <td style="text-align:right;">
-0.772
+0.971
 </td>
 <td style="text-align:right;">
 1.000
@@ -1413,13 +1419,13 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
-0.05
+0.04
 </td>
 <td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
-0.367
+0.416
 </td>
 <td style="text-align:right;">
 1.000
@@ -1430,13 +1436,13 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-0.10
+0.11
 </td>
 <td style="text-align:right;">
 0.06
 </td>
 <td style="text-align:right;">
-0.075
+0.059
 </td>
 <td style="text-align:right;">
 1.000
@@ -1452,13 +1458,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
-0.11
+0.12
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
-0.166
+0.142
 </td>
 <td style="text-align:right;">
 1.000
@@ -1469,7 +1475,7 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
-0.29
+0.30
 </td>
 <td style="text-align:right;">
 0.08
@@ -1478,7 +1484,7 @@ Careviver depression
 0.000
 </td>
 <td style="text-align:right;">
-0.019
+0.012
 </td>
 </tr>
 <tr>
@@ -1492,7 +1498,7 @@ Caregver stress
 0.11
 </td>
 <td style="text-align:right;">
-0.461
+0.427
 </td>
 <td style="text-align:right;">
 1.000
@@ -1509,7 +1515,7 @@ Child externalzing
 0.06
 </td>
 <td style="text-align:right;">
-0.114
+0.110
 </td>
 <td style="text-align:right;">
 1.000
@@ -1526,15 +1532,15 @@ Child internalizing
 0.07
 </td>
 <td style="text-align:right;">
-0.002
+0.001
 </td>
 <td style="text-align:right;">
-0.141
+0.091
 </td>
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Have delayed healthcare (N = 498)</strong>
+<strong> Have delayed healthcare (N = 517)</strong>
 </td>
 </tr>
 <tr>
@@ -1565,7 +1571,7 @@ Careviver depression
 0.05
 </td>
 <td style="text-align:right;">
-0.032
+0.023
 </td>
 <td style="text-align:right;">
 1.000
@@ -1576,7 +1582,7 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
-0.35
+0.34
 </td>
 <td style="text-align:right;">
 0.08
@@ -1585,7 +1591,7 @@ Caregver stress
 0.000
 </td>
 <td style="text-align:right;">
-0.004
+0.003
 </td>
 </tr>
 <tr>
@@ -1593,13 +1599,13 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
-0.09
+0.08
 </td>
 <td style="text-align:right;">
 0.04
 </td>
 <td style="text-align:right;">
-0.037
+0.071
 </td>
 <td style="text-align:right;">
 1.000
@@ -1610,13 +1616,13 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-0.11
+0.10
 </td>
 <td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
-0.025
+0.032
 </td>
 <td style="text-align:right;">
 1.000
@@ -1624,7 +1630,7 @@ Child internalizing
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> African American (N = 93)</strong>
+<strong> African American (N = 103)</strong>
 </td>
 </tr>
 <tr>
@@ -1632,13 +1638,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
--0.10
+-0.08
 </td>
 <td style="text-align:right;">
-0.10
+0.09
 </td>
 <td style="text-align:right;">
-0.291
+0.374
 </td>
 <td style="text-align:right;">
 1.000
@@ -1649,13 +1655,13 @@ Caregiver anxiety
 Careviver depression
 </td>
 <td style="text-align:right;">
--0.08
+-0.07
 </td>
 <td style="text-align:right;">
-0.10
+0.09
 </td>
 <td style="text-align:right;">
-0.442
+0.439
 </td>
 <td style="text-align:right;">
 1.000
@@ -1666,13 +1672,13 @@ Careviver depression
 Caregver stress
 </td>
 <td style="text-align:right;">
--0.15
+-0.11
 </td>
 <td style="text-align:right;">
-0.13
+0.12
 </td>
 <td style="text-align:right;">
-0.239
+0.381
 </td>
 <td style="text-align:right;">
 1.000
@@ -1683,13 +1689,13 @@ Caregver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
--0.16
+-0.15
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
-0.020
+0.023
 </td>
 <td style="text-align:right;">
 1.000
@@ -1700,13 +1706,13 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
--0.13
+-0.10
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
-0.106
+0.206
 </td>
 <td style="text-align:right;">
 1.000
@@ -1731,7 +1737,7 @@ Caregiver anxiety
 0.006
 </td>
 <td style="text-align:right;">
-0.341
+0.323
 </td>
 </tr>
 <tr>
@@ -1748,7 +1754,7 @@ Careviver depression
 0.010
 </td>
 <td style="text-align:right;">
-0.546
+0.526
 </td>
 </tr>
 <tr>
@@ -1812,13 +1818,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
-0.12
+0.13
 </td>
 <td style="text-align:right;">
 0.09
 </td>
 <td style="text-align:right;">
-0.175
+0.135
 </td>
 <td style="text-align:right;">
 1.000
@@ -1835,7 +1841,7 @@ Careviver depression
 0.08
 </td>
 <td style="text-align:right;">
-0.254
+0.246
 </td>
 <td style="text-align:right;">
 1.000
@@ -1852,7 +1858,7 @@ Caregver stress
 0.13
 </td>
 <td style="text-align:right;">
-0.189
+0.192
 </td>
 <td style="text-align:right;">
 1.000
@@ -1869,7 +1875,7 @@ Child externalzing
 0.07
 </td>
 <td style="text-align:right;">
-0.579
+0.523
 </td>
 <td style="text-align:right;">
 1.000
@@ -1886,7 +1892,7 @@ Child internalizing
 0.07
 </td>
 <td style="text-align:right;">
-0.242
+0.252
 </td>
 <td style="text-align:right;">
 1.000
@@ -1979,7 +1985,7 @@ Child internalizing
 0.006
 </td>
 <td style="text-align:right;">
-0.330
+0.313
 </td>
 </tr>
 </tbody>

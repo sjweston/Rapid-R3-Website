@@ -411,6 +411,9 @@ div.tocify {
     <li>
       <a href="week9_report.html">Week 9 (June 2 - June 8)</a>
     </li>
+    <li>
+      <a href="week15_report.html">Week 10 (June 7 - June 15)</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -446,6 +449,9 @@ div.tocify {
     </li>
     <li>
       <a href="blm.html">BLM</a>
+    </li>
+    <li>
+      <a href="canary.html">Canary</a>
     </li>
   </ul>
 </li>
@@ -587,11 +593,11 @@ div.tocify {
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  week1$single and week1$income_decreaed
-## X-squared = 7.641, df = 1, p-value = 0.005706</code></pre>
+## X-squared = 6.2875, df = 1, p-value = 0.01216</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   single     n decreased_income percent
 ##    &lt;dbl&gt; &lt;int&gt;            &lt;dbl&gt;   &lt;dbl&gt;
-## 1      0  3843              788   0.205
+## 1      0  4099              839   0.205
 ## 2      1   487              106   0.218</code></pre>
 </div>
 <div id="lost-non-family-childcare" class="section level2">
@@ -600,11 +606,11 @@ div.tocify {
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  week1$single and week1$decrease_nonfamilyCC
-## X-squared = 78.344, df = 1, p-value &lt; 2.2e-16</code></pre>
+## X-squared = 95.848, df = 1, p-value &lt; 2.2e-16</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   single     n decrease_nonfamilyCC percent
 ##    &lt;dbl&gt; &lt;int&gt;                &lt;dbl&gt;   &lt;dbl&gt;
-## 1      0  3843                  951   0.247
+## 1      0  4099                  951   0.232
 ## 2      1   487                  213   0.437</code></pre>
 </div>
 <div id="trouble-paying-for-basics" class="section level2">
@@ -613,11 +619,11 @@ div.tocify {
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  week1$single and week1$difficulty_basics
-## X-squared = 52.58, df = 1, p-value = 4.131e-13</code></pre>
+## X-squared = 53.335, df = 1, p-value = 2.812e-13</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   single     n difficulty_basics percent
 ##    &lt;dbl&gt; &lt;int&gt;             &lt;dbl&gt;   &lt;dbl&gt;
-## 1      0  3843               719   0.187
+## 1      0  4099               766   0.187
 ## 2      1   487               160   0.329</code></pre>
 </div>
 <div id="delayed-healthcare" class="section level2">
@@ -626,11 +632,11 @@ div.tocify {
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  week1$single and week1$delay_healthcare
-## X-squared = 0.48745, df = 1, p-value = 0.4851</code></pre>
+## X-squared = 0.82761, df = 1, p-value = 0.363</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   single     n delay_healthcare percent
 ##    &lt;dbl&gt; &lt;int&gt;            &lt;dbl&gt;   &lt;dbl&gt;
-## 1      0  3843             2598   0.676
+## 1      0  4099             2790   0.681
 ## 2      1   487              321   0.659</code></pre>
 </div>
 </div>
@@ -783,7 +789,7 @@ Caregiver depression
 0.011
 </td>
 <td style="text-align:right;">
-0.588
+0.600
 </td>
 </tr>
 <tr>
@@ -929,7 +935,7 @@ Child internalizing
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Two or more children in household (N = 224)</strong>
+<strong> Two or more children in household (N = 223)</strong>
 </td>
 </tr>
 <tr>
@@ -943,7 +949,7 @@ Caregiver anxiety
 0.09
 </td>
 <td style="text-align:right;">
-0.409
+0.385
 </td>
 <td style="text-align:right;">
 1.000
@@ -960,10 +966,10 @@ Caregiver depression
 0.08
 </td>
 <td style="text-align:right;">
-0.007
+0.008
 </td>
 <td style="text-align:right;">
-0.409
+0.468
 </td>
 </tr>
 <tr>
@@ -971,13 +977,13 @@ Caregiver depression
 Caregiver stress
 </td>
 <td style="text-align:right;">
-0.17
+0.15
 </td>
 <td style="text-align:right;">
-0.12
+0.13
 </td>
 <td style="text-align:right;">
-0.185
+0.235
 </td>
 <td style="text-align:right;">
 1.000
@@ -997,7 +1003,7 @@ Child externalzing
 0.001
 </td>
 <td style="text-align:right;">
-0.045
+0.046
 </td>
 </tr>
 <tr>
@@ -1005,21 +1011,21 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-0.18
+0.16
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
-0.009
+0.016
 </td>
 <td style="text-align:right;">
-0.486
+0.798
 </td>
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Three or more children in household (N = 111)</strong>
+<strong> Three or more children in household (N = 110)</strong>
 </td>
 </tr>
 <tr>
@@ -1027,13 +1033,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
--0.03
+-0.02
 </td>
 <td style="text-align:right;">
 0.11
 </td>
 <td style="text-align:right;">
-0.793
+0.839
 </td>
 <td style="text-align:right;">
 1.000
@@ -1044,13 +1050,13 @@ Caregiver anxiety
 Caregiver depression
 </td>
 <td style="text-align:right;">
-0.14
+0.15
 </td>
 <td style="text-align:right;">
 0.10
 </td>
 <td style="text-align:right;">
-0.158
+0.138
 </td>
 <td style="text-align:right;">
 1.000
@@ -1061,13 +1067,13 @@ Caregiver depression
 Caregiver stress
 </td>
 <td style="text-align:right;">
-0.32
+0.30
 </td>
 <td style="text-align:right;">
 0.15
 </td>
 <td style="text-align:right;">
-0.031
+0.046
 </td>
 <td style="text-align:right;">
 1.000
@@ -1084,7 +1090,7 @@ Child externalzing
 0.08
 </td>
 <td style="text-align:right;">
-0.342
+0.305
 </td>
 <td style="text-align:right;">
 1.000
@@ -1095,13 +1101,13 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-0.10
+0.08
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
-0.209
+0.333
 </td>
 <td style="text-align:right;">
 1.000
@@ -1126,7 +1132,7 @@ Caregiver anxiety
 0.007
 </td>
 <td style="text-align:right;">
-0.426
+0.433
 </td>
 </tr>
 <tr>
@@ -1160,7 +1166,7 @@ Caregiver stress
 0.015
 </td>
 <td style="text-align:right;">
-0.762
+0.777
 </td>
 </tr>
 <tr>
@@ -1323,7 +1329,7 @@ Caregiver depression
 0.016
 </td>
 <td style="text-align:right;">
-0.794
+0.798
 </td>
 </tr>
 <tr>
@@ -1464,7 +1470,7 @@ Child internalizing
 0.010
 </td>
 <td style="text-align:right;">
-0.514
+0.524
 </td>
 </tr>
 <tr grouplength="5">
@@ -1593,7 +1599,7 @@ Caregiver depression
 0.007
 </td>
 <td style="text-align:right;">
-0.426
+0.433
 </td>
 </tr>
 <tr>
@@ -1610,7 +1616,7 @@ Caregiver stress
 0.013
 </td>
 <td style="text-align:right;">
-0.675
+0.688
 </td>
 </tr>
 <tr>
@@ -1807,7 +1813,7 @@ Child externalzing
 0.015
 </td>
 <td style="text-align:right;">
-0.762
+0.777
 </td>
 </tr>
 <tr>
@@ -1846,7 +1852,7 @@ Caregiver anxiety
 0.007
 </td>
 <td style="text-align:right;">
-0.426
+0.433
 </td>
 </tr>
 <tr>

@@ -22,13 +22,16 @@ library(ggpubr)
 source(here("Scripts/score data.R")) 
 
 completedWeek9 = scored %>%
-  filter(Week == 9)
+  filter(Week >= 9) 
 completedWeek9 = completedWeek9$CaregiverID
 
 scored = scored %>%
   filter(
     CaregiverID %in% completedWeek9,
-    Week %in% c(0,9))
+    (Week == 0 | Week >= 9)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == 0 | Week == max(Week)) %>%
+  ungroup()
 
 # groups
 scored = scored %>%
@@ -47,7 +50,8 @@ scored = scored %>%
       race_cat == "White/Caucasian" ~ "White",
       !is.na(race_cat) ~ "Non-white",
       TRUE ~ NA_character_),
-    poverty150 = factor(poverty150s, labels = c("High Income", "Low Income")),
+    poverty150 = factor(poverty150, levels = c(0,1), 
+                        labels = c("High Income", "Low Income")),
     conflictSource = factor(conflictSource, 
                             labels = c("Being confident that my family has health insurance",
                                        "Not being so socially isolated",
@@ -72,6 +76,8 @@ scored_prepost = scored %>%
 ```
 
 # Descriptives
+
+Weeks used in these analyses are `r unique(scored$Week)`.
 
 ```{r canary-2, results = 'asis'}
 test = scored %>%

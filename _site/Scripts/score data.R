@@ -43,7 +43,8 @@ scored = scored %>%
   mutate_at(.vars = c("income", "household_size", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx",
-                      "zip", "state", "region"), 
+                      "zip", "state", "region",
+                      "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   ungroup()
   
