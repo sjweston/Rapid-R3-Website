@@ -1,0 +1,381 @@
+---
+title: "Charting the curve"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+#re-run all the machine learning models?
+rerun = FALSE
+dontrerun = !rerun
+```
+
+```{r packages}
+library(conflicted)
+library(here)
+library(ggpubr)
+#library(tidymodels)
+library(brolgar)
+library(lme4)
+#library(modelr)
+library(caret)
+library(knitr)
+library(kableExtra)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+library(sjPlot)
+```
+
+```{r curve-1}
+options(mc.cores = parallel::detectCores())
+```
+
+
+```{r load data}
+source(here("Scripts/score data.R")) 
+```
+
+# Pre-process
+
+Center emotion variables on caregiver baseline (Week 0)
+
+```{r curve-2}
+# identify "baseline" values
+baseline = scored %>%
+  filter(Week == 0) %>% # only Week 0
+  select(CaregiverID, anxiety, depress, stress, lonely, fussy, fear) #only these variables
+names(baseline)[-1] = paste(names(baseline)[-1], "pre", sep = "_")  # rename
+
+emotion = scored %>%
+  select(CaregiverID, Week, anxiety, depress, stress, lonely, fussy, fear) %>% #only these variables
+  filter(Week > 0 | Week <= 10) %>% # remove week 0 and any week after 10
+  full_join(baseline) %>% # join with baseline data -- creates columns of "pre" variables
+  gather(key, value, -CaregiverID, -Week) %>% 
+  mutate(time = ifelse(grepl("_pre", key), "Pre", "Now"),
+         key = gsub("_pre","",key)) %>%
+  spread(time, value) %>% #now one row per emotion per week per caregiver
+  mutate(value = Now-Pre) %>% # subtract
+  select(-Now, -Pre) %>% # remove extra variables
+  spread(key, value) # now one row per week per caregiver
+```
+
+```{r}
+groups = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  select(CaregiverID, black, poverty150)
+
+emotion_g = full_join(emotion, groups)
+```
+
+
+<!-- # Plots{.tabset} -->
+
+<!-- ```{r} -->
+<!-- emotion.p <- as_tsibble(emotion, -->
+<!--                       index = Week, -->
+<!--                       key = CaregiverID, -->
+<!--                       regular = FALSE) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- control = lmerControl(check.conv.grad = F, check.nobs.vs.nRE = F) -->
+<!-- ``` -->
+
+
+
+<!-- ## Anxiety -->
+
+<!-- ```{r} -->
+<!-- anxiety_fit <- lmer(anxiety ~ Week + (1 + Week|CaregiverID),  -->
+<!--                     data = emotion,  -->
+<!--                     control = lmerControl( -->
+<!--                       check.conv.grad = "ignore", -->
+<!--                       check.nobs.vs.nlev = "ignore")) -->
+<!-- emotion %>% -->
+<!--   add_predictions(anxiety_fit, type = "pred") %>% -->
+<!--   ggplot(aes(x = Week, y = anxiety)) + -->
+<!--   geom_smooth(method = "loess", se= F) + -->
+<!--   facet_strata(along = -anxiety) -->
+<!-- ``` -->
+
+
+# Identify best model
+
+```{r curve-3}
+source(here("Functions/curves.R"))
+```
+
+
+```{r curve-4, eval = F}
+emotion.recipe = recipe(anxiety + depress + stress + lonely + fussy + fear ~ Week, data = emotion)
+emotion.prepped = bake(emotion.recipe, emotion)
+
+anx_fit1 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 1), data = emotion.prepped)
+
+anx_fit2 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 2), data = emotion.prepped)
+
+anx_fit3 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 3), data = emotion.prepped)
+
+anx_fit4 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 4), data = emotion.prepped)
+
+  
+```
+
+
+```{r curve-5, eval = rerun}
+set.seed(115)
+
+fit_models = emotion %>%
+  gather("emotion", "value", -CaregiverID, -Week) %>%
+  filter(!is.na(value)) %>%
+  group_by(emotion) %>%
+  nest() %>%
+  mutate(train1 = map(data, train_fun, 1),
+         train2 = map(data, train_fun, 2),
+         train3 = map(data, train_fun, 3),
+         train4 = map(data, train_fun, 4))
+
+train_perf = fit_models %>%
+  gather("model", "output", contains("train")) %>%
+  mutate(performance = map(output, "results")) 
+
+
+save(fit_models, train_perf, file = here("curve_data/fit_models.Rdata"))
+```
+
+```{r curve-6, eval = dontrerun}
+load(file = here("curve_data/fit_models.Rdata"))
+```
+
+```{r curve-7, results = 'asis'}
+train_perf %>%
+  dplyr::select(emotion, model, performance) %>%
+  unnest(cols = c(performance)) %>%
+  dplyr::select(-intercept, -contains("SD")) %>%
+  arrange(emotion, model) %>%
+  mutate(model = factor(model,
+                        levels = paste0("train",1:4),
+                        labels = c("Linear", "Quadratic", "Cubic", "Quartic"))) %>%
+  ungroup() %>%
+  dplyr::select(-emotion) %>%
+  kable(., digits = 4) %>%
+  kable_styling(full_width = T) %>%
+  group_rows("Anxiety", 1,4) %>%
+  group_rows("Depression", 5,8) %>%
+  group_rows("Child Internalizing", 9,12) %>%
+  group_rows("Child Externalizing", 13,16) %>%
+  group_rows("Loneliness", 17,20) %>%
+  group_rows("Stress", 21,24)
+```
+
+Based on these results, we will run the following models:
+
+- anxiety: quartic
+- depression:quadratic
+- stress: quadtratic
+- loneliness: linear
+- child externalizing: linear
+- child internalizing: linear
+
+# Anxiety{.tabset}
+
+## Overall
+
+```{r curve-8}
+overall = overall_model(emotion, anxiety, 4)
+overall$plot
+```
+
+## Black/African American
+
+```{r}
+group = group_model(emotion_g, anxiety, black, 4)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Poverty
+
+```{r}
+group = group_model(emotion_g, anxiety, poverty150, 4)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+
+
+# Depression{.tabset}
+
+## Overall
+
+```{r curve-9}
+overall = overall_model(emotion, depress, 2)
+overall$plot
+```
+
+## Black/African American
+
+```{r}
+group = group_model(emotion_g, depress, black, 2)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Poverty
+
+```{r}
+group = group_model(emotion_g, depress, poverty150, 2)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+# Stress{.tabset}
+
+## Overall
+
+```{r curve-10}
+overall = overall_model(emotion, stress, 2)
+overall$plot
+```
+
+## Black/African American
+
+```{r}
+group = group_model(emotion_g, stress, black, 2)
+group$plot
+```
+
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Poverty
+
+```{r}
+group = group_model(emotion_g, stress, poverty150, 2)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+# Loneliness{.tabset}
+
+## Overall
+
+```{r curve-11}
+overall = overall_model(emotion, lonely, 1)
+overall$plot
+```
+
+## Black/African American
+
+```{r}
+group = group_model(emotion_g, lonely, black, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Poverty
+
+```{r}
+group = group_model(emotion_g, lonely, poverty150, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+
+# Child Externalizing{.tabset}
+
+## Overall
+
+```{r curve-12}
+overall = overall_model(emotion, fussy, 1)
+overall$plot
+```
+
+## Black/African American
+
+```{r}
+group = group_model(emotion_g, fussy, black, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Poverty
+
+```{r}
+group = group_model(emotion_g, fussy, poverty150, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+# Child Internalizing{.tabset}
+
+## Overall
+
+```{r curve-13}
+overall = overall_model(emotion, fear, 1)
+overall$plot
+```
+
+## Black/African American
+
+```{r}
+group = group_model(emotion_g, fear, black, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Poverty
+
+```{r}
+group = group_model(emotion_g, fear, poverty150, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
