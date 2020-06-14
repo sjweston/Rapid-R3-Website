@@ -27,6 +27,8 @@ library(knitr)
 library(kableExtra)
 conflict_prefer("group_rows", "kableExtra")
 conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
 library(sjPlot)
 ```
 
@@ -72,6 +74,15 @@ groups = scored %>%
 
 emotion_g = full_join(emotion, groups)
 ```
+
+# Descriptives
+
+```{r}
+emotion_g %>%
+  select_if(is.numeric) %>%
+  psych::describeBy(group = emotion_g$Week, fast = T) 
+```
+
 
 
 <!-- # Plots{.tabset} -->

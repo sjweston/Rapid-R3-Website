@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Charting the curve</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Weekly Summaries
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 20)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 21 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 28 - May 4)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 5 - May 11)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 12 - May 18)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 25)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 26 - June 1)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 2 - June 8)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 10 (June 7 - June 15)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Preliminary analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="0prelim_april27.html">April 27</a>
+    </li>
+    <li>
+      <a href="disability.html">Children with disabilities</a>
+    </li>
+    <li>
+      <a href="single.html">Single parents</a>
+    </li>
+    <li>
+      <a href="poverty.html">Low-income households</a>
+    </li>
+    <li>
+      <a href="childcare.html">Childcare</a>
+    </li>
+    <li>
+      <a href="access_by_race.html">Race/Ethnicity</a>
+    </li>
+    <li>
+      <a href="0prelim_may22.html">May 22</a>
+    </li>
+    <li>
+      <a href="0prelim_may29.html">May 29</a>
+    </li>
+    <li>
+      <a href="blm.html">BLM</a>
+    </li>
+    <li>
+      <a href="canary.html">Canary</a>
+    </li>
+    <li>
+      <a href="curve.html">Curve</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Charting the curve</h1>
+
+</div>
+
+
+<div id="pre-process" class="section level1">
+<h1>Pre-process</h1>
+<p>Center emotion variables on caregiver baseline (Week 0)</p>
+</div>
+<div id="descriptives" class="section level1">
+<h1>Descriptives</h1>
+<pre><code>## 
+##  Descriptive statistics by group 
+## group: 0
+##            vars    n mean   sd min max range   se
+## Week          1 4586 0.00 0.00   0   0     0 0.00
+## anxiety       2 4582 0.00 0.00   0   0     0 0.00
+## depress       3 4581 0.00 0.00   0   0     0 0.00
+## fear          4 4563 0.00 0.00   0   0     0 0.00
+## fussy         5 4579 0.00 0.00   0   0     0 0.00
+## lonely        6 4584 0.00 0.00   0   0     0 0.00
+## stress        7 4574 0.00 0.00   0   0     0 0.00
+## black         8 4586 0.13 0.33   0   1     1 0.00
+## poverty150    9 2781 0.23 0.42   0   1     1 0.01
+## ------------------------------------------------------------ 
+## group: 1
+##            vars   n  mean   sd min max range   se
+## Week          1 792  1.00 0.00   1   1     0 0.00
+## anxiety       2 791  0.46 0.86  -2   3     5 0.03
+## depress       3 787  0.31 0.71  -3   3     6 0.03
+## fear          4 759 -0.40 0.79  -2   2     4 0.03
+## fussy         5 777  0.33 0.67  -2   2     4 0.02
+## lonely        6 787  0.53 1.05  -3   4     7 0.04
+## stress        7 791  0.91 1.26  -4   4     8 0.04
+## black         8 792  0.14 0.35   0   1     1 0.01
+## poverty150    9 464  0.31 0.46   0   1     1 0.02
+## ------------------------------------------------------------ 
+## group: 2
+##            vars    n  mean   sd  min max range   se
+## Week          1 1000  2.00 0.00  2.0   2   0.0 0.00
+## anxiety       2  998  0.42 0.85 -2.0   3   5.0 0.03
+## depress       3  996  0.34 0.72 -2.5   3   5.5 0.02
+## fear          4  964 -0.38 0.75 -2.0   2   4.0 0.02
+## fussy         5  981  0.31 0.66 -2.0   2   4.0 0.02
+## lonely        6  999  0.53 1.05 -4.0   4   8.0 0.03
+## stress        7 1000  0.84 1.26 -4.0   4   8.0 0.04
+## black         8 1000  0.14 0.34  0.0   1   1.0 0.01
+## poverty150    9  615  0.29 0.45  0.0   1   1.0 0.02
+## ------------------------------------------------------------ 
+## group: 3
+##            vars   n  mean   sd min max range   se
+## Week          1 891  3.00 0.00   3   3     0 0.00
+## anxiety       2 883  0.40 0.83  -3   3     6 0.03
+## depress       3 883  0.38 0.75  -2   3     5 0.03
+## fear          4 877 -0.42 0.75  -2   2     4 0.03
+## fussy         5 880  0.31 0.65  -2   2     4 0.02
+## lonely        6 884  0.54 1.05  -3   4     7 0.04
+## stress        7 883  0.84 1.22  -4   4     8 0.04
+## black         8 891  0.12 0.32   0   1     1 0.01
+## poverty150    9 548  0.24 0.43   0   1     1 0.02
+## ------------------------------------------------------------ 
+## group: 4
+##            vars   n  mean   sd  min max range   se
+## Week          1 841  4.00 0.00  4.0   4   0.0 0.00
+## anxiety       2 839  0.36 0.85 -2.5   3   5.5 0.03
+## depress       3 836  0.36 0.76 -3.0   3   6.0 0.03
+## fear          4 837 -0.43 0.76 -2.0   2   4.0 0.03
+## fussy         5 839  0.28 0.63 -1.0   2   3.0 0.02
+## lonely        6 840  0.46 0.99 -3.0   4   7.0 0.03
+## stress        7 830  0.78 1.27 -4.0   4   8.0 0.04
+## black         8 841  0.09 0.28  0.0   1   1.0 0.01
+## poverty150    9 524  0.21 0.41  0.0   1   1.0 0.02
+## ------------------------------------------------------------ 
+## group: 5
+##            vars   n  mean   sd min max range   se
+## Week          1 812  5.00 0.00   5   5     0 0.00
+## anxiety       2 812  0.39 0.84  -2   3     5 0.03
+## depress       3 811  0.35 0.71  -2   3     5 0.02
+## fear          4 809 -0.42 0.77  -2   2     4 0.03
+## fussy         5 809  0.35 0.65  -1   2     3 0.02
+## lonely        6 812  0.50 1.01  -3   4     7 0.04
+## stress        7 812  0.80 1.21  -4   4     8 0.04
+## black         8 812  0.07 0.25   0   1     1 0.01
+## poverty150    9 506  0.17 0.38   0   1     1 0.02
+## ------------------------------------------------------------ 
+## group: 6
+##            vars   n  mean   sd  min max range   se
+## Week          1 974  6.00 0.00  6.0   6   0.0 0.00
+## anxiety       2 974  0.36 0.89 -3.0   3   6.0 0.03
+## depress       3 974  0.38 0.80 -2.5   3   5.5 0.03
+## fear          4 967 -0.41 0.75 -2.0   2   4.0 0.02
+## fussy         5 969  0.31 0.62 -2.0   2   4.0 0.02
+## lonely        6 974  0.48 1.01 -3.0   4   7.0 0.03
+## stress        7 970  0.74 1.34 -4.0   4   8.0 0.04
+## black         8 974  0.09 0.29  0.0   1   1.0 0.01
+## poverty150    9 613  0.18 0.39  0.0   1   1.0 0.02
+## ------------------------------------------------------------ 
+## group: 7
+##            vars    n  mean   sd min max range   se
+## Week          1 1062  7.00 0.00   7   7     0 0.00
+## anxiety       2 1062  0.41 0.91  -3   3     6 0.03
+## depress       3 1062  0.39 0.78  -3   3     6 0.02
+## fear          4 1062 -0.48 0.71  -2   2     4 0.02
+## fussy         5 1062  0.29 0.67  -2   2     4 0.02
+## lonely        6 1062  0.44 1.05  -4   4     8 0.03
+## stress        7 1061  0.76 1.35  -4   4     8 0.04
+## black         8 1062  0.08 0.26   0   1     1 0.01
+## poverty150    9  714  0.17 0.37   0   1     1 0.01
+## ------------------------------------------------------------ 
+## group: 8
+##            vars    n  mean   sd  min max range   se
+## Week          1 1218  8.00 0.00  8.0   8   0.0 0.00
+## anxiety       2 1217  0.33 0.91 -3.0   3   6.0 0.03
+## depress       3 1216  0.34 0.78 -2.5   3   5.5 0.02
+## fear          4 1216 -0.49 0.70 -2.0   1   3.0 0.02
+## fussy         5 1216  0.26 0.67 -2.0   2   4.0 0.02
+## lonely        6 1217  0.45 1.03 -3.0   4   7.0 0.03
+## stress        7 1215  0.67 1.34 -4.0   4   8.0 0.04
+## black         8 1218  0.11 0.31  0.0   1   1.0 0.01
+## poverty150    9  803  0.19 0.40  0.0   1   1.0 0.01
+## ------------------------------------------------------------ 
+## group: 9
+##            vars    n  mean   sd min max range   se
+## Week          1 1475  9.00 0.00   9   9     0 0.00
+## anxiety       2 1475  0.47 0.91  -3   3     6 0.02
+## depress       3 1474  0.38 0.77  -3   3     6 0.02
+## fear          4 1472 -0.48 0.72  -2   2     4 0.02
+## fussy         5 1472  0.31 0.69  -2   2     4 0.02
+## lonely        6 1475  0.48 1.04  -3   4     7 0.03
+## stress        7 1468  0.78 1.34  -4   4     8 0.03
+## black         8 1475  0.12 0.32   0   1     1 0.01
+## poverty150    9  958  0.17 0.38   0   1     1 0.01
+## ------------------------------------------------------------ 
+## group: 10
+##            vars    n  mean   sd  min max range   se
+## Week          1 1250 10.00 0.00 10.0  10   0.0 0.00
+## anxiety       2 1248  0.33 0.87 -3.0   3   6.0 0.02
+## depress       3 1248  0.35 0.76 -2.5   3   5.5 0.02
+## fear          4 1250 -0.50 0.66 -2.0   2   4.0 0.02
+## fussy         5 1247  0.28 0.69 -2.0   2   4.0 0.02
+## lonely        6 1247  0.47 1.01 -3.0   4   7.0 0.03
+## stress        7 1247  0.66 1.35 -4.0   4   8.0 0.04
+## black         8 1250  0.10 0.31  0.0   1   1.0 0.01
+## poverty150    9  806  0.17 0.38  0.0   1   1.0 0.01</code></pre>
+<!-- # Plots{.tabset} -->
+<!-- ```{r} -->
+<!-- emotion.p <- as_tsibble(emotion, -->
+<!--                       index = Week, -->
+<!--                       key = CaregiverID, -->
+<!--                       regular = FALSE) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- control = lmerControl(check.conv.grad = F, check.nobs.vs.nRE = F) -->
+<!-- ``` -->
+<!-- ## Anxiety -->
+<!-- ```{r} -->
+<!-- anxiety_fit <- lmer(anxiety ~ Week + (1 + Week|CaregiverID),  -->
+<!--                     data = emotion,  -->
+<!--                     control = lmerControl( -->
+<!--                       check.conv.grad = "ignore", -->
+<!--                       check.nobs.vs.nlev = "ignore")) -->
+<!-- emotion %>% -->
+<!--   add_predictions(anxiety_fit, type = "pred") %>% -->
+<!--   ggplot(aes(x = Week, y = anxiety)) + -->
+<!--   geom_smooth(method = "loess", se= F) + -->
+<!--   facet_strata(along = -anxiety) -->
+<!-- ``` -->
+</div>
+<div id="identify-best-model" class="section level1">
+<h1>Identify best model</h1>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+model
+</th>
+<th style="text-align:right;">
+RMSE
+</th>
+<th style="text-align:right;">
+Rsquared
+</th>
+<th style="text-align:right;">
+MAE
+</th>
+</tr>
+</thead>
+<tbody>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Anxiety</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Linear
+</td>
+<td style="text-align:right;">
+0.8754
+</td>
+<td style="text-align:right;">
+0.0010
+</td>
+<td style="text-align:right;">
+0.6745
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quadratic
+</td>
+<td style="text-align:right;">
+0.8754
+</td>
+<td style="text-align:right;">
+0.0011
+</td>
+<td style="text-align:right;">
+0.6746
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Cubic
+</td>
+<td style="text-align:right;">
+0.8752
+</td>
+<td style="text-align:right;">
+0.0014
+</td>
+<td style="text-align:right;">
+0.6743
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quartic
+</td>
+<td style="text-align:right;">
+0.8753
+</td>
+<td style="text-align:right;">
+0.0014
+</td>
+<td style="text-align:right;">
+0.6741
+</td>
+</tr>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Depression</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Linear
+</td>
+<td style="text-align:right;">
+0.7576
+</td>
+<td style="text-align:right;">
+0.0009
+</td>
+<td style="text-align:right;">
+0.5795
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quadratic
+</td>
+<td style="text-align:right;">
+0.7574
+</td>
+<td style="text-align:right;">
+0.0010
+</td>
+<td style="text-align:right;">
+0.5791
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Cubic
+</td>
+<td style="text-align:right;">
+0.7576
+</td>
+<td style="text-align:right;">
+0.0010
+</td>
+<td style="text-align:right;">
+0.5793
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quartic
+</td>
+<td style="text-align:right;">
+0.7576
+</td>
+<td style="text-align:right;">
+0.0009
+</td>
+<td style="text-align:right;">
+0.5793
+</td>
+</tr>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Child Internalizing</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Linear
+</td>
+<td style="text-align:right;">
+0.7315
+</td>
+<td style="text-align:right;">
+0.0036
+</td>
+<td style="text-align:right;">
+0.6352
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quadratic
+</td>
+<td style="text-align:right;">
+0.7315
+</td>
+<td style="text-align:right;">
+0.0032
+</td>
+<td style="text-align:right;">
+0.6352
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Cubic
+</td>
+<td style="text-align:right;">
+0.7316
+</td>
+<td style="text-align:right;">
+0.0032
+</td>
+<td style="text-align:right;">
+0.6352
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quartic
+</td>
+<td style="text-align:right;">
+0.7317
+</td>
+<td style="text-align:right;">
+0.0031
+</td>
+<td style="text-align:right;">
+0.6353
+</td>
+</tr>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Child Externalizing</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Linear
+</td>
+<td style="text-align:right;">
+0.6636
+</td>
+<td style="text-align:right;">
+0.0012
+</td>
+<td style="text-align:right;">
+0.5464
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quadratic
+</td>
+<td style="text-align:right;">
+0.6636
+</td>
+<td style="text-align:right;">
+0.0011
+</td>
+<td style="text-align:right;">
+0.5464
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Cubic
+</td>
+<td style="text-align:right;">
+0.6637
+</td>
+<td style="text-align:right;">
+0.0010
+</td>
+<td style="text-align:right;">
+0.5465
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quartic
+</td>
+<td style="text-align:right;">
+0.6637
+</td>
+<td style="text-align:right;">
+0.0008
+</td>
+<td style="text-align:right;">
+0.5465
+</td>
+</tr>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Loneliness</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Linear
+</td>
+<td style="text-align:right;">
+1.0295
+</td>
+<td style="text-align:right;">
+0.0014
+</td>
+<td style="text-align:right;">
+0.8359
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quadratic
+</td>
+<td style="text-align:right;">
+1.0296
+</td>
+<td style="text-align:right;">
+0.0012
+</td>
+<td style="text-align:right;">
+0.8361
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Cubic
+</td>
+<td style="text-align:right;">
+1.0297
+</td>
+<td style="text-align:right;">
+0.0011
+</td>
+<td style="text-align:right;">
+0.8361
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quartic
+</td>
+<td style="text-align:right;">
+1.0298
+</td>
+<td style="text-align:right;">
+0.0012
+</td>
+<td style="text-align:right;">
+0.8362
+</td>
+</tr>
+<tr grouplength="4">
+<td colspan="4" style="border-bottom: 1px solid;">
+<strong>Stress</strong>
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Linear
+</td>
+<td style="text-align:right;">
+1.3024
+</td>
+<td style="text-align:right;">
+0.0032
+</td>
+<td style="text-align:right;">
+1.0336
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quadratic
+</td>
+<td style="text-align:right;">
+1.3025
+</td>
+<td style="text-align:right;">
+0.0028
+</td>
+<td style="text-align:right;">
+1.0336
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Cubic
+</td>
+<td style="text-align:right;">
+1.3027
+</td>
+<td style="text-align:right;">
+0.0028
+</td>
+<td style="text-align:right;">
+1.0336
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+Quartic
+</td>
+<td style="text-align:right;">
+1.3027
+</td>
+<td style="text-align:right;">
+0.0028
+</td>
+<td style="text-align:right;">
+1.0337
+</td>
+</tr>
+</tbody>
+</table>
+<p>Based on these results, we will run the following models:</p>
+<ul>
+<li>anxiety: quartic</li>
+<li>depression:quadratic</li>
+<li>stress: quadtratic</li>
+<li>loneliness: linear</li>
+<li>child externalizing: linear</li>
+<li>child internalizing: linear</li>
+</ul>
+</div>
+<div id="anxiety" class="section level1 tabset">
+<h1>Anxiety</h1>
+<div id="overall" class="section level2">
+<h2>Overall</h2>
+<p><img src="curve_files/figure-html/curve-8-1.png" width="672" /></p>
+</div>
+<div id="blackafrican-american" class="section level2">
+<h2>Black/African American</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:right;">
+-0.11
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-4.61
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 4)1
+</td>
+<td style="text-align:right;">
+-5.67
+</td>
+<td style="text-align:right;">
+2.00
+</td>
+<td style="text-align:right;">
+-2.84
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 4)2
+</td>
+<td style="text-align:right;">
+8.41
+</td>
+<td style="text-align:right;">
+2.08
+</td>
+<td style="text-align:right;">
+4.04
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 4)3
+</td>
+<td style="text-align:right;">
+-3.13
+</td>
+<td style="text-align:right;">
+1.96
+</td>
+<td style="text-align:right;">
+-1.60
+</td>
+<td style="text-align:right;">
+0.11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 4)4
+</td>
+<td style="text-align:right;">
+-3.92
+</td>
+<td style="text-align:right;">
+1.97
+</td>
+<td style="text-align:right;">
+-1.99
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="poverty" class="section level2">
+<h2>Poverty</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+poverty150
+</td>
+<td style="text-align:right;">
+-0.10
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-4.02
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 4)1
+</td>
+<td style="text-align:right;">
+-2.83
+</td>
+<td style="text-align:right;">
+2.00
+</td>
+<td style="text-align:right;">
+-1.41
+</td>
+<td style="text-align:right;">
+0.16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 4)2
+</td>
+<td style="text-align:right;">
+7.42
+</td>
+<td style="text-align:right;">
+1.96
+</td>
+<td style="text-align:right;">
+3.79
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 4)3
+</td>
+<td style="text-align:right;">
+-5.47
+</td>
+<td style="text-align:right;">
+1.88
+</td>
+<td style="text-align:right;">
+-2.91
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 4)4
+</td>
+<td style="text-align:right;">
+-0.53
+</td>
+<td style="text-align:right;">
+1.88
+</td>
+<td style="text-align:right;">
+-0.28
+</td>
+<td style="text-align:right;">
+0.78
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="depression" class="section level1 tabset">
+<h1>Depression</h1>
+<div id="overall-1" class="section level2">
+<h2>Overall</h2>
+<p><img src="curve_files/figure-html/curve-9-1.png" width="672" /></p>
+</div>
+<div id="blackafrican-american-1" class="section level2">
+<h2>Black/African American</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:right;">
+-0.11
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-5.23
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+-7.75
+</td>
+<td style="text-align:right;">
+1.74
+</td>
+<td style="text-align:right;">
+-4.45
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+5.77
+</td>
+<td style="text-align:right;">
+1.81
+</td>
+<td style="text-align:right;">
+3.19
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="poverty-1" class="section level2">
+<h2>Poverty</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+poverty150
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-0.31
+</td>
+<td style="text-align:right;">
+0.76
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+0.45
+</td>
+<td style="text-align:right;">
+1.72
+</td>
+<td style="text-align:right;">
+0.26
+</td>
+<td style="text-align:right;">
+0.79
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+2.26
+</td>
+<td style="text-align:right;">
+1.67
+</td>
+<td style="text-align:right;">
+1.35
+</td>
+<td style="text-align:right;">
+0.18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="stress" class="section level1 tabset">
+<h1>Stress</h1>
+<div id="overall-2" class="section level2">
+<h2>Overall</h2>
+<p><img src="curve_files/figure-html/curve-10-1.png" width="672" /></p>
+</div>
+<div id="blackafrican-american-2" class="section level2">
+<h2>Black/African American</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:right;">
+-0.11
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+-3.11
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+-6.39
+</td>
+<td style="text-align:right;">
+3.03
+</td>
+<td style="text-align:right;">
+-2.11
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+7.41
+</td>
+<td style="text-align:right;">
+3.15
+</td>
+<td style="text-align:right;">
+2.35
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="poverty-2" class="section level2">
+<h2>Poverty</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+poverty150
+</td>
+<td style="text-align:right;">
+-0.06
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+-1.50
+</td>
+<td style="text-align:right;">
+0.13
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+-4.46
+</td>
+<td style="text-align:right;">
+3.04
+</td>
+<td style="text-align:right;">
+-1.47
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+3.13
+</td>
+<td style="text-align:right;">
+2.96
+</td>
+<td style="text-align:right;">
+1.06
+</td>
+<td style="text-align:right;">
+0.29
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="loneliness" class="section level1 tabset">
+<h1>Loneliness</h1>
+<div id="overall-3" class="section level2">
+<h2>Overall</h2>
+<p><img src="curve_files/figure-html/curve-11-1.png" width="672" /></p>
+</div>
+<div id="blackafrican-american-3" class="section level2">
+<h2>Black/African American</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+-0.72
+</td>
+<td style="text-align:right;">
+0.47
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:Week
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-4.94
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="poverty-3" class="section level2">
+<h2>Poverty</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+poverty150
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+<td style="text-align:right;">
+-0.29
+</td>
+<td style="text-align:right;">
+0.77
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:Week
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-3.30
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="child-externalizing" class="section level1 tabset">
+<h1>Child Externalizing</h1>
+<div id="overall-4" class="section level2">
+<h2>Overall</h2>
+<p><img src="curve_files/figure-html/curve-12-1.png" width="672" /></p>
+</div>
+<div id="blackafrican-american-4" class="section level2">
+<h2>Black/African American</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:right;">
+-0.05
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-2.12
+</td>
+<td style="text-align:right;">
+0.03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:Week
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+-2.59
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="poverty-4" class="section level2">
+<h2>Poverty</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+poverty150
+</td>
+<td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-0.96
+</td>
+<td style="text-align:right;">
+0.34
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:Week
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+-0.18
+</td>
+<td style="text-align:right;">
+0.86
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="child-internalizing" class="section level1 tabset">
+<h1>Child Internalizing</h1>
+<div id="overall-5" class="section level2">
+<h2>Overall</h2>
+<p><img src="curve_files/figure-html/curve-13-1.png" width="672" /></p>
+</div>
+<div id="blackafrican-american-5" class="section level2">
+<h2>Black/African American</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+black
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+1.70
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black:Week
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.93
+</td>
+<td style="text-align:right;">
+0.35
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="poverty-5" class="section level2">
+<h2>Poverty</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+poverty150
+</td>
+<td style="text-align:right;">
+-0.04
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-1.47
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+poverty150:Week
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+-1.67
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
