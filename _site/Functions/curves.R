@@ -75,7 +75,7 @@ group_model = function(data, outcome, group, poly){
   mod.summary = broom::tidy(model)
   
   
-  color.pal = c("darkgrey", "red")
+  color.pal = c("red", "darkgrey")
   
   plot = data %>%
     filter(!is.na({{outcome}})) %>%
@@ -102,10 +102,10 @@ group_model = function(data, outcome, group, poly){
     #geom_line(aes(x = x, y = predicted, color = as.factor(group)), data = pred.data, inherit.aes = F) +
     scale_color_manual(str_to_title(deparse(substitute(group))),
                        values = color.pal, 
-                       labels = c("No", "Yes"))+
+                       labels = c("Group", "Mean"))+
     scale_fill_manual(str_to_title(deparse(substitute(group))),
                        values = color.pal, 
-                       labels = c("No", "Yes"))+
+                       labels = c("Group", "Mean"))+
     scale_x_continuous(breaks = c(1:10))+
     scale_y_continuous(str_to_title(deparse(substitute(outcome))))+
     theme_pubclean()

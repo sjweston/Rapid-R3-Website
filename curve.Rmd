@@ -70,9 +70,15 @@ groups = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == min(Week)) %>%
   ungroup() %>%
-  select(CaregiverID, black, poverty150)
+  select(CaregiverID, black, poverty150) %>%
+  mutate_at(vars(-CaregiverID), 
+            .funs = function(x) 1-x) %>%
+  mutate_at(vars(-CaregiverID), factor)
 
 emotion_g = full_join(emotion, groups)
+
+contrasts(emotion_g$black) = contr.sum(2)
+contrasts(emotion_g$poverty150) = contr.sum(2)
 ```
 
 # Descriptives
