@@ -125,3 +125,120 @@ group_model = function(data, outcome, group, poly){
                      summary = mod.summary)
   return(return.list)
 }
+
+splines.overall = function(data, outcome, point){
+  
+  data = data %>%
+    mutate(SL1 = ifelse(Week <= point, Week-point, 0),
+           SL2 = ifelse(Week > point, Week-point, 0))
+  
+  reg.formula = as.formula(paste0(deparse(substitute(outcome)),
+                                  " ~ SL1 + SL2 + (1|CaregiverID)")) 
+  model = lmer(reg.formula, data)
+  
+  mod.summary = broom::tidy(model) 
+  mod.summary = mod.summary %>%
+    mutate(pvalue = pt(abs(statistic), 
+                       df = nrow(data)-nrow(mod.summary), 
+                       lower.tail = F)*2) %>%
+    filter(!grepl("^sd_", term)) %>%
+    select(-group) %>%
+    kable(., digits = 2) %>%
+    kable_styling()
+  
+  predicted = data.frame(Week = 1:10,
+                         CaregiverID = 0000) %>%
+    mutate(SL1 = ifelse(Week <= point, Week-point, 0),
+           SL2 = ifelse(Week > point, Week-point, 0))
+  
+  predicted$fit = predict(model, 
+                          newdata = predicted, 
+                          allow.new.levels = T)
+  
+  plot = data %>%
+    filter(!is.na({{outcome}})) %>%
+    group_by(Week) %>%
+    summarize(m = mean({{outcome}}),
+              sd = sd({{outcome}}),
+              n = n(),
+              se = sd/sqrt(n),
+              moe = 1.96*se) %>%
+    ggplot(aes(x = Week, y = m)) +
+    geom_point(color = "darkgrey") +
+    geom_line(aes(x = Week, y = fit), data = predicted, inherit.aes = F) +
+    scale_x_continuous(breaks = c(1:10))+
+    scale_y_continuous(str_to_title(deparse(substitute(outcome))))+
+    theme_pubclean()
+  
+  return.list = list(model = model,
+                     summary = mod.summary,
+                     pdata = predicted,
+                     plot = plot)
+  return(return.list)
+}
+
+splines.groups = function(data, outcome, group, point){
+  
+  group.name = deparse(substitute(group))
+  
+  color.pal = c("red", "darkgrey")
+  
+  data = data %>%
+    mutate(SL1 = ifelse(Week <= point, Week-point, 0),
+           SL2 = ifelse(Week > point, Week-point, 0))
+  
+  reg.formula = as.formula(paste0(deparse(substitute(outcome)),
+                                  " ~ SL1*",
+                                  deparse(substitute(group)),
+                                  "+ SL2*",
+                                  deparse(substitute(group)),
+                                  "+ (1|CaregiverID)")) 
+  model = lmer(reg.formula, data)
+  
+  mod.summary = broom::tidy(model) 
+  mod.summary = mod.summary %>%
+    mutate(pvalue = pt(abs(statistic), 
+                       df = nrow(data)-nrow(mod.summary), 
+                       lower.tail = F)*2) %>%
+    filter(grepl(group.name,term)) %>%
+    select(-group) %>%
+    kable(., digits = 2) %>%
+    kable_styling()
+  
+  predicted = data %>% 
+    group_by(Week, {{group}}) %>% 
+    summarize(n=n()) %>%
+    mutate(CaregiverID = 0000,
+           SL1 = ifelse(Week <= point, Week-point, 0),
+           SL2 = ifelse(Week > point, Week-point, 0))
+
+  predicted$fit = predict(model, 
+                          newdata = predicted, 
+                          allow.new.levels = T)
+  
+  plot = data %>%
+    filter(!is.na({{outcome}})) %>%
+    group_by(Week, {{group}}) %>%
+    summarize(m = mean({{outcome}}),
+              sd = sd({{outcome}}),
+              n = n(),
+              se = sd/sqrt(n),
+              moe = 1.96*se) %>%
+    ggplot(aes(x = Week, y = m, color = as.factor({{group}}))) +
+    geom_point(alpha = .5) +
+    geom_line(aes(x = Week, y = fit, color = as.factor({{group}})), 
+                  data = predicted, 
+                  inherit.aes = F) +
+    scale_color_manual(str_to_title(deparse(substitute(group))),
+                                   values = color.pal, 
+                                   labels = c("Group", "Mean")) +            
+    scale_x_continuous(breaks = c(1:10))+
+    scale_y_continuous(str_to_title(deparse(substitute(outcome))))+
+    theme_pubclean()
+  
+  return.list = list(model = model,
+                     summary = mod.summary,
+                     pdata = predicted,
+                     plot = plot)
+  return(return.list)
+}
