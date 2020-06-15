@@ -41,11 +41,9 @@ options(mc.cores = parallel::detectCores())
 source(here("Scripts/score data.R")) 
 ```
 
-# Pre-process
-
-Center emotion variables on caregiver baseline (Week 0)
 
 ```{r curve-2}
+#Center emotion variables on caregiver baseline (Week 0)
 # identify "baseline" values
 baseline = scored %>%
   filter(Week == 0) %>% # only Week 0
@@ -70,7 +68,7 @@ groups = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == min(Week)) %>%
   ungroup() %>%
-  select(CaregiverID, black, poverty150) %>%
+  select(CaregiverID, black, poverty150, single, latinx) %>%
   mutate_at(vars(-CaregiverID), 
             .funs = function(x) 1-x) %>%
   mutate_at(vars(-CaregiverID), factor)
@@ -79,7 +77,26 @@ emotion_g = full_join(emotion, groups)
 
 contrasts(emotion_g$black) = contr.sum(2)
 contrasts(emotion_g$poverty150) = contr.sum(2)
+contrasts(emotion_g$single) = contr.sum(2)
+contrasts(emotion_g$latinx) = contr.sum(2)
+
 ```
+
+# Representativeness disclaimer
+
+```{r}
+n_care = length(unique(emotion$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line.  The data for these analyses are *not* weighted.
 
 # Descriptives
 
@@ -228,10 +245,32 @@ group$plot
 group$summary
 ```
 
+## Latinx
+
+```{r}
+group = group_model(emotion_g, anxiety, latinx, 4)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
 ## Poverty
 
 ```{r}
 group = group_model(emotion_g, anxiety, poverty150, 4)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Single Parents
+
+```{r}
+group = group_model(emotion_g, anxiety, single, 4)
 group$plot
 ```
 
@@ -261,10 +300,32 @@ group$plot
 group$summary
 ```
 
+## Latinx
+
+```{r}
+group = group_model(emotion_g, depress, latinx, 2)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
 ## Poverty
 
 ```{r}
 group = group_model(emotion_g, depress, poverty150, 2)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Single Parents
+
+```{r}
+group = group_model(emotion_g, depress, single, 2)
 group$plot
 ```
 
@@ -293,10 +354,33 @@ group$plot
 group$summary
 ```
 
+## Latinx
+
+```{r}
+group = group_model(emotion_g, stress, latinx, 2)
+group$plot
+```
+
+
+```{r, results = 'asis'}
+group$summary
+```
+
 ## Poverty
 
 ```{r}
 group = group_model(emotion_g, stress, poverty150, 2)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Single Parents
+
+```{r}
+group = group_model(emotion_g, stress, single, 2)
 group$plot
 ```
 
@@ -324,6 +408,17 @@ group$plot
 group$summary
 ```
 
+## Latinx
+
+```{r}
+group = group_model(emotion_g, lonely, latinx, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
 ## Poverty
 
 ```{r}
@@ -335,6 +430,16 @@ group$plot
 group$summary
 ```
 
+## Single Parents
+
+```{r}
+group = group_model(emotion_g, lonely, single, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
 
 # Child Externalizing{.tabset}
 
@@ -356,6 +461,17 @@ group$plot
 group$summary
 ```
 
+## Latinx
+
+```{r}
+group = group_model(emotion_g, fussy, latinx, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
 ## Poverty
 
 ```{r}
@@ -366,6 +482,18 @@ group$plot
 ```{r, results = 'asis'}
 group$summary
 ```
+
+## Single Parents
+
+```{r}
+group = group_model(emotion_g, fussy, single, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
 # Child Internalizing{.tabset}
 
 ## Overall
@@ -386,10 +514,32 @@ group$plot
 group$summary
 ```
 
+## Latinx
+
+```{r}
+group = group_model(emotion_g, fear, latinx, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
 ## Poverty
 
 ```{r}
 group = group_model(emotion_g, fear, poverty150, 1)
+group$plot
+```
+
+```{r, results = 'asis'}
+group$summary
+```
+
+## Single Parents
+
+```{r}
+group = group_model(emotion_g, fear, single, 1)
 group$plot
 ```
 

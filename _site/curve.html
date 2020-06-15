@@ -480,9 +480,9 @@ div.tocify {
 </div>
 
 
-<div id="pre-process" class="section level1">
-<h1>Pre-process</h1>
-<p>Center emotion variables on caregiver baseline (Week 0)</p>
+<div id="representativeness-disclaimer" class="section level1">
+<h1>Representativeness disclaimer</h1>
+<p>These analyses are based on responses collected from 4586 caregivers between the dates of April 06, 2020 and June 11, 2020. These caregivers represent a range of voices: 12.63% are Black/African American, 17.51% are LatinX, and 9.38% live at or below 1.5 times the federal poverty line. The data for these analyses are <em>not</em> weighted.</p>
 </div>
 <div id="descriptives" class="section level1">
 <h1>Descriptives</h1>
@@ -1027,7 +1027,7 @@ Quartic
 </div>
 <div id="blackafrican-american" class="section level2">
 <h2>Black/African American</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1137,9 +1137,121 @@ black1:poly(Week, 4)4
 </tbody>
 </table>
 </div>
+<div id="latinx" class="section level2">
+<h2>Latinx</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+latinx1
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+1.38
+</td>
+<td style="text-align:right;">
+0.17
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 4)1
+</td>
+<td style="text-align:right;">
+1.59
+</td>
+<td style="text-align:right;">
+0.81
+</td>
+<td style="text-align:right;">
+1.97
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 4)2
+</td>
+<td style="text-align:right;">
+-0.74
+</td>
+<td style="text-align:right;">
+0.82
+</td>
+<td style="text-align:right;">
+-0.91
+</td>
+<td style="text-align:right;">
+0.36
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 4)3
+</td>
+<td style="text-align:right;">
+-1.33
+</td>
+<td style="text-align:right;">
+0.80
+</td>
+<td style="text-align:right;">
+-1.67
+</td>
+<td style="text-align:right;">
+0.10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 4)4
+</td>
+<td style="text-align:right;">
+-0.10
+</td>
+<td style="text-align:right;">
+0.80
+</td>
+<td style="text-align:right;">
+-0.13
+</td>
+<td style="text-align:right;">
+0.90
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="poverty" class="section level2">
 <h2>Poverty</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1249,6 +1361,118 @@ poverty1501:poly(Week, 4)4
 </tbody>
 </table>
 </div>
+<div id="single-parents" class="section level2">
+<h2>Single Parents</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+single1
+</td>
+<td style="text-align:right;">
+-0.04
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-3.07
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 4)1
+</td>
+<td style="text-align:right;">
+-2.01
+</td>
+<td style="text-align:right;">
+0.98
+</td>
+<td style="text-align:right;">
+-2.04
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 4)2
+</td>
+<td style="text-align:right;">
+2.87
+</td>
+<td style="text-align:right;">
+0.96
+</td>
+<td style="text-align:right;">
+3.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 4)3
+</td>
+<td style="text-align:right;">
+0.14
+</td>
+<td style="text-align:right;">
+0.92
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+<td style="text-align:right;">
+0.88
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 4)4
+</td>
+<td style="text-align:right;">
+-0.60
+</td>
+<td style="text-align:right;">
+0.93
+</td>
+<td style="text-align:right;">
+-0.64
+</td>
+<td style="text-align:right;">
+0.52
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="depression" class="section level1 tabset">
 <h1>Depression</h1>
@@ -1258,7 +1482,7 @@ poverty1501:poly(Week, 4)4
 </div>
 <div id="blackafrican-american-1" class="section level2">
 <h2>Black/African American</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1334,9 +1558,87 @@ black1:poly(Week, 2)2
 </tbody>
 </table>
 </div>
+<div id="latinx-1" class="section level2">
+<h2>Latinx</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+latinx1
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.48
+</td>
+<td style="text-align:right;">
+0.63
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+1.37
+</td>
+<td style="text-align:right;">
+0.71
+</td>
+<td style="text-align:right;">
+1.94
+</td>
+<td style="text-align:right;">
+0.05
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+0.97
+</td>
+<td style="text-align:right;">
+0.72
+</td>
+<td style="text-align:right;">
+1.35
+</td>
+<td style="text-align:right;">
+0.18
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="poverty-1" class="section level2">
 <h2>Poverty</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1412,6 +1714,84 @@ poverty1501:poly(Week, 2)2
 </tbody>
 </table>
 </div>
+<div id="single-parents-1" class="section level2">
+<h2>Single Parents</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+single1
+</td>
+<td style="text-align:right;">
+0.0
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.24
+</td>
+<td style="text-align:right;">
+0.81
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+-0.5
+</td>
+<td style="text-align:right;">
+0.86
+</td>
+<td style="text-align:right;">
+-0.58
+</td>
+<td style="text-align:right;">
+0.56
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+-0.4
+</td>
+<td style="text-align:right;">
+0.83
+</td>
+<td style="text-align:right;">
+-0.48
+</td>
+<td style="text-align:right;">
+0.63
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="stress" class="section level1 tabset">
 <h1>Stress</h1>
@@ -1421,7 +1801,7 @@ poverty1501:poly(Week, 2)2
 </div>
 <div id="blackafrican-american-2" class="section level2">
 <h2>Black/African American</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1497,9 +1877,87 @@ black1:poly(Week, 2)2
 </tbody>
 </table>
 </div>
+<div id="latinx-2" class="section level2">
+<h2>Latinx</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+latinx1
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+1.27
+</td>
+<td style="text-align:right;">
+0.20
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+2.08
+</td>
+<td style="text-align:right;">
+1.23
+</td>
+<td style="text-align:right;">
+1.69
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+-0.89
+</td>
+<td style="text-align:right;">
+1.25
+</td>
+<td style="text-align:right;">
+-0.71
+</td>
+<td style="text-align:right;">
+0.48
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="poverty-2" class="section level2">
 <h2>Poverty</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1575,6 +2033,84 @@ poverty1501:poly(Week, 2)2
 </tbody>
 </table>
 </div>
+<div id="single-parents-2" class="section level2">
+<h2>Single Parents</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+single1
+</td>
+<td style="text-align:right;">
+-0.03
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+-1.71
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 2)1
+</td>
+<td style="text-align:right;">
+-2.14
+</td>
+<td style="text-align:right;">
+1.50
+</td>
+<td style="text-align:right;">
+-1.43
+</td>
+<td style="text-align:right;">
+0.15
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:poly(Week, 2)2
+</td>
+<td style="text-align:right;">
+1.48
+</td>
+<td style="text-align:right;">
+1.45
+</td>
+<td style="text-align:right;">
+1.02
+</td>
+<td style="text-align:right;">
+0.31
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="loneliness" class="section level1 tabset">
 <h1>Loneliness</h1>
@@ -1584,7 +2120,7 @@ poverty1501:poly(Week, 2)2
 </div>
 <div id="blackafrican-american-3" class="section level2">
 <h2>Black/African American</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1643,9 +2179,70 @@ black1:Week
 </tbody>
 </table>
 </div>
+<div id="latinx-3" class="section level2">
+<h2>Latinx</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+latinx1
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.89
+</td>
+<td style="text-align:right;">
+0.38
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:Week
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.18
+</td>
+<td style="text-align:right;">
+0.85
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="poverty-3" class="section level2">
 <h2>Poverty</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1704,6 +2301,67 @@ poverty1501:Week
 </tbody>
 </table>
 </div>
+<div id="single-parents-3" class="section level2">
+<h2>Single Parents</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+single1
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+1.19
+</td>
+<td style="text-align:right;">
+0.24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:Week
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+-0.46
+</td>
+<td style="text-align:right;">
+0.64
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="child-externalizing" class="section level1 tabset">
 <h1>Child Externalizing</h1>
@@ -1713,7 +2371,7 @@ poverty1501:Week
 </div>
 <div id="blackafrican-american-4" class="section level2">
 <h2>Black/African American</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1772,9 +2430,70 @@ black1:Week
 </tbody>
 </table>
 </div>
+<div id="latinx-4" class="section level2">
+<h2>Latinx</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+latinx1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.18
+</td>
+<td style="text-align:right;">
+0.86
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:Week
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+1.68
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="poverty-4" class="section level2">
 <h2>Poverty</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1833,6 +2552,67 @@ poverty1501:Week
 </tbody>
 </table>
 </div>
+<div id="single-parents-4" class="section level2">
+<h2>Single Parents</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+single1
+</td>
+<td style="text-align:right;">
+-0.01
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.89
+</td>
+<td style="text-align:right;">
+0.37
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:Week
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+0.65
+</td>
+<td style="text-align:right;">
+0.52
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="child-internalizing" class="section level1 tabset">
 <h1>Child Internalizing</h1>
@@ -1842,7 +2622,7 @@ poverty1501:Week
 </div>
 <div id="blackafrican-american-5" class="section level2">
 <h2>Black/African American</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1901,9 +2681,70 @@ black1:Week
 </tbody>
 </table>
 </div>
+<div id="latinx-5" class="section level2">
+<h2>Latinx</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+latinx1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+0.23
+</td>
+<td style="text-align:right;">
+0.82
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:Week
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+1.81
+</td>
+<td style="text-align:right;">
+0.07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="poverty-5" class="section level2">
 <h2>Poverty</h2>
-<p><img src="curve_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p><img src="curve_files/figure-html/unnamed-chunk-48-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1957,6 +2798,67 @@ poverty1501:Week
 </td>
 <td style="text-align:right;">
 0.10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="single-parents-5" class="section level2">
+<h2>Single Parents</h2>
+<p><img src="curve_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+pvalue
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+single1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-0.07
+</td>
+<td style="text-align:right;">
+0.95
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:Week
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.00
+</td>
+<td style="text-align:right;">
+-1.81
+</td>
+<td style="text-align:right;">
+0.07
 </td>
 </tr>
 </tbody>

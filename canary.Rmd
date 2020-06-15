@@ -72,6 +72,20 @@ scored_prepost = scored %>%
   spread(key, change)
 ```
 
+```{r, eval = F}
+did_increase = function(x){
+  x = ifelse(x > 0, 1, 0)
+}
+
+scored_prepost %>%
+  mutate_at(vars(contains("conflict")), did_increase) %>%
+  gather("variable", "value", contains("conflict")) %>%
+  filter(!is.na(value)) %>%
+  group_by(variable) %>%
+  summarize(Percent = 100*sum(value)/n())
+```
+
+
 # Descriptives
 
 Weeks used in these analyses are `r unique(scored$Week)`.

@@ -786,7 +786,15 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$conflictSource = data$FamCon.015
   }  
   
-  if(contains_items("DEMO.002", data))newdata$single = ifelse(data$DEMO.002 %in% c(3,4,5,7,8), 1, 0)
+  if(contains_items("DEMO.002", data)){
+    data = data %>%
+      mutate(single = case_when(
+        DEMO.002 %in% c(3,4,5,7,8) ~ 1,
+        DEMO.011 %in% c(2,4) ~ 1, 
+        !is.na(DEMO.002) ~ 0,
+        !is.na(DEMO.011) ~ 0,
+        TRUE ~ NA_real_))
+    newdata$single = data$single}
   
   if(contains_items("DEMO.003", data)){
       newdata$num_children = case_when(
@@ -834,7 +842,19 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       TRUE ~ NA_character_)
     }
   
-  if(contains_items("DEMO.008", data)) newdata$latinx = as.numeric(data$DEMO.008)
+  if(contains_items("DEMO.008", data)){
+    data = data %>%
+      mutate(latinx = case_when(
+        DEMO.008 == 1 ~ 1,
+        DEMO.008 == 0 ~ 0,
+        DEMO.008.2 == 0 ~ 0,
+        DEMO.008.2 == 1 ~ 1,
+        DEMO.008.2 == 2 ~ 1,
+        TRUE ~ NA_real_
+      ))
+    
+    newdata$latinx = data$latinx
+    }
   
   if(contains_items("DEMO.001", data)){
     state = unlist(sapply(data$DEMO.001, identify_state))
