@@ -184,6 +184,7 @@ splines.groups = function(data, outcome, group, point){
   color.pal = c("red", "darkgrey")
   
   data = data %>%
+    filter(!is.na({{group}})) %>%
     mutate(SL1 = ifelse(Week <= point, Week-point, 0),
            SL2 = ifelse(Week > point, Week-point, 0))
   
