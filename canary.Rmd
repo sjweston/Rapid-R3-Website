@@ -57,12 +57,12 @@ scored = scored %>%
                                        "Knowing my/our job is secure",
                                        "Being able to meet my child's social and emotional needs",
                                        "Knowing we have access to childcare"))) %>%
-  select(CaregiverID, Week, contains("conflict"), contains("cohesive"), poc, pocA, whiteO, poverty150)
+  select(CaregiverID, Week, Date, contains("conflict"), contains("cohesive"), black, latinx, poc, pocA, whiteO, poverty150)
 ```
 
 ```{r canary-1}
 scored_prepost = scored %>%
-  select(-contains("Source")) %>%
+  select(-contains("Source"), -Date) %>%
   gather("key", "value", 
          contains("conflict"), contains("cohesive")) %>%
   mutate(Week = ifelse(Week == 0, "pre", "post")) %>%
@@ -84,6 +84,23 @@ scored_prepost %>%
   group_by(variable) %>%
   summarize(Percent = 100*sum(value)/n())
 ```
+
+# Representativeness disclaimer
+
+```{r curve-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = table(perc$poverty150)
+perc.fpl = 100*perc.fpl/sum(perc.fpl)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl[2])`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
 
 
 # Descriptives
