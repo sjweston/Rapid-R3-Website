@@ -613,3162 +613,403 @@ div.tocify {
 <!--   geom_smooth(method = "loess", se= F) + -->
 <!--   facet_strata(along = -anxiety) -->
 <!-- ``` -->
-</div>
-<div id="polynomials" class="section level1">
-<h1>Polynomials</h1>
-<div id="identify-best-model" class="section level2">
-<h2>Identify best model</h2>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-model
-</th>
-<th style="text-align:right;">
-RMSE
-</th>
-<th style="text-align:right;">
-Rsquared
-</th>
-<th style="text-align:right;">
-MAE
-</th>
-</tr>
-</thead>
-<tbody>
-<tr grouplength="4">
-<td colspan="4" style="border-bottom: 1px solid;">
-<strong>Anxiety</strong>
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Linear
-</td>
-<td style="text-align:right;">
-0.9152
-</td>
-<td style="text-align:right;">
-0.0026
-</td>
-<td style="text-align:right;">
-0.7393
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quadratic
-</td>
-<td style="text-align:right;">
-0.9148
-</td>
-<td style="text-align:right;">
-0.0036
-</td>
-<td style="text-align:right;">
-0.7384
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Cubic
-</td>
-<td style="text-align:right;">
-0.9148
-</td>
-<td style="text-align:right;">
-0.0036
-</td>
-<td style="text-align:right;">
-0.7385
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quartic
-</td>
-<td style="text-align:right;">
-0.9148
-</td>
-<td style="text-align:right;">
-0.0036
-</td>
-<td style="text-align:right;">
-0.7383
-</td>
-</tr>
-<tr grouplength="4">
-<td colspan="4" style="border-bottom: 1px solid;">
-<strong>Depression</strong>
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Linear
-</td>
-<td style="text-align:right;">
-0.8485
-</td>
-<td style="text-align:right;">
-0.0023
-</td>
-<td style="text-align:right;">
-0.6832
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quadratic
-</td>
-<td style="text-align:right;">
-0.8485
-</td>
-<td style="text-align:right;">
-0.0024
-</td>
-<td style="text-align:right;">
-0.6833
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Cubic
-</td>
-<td style="text-align:right;">
-0.8485
-</td>
-<td style="text-align:right;">
-0.0021
-</td>
-<td style="text-align:right;">
-0.6833
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quartic
-</td>
-<td style="text-align:right;">
-0.8485
-</td>
-<td style="text-align:right;">
-0.0024
-</td>
-<td style="text-align:right;">
-0.6832
-</td>
-</tr>
-<tr grouplength="4">
-<td colspan="4" style="border-bottom: 1px solid;">
-<strong>Child Internalizing</strong>
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Linear
-</td>
-<td style="text-align:right;">
-0.6651
-</td>
-<td style="text-align:right;">
-0.0018
-</td>
-<td style="text-align:right;">
-0.6008
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quadratic
-</td>
-<td style="text-align:right;">
-0.6652
-</td>
-<td style="text-align:right;">
-0.0015
-</td>
-<td style="text-align:right;">
-0.6008
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Cubic
-</td>
-<td style="text-align:right;">
-0.6652
-</td>
-<td style="text-align:right;">
-0.0012
-</td>
-<td style="text-align:right;">
-0.6008
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quartic
-</td>
-<td style="text-align:right;">
-0.6653
-</td>
-<td style="text-align:right;">
-0.0012
-</td>
-<td style="text-align:right;">
-0.6009
-</td>
-</tr>
-<tr grouplength="4">
-<td colspan="4" style="border-bottom: 1px solid;">
-<strong>Child Externalizing</strong>
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Linear
-</td>
-<td style="text-align:right;">
-0.6809
-</td>
-<td style="text-align:right;">
-0.0009
-</td>
-<td style="text-align:right;">
-0.4746
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quadratic
-</td>
-<td style="text-align:right;">
-0.6809
-</td>
-<td style="text-align:right;">
-0.0008
-</td>
-<td style="text-align:right;">
-0.4746
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Cubic
-</td>
-<td style="text-align:right;">
-0.6810
-</td>
-<td style="text-align:right;">
-0.0009
-</td>
-<td style="text-align:right;">
-0.4747
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quartic
-</td>
-<td style="text-align:right;">
-0.6810
-</td>
-<td style="text-align:right;">
-0.0008
-</td>
-<td style="text-align:right;">
-0.4746
-</td>
-</tr>
-<tr grouplength="4">
-<td colspan="4" style="border-bottom: 1px solid;">
-<strong>Loneliness</strong>
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Linear
-</td>
-<td style="text-align:right;">
-1.1216
-</td>
-<td style="text-align:right;">
-0.0009
-</td>
-<td style="text-align:right;">
-0.9180
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quadratic
-</td>
-<td style="text-align:right;">
-1.1217
-</td>
-<td style="text-align:right;">
-0.0011
-</td>
-<td style="text-align:right;">
-0.9181
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Cubic
-</td>
-<td style="text-align:right;">
-1.1218
-</td>
-<td style="text-align:right;">
-0.0013
-</td>
-<td style="text-align:right;">
-0.9181
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quartic
-</td>
-<td style="text-align:right;">
-1.1220
-</td>
-<td style="text-align:right;">
-0.0016
-</td>
-<td style="text-align:right;">
-0.9183
-</td>
-</tr>
-<tr grouplength="4">
-<td colspan="4" style="border-bottom: 1px solid;">
-<strong>Stress</strong>
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Linear
-</td>
-<td style="text-align:right;">
-1.2945
-</td>
-<td style="text-align:right;">
-0.0022
-</td>
-<td style="text-align:right;">
-1.0719
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quadratic
-</td>
-<td style="text-align:right;">
-1.2944
-</td>
-<td style="text-align:right;">
-0.0020
-</td>
-<td style="text-align:right;">
-1.0717
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Cubic
-</td>
-<td style="text-align:right;">
-1.2946
-</td>
-<td style="text-align:right;">
-0.0023
-</td>
-<td style="text-align:right;">
-1.0719
-</td>
-</tr>
-<tr>
-<td style="text-align:left; padding-left: 2em;" indentlevel="1">
-Quartic
-</td>
-<td style="text-align:right;">
-1.2947
-</td>
-<td style="text-align:right;">
-0.0020
-</td>
-<td style="text-align:right;">
-1.0719
-</td>
-</tr>
-</tbody>
-</table>
-<p>Based on these results, we will run the following models:</p>
-<ul>
-<li>anxiety: quartic</li>
-<li>depression: quadratic</li>
-<li>stress: linear</li>
-<li>loneliness: quadratic</li>
-<li>child externalizing: linear</li>
-<li>child internalizing: linear</li>
-</ul>
-</div>
-<div id="anxiety" class="section level2 tabset">
-<h2>Anxiety</h2>
-<div id="overall" class="section level3">
-<h3>Overall</h3>
-<p><img src="curve_means_files/figure-html/curve-14-1.png" width="672" /></p>
-</div>
-<div id="blackafrican-american" class="section level3">
-<h3>Black/African American</h3>
-<p><img src="curve_means_files/figure-html/curve-15-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-black1
-</td>
-<td style="text-align:right;">
--0.09
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
--4.22
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 4)1
-</td>
-<td style="text-align:right;">
-0.51
-</td>
-<td style="text-align:right;">
-1.19
-</td>
-<td style="text-align:right;">
-0.43
-</td>
-<td style="text-align:right;">
-0.67
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 4)2
-</td>
-<td style="text-align:right;">
-2.11
-</td>
-<td style="text-align:right;">
-1.13
-</td>
-<td style="text-align:right;">
-1.86
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 4)3
-</td>
-<td style="text-align:right;">
--0.93
-</td>
-<td style="text-align:right;">
-1.08
-</td>
-<td style="text-align:right;">
--0.86
-</td>
-<td style="text-align:right;">
-0.39
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 4)4
-</td>
-<td style="text-align:right;">
--2.33
-</td>
-<td style="text-align:right;">
-1.06
-</td>
-<td style="text-align:right;">
--2.20
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="latinx" class="section level3">
-<h3>Latinx</h3>
-<p><img src="curve_means_files/figure-html/curve-17-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-latinx1
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-1.35
-</td>
-<td style="text-align:right;">
-0.18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 4)1
-</td>
-<td style="text-align:right;">
--2.02
-</td>
-<td style="text-align:right;">
-0.97
-</td>
-<td style="text-align:right;">
--2.10
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 4)2
-</td>
-<td style="text-align:right;">
--0.25
-</td>
-<td style="text-align:right;">
-0.89
-</td>
-<td style="text-align:right;">
--0.28
-</td>
-<td style="text-align:right;">
-0.78
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 4)3
-</td>
-<td style="text-align:right;">
--0.94
-</td>
-<td style="text-align:right;">
-0.86
-</td>
-<td style="text-align:right;">
--1.09
-</td>
-<td style="text-align:right;">
-0.28
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 4)4
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.86
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-1.00
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="poverty" class="section level3">
-<h3>Poverty</h3>
-<p><img src="curve_means_files/figure-html/curve-19-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-poverty1501
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-4.18
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 4)1
-</td>
-<td style="text-align:right;">
-2.41
-</td>
-<td style="text-align:right;">
-1.14
-</td>
-<td style="text-align:right;">
-2.12
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 4)2
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-1.05
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-0.98
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 4)3
-</td>
-<td style="text-align:right;">
-0.49
-</td>
-<td style="text-align:right;">
-1.02
-</td>
-<td style="text-align:right;">
-0.48
-</td>
-<td style="text-align:right;">
-0.63
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 4)4
-</td>
-<td style="text-align:right;">
--1.65
-</td>
-<td style="text-align:right;">
-1.01
-</td>
-<td style="text-align:right;">
--1.63
-</td>
-<td style="text-align:right;">
-0.10
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="single-parents" class="section level3">
-<h3>Single Parents</h3>
-<p><img src="curve_means_files/figure-html/curve-21-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-single1
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.57
-</td>
-<td style="text-align:right;">
-0.57
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 4)1
-</td>
-<td style="text-align:right;">
-2.39
-</td>
-<td style="text-align:right;">
-1.14
-</td>
-<td style="text-align:right;">
-2.10
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 4)2
-</td>
-<td style="text-align:right;">
--0.34
-</td>
-<td style="text-align:right;">
-1.05
-</td>
-<td style="text-align:right;">
--0.33
-</td>
-<td style="text-align:right;">
-0.74
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 4)3
-</td>
-<td style="text-align:right;">
-0.60
-</td>
-<td style="text-align:right;">
-1.00
-</td>
-<td style="text-align:right;">
-0.60
-</td>
-<td style="text-align:right;">
-0.55
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 4)4
-</td>
-<td style="text-align:right;">
--1.81
-</td>
-<td style="text-align:right;">
-1.01
-</td>
-<td style="text-align:right;">
--1.79
-</td>
-<td style="text-align:right;">
-0.07
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-with-disabilites" class="section level3">
-<h3>Children with disabilites</h3>
-<p><img src="curve_means_files/figure-html/curve-23-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-disability1
-</td>
-<td style="text-align:right;">
--0.31
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
--8.29
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 4)1
-</td>
-<td style="text-align:right;">
-5.55
-</td>
-<td style="text-align:right;">
-2.21
-</td>
-<td style="text-align:right;">
-2.51
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 4)2
-</td>
-<td style="text-align:right;">
--2.83
-</td>
-<td style="text-align:right;">
-1.92
-</td>
-<td style="text-align:right;">
--1.47
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 4)3
-</td>
-<td style="text-align:right;">
--0.11
-</td>
-<td style="text-align:right;">
-1.90
-</td>
-<td style="text-align:right;">
--0.06
-</td>
-<td style="text-align:right;">
-0.95
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 4)4
-</td>
-<td style="text-align:right;">
-1.88
-</td>
-<td style="text-align:right;">
-1.91
-</td>
-<td style="text-align:right;">
-0.98
-</td>
-<td style="text-align:right;">
-0.33
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children" class="section level3">
-<h3>3+ Children</h3>
-<p><img src="curve_means_files/figure-html/curve-25-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-child31
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-1.90
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 4)1
-</td>
-<td style="text-align:right;">
-2.05
-</td>
-<td style="text-align:right;">
-0.92
-</td>
-<td style="text-align:right;">
-2.22
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 4)2
-</td>
-<td style="text-align:right;">
-0.61
-</td>
-<td style="text-align:right;">
-0.82
-</td>
-<td style="text-align:right;">
-0.75
-</td>
-<td style="text-align:right;">
-0.46
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 4)3
-</td>
-<td style="text-align:right;">
--1.30
-</td>
-<td style="text-align:right;">
-0.80
-</td>
-<td style="text-align:right;">
--1.62
-</td>
-<td style="text-align:right;">
-0.11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 4)4
-</td>
-<td style="text-align:right;">
-1.08
-</td>
-<td style="text-align:right;">
-0.80
-</td>
-<td style="text-align:right;">
-1.35
-</td>
-<td style="text-align:right;">
-0.18
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="depression" class="section level2 tabset">
-<h2>Depression</h2>
-<div id="overall-1" class="section level3">
-<h3>Overall</h3>
-<p><img src="curve_means_files/figure-html/curve-27-1.png" width="672" /></p>
-</div>
-<div id="blackafrican-american-1" class="section level3">
-<h3>Black/African American</h3>
-<p><img src="curve_means_files/figure-html/curve-28-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-black1
-</td>
-<td style="text-align:right;">
--0.03
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
--1.50
-</td>
-<td style="text-align:right;">
-0.13
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
--1.76
-</td>
-<td style="text-align:right;">
-1.07
-</td>
-<td style="text-align:right;">
--1.65
-</td>
-<td style="text-align:right;">
-0.10
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
-2.12
-</td>
-<td style="text-align:right;">
-1.00
-</td>
-<td style="text-align:right;">
-2.12
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="latinx-1" class="section level3">
-<h3>Latinx</h3>
-<p><img src="curve_means_files/figure-html/curve-30-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-latinx1
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-2.73
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
--0.59
-</td>
-<td style="text-align:right;">
-0.86
-</td>
-<td style="text-align:right;">
--0.68
-</td>
-<td style="text-align:right;">
-0.50
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
-0.55
-</td>
-<td style="text-align:right;">
-0.79
-</td>
-<td style="text-align:right;">
-0.70
-</td>
-<td style="text-align:right;">
-0.48
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="poverty-1" class="section level3">
-<h3>Poverty</h3>
-<p><img src="curve_means_files/figure-html/curve-32-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-poverty1501
-</td>
-<td style="text-align:right;">
-0.17
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-9.01
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
-1.76
-</td>
-<td style="text-align:right;">
-0.99
-</td>
-<td style="text-align:right;">
-1.78
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
-0.38
-</td>
-<td style="text-align:right;">
-0.90
-</td>
-<td style="text-align:right;">
-0.42
-</td>
-<td style="text-align:right;">
-0.68
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="single-parents-1" class="section level3">
-<h3>Single Parents</h3>
-<p><img src="curve_means_files/figure-html/curve-34-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-single1
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-2.14
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
-2.18
-</td>
-<td style="text-align:right;">
-1.02
-</td>
-<td style="text-align:right;">
-2.14
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
--0.26
-</td>
-<td style="text-align:right;">
-0.93
-</td>
-<td style="text-align:right;">
--0.28
-</td>
-<td style="text-align:right;">
-0.78
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-with-disabilites-1" class="section level3">
-<h3>Children with disabilites</h3>
-<p><img src="curve_means_files/figure-html/curve-36-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-disability1
-</td>
-<td style="text-align:right;">
--0.42
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
--11.91
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
-7.99
-</td>
-<td style="text-align:right;">
-1.97
-</td>
-<td style="text-align:right;">
-4.06
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
--3.45
-</td>
-<td style="text-align:right;">
-1.70
-</td>
-<td style="text-align:right;">
--2.03
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-1" class="section level3">
-<h3>3+ Children</h3>
-<p><img src="curve_means_files/figure-html/curve-38-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-child31
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-2.36
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
-1.48
-</td>
-<td style="text-align:right;">
-0.82
-</td>
-<td style="text-align:right;">
-1.80
-</td>
-<td style="text-align:right;">
-0.07
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
-1.19
-</td>
-<td style="text-align:right;">
-0.72
-</td>
-<td style="text-align:right;">
-1.64
-</td>
-<td style="text-align:right;">
-0.10
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="stress" class="section level2 tabset">
-<h2>Stress</h2>
-<div id="overall-2" class="section level3">
-<h3>Overall</h3>
-<p><img src="curve_means_files/figure-html/curve-40-1.png" width="672" /></p>
-</div>
-<div id="blackafrican-american-2" class="section level3">
-<h3>Black/African American</h3>
-<p><img src="curve_means_files/figure-html/curve-41-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-black1
-</td>
-<td style="text-align:right;">
--0.06
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
--1.49
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
--0.35
-</td>
-<td style="text-align:right;">
-0.73
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="latinx-2" class="section level3">
-<h3>Latinx</h3>
-<p><img src="curve_means_files/figure-html/curve-43-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-latinx1
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-1.63
-</td>
-<td style="text-align:right;">
-0.1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
--1.03
-</td>
-<td style="text-align:right;">
-0.3
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="poverty-2" class="section level3">
-<h3>Poverty</h3>
-<p><img src="curve_means_files/figure-html/curve-45-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-poverty1501
-</td>
-<td style="text-align:right;">
-0.13
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-3.22
-</td>
-<td style="text-align:right;">
-0.0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:Week
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-1.03
-</td>
-<td style="text-align:right;">
-0.3
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="single-parents-2" class="section level3">
-<h3>Single Parents</h3>
-<p><img src="curve_means_files/figure-html/curve-47-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-single1
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-0.45
-</td>
-<td style="text-align:right;">
-0.66
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:Week
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-1.10
-</td>
-<td style="text-align:right;">
-0.27
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-with-disabilites-2" class="section level3">
-<h3>Children with disabilites</h3>
-<p><img src="curve_means_files/figure-html/curve-49-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-disability1
-</td>
-<td style="text-align:right;">
--0.32
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-<td style="text-align:right;">
--4.13
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
--0.08
-</td>
-<td style="text-align:right;">
-0.94
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-2" class="section level3">
-<h3>3+ Children</h3>
-<p><img src="curve_means_files/figure-html/curve-51-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-child31
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-1.77
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:Week
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-1.71
-</td>
-<td style="text-align:right;">
-0.09
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="loneliness" class="section level2 tabset">
-<h2>Loneliness</h2>
-<div id="overall-3" class="section level3">
-<h3>Overall</h3>
-<p><img src="curve_means_files/figure-html/curve-53-1.png" width="672" /></p>
-</div>
-<div id="blackafrican-american-3" class="section level3">
-<h3>Black/African American</h3>
-<p><img src="curve_means_files/figure-html/curve-54-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-black1
-</td>
-<td style="text-align:right;">
--0.09
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
--3.58
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
--2.45
-</td>
-<td style="text-align:right;">
-1.36
-</td>
-<td style="text-align:right;">
--1.80
-</td>
-<td style="text-align:right;">
-0.07
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
-0.75
-</td>
-<td style="text-align:right;">
-1.27
-</td>
-<td style="text-align:right;">
-0.59
-</td>
-<td style="text-align:right;">
-0.56
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="latinx-3" class="section level3">
-<h3>Latinx</h3>
-<p><img src="curve_means_files/figure-html/curve-56-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-latinx1
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.88
-</td>
-<td style="text-align:right;">
-0.38
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
--0.07
-</td>
-<td style="text-align:right;">
-1.10
-</td>
-<td style="text-align:right;">
--0.07
-</td>
-<td style="text-align:right;">
-0.95
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
--1.36
-</td>
-<td style="text-align:right;">
-1.00
-</td>
-<td style="text-align:right;">
--1.37
-</td>
-<td style="text-align:right;">
-0.17
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="poverty-3" class="section level3">
-<h3>Poverty</h3>
-<p><img src="curve_means_files/figure-html/curve-58-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-poverty1501
-</td>
-<td style="text-align:right;">
-0.16
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-6.64
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
--0.30
-</td>
-<td style="text-align:right;">
-1.27
-</td>
-<td style="text-align:right;">
--0.24
-</td>
-<td style="text-align:right;">
-0.81
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
--0.32
-</td>
-<td style="text-align:right;">
-1.16
-</td>
-<td style="text-align:right;">
--0.27
-</td>
-<td style="text-align:right;">
-0.78
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="single-parents-3" class="section level3">
-<h3>Single Parents</h3>
-<p><img src="curve_means_files/figure-html/curve-60-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-single1
-</td>
-<td style="text-align:right;">
-0.15
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-6.16
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
-1.57
-</td>
-<td style="text-align:right;">
-1.30
-</td>
-<td style="text-align:right;">
-1.21
-</td>
-<td style="text-align:right;">
-0.23
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
--1.19
-</td>
-<td style="text-align:right;">
-1.19
-</td>
-<td style="text-align:right;">
--1.01
-</td>
-<td style="text-align:right;">
-0.31
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-with-disabilites-3" class="section level3">
-<h3>Children with disabilites</h3>
-<p><img src="curve_means_files/figure-html/curve-62-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-disability1
-</td>
-<td style="text-align:right;">
--0.37
-</td>
-<td style="text-align:right;">
-0.05
-</td>
-<td style="text-align:right;">
--7.89
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
-12.04
-</td>
-<td style="text-align:right;">
-2.51
-</td>
-<td style="text-align:right;">
-4.79
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
--5.68
-</td>
-<td style="text-align:right;">
-2.16
-</td>
-<td style="text-align:right;">
--2.63
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-3" class="section level3">
-<h3>3+ Children</h3>
-<p><img src="curve_means_files/figure-html/curve-64-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-child31
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-1.12
-</td>
-<td style="text-align:right;">
-0.26
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 2)1
-</td>
-<td style="text-align:right;">
--0.71
-</td>
-<td style="text-align:right;">
-1.05
-</td>
-<td style="text-align:right;">
--0.68
-</td>
-<td style="text-align:right;">
-0.50
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:poly(Week, 2)2
-</td>
-<td style="text-align:right;">
--1.31
-</td>
-<td style="text-align:right;">
-0.92
-</td>
-<td style="text-align:right;">
--1.43
-</td>
-<td style="text-align:right;">
-0.15
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="child-externalizing" class="section level2 tabset">
-<h2>Child Externalizing</h2>
-<div id="overall-4" class="section level3">
-<h3>Overall</h3>
-<p><img src="curve_means_files/figure-html/curve-66-1.png" width="672" /></p>
-</div>
-<div id="blackafrican-american-4" class="section level3">
-<h3>Black/African American</h3>
-<p><img src="curve_means_files/figure-html/curve-67-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-black1
-</td>
-<td style="text-align:right;">
--0.07
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
--3.00
-</td>
-<td style="text-align:right;">
-0.0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-1.03
-</td>
-<td style="text-align:right;">
-0.3
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="latinx-4" class="section level3">
-<h3>Latinx</h3>
-<p><img src="curve_means_files/figure-html/curve-69-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-latinx1
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-1.31
-</td>
-<td style="text-align:right;">
-0.19
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
--0.34
-</td>
-<td style="text-align:right;">
-0.73
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="poverty-4" class="section level3">
-<h3>Poverty</h3>
-<p><img src="curve_means_files/figure-html/curve-71-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-poverty1501
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-1.21
-</td>
-<td style="text-align:right;">
-0.23
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:Week
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-2.09
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="single-parents-4" class="section level3">
-<h3>Single Parents</h3>
-<p><img src="curve_means_files/figure-html/curve-73-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-single1
-</td>
-<td style="text-align:right;">
--0.03
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
--1.28
-</td>
-<td style="text-align:right;">
-0.2
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:Week
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-2.97
-</td>
-<td style="text-align:right;">
-0.0
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-with-disabilites-4" class="section level3">
-<h3>Children with disabilites</h3>
-<p><img src="curve_means_files/figure-html/curve-75-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-disability1
-</td>
-<td style="text-align:right;">
--0.21
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
--5.15
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-4" class="section level3">
-<h3>3+ Children</h3>
-<p><img src="curve_means_files/figure-html/curve-77-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-child31
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.81
-</td>
-<td style="text-align:right;">
-0.42
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-1.59
-</td>
-<td style="text-align:right;">
-0.11
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="child-internalizing" class="section level2 tabset">
-<h2>Child Internalizing</h2>
-<div id="overall-5" class="section level3">
-<h3>Overall</h3>
-<p><img src="curve_means_files/figure-html/curve-79-1.png" width="672" /></p>
-</div>
-<div id="blackafrican-american-5" class="section level3">
-<h3>Black/African American</h3>
-<p><img src="curve_means_files/figure-html/curve-80-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-black1
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-2.02
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:Week
-</td>
-<td style="text-align:right;">
--0.01
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
--1.91
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="latinx-5" class="section level3">
-<h3>Latinx</h3>
-<p><img src="curve_means_files/figure-html/curve-82-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-latinx1
-</td>
-<td style="text-align:right;">
-0.07
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-3.5
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
--1.7
-</td>
-<td style="text-align:right;">
-0.09
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="poverty-5" class="section level3">
-<h3>Poverty</h3>
-<p><img src="curve_means_files/figure-html/curve-84-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-poverty1501
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-1.84
-</td>
-<td style="text-align:right;">
-0.07
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-poverty1501:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.97
-</td>
-<td style="text-align:right;">
-0.33
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="single-parents-5" class="section level3">
-<h3>Single Parents</h3>
-<p><img src="curve_means_files/figure-html/curve-86-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-single1
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-0.35
-</td>
-<td style="text-align:right;">
-0.73
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-1.02
-</td>
-<td style="text-align:right;">
-0.31
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-with-disabilites-5" class="section level3">
-<h3>Children with disabilites</h3>
-<p><img src="curve_means_files/figure-html/curve-88-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-disability1
-</td>
-<td style="text-align:right;">
--0.56
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
--13.81
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-disability1:Week
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-4.59
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="children-5" class="section level3">
-<h3>3+ Children</h3>
-<p><img src="curve_means_files/figure-html/curve-90-1.png" width="672" /></p>
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-term
-</th>
-<th style="text-align:right;">
-estimate
-</th>
-<th style="text-align:right;">
-std.error
-</th>
-<th style="text-align:right;">
-statistic
-</th>
-<th style="text-align:right;">
-pvalue
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-child31
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
-3.31
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-child31:Week
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
--1.67
-</td>
-<td style="text-align:right;">
-0.09
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<!-- # Polynomials -->
+<!-- ## Identify best model -->
+<!-- ```{r curve-10, eval = F} -->
+<!-- emotion.recipe = recipe(anxiety + depress + stress + lonely + fussy + fear ~ Week, data = emotion) -->
+<!-- emotion.prepped = bake(emotion.recipe, emotion) -->
+<!-- anx_fit1 = linear_reg() %>% -->
+<!--   set_engine(engine = "lm") %>% -->
+<!--   fit(anxiety ~ poly(Week, 1), data = emotion.prepped) -->
+<!-- anx_fit2 = linear_reg() %>% -->
+<!--   set_engine(engine = "lm") %>% -->
+<!--   fit(anxiety ~ poly(Week, 2), data = emotion.prepped) -->
+<!-- anx_fit3 = linear_reg() %>% -->
+<!--   set_engine(engine = "lm") %>% -->
+<!--   fit(anxiety ~ poly(Week, 3), data = emotion.prepped) -->
+<!-- anx_fit4 = linear_reg() %>% -->
+<!--   set_engine(engine = "lm") %>% -->
+<!--   fit(anxiety ~ poly(Week, 4), data = emotion.prepped) -->
+<!-- ``` -->
+<!-- ```{r curve-11 } -->
+<!-- if(rerun){ -->
+<!--   set.seed(115) -->
+<!--   fit_models = emotion %>% -->
+<!--     gather("emotion", "value", -CaregiverID, -Week) %>% -->
+<!--     filter(!is.na(value)) %>% -->
+<!--     group_by(emotion) %>% -->
+<!--     nest() %>% -->
+<!--     mutate(train1 = map(data, train_fun, 1), -->
+<!--            train2 = map(data, train_fun, 2), -->
+<!--            train3 = map(data, train_fun, 3), -->
+<!--            train4 = map(data, train_fun, 4)) -->
+<!--   train_perf = fit_models %>% -->
+<!--     gather("model", "output", contains("train")) %>% -->
+<!--     mutate(performance = map(output, "results"))  -->
+<!--   save(fit_models, train_perf, file = here("curve_data/fit_models_means.Rdata")) -->
+<!-- } -->
+<!-- ``` -->
+<!-- ```{r curve-12 } -->
+<!-- if(dontrerun){load(file = here("curve_data/fit_models_means.Rdata"))} -->
+<!-- ``` -->
+<!-- ```{r curve-13, results = 'asis'} -->
+<!-- train_perf %>% -->
+<!--   dplyr::select(emotion, model, performance) %>% -->
+<!--   unnest(cols = c(performance)) %>% -->
+<!--   dplyr::select(-intercept, -contains("SD")) %>% -->
+<!--   arrange(emotion, model) %>% -->
+<!--   mutate(model = factor(model, -->
+<!--                         levels = paste0("train",1:4), -->
+<!--                         labels = c("Linear", "Quadratic", "Cubic", "Quartic"))) %>% -->
+<!--   ungroup() %>% -->
+<!--   dplyr::select(-emotion) %>% -->
+<!--   kable(., digits = 4) %>% -->
+<!--   kable_styling(full_width = T) %>% -->
+<!--   group_rows("Anxiety", 1,4) %>% -->
+<!--   group_rows("Depression", 5,8) %>% -->
+<!--   group_rows("Child Internalizing", 9,12) %>% -->
+<!--   group_rows("Child Externalizing", 13,16) %>% -->
+<!--   group_rows("Loneliness", 17,20) %>% -->
+<!--   group_rows("Stress", 21,24) -->
+<!-- ``` -->
+<!-- Based on these results, we will run the following models: -->
+<!-- - anxiety: quartic -->
+<!-- - depression: quadratic -->
+<!-- - stress: linear -->
+<!-- - loneliness: quadratic -->
+<!-- - child externalizing: linear -->
+<!-- - child internalizing: linear -->
+<!-- ## Anxiety{.tabset} -->
+<!-- ### Overall -->
+<!-- ```{r curve-14 } -->
+<!-- overall = overall_model(emotion, anxiety, 4) -->
+<!-- overall$plot -->
+<!-- ``` -->
+<!-- ### Black/African American -->
+<!-- ```{r curve-15 } -->
+<!-- group = group_model(emotion_g, anxiety, black, 4) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-16, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Latinx -->
+<!-- ```{r curve-17 } -->
+<!-- group = group_model(emotion_g, anxiety, latinx, 4) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-18, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Poverty -->
+<!-- ```{r curve-19 } -->
+<!-- group = group_model(emotion_g, anxiety, poverty150, 4) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-20, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Single Parents -->
+<!-- ```{r curve-21 } -->
+<!-- group = group_model(emotion_g, anxiety, single, 4) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-22, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Children with disabilites -->
+<!-- ```{r curve-23 } -->
+<!-- group = group_model(emotion_g, anxiety, disability, 4) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-24, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### 3+ Children -->
+<!-- ```{r curve-25 } -->
+<!-- group = group_model(emotion_g, anxiety, child3, 4) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-26, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ## Depression{.tabset} -->
+<!-- ### Overall -->
+<!-- ```{r curve-27 } -->
+<!-- overall = overall_model(emotion, depress, 2) -->
+<!-- overall$plot -->
+<!-- ``` -->
+<!-- ### Black/African American -->
+<!-- ```{r curve-28 } -->
+<!-- group = group_model(emotion_g, depress, black, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-29, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Latinx -->
+<!-- ```{r curve-30 } -->
+<!-- group = group_model(emotion_g, depress, latinx, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-31, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Poverty -->
+<!-- ```{r curve-32 } -->
+<!-- group = group_model(emotion_g, depress, poverty150, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-33, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Single Parents -->
+<!-- ```{r curve-34 } -->
+<!-- group = group_model(emotion_g, depress, single, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-35, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Children with disabilites -->
+<!-- ```{r curve-36 } -->
+<!-- group = group_model(emotion_g, depress, disability, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-37, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### 3+ Children -->
+<!-- ```{r curve-38 } -->
+<!-- group = group_model(emotion_g, depress, child3, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-39, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ## Stress{.tabset} -->
+<!-- ### Overall -->
+<!-- ```{r curve-40 } -->
+<!-- overall = overall_model(emotion, stress, 1) -->
+<!-- overall$plot -->
+<!-- ``` -->
+<!-- ### Black/African American -->
+<!-- ```{r curve-41 } -->
+<!-- group = group_model(emotion_g, stress, black, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-42, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Latinx -->
+<!-- ```{r curve-43 } -->
+<!-- group = group_model(emotion_g, stress, latinx, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-44, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Poverty -->
+<!-- ```{r curve-45 } -->
+<!-- group = group_model(emotion_g, stress, poverty150, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-46, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Single Parents -->
+<!-- ```{r curve-47 } -->
+<!-- group = group_model(emotion_g, stress, single, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-48, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Children with disabilites -->
+<!-- ```{r curve-49 } -->
+<!-- group = group_model(emotion_g, stress, disability, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-50, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### 3+ Children -->
+<!-- ```{r curve-51 } -->
+<!-- group = group_model(emotion_g, stress, child3, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-52, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ## Loneliness{.tabset} -->
+<!-- ### Overall -->
+<!-- ```{r curve-53 } -->
+<!-- overall = overall_model(emotion, lonely, 2) -->
+<!-- overall$plot -->
+<!-- ``` -->
+<!-- ### Black/African American -->
+<!-- ```{r curve-54 } -->
+<!-- group = group_model(emotion_g, lonely, black, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-55, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Latinx -->
+<!-- ```{r curve-56 } -->
+<!-- group = group_model(emotion_g, lonely, latinx, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-57, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Poverty -->
+<!-- ```{r curve-58 } -->
+<!-- group = group_model(emotion_g, lonely, poverty150, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-59, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Single Parents -->
+<!-- ```{r curve-60 } -->
+<!-- group = group_model(emotion_g, lonely, single, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-61, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Children with disabilites -->
+<!-- ```{r curve-62 } -->
+<!-- group = group_model(emotion_g, lonely, disability, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-63, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### 3+ Children -->
+<!-- ```{r curve-64 } -->
+<!-- group = group_model(emotion_g, lonely, child3, 2) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-65, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ## Child Externalizing{.tabset} -->
+<!-- ### Overall -->
+<!-- ```{r curve-66 } -->
+<!-- overall = overall_model(emotion, fussy, 1) -->
+<!-- overall$plot -->
+<!-- ``` -->
+<!-- ### Black/African American -->
+<!-- ```{r curve-67 } -->
+<!-- group = group_model(emotion_g, fussy, black, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-68, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Latinx -->
+<!-- ```{r curve-69 } -->
+<!-- group = group_model(emotion_g, fussy, latinx, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-70, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Poverty -->
+<!-- ```{r curve-71 } -->
+<!-- group = group_model(emotion_g, fussy, poverty150, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-72, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Single Parents -->
+<!-- ```{r curve-73 } -->
+<!-- group = group_model(emotion_g, fussy, single, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-74, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Children with disabilites -->
+<!-- ```{r curve-75 } -->
+<!-- group = group_model(emotion_g, fussy, disability, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-76, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### 3+ Children -->
+<!-- ```{r curve-77 } -->
+<!-- group = group_model(emotion_g, fussy, child3, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-78, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ## Child Internalizing{.tabset} -->
+<!-- ### Overall -->
+<!-- ```{r curve-79 } -->
+<!-- overall = overall_model(emotion, fear, 1) -->
+<!-- overall$plot -->
+<!-- ``` -->
+<!-- ### Black/African American -->
+<!-- ```{r curve-80 } -->
+<!-- group = group_model(emotion_g, fear, black, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-81, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Latinx -->
+<!-- ```{r curve-82 } -->
+<!-- group = group_model(emotion_g, fear, latinx, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-83, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Poverty -->
+<!-- ```{r curve-84 } -->
+<!-- group = group_model(emotion_g, fear, poverty150, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-85, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Single Parents -->
+<!-- ```{r curve-86 } -->
+<!-- group = group_model(emotion_g, fear, single, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-87, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### Children with disabilites -->
+<!-- ```{r curve-88 } -->
+<!-- group = group_model(emotion_g, fear, disability, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-89, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
+<!-- ### 3+ Children -->
+<!-- ```{r curve-90 } -->
+<!-- group = group_model(emotion_g, fear, child3, 1) -->
+<!-- group$plot -->
+<!-- ``` -->
+<!-- ```{r curve-91, results = 'asis'} -->
+<!-- group$summary -->
+<!-- ``` -->
 </div>
 <div id="spline-models" class="section level1">
 <h1>Spline models</h1>
-<p>Spline models are fit with nodes at Week 7, which is the week ending on May 25th, 2020.</p>
-<div id="anxiety-1" class="section level2 tabset">
+<!-- Spline models are fit with nodes at Week 7, which is the week ending on May 25th, 2020. -->
+<div id="anxiety" class="section level2 tabset">
 <h2>Anxiety</h2>
-<div id="overall-6" class="section level3">
+<div id="overall" class="section level3">
 <h3>Overall</h3>
 <p><img src="curve_means_files/figure-html/curve-92-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -3797,16 +1038,16 @@ pvalue
 (Intercept)
 </td>
 <td style="text-align:right;">
-1.15
+1.25
 </td>
 <td style="text-align:right;">
 0.02
 </td>
 <td style="text-align:right;">
-63.97
+71.52
 </td>
 <td style="text-align:right;">
-0.00
+0
 </td>
 </tr>
 <tr>
@@ -3814,16 +1055,16 @@ pvalue
 SL1
 </td>
 <td style="text-align:right;">
--0.04
+-0.12
 </td>
 <td style="text-align:right;">
-0.01
+0.03
 </td>
 <td style="text-align:right;">
--7.23
+-4.25
 </td>
 <td style="text-align:right;">
-0.00
+0
 </td>
 </tr>
 <tr>
@@ -3831,22 +1072,22 @@ SL1
 SL2
 </td>
 <td style="text-align:right;">
+-0.02
+</td>
+<td style="text-align:right;">
 0.00
 </td>
 <td style="text-align:right;">
-0.01
+-5.88
 </td>
 <td style="text-align:right;">
--0.78
-</td>
-<td style="text-align:right;">
-0.44
+0
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="blackafrican-american-6" class="section level3">
+<div id="blackafrican-american" class="section level3">
 <h3>Black/African American</h3>
 <p><img src="curve_means_files/figure-html/curve-94-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -3875,13 +1116,13 @@ pvalue
 black1
 </td>
 <td style="text-align:right;">
--0.12
+-0.18
 </td>
 <td style="text-align:right;">
-0.03
+0.06
 </td>
 <td style="text-align:right;">
--4.07
+-3.31
 </td>
 <td style="text-align:right;">
 0.00
@@ -3892,16 +1133,16 @@ black1
 SL1:black1
 </td>
 <td style="text-align:right;">
--0.01
+-0.06
 </td>
 <td style="text-align:right;">
-0.01
+0.09
 </td>
 <td style="text-align:right;">
--1.61
+-0.68
 </td>
 <td style="text-align:right;">
-0.11
+0.50
 </td>
 </tr>
 <tr>
@@ -3909,22 +1150,22 @@ SL1:black1
 black1:SL2
 </td>
 <td style="text-align:right;">
-0.02
+0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-2.14
+0.77
 </td>
 <td style="text-align:right;">
-0.03
+0.44
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="latinx-6" class="section level3">
+<div id="latinx" class="section level3">
 <h3>LatinX</h3>
 <p><img src="curve_means_files/figure-html/curve-96-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -3953,16 +1194,16 @@ pvalue
 latinx1
 </td>
 <td style="text-align:right;">
-0.03
+0.11
 </td>
 <td style="text-align:right;">
-0.02
+0.05
 </td>
 <td style="text-align:right;">
-1.40
+2.46
 </td>
 <td style="text-align:right;">
-0.16
+0.01
 </td>
 </tr>
 <tr>
@@ -3970,16 +1211,16 @@ latinx1
 SL1:latinx1
 </td>
 <td style="text-align:right;">
-0.00
+0.02
 </td>
 <td style="text-align:right;">
-0.01
+0.08
 </td>
 <td style="text-align:right;">
--0.46
+0.28
 </td>
 <td style="text-align:right;">
-0.64
+0.78
 </td>
 </tr>
 <tr>
@@ -3987,22 +1228,22 @@ SL1:latinx1
 latinx1:SL2
 </td>
 <td style="text-align:right;">
--0.01
+-0.02
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
--1.49
+-2.16
 </td>
 <td style="text-align:right;">
-0.14
+0.03
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="poverty-6" class="section level3">
+<div id="poverty" class="section level3">
 <h3>Poverty</h3>
 <p><img src="curve_means_files/figure-html/curve-98-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4031,13 +1272,13 @@ pvalue
 poverty1501
 </td>
 <td style="text-align:right;">
-0.08
+0.14
 </td>
 <td style="text-align:right;">
-0.03
+0.05
 </td>
 <td style="text-align:right;">
-2.68
+2.70
 </td>
 <td style="text-align:right;">
 0.01
@@ -4048,16 +1289,16 @@ poverty1501
 SL1:poverty1501
 </td>
 <td style="text-align:right;">
-0.01
+0.12
 </td>
 <td style="text-align:right;">
-0.01
+0.08
 </td>
 <td style="text-align:right;">
-0.66
+1.49
 </td>
 <td style="text-align:right;">
-0.51
+0.14
 </td>
 </tr>
 <tr>
@@ -4071,16 +1312,16 @@ poverty1501:SL2
 0.01
 </td>
 <td style="text-align:right;">
-1.31
+1.15
 </td>
 <td style="text-align:right;">
-0.19
+0.25
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="single-parents-6" class="section level3">
+<div id="single-parents" class="section level3">
 <h3>Single Parents</h3>
 <p><img src="curve_means_files/figure-html/curve-100-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4112,13 +1353,13 @@ single1
 0.01
 </td>
 <td style="text-align:right;">
-0.03
+0.05
 </td>
 <td style="text-align:right;">
-0.33
+0.11
 </td>
 <td style="text-align:right;">
-0.74
+0.91
 </td>
 </tr>
 <tr>
@@ -4126,16 +1367,16 @@ single1
 SL1:single1
 </td>
 <td style="text-align:right;">
-0.01
+0.16
 </td>
 <td style="text-align:right;">
-0.01
+0.08
 </td>
 <td style="text-align:right;">
-0.90
+1.87
 </td>
 <td style="text-align:right;">
-0.37
+0.06
 </td>
 </tr>
 <tr>
@@ -4149,16 +1390,16 @@ single1:SL2
 0.01
 </td>
 <td style="text-align:right;">
-1.04
+1.01
 </td>
 <td style="text-align:right;">
-0.30
+0.31
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-with-disabilites-6" class="section level3">
+<div id="children-with-disabilites" class="section level3">
 <h3>Children with disabilites</h3>
 <p><img src="curve_means_files/figure-html/curve-102-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4187,13 +1428,13 @@ pvalue
 disability1
 </td>
 <td style="text-align:right;">
--0.26
+0.38
 </td>
 <td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
--5.08
+7.63
 </td>
 <td style="text-align:right;">
 0.00
@@ -4204,16 +1445,16 @@ disability1
 SL1:disability1
 </td>
 <td style="text-align:right;">
-0.04
+-0.03
 </td>
 <td style="text-align:right;">
-0.01
+0.08
 </td>
 <td style="text-align:right;">
-2.50
+-0.38
 </td>
 <td style="text-align:right;">
-0.01
+0.71
 </td>
 </tr>
 <tr>
@@ -4221,22 +1462,22 @@ SL1:disability1
 disability1:SL2
 </td>
 <td style="text-align:right;">
-0.00
+-0.02
 </td>
 <td style="text-align:right;">
-0.02
+0.01
 </td>
 <td style="text-align:right;">
--0.22
+-1.99
 </td>
 <td style="text-align:right;">
-0.82
+0.05
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-6" class="section level3">
+<div id="children" class="section level3">
 <h3>3+ Children</h3>
 <p><img src="curve_means_files/figure-html/curve-104-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4265,16 +1506,16 @@ pvalue
 child31
 </td>
 <td style="text-align:right;">
-0.03
+-0.01
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
-1.47
+-0.21
 </td>
 <td style="text-align:right;">
-0.14
+0.84
 </td>
 </tr>
 <tr>
@@ -4282,16 +1523,16 @@ child31
 SL1:child31
 </td>
 <td style="text-align:right;">
-0.01
+-0.05
 </td>
 <td style="text-align:right;">
-0.01
+0.07
 </td>
 <td style="text-align:right;">
-1.11
+-0.79
 </td>
 <td style="text-align:right;">
-0.27
+0.43
 </td>
 </tr>
 <tr>
@@ -4299,25 +1540,25 @@ SL1:child31
 child31:SL2
 </td>
 <td style="text-align:right;">
-0.01
+0.02
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.95
+2.33
 </td>
 <td style="text-align:right;">
-0.34
+0.02
 </td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="depression-1" class="section level2 tabset">
+<div id="depression" class="section level2 tabset">
 <h2>Depression</h2>
-<div id="overall-7" class="section level3">
+<div id="overall-1" class="section level3">
 <h3>Overall</h3>
 <p><img src="curve_means_files/figure-html/curve-106-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4346,13 +1587,13 @@ pvalue
 (Intercept)
 </td>
 <td style="text-align:right;">
-0.93
+0.98
 </td>
 <td style="text-align:right;">
 0.02
 </td>
 <td style="text-align:right;">
-56.63
+60.71
 </td>
 <td style="text-align:right;">
 0.00
@@ -4363,16 +1604,16 @@ pvalue
 SL1
 </td>
 <td style="text-align:right;">
--0.01
+0.01
 </td>
 <td style="text-align:right;">
-0.00
+0.03
 </td>
 <td style="text-align:right;">
--1.78
+0.31
 </td>
 <td style="text-align:right;">
-0.07
+0.75
 </td>
 </tr>
 <tr>
@@ -4380,13 +1621,13 @@ SL1
 SL2
 </td>
 <td style="text-align:right;">
--0.02
+-0.01
 </td>
 <td style="text-align:right;">
 0.00
 </td>
 <td style="text-align:right;">
--3.53
+-5.23
 </td>
 <td style="text-align:right;">
 0.00
@@ -4395,7 +1636,7 @@ SL2
 </tbody>
 </table>
 </div>
-<div id="blackafrican-american-7" class="section level3">
+<div id="blackafrican-american-1" class="section level3">
 <h3>Black/African American</h3>
 <p><img src="curve_means_files/figure-html/curve-108-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4424,16 +1665,16 @@ pvalue
 black1
 </td>
 <td style="text-align:right;">
--0.07
+-0.01
 </td>
 <td style="text-align:right;">
-0.03
+0.05
 </td>
 <td style="text-align:right;">
--2.56
+-0.16
 </td>
 <td style="text-align:right;">
-0.01
+0.87
 </td>
 </tr>
 <tr>
@@ -4441,16 +1682,16 @@ black1
 SL1:black1
 </td>
 <td style="text-align:right;">
--0.02
+-0.04
 </td>
 <td style="text-align:right;">
-0.01
+0.08
 </td>
 <td style="text-align:right;">
--2.85
+-0.47
 </td>
 <td style="text-align:right;">
-0.00
+0.64
 </td>
 </tr>
 <tr>
@@ -4458,22 +1699,22 @@ SL1:black1
 black1:SL2
 </td>
 <td style="text-align:right;">
-0.01
+-0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-1.43
+-1.25
 </td>
 <td style="text-align:right;">
-0.15
+0.21
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="latinx-7" class="section level3">
+<div id="latinx-1" class="section level3">
 <h3>LatinX</h3>
 <p><img src="curve_means_files/figure-html/curve-110-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4502,16 +1743,16 @@ pvalue
 latinx1
 </td>
 <td style="text-align:right;">
-0.03
+0.1
+</td>
+<td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
+2.41
 </td>
 <td style="text-align:right;">
 0.02
-</td>
-<td style="text-align:right;">
-1.55
-</td>
-<td style="text-align:right;">
-0.12
 </td>
 </tr>
 <tr>
@@ -4519,16 +1760,16 @@ latinx1
 SL1:latinx1
 </td>
 <td style="text-align:right;">
--0.01
+0.0
 </td>
 <td style="text-align:right;">
-0.01
+0.07
 </td>
 <td style="text-align:right;">
--0.89
+-0.06
 </td>
 <td style="text-align:right;">
-0.38
+0.95
 </td>
 </tr>
 <tr>
@@ -4536,22 +1777,22 @@ SL1:latinx1
 latinx1:SL2
 </td>
 <td style="text-align:right;">
-0.00
+0.0
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.32
+-0.53
 </td>
 <td style="text-align:right;">
-0.75
+0.60
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="poverty-7" class="section level3">
+<div id="poverty-1" class="section level3">
 <h3>Poverty</h3>
 <p><img src="curve_means_files/figure-html/curve-112-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4580,13 +1821,13 @@ pvalue
 poverty1501
 </td>
 <td style="text-align:right;">
-0.15
+0.32
 </td>
 <td style="text-align:right;">
-0.03
+0.05
 </td>
 <td style="text-align:right;">
-5.87
+6.76
 </td>
 <td style="text-align:right;">
 0.00
@@ -4597,16 +1838,16 @@ poverty1501
 SL1:poverty1501
 </td>
 <td style="text-align:right;">
-0.00
+0.13
 </td>
 <td style="text-align:right;">
-0.01
+0.07
 </td>
 <td style="text-align:right;">
-0.04
+1.83
 </td>
 <td style="text-align:right;">
-0.97
+0.07
 </td>
 </tr>
 <tr>
@@ -4620,16 +1861,16 @@ poverty1501:SL2
 0.01
 </td>
 <td style="text-align:right;">
-1.70
+0.94
 </td>
 <td style="text-align:right;">
-0.09
+0.35
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="single-parents-7" class="section level3">
+<div id="single-parents-1" class="section level3">
 <h3>Single Parents</h3>
 <p><img src="curve_means_files/figure-html/curve-114-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4658,16 +1899,16 @@ pvalue
 single1
 </td>
 <td style="text-align:right;">
+0.04
+</td>
+<td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
-0.03
+0.90
 </td>
 <td style="text-align:right;">
-1.75
-</td>
-<td style="text-align:right;">
-0.08
+0.37
 </td>
 </tr>
 <tr>
@@ -4675,16 +1916,16 @@ single1
 SL1:single1
 </td>
 <td style="text-align:right;">
-0.01
+0.10
 </td>
 <td style="text-align:right;">
-0.01
+0.07
 </td>
 <td style="text-align:right;">
-1.37
+1.40
 </td>
 <td style="text-align:right;">
-0.17
+0.16
 </td>
 </tr>
 <tr>
@@ -4692,22 +1933,22 @@ SL1:single1
 single1:SL2
 </td>
 <td style="text-align:right;">
-0.00
+0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.61
+1.45
 </td>
 <td style="text-align:right;">
-0.54
+0.15
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-with-disabilites-7" class="section level3">
+<div id="children-with-disabilites-1" class="section level3">
 <h3>Children with disabilites</h3>
 <p><img src="curve_means_files/figure-html/curve-116-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4736,13 +1977,13 @@ pvalue
 disability1
 </td>
 <td style="text-align:right;">
--0.36
+0.50
 </td>
 <td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
--7.73
+11.06
 </td>
 <td style="text-align:right;">
 0.00
@@ -4753,16 +1994,16 @@ disability1
 SL1:disability1
 </td>
 <td style="text-align:right;">
-0.05
+-0.11
 </td>
 <td style="text-align:right;">
-0.01
+0.07
 </td>
 <td style="text-align:right;">
-3.63
+-1.50
 </td>
 <td style="text-align:right;">
-0.00
+0.13
 </td>
 </tr>
 <tr>
@@ -4770,22 +2011,22 @@ SL1:disability1
 disability1:SL2
 </td>
 <td style="text-align:right;">
-0.00
+-0.02
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.19
+-2.94
 </td>
 <td style="text-align:right;">
-0.85
+0.00
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-7" class="section level3">
+<div id="children-1" class="section level3">
 <h3>3+ Children</h3>
 <p><img src="curve_means_files/figure-html/curve-118-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4817,13 +2058,13 @@ child31
 0.02
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
-0.96
+0.52
 </td>
 <td style="text-align:right;">
-0.34
+0.60
 </td>
 </tr>
 <tr>
@@ -4831,16 +2072,16 @@ child31
 SL1:child31
 </td>
 <td style="text-align:right;">
-0.00
+-0.03
 </td>
 <td style="text-align:right;">
-0.01
+0.06
 </td>
 <td style="text-align:right;">
--0.18
+-0.54
 </td>
 <td style="text-align:right;">
-0.86
+0.59
 </td>
 </tr>
 <tr>
@@ -4854,7 +2095,7 @@ child31:SL2
 0.01
 </td>
 <td style="text-align:right;">
-2.07
+2.05
 </td>
 <td style="text-align:right;">
 0.04
@@ -4864,9 +2105,9 @@ child31:SL2
 </table>
 </div>
 </div>
-<div id="stress-1" class="section level2 tabset">
+<div id="stress" class="section level2 tabset">
 <h2>Stress</h2>
-<div id="overall-8" class="section level3">
+<div id="overall-2" class="section level3">
 <h3>Overall</h3>
 <p><img src="curve_means_files/figure-html/curve-120-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4895,13 +2136,13 @@ pvalue
 (Intercept)
 </td>
 <td style="text-align:right;">
-2.10
+2.24
 </td>
 <td style="text-align:right;">
-0.03
+0.02
 </td>
 <td style="text-align:right;">
-81.95
+89.95
 </td>
 <td style="text-align:right;">
 0
@@ -4912,13 +2153,13 @@ pvalue
 SL1
 </td>
 <td style="text-align:right;">
--0.04
+-0.13
 </td>
 <td style="text-align:right;">
-0.01
+0.04
 </td>
 <td style="text-align:right;">
--5.99
+-3.06
 </td>
 <td style="text-align:right;">
 0
@@ -4929,13 +2170,13 @@ SL1
 SL2
 </td>
 <td style="text-align:right;">
--0.02
+-0.03
 </td>
 <td style="text-align:right;">
-0.01
+0.00
 </td>
 <td style="text-align:right;">
--3.02
+-7.37
 </td>
 <td style="text-align:right;">
 0
@@ -4944,7 +2185,7 @@ SL2
 </tbody>
 </table>
 </div>
-<div id="blackafrican-american-8" class="section level3">
+<div id="blackafrican-american-2" class="section level3">
 <h3>Black/African American</h3>
 <p><img src="curve_means_files/figure-html/curve-122-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -4973,16 +2214,16 @@ pvalue
 black1
 </td>
 <td style="text-align:right;">
--0.16
+-0.10
 </td>
 <td style="text-align:right;">
-0.04
+0.08
 </td>
 <td style="text-align:right;">
--3.75
+-1.29
 </td>
 <td style="text-align:right;">
-0.00
+0.20
 </td>
 </tr>
 <tr>
@@ -4990,16 +2231,16 @@ black1
 SL1:black1
 </td>
 <td style="text-align:right;">
--0.03
+0.12
 </td>
 <td style="text-align:right;">
-0.01
+0.13
 </td>
 <td style="text-align:right;">
--2.39
+0.93
 </td>
 <td style="text-align:right;">
-0.02
+0.35
 </td>
 </tr>
 <tr>
@@ -5007,22 +2248,22 @@ SL1:black1
 black1:SL2
 </td>
 <td style="text-align:right;">
-0.03
+-0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-2.22
+-0.71
 </td>
 <td style="text-align:right;">
-0.03
+0.48
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="latinx-8" class="section level3">
+<div id="latinx-2" class="section level3">
 <h3>LatinX</h3>
 <p><img src="curve_means_files/figure-html/curve-124-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5051,21 +2292,38 @@ pvalue
 latinx1
 </td>
 <td style="text-align:right;">
-0.02
+0.09
 </td>
 <td style="text-align:right;">
-0.03
+0.07
 </td>
 <td style="text-align:right;">
-0.60
+1.31
 </td>
 <td style="text-align:right;">
-0.55
+0.19
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 SL1:latinx1
+</td>
+<td style="text-align:right;">
+-0.06
+</td>
+<td style="text-align:right;">
+0.11
+</td>
+<td style="text-align:right;">
+-0.51
+</td>
+<td style="text-align:right;">
+0.61
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+latinx1:SL2
 </td>
 <td style="text-align:right;">
 -0.01
@@ -5074,33 +2332,16 @@ SL1:latinx1
 0.01
 </td>
 <td style="text-align:right;">
--0.77
+-0.75
 </td>
 <td style="text-align:right;">
-0.44
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-latinx1:SL2
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
--0.16
-</td>
-<td style="text-align:right;">
-0.88
+0.45
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="poverty-8" class="section level3">
+<div id="poverty-2" class="section level3">
 <h3>Poverty</h3>
 <p><img src="curve_means_files/figure-html/curve-126-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5129,13 +2370,13 @@ pvalue
 poverty1501
 </td>
 <td style="text-align:right;">
-0.16
+0.36
 </td>
 <td style="text-align:right;">
-0.04
+0.07
 </td>
 <td style="text-align:right;">
-3.97
+4.96
 </td>
 <td style="text-align:right;">
 0.00
@@ -5146,16 +2387,16 @@ poverty1501
 SL1:poverty1501
 </td>
 <td style="text-align:right;">
-0.01
+0.33
+</td>
+<td style="text-align:right;">
+0.12
+</td>
+<td style="text-align:right;">
+2.75
 </td>
 <td style="text-align:right;">
 0.01
-</td>
-<td style="text-align:right;">
-0.52
-</td>
-<td style="text-align:right;">
-0.60
 </td>
 </tr>
 <tr>
@@ -5163,22 +2404,22 @@ SL1:poverty1501
 poverty1501:SL2
 </td>
 <td style="text-align:right;">
-0.01
+0.00
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.55
+-0.24
 </td>
 <td style="text-align:right;">
-0.58
+0.81
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="single-parents-8" class="section level3">
+<div id="single-parents-2" class="section level3">
 <h3>Single Parents</h3>
 <p><img src="curve_means_files/figure-html/curve-128-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5207,21 +2448,38 @@ pvalue
 single1
 </td>
 <td style="text-align:right;">
-0.04
+0.11
 </td>
 <td style="text-align:right;">
-0.04
+0.07
 </td>
 <td style="text-align:right;">
-1.0
+1.49
 </td>
 <td style="text-align:right;">
-0.32
+0.14
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 SL1:single1
+</td>
+<td style="text-align:right;">
+0.19
+</td>
+<td style="text-align:right;">
+0.12
+</td>
+<td style="text-align:right;">
+1.55
+</td>
+<td style="text-align:right;">
+0.12
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+single1:SL2
 </td>
 <td style="text-align:right;">
 0.00
@@ -5230,33 +2488,16 @@ SL1:single1
 0.01
 </td>
 <td style="text-align:right;">
-0.2
-</td>
-<td style="text-align:right;">
-0.84
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-single1:SL2
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.9
-</td>
-<td style="text-align:right;">
 0.37
+</td>
+<td style="text-align:right;">
+0.71
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-with-disabilites-8" class="section level3">
+<div id="children-with-disabilites-2" class="section level3">
 <h3>Children with disabilites</h3>
 <p><img src="curve_means_files/figure-html/curve-130-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5285,13 +2526,13 @@ pvalue
 disability1
 </td>
 <td style="text-align:right;">
--0.30
+0.34
 </td>
 <td style="text-align:right;">
 0.07
 </td>
 <td style="text-align:right;">
--4.02
+4.83
 </td>
 <td style="text-align:right;">
 0.00
@@ -5302,16 +2543,16 @@ disability1
 SL1:disability1
 </td>
 <td style="text-align:right;">
-0.01
+0.08
 </td>
 <td style="text-align:right;">
-0.02
+0.12
 </td>
 <td style="text-align:right;">
-0.47
+0.71
 </td>
 <td style="text-align:right;">
-0.64
+0.48
 </td>
 </tr>
 <tr>
@@ -5319,22 +2560,22 @@ SL1:disability1
 disability1:SL2
 </td>
 <td style="text-align:right;">
--0.01
+0.00
 </td>
 <td style="text-align:right;">
-0.02
+0.01
 </td>
 <td style="text-align:right;">
--0.58
+-0.22
 </td>
 <td style="text-align:right;">
-0.56
+0.83
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-8" class="section level3">
+<div id="children-2" class="section level3">
 <h3>3+ Children</h3>
 <p><img src="curve_means_files/figure-html/curve-132-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5363,16 +2604,16 @@ pvalue
 child31
 </td>
 <td style="text-align:right;">
-0.10
+0.11
 </td>
 <td style="text-align:right;">
-0.03
+0.06
 </td>
 <td style="text-align:right;">
-3.08
+1.81
 </td>
 <td style="text-align:right;">
-0.00
+0.07
 </td>
 </tr>
 <tr>
@@ -5380,16 +2621,16 @@ child31
 SL1:child31
 </td>
 <td style="text-align:right;">
-0.01
+-0.10
 </td>
 <td style="text-align:right;">
-0.01
+0.10
 </td>
 <td style="text-align:right;">
-0.59
+-1.00
 </td>
 <td style="text-align:right;">
-0.56
+0.32
 </td>
 </tr>
 <tr>
@@ -5397,25 +2638,25 @@ SL1:child31
 child31:SL2
 </td>
 <td style="text-align:right;">
-0.01
+0.02
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-1.11
+2.11
 </td>
 <td style="text-align:right;">
-0.27
+0.03
 </td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="loneliness-1" class="section level2 tabset">
+<div id="loneliness" class="section level2 tabset">
 <h2>Loneliness</h2>
-<div id="overall-9" class="section level3">
+<div id="overall-3" class="section level3">
 <h3>Overall</h3>
 <p><img src="curve_means_files/figure-html/curve-134-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5444,16 +2685,16 @@ pvalue
 (Intercept)
 </td>
 <td style="text-align:right;">
-1.79
+1.86
 </td>
 <td style="text-align:right;">
 0.02
 </td>
 <td style="text-align:right;">
-83.40
+88.65
 </td>
 <td style="text-align:right;">
-0
+0.00
 </td>
 </tr>
 <tr>
@@ -5461,16 +2702,16 @@ pvalue
 SL1
 </td>
 <td style="text-align:right;">
--0.02
+-0.03
 </td>
 <td style="text-align:right;">
-0.01
+0.03
 </td>
 <td style="text-align:right;">
--3.00
+-1.01
 </td>
 <td style="text-align:right;">
-0
+0.31
 </td>
 </tr>
 <tr>
@@ -5481,19 +2722,19 @@ SL2
 -0.02
 </td>
 <td style="text-align:right;">
-0.01
+0.00
 </td>
 <td style="text-align:right;">
--3.49
+-5.77
 </td>
 <td style="text-align:right;">
-0
+0.00
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="blackafrican-american-9" class="section level3">
+<div id="blackafrican-american-3" class="section level3">
 <h3>Black/African American</h3>
 <p><img src="curve_means_files/figure-html/curve-136-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5525,13 +2766,13 @@ black1
 -0.11
 </td>
 <td style="text-align:right;">
-0.04
+0.07
 </td>
 <td style="text-align:right;">
--2.98
+-1.71
 </td>
 <td style="text-align:right;">
-0.00
+0.09
 </td>
 </tr>
 <tr>
@@ -5539,16 +2780,16 @@ black1
 SL1:black1
 </td>
 <td style="text-align:right;">
--0.01
+-0.02
 </td>
 <td style="text-align:right;">
-0.01
+0.10
 </td>
 <td style="text-align:right;">
--1.52
+-0.22
 </td>
 <td style="text-align:right;">
-0.13
+0.83
 </td>
 </tr>
 <tr>
@@ -5556,22 +2797,22 @@ SL1:black1
 black1:SL2
 </td>
 <td style="text-align:right;">
-0.00
+-0.02
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
--0.12
+-1.53
 </td>
 <td style="text-align:right;">
-0.90
+0.13
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="latinx-9" class="section level3">
+<div id="latinx-3" class="section level3">
 <h3>LatinX</h3>
 <p><img src="curve_means_files/figure-html/curve-138-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5600,16 +2841,16 @@ pvalue
 latinx1
 </td>
 <td style="text-align:right;">
-0.03
+0.08
 </td>
 <td style="text-align:right;">
-0.03
+0.05
 </td>
 <td style="text-align:right;">
-1.14
+1.53
 </td>
 <td style="text-align:right;">
-0.25
+0.13
 </td>
 </tr>
 <tr>
@@ -5617,16 +2858,16 @@ latinx1
 SL1:latinx1
 </td>
 <td style="text-align:right;">
-0.00
+0.17
 </td>
 <td style="text-align:right;">
-0.01
+0.09
 </td>
 <td style="text-align:right;">
-0.62
+1.99
 </td>
 <td style="text-align:right;">
-0.53
+0.05
 </td>
 </tr>
 <tr>
@@ -5640,16 +2881,16 @@ latinx1:SL2
 0.01
 </td>
 <td style="text-align:right;">
--0.84
+-1.08
 </td>
 <td style="text-align:right;">
-0.40
+0.28
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="poverty-9" class="section level3">
+<div id="poverty-3" class="section level3">
 <h3>Poverty</h3>
 <p><img src="curve_means_files/figure-html/curve-140-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5678,13 +2919,13 @@ pvalue
 poverty1501
 </td>
 <td style="text-align:right;">
-0.15
+0.40
 </td>
 <td style="text-align:right;">
-0.03
+0.06
 </td>
 <td style="text-align:right;">
-4.54
+6.46
 </td>
 <td style="text-align:right;">
 0.00
@@ -5695,16 +2936,16 @@ poverty1501
 SL1:poverty1501
 </td>
 <td style="text-align:right;">
-0.00
+0.23
+</td>
+<td style="text-align:right;">
+0.09
+</td>
+<td style="text-align:right;">
+2.49
 </td>
 <td style="text-align:right;">
 0.01
-</td>
-<td style="text-align:right;">
--0.57
-</td>
-<td style="text-align:right;">
-0.57
 </td>
 </tr>
 <tr>
@@ -5712,22 +2953,22 @@ SL1:poverty1501
 poverty1501:SL2
 </td>
 <td style="text-align:right;">
-0.00
+-0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.34
+-1.34
 </td>
 <td style="text-align:right;">
-0.73
+0.18
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="single-parents-9" class="section level3">
+<div id="single-parents-3" class="section level3">
 <h3>Single Parents</h3>
 <p><img src="curve_means_files/figure-html/curve-142-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5756,13 +2997,13 @@ pvalue
 single1
 </td>
 <td style="text-align:right;">
-0.16
+0.28
 </td>
 <td style="text-align:right;">
-0.03
+0.06
 </td>
 <td style="text-align:right;">
-4.73
+4.64
 </td>
 <td style="text-align:right;">
 0.00
@@ -5773,16 +3014,16 @@ single1
 SL1:single1
 </td>
 <td style="text-align:right;">
-0.01
+0.12
 </td>
 <td style="text-align:right;">
-0.01
+0.10
 </td>
 <td style="text-align:right;">
-1.03
+1.23
 </td>
 <td style="text-align:right;">
-0.30
+0.22
 </td>
 </tr>
 <tr>
@@ -5790,22 +3031,22 @@ SL1:single1
 single1:SL2
 </td>
 <td style="text-align:right;">
-0.00
+0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.03
+0.58
 </td>
 <td style="text-align:right;">
-0.97
+0.56
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-with-disabilites-9" class="section level3">
+<div id="children-with-disabilites-3" class="section level3">
 <h3>Children with disabilites</h3>
 <p><img src="curve_means_files/figure-html/curve-144-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5834,13 +3075,13 @@ pvalue
 disability1
 </td>
 <td style="text-align:right;">
--0.27
+0.53
 </td>
 <td style="text-align:right;">
 0.06
 </td>
 <td style="text-align:right;">
--4.35
+8.94
 </td>
 <td style="text-align:right;">
 0.00
@@ -5851,16 +3092,16 @@ disability1
 SL1:disability1
 </td>
 <td style="text-align:right;">
-0.08
+-0.03
 </td>
 <td style="text-align:right;">
-0.02
+0.09
 </td>
 <td style="text-align:right;">
-4.72
+-0.32
 </td>
 <td style="text-align:right;">
-0.00
+0.75
 </td>
 </tr>
 <tr>
@@ -5868,22 +3109,22 @@ SL1:disability1
 disability1:SL2
 </td>
 <td style="text-align:right;">
+-0.04
+</td>
+<td style="text-align:right;">
+0.01
+</td>
+<td style="text-align:right;">
+-4.09
+</td>
+<td style="text-align:right;">
 0.00
-</td>
-<td style="text-align:right;">
-0.02
-</td>
-<td style="text-align:right;">
--0.23
-</td>
-<td style="text-align:right;">
-0.82
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-9" class="section level3">
+<div id="children-3" class="section level3">
 <h3>3+ Children</h3>
 <p><img src="curve_means_files/figure-html/curve-146-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5912,16 +3153,16 @@ pvalue
 child31
 </td>
 <td style="text-align:right;">
+0.07
+</td>
+<td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
-0.03
+1.35
 </td>
 <td style="text-align:right;">
-1.78
-</td>
-<td style="text-align:right;">
-0.07
+0.18
 </td>
 </tr>
 <tr>
@@ -5929,16 +3170,16 @@ child31
 SL1:child31
 </td>
 <td style="text-align:right;">
-0.01
+0.02
 </td>
 <td style="text-align:right;">
-0.01
+0.08
 </td>
 <td style="text-align:right;">
-0.94
+0.29
 </td>
 <td style="text-align:right;">
-0.35
+0.77
 </td>
 </tr>
 <tr>
@@ -5952,19 +3193,19 @@ child31:SL2
 0.01
 </td>
 <td style="text-align:right;">
--1.75
+-0.85
 </td>
 <td style="text-align:right;">
-0.08
+0.39
 </td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="child-externalizing-1" class="section level2 tabset">
+<div id="child-externalizing" class="section level2 tabset">
 <h2>Child Externalizing</h2>
-<div id="overall-10" class="section level3">
+<div id="overall-4" class="section level3">
 <h3>Overall</h3>
 <p><img src="curve_means_files/figure-html/curve-148-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -5993,13 +3234,13 @@ pvalue
 (Intercept)
 </td>
 <td style="text-align:right;">
-1.01
+1.05
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-73.88
+79.28
 </td>
 <td style="text-align:right;">
 0.00
@@ -6010,16 +3251,16 @@ pvalue
 SL1
 </td>
 <td style="text-align:right;">
--0.01
+-0.05
 </td>
 <td style="text-align:right;">
-0.00
+0.02
 </td>
 <td style="text-align:right;">
--3.50
+-2.17
 </td>
 <td style="text-align:right;">
-0.00
+0.03
 </td>
 </tr>
 <tr>
@@ -6033,16 +3274,16 @@ SL2
 0.00
 </td>
 <td style="text-align:right;">
--2.25
+-4.63
 </td>
 <td style="text-align:right;">
-0.02
+0.00
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="blackafrican-american-10" class="section level3">
+<div id="blackafrican-american-4" class="section level3">
 <h3>Black/African American</h3>
 <p><img src="curve_means_files/figure-html/curve-150-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6071,13 +3312,13 @@ pvalue
 black1
 </td>
 <td style="text-align:right;">
--0.10
+-0.12
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
--4.28
+-2.96
 </td>
 <td style="text-align:right;">
 0.00
@@ -6088,16 +3329,16 @@ black1
 SL1:black1
 </td>
 <td style="text-align:right;">
--0.01
-</td>
-<td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
--1.96
+0.07
 </td>
 <td style="text-align:right;">
-0.05
+0.12
+</td>
+<td style="text-align:right;">
+0.91
 </td>
 </tr>
 <tr>
@@ -6105,22 +3346,22 @@ SL1:black1
 black1:SL2
 </td>
 <td style="text-align:right;">
-0.02
+0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-3.00
+0.94
 </td>
 <td style="text-align:right;">
-0.00
+0.35
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="latinx-10" class="section level3">
+<div id="latinx-4" class="section level3">
 <h3>LatinX</h3>
 <p><img src="curve_means_files/figure-html/curve-152-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6149,16 +3390,16 @@ pvalue
 latinx1
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
-0.95
+1.03
 </td>
 <td style="text-align:right;">
-0.34
+0.30
 </td>
 </tr>
 <tr>
@@ -6166,16 +3407,16 @@ latinx1
 SL1:latinx1
 </td>
 <td style="text-align:right;">
-0.00
+-0.04
 </td>
 <td style="text-align:right;">
-0.01
+0.06
 </td>
 <td style="text-align:right;">
--0.32
+-0.73
 </td>
 <td style="text-align:right;">
-0.75
+0.47
 </td>
 </tr>
 <tr>
@@ -6189,16 +3430,16 @@ latinx1:SL2
 0.01
 </td>
 <td style="text-align:right;">
-0.02
+0.00
 </td>
 <td style="text-align:right;">
-0.99
+1.00
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="poverty-10" class="section level3">
+<div id="poverty-4" class="section level3">
 <h3>Poverty</h3>
 <p><img src="curve_means_files/figure-html/curve-154-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6227,16 +3468,16 @@ pvalue
 poverty1501
 </td>
 <td style="text-align:right;">
+0.10
+</td>
+<td style="text-align:right;">
 0.04
 </td>
 <td style="text-align:right;">
-0.02
+2.48
 </td>
 <td style="text-align:right;">
-1.69
-</td>
-<td style="text-align:right;">
-0.09
+0.01
 </td>
 </tr>
 <tr>
@@ -6244,16 +3485,16 @@ poverty1501
 SL1:poverty1501
 </td>
 <td style="text-align:right;">
-0.00
+0.10
 </td>
 <td style="text-align:right;">
-0.01
+0.07
 </td>
 <td style="text-align:right;">
--0.45
+1.46
 </td>
 <td style="text-align:right;">
-0.65
+0.15
 </td>
 </tr>
 <tr>
@@ -6261,22 +3502,22 @@ SL1:poverty1501
 poverty1501:SL2
 </td>
 <td style="text-align:right;">
-0.02
+0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-2.43
+1.33
 </td>
 <td style="text-align:right;">
-0.01
+0.18
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="single-parents-10" class="section level3">
+<div id="single-parents-4" class="section level3">
 <h3>Single Parents</h3>
 <p><img src="curve_means_files/figure-html/curve-156-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6305,16 +3546,16 @@ pvalue
 single1
 </td>
 <td style="text-align:right;">
-0.01
+-0.03
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
-0.36
+-0.72
 </td>
 <td style="text-align:right;">
-0.72
+0.47
 </td>
 </tr>
 <tr>
@@ -6322,16 +3563,16 @@ single1
 SL1:single1
 </td>
 <td style="text-align:right;">
-0.00
+-0.02
 </td>
 <td style="text-align:right;">
-0.01
+0.07
 </td>
 <td style="text-align:right;">
-0.46
+-0.23
 </td>
 <td style="text-align:right;">
-0.65
+0.82
 </td>
 </tr>
 <tr>
@@ -6345,16 +3586,16 @@ single1:SL2
 0.01
 </td>
 <td style="text-align:right;">
-2.33
+2.89
 </td>
 <td style="text-align:right;">
-0.02
+0.00
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-with-disabilites-10" class="section level3">
+<div id="children-with-disabilites-4" class="section level3">
 <h3>Children with disabilites</h3>
 <p><img src="curve_means_files/figure-html/curve-158-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6383,13 +3624,13 @@ pvalue
 disability1
 </td>
 <td style="text-align:right;">
--0.23
+0.27
 </td>
 <td style="text-align:right;">
 0.04
 </td>
 <td style="text-align:right;">
--5.87
+7.08
 </td>
 <td style="text-align:right;">
 0.00
@@ -6400,16 +3641,16 @@ disability1
 SL1:disability1
 </td>
 <td style="text-align:right;">
--0.01
+0.20
 </td>
 <td style="text-align:right;">
-0.01
+0.06
 </td>
 <td style="text-align:right;">
--0.50
+3.10
 </td>
 <td style="text-align:right;">
-0.62
+0.00
 </td>
 </tr>
 <tr>
@@ -6417,22 +3658,22 @@ SL1:disability1
 disability1:SL2
 </td>
 <td style="text-align:right;">
-0.01
+-0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.50
+-1.42
 </td>
 <td style="text-align:right;">
-0.62
+0.16
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-10" class="section level3">
+<div id="children-4" class="section level3">
 <h3>3+ Children</h3>
 <p><img src="curve_means_files/figure-html/curve-160-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6464,13 +3705,13 @@ child31
 0.05
 </td>
 <td style="text-align:right;">
-0.02
+0.03
 </td>
 <td style="text-align:right;">
-2.66
+1.53
 </td>
 <td style="text-align:right;">
-0.01
+0.13
 </td>
 </tr>
 <tr>
@@ -6478,16 +3719,16 @@ child31
 SL1:child31
 </td>
 <td style="text-align:right;">
-0.01
+0.03
 </td>
 <td style="text-align:right;">
-0.00
+0.05
 </td>
 <td style="text-align:right;">
-1.31
+0.61
 </td>
 <td style="text-align:right;">
-0.19
+0.54
 </td>
 </tr>
 <tr>
@@ -6495,25 +3736,25 @@ SL1:child31
 child31:SL2
 </td>
 <td style="text-align:right;">
-0.00
+0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.21
+1.23
 </td>
 <td style="text-align:right;">
-0.84
+0.22
 </td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<div id="child-internalizing-1" class="section level2 tabset">
+<div id="child-internalizing" class="section level2 tabset">
 <h2>Child Internalizing</h2>
-<div id="overall-11" class="section level3">
+<div id="overall-5" class="section level3">
 <h3>Overall</h3>
 <p><img src="curve_means_files/figure-html/curve-162-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6542,13 +3783,13 @@ pvalue
 (Intercept)
 </td>
 <td style="text-align:right;">
-0.57
+0.58
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-43.06
+44.61
 </td>
 <td style="text-align:right;">
 0.00
@@ -6562,13 +3803,13 @@ SL1
 0.00
 </td>
 <td style="text-align:right;">
-0.00
+0.02
 </td>
 <td style="text-align:right;">
-0.06
+-0.17
 </td>
 <td style="text-align:right;">
-0.95
+0.87
 </td>
 </tr>
 <tr>
@@ -6582,16 +3823,16 @@ SL2
 0.00
 </td>
 <td style="text-align:right;">
--2.87
+-2.64
 </td>
 <td style="text-align:right;">
-0.00
+0.01
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="blackafrican-american-11" class="section level3">
+<div id="blackafrican-american-5" class="section level3">
 <h3>Black/African American</h3>
 <p><img src="curve_means_files/figure-html/curve-164-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6620,21 +3861,38 @@ pvalue
 black1
 </td>
 <td style="text-align:right;">
-0.00
+0.05
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
--0.15
+1.18
 </td>
 <td style="text-align:right;">
-0.88
+0.24
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
 SL1:black1
+</td>
+<td style="text-align:right;">
+-0.07
+</td>
+<td style="text-align:right;">
+0.07
+</td>
+<td style="text-align:right;">
+-1.01
+</td>
+<td style="text-align:right;">
+0.31
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+black1:SL2
 </td>
 <td style="text-align:right;">
 -0.01
@@ -6643,33 +3901,16 @@ SL1:black1
 0.01
 </td>
 <td style="text-align:right;">
--1.63
+-1.27
 </td>
 <td style="text-align:right;">
-0.10
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-black1:SL2
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
--0.13
-</td>
-<td style="text-align:right;">
-0.89
+0.21
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="latinx-11" class="section level3">
+<div id="latinx-5" class="section level3">
 <h3>LatinX</h3>
 <p><img src="curve_means_files/figure-html/curve-166-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6698,16 +3939,16 @@ pvalue
 latinx1
 </td>
 <td style="text-align:right;">
-0.04
+0.12
 </td>
 <td style="text-align:right;">
-0.02
+0.03
 </td>
 <td style="text-align:right;">
-2.44
+3.44
 </td>
 <td style="text-align:right;">
-0.01
+0.00
 </td>
 </tr>
 <tr>
@@ -6718,13 +3959,13 @@ SL1:latinx1
 0.00
 </td>
 <td style="text-align:right;">
-0.01
+0.06
 </td>
 <td style="text-align:right;">
--0.68
+0.05
 </td>
 <td style="text-align:right;">
-0.50
+0.96
 </td>
 </tr>
 <tr>
@@ -6738,16 +3979,16 @@ latinx1:SL2
 0.01
 </td>
 <td style="text-align:right;">
--0.94
+-1.60
 </td>
 <td style="text-align:right;">
-0.35
+0.11
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="poverty-11" class="section level3">
+<div id="poverty-5" class="section level3">
 <h3>Poverty</h3>
 <p><img src="curve_means_files/figure-html/curve-168-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6776,16 +4017,16 @@ pvalue
 poverty1501
 </td>
 <td style="text-align:right;">
-0.06
+0.08
 </td>
 <td style="text-align:right;">
-0.02
+0.04
 </td>
 <td style="text-align:right;">
-2.69
+2.04
 </td>
 <td style="text-align:right;">
-0.01
+0.04
 </td>
 </tr>
 <tr>
@@ -6793,16 +4034,16 @@ poverty1501
 SL1:poverty1501
 </td>
 <td style="text-align:right;">
-0.00
+-0.03
 </td>
 <td style="text-align:right;">
-0.01
+0.06
 </td>
 <td style="text-align:right;">
-0.40
+-0.45
 </td>
 <td style="text-align:right;">
-0.69
+0.65
 </td>
 </tr>
 <tr>
@@ -6810,22 +4051,22 @@ SL1:poverty1501
 poverty1501:SL2
 </td>
 <td style="text-align:right;">
-0.00
+0.01
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-0.30
+1.10
 </td>
 <td style="text-align:right;">
-0.76
+0.27
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="single-parents-11" class="section level3">
+<div id="single-parents-5" class="section level3">
 <h3>Single Parents</h3>
 <p><img src="curve_means_files/figure-html/curve-170-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6854,16 +4095,16 @@ pvalue
 single1
 </td>
 <td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
 0.02
 </td>
 <td style="text-align:right;">
-0.54
+0.04
 </td>
 <td style="text-align:right;">
-0.59
+0.64
+</td>
+<td style="text-align:right;">
+0.52
 </td>
 </tr>
 <tr>
@@ -6874,13 +4115,13 @@ SL1:single1
 0.00
 </td>
 <td style="text-align:right;">
-0.01
+0.06
 </td>
 <td style="text-align:right;">
--0.30
+-0.02
 </td>
 <td style="text-align:right;">
-0.76
+0.98
 </td>
 </tr>
 <tr>
@@ -6894,16 +4135,16 @@ single1:SL2
 0.01
 </td>
 <td style="text-align:right;">
-1.20
+0.97
 </td>
 <td style="text-align:right;">
-0.23
+0.33
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-with-disabilites-11" class="section level3">
+<div id="children-with-disabilites-5" class="section level3">
 <h3>Children with disabilites</h3>
 <p><img src="curve_means_files/figure-html/curve-172-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -6932,13 +4173,13 @@ pvalue
 disability1
 </td>
 <td style="text-align:right;">
--0.40
+0.51
 </td>
 <td style="text-align:right;">
 0.04
 </td>
 <td style="text-align:right;">
--10.58
+13.99
 </td>
 <td style="text-align:right;">
 0.00
@@ -6949,16 +4190,16 @@ disability1
 SL1:disability1
 </td>
 <td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-2.29
+0.06
 </td>
 <td style="text-align:right;">
-0.02
+0.23
+</td>
+<td style="text-align:right;">
+0.82
 </td>
 </tr>
 <tr>
@@ -6966,22 +4207,22 @@ SL1:disability1
 disability1:SL2
 </td>
 <td style="text-align:right;">
-0.03
+-0.03
 </td>
 <td style="text-align:right;">
 0.01
 </td>
 <td style="text-align:right;">
-2.21
+-4.38
 </td>
 <td style="text-align:right;">
-0.03
+0.00
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="children-11" class="section level3">
+<div id="children-5" class="section level3">
 <h3>3+ Children</h3>
 <p><img src="curve_means_files/figure-html/curve-174-1.png" width="672" /></p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -7010,16 +4251,16 @@ pvalue
 child31
 </td>
 <td style="text-align:right;">
-0.04
+0.11
 </td>
 <td style="text-align:right;">
-0.02
+0.03
 </td>
 <td style="text-align:right;">
-2.42
+3.51
 </td>
 <td style="text-align:right;">
-0.02
+0.00
 </td>
 </tr>
 <tr>
@@ -7027,16 +4268,16 @@ child31
 SL1:child31
 </td>
 <td style="text-align:right;">
-0.00
+0.04
 </td>
 <td style="text-align:right;">
-0.00
+0.05
 </td>
 <td style="text-align:right;">
--0.47
+0.71
 </td>
 <td style="text-align:right;">
-0.64
+0.48
 </td>
 </tr>
 <tr>
@@ -7050,10 +4291,10 @@ child31:SL2
 0.01
 </td>
 <td style="text-align:right;">
--1.19
+-1.88
 </td>
 <td style="text-align:right;">
-0.23
+0.06
 </td>
 </tr>
 </tbody>
