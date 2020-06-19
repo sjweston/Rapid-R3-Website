@@ -102,10 +102,10 @@ group_model = function(data, outcome, group, poly){
     #geom_line(aes(x = x, y = predicted, color = as.factor(group)), data = pred.data, inherit.aes = F) +
     scale_color_manual(str_to_title(deparse(substitute(group))),
                        values = color.pal, 
-                       labels = c("Group", "Mean"))+
+                       labels = c("Group", "Everyone else"))+
     scale_fill_manual(str_to_title(deparse(substitute(group))),
                        values = color.pal, 
-                       labels = c("Group", "Mean"))+
+                       labels = c("Group", "Everyone else"))+
     scale_x_continuous(breaks = c(1:10))+
     scale_y_continuous(str_to_title(deparse(substitute(outcome))))+
     theme_pubclean()
@@ -232,7 +232,7 @@ splines.groups = function(data, outcome, group, point){
                   inherit.aes = F) +
     scale_color_manual(str_to_title(deparse(substitute(group))),
                                    values = color.pal, 
-                                   labels = c("Group", "Mean")) +            
+                                   labels = c("Group", "Everyone else")) +            
     scale_x_continuous(breaks = c(1:10))+
     scale_y_continuous(str_to_title(deparse(substitute(outcome))))+
     theme_pubclean()

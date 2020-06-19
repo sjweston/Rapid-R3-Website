@@ -75,19 +75,20 @@ groups = scored %>%
   mutate(child2 = ifelse(num_children_raw >= 2, 1, 0),
          child3 = ifelse(num_children_raw >= 3, 1, 0)) %>%
   select(CaregiverID, black, poverty150, single, latinx, disability,
-         child2, child3) %>%
-  # mutate_at(vars(-CaregiverID), 
-  #           .funs = function(x) 1-x) %>%
+         child2, child3,
+         lost_free_lunch) %>%
+  mutate_at(vars(-CaregiverID),
+            .funs = function(x) 1-x) %>%
   mutate_at(vars(-CaregiverID), factor)
 
 emotion_g = full_join(emotion, groups)
 # 
-# contrasts(emotion_g$black) = contr.sum(2)
-# contrasts(emotion_g$poverty150) = contr.sum(2)
-# contrasts(emotion_g$single) = contr.sum(2)
-# contrasts(emotion_g$latinx) = contr.sum(2)
-# contrasts(emotion_g$child2) = contr.sum(2)
-# contrasts(emotion_g$child3) = contr.sum(2)
+# contrasts(emotion_g$black) = contr.sum(6)
+# contrasts(emotion_g$poverty150) = contr.sum(6)
+# contrasts(emotion_g$single) = contr.sum(6)
+# contrasts(emotion_g$latinx) = contr.sum(6)
+# contrasts(emotion_g$child6) = contr.sum(6)
+# contrasts(emotion_g$child3) = contr.sum(6)
 ```
 
 # Representativeness disclaimer
@@ -162,7 +163,7 @@ emotion_g %>%
 
 <!-- anx_fit2 = linear_reg() %>% -->
 <!--   set_engine(engine = "lm") %>% -->
-<!--   fit(anxiety ~ poly(Week, 2), data = emotion.prepped) -->
+<!--   fit(anxiety ~ poly(Week, 6), data = emotion.prepped) -->
 
 <!-- anx_fit3 = linear_reg() %>% -->
 <!--   set_engine(engine = "lm") %>% -->
@@ -186,7 +187,7 @@ emotion_g %>%
 <!--     group_by(emotion) %>% -->
 <!--     nest() %>% -->
 <!--     mutate(train1 = map(data, train_fun, 1), -->
-<!--            train2 = map(data, train_fun, 2), -->
+<!--            train2 = map(data, train_fun, 6), -->
 <!--            train3 = map(data, train_fun, 3), -->
 <!--            train4 = map(data, train_fun, 4)) -->
 
@@ -218,7 +219,7 @@ emotion_g %>%
 <!--   kable_styling(full_width = T) %>% -->
 <!--   group_rows("Anxiety", 1,4) %>% -->
 <!--   group_rows("Depression", 5,8) %>% -->
-<!--   group_rows("Child Internalizing", 9,12) %>% -->
+<!--   group_rows("Child Internalizing", 9,16) %>% -->
 <!--   group_rows("Child Externalizing", 13,16) %>% -->
 <!--   group_rows("Loneliness", 17,20) %>% -->
 <!--   group_rows("Stress", 21,24) -->
@@ -315,14 +316,14 @@ emotion_g %>%
 <!-- ### Overall -->
 
 <!-- ```{r curve-27 } -->
-<!-- overall = overall_model(emotion, depress, 2) -->
+<!-- overall = overall_model(emotion, depress, 6) -->
 <!-- overall$plot -->
 <!-- ``` -->
 
 <!-- ### Black/African American -->
 
 <!-- ```{r curve-28 } -->
-<!-- group = group_model(emotion_g, depress, black, 2) -->
+<!-- group = group_model(emotion_g, depress, black, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -333,7 +334,7 @@ emotion_g %>%
 <!-- ### Latinx -->
 
 <!-- ```{r curve-30 } -->
-<!-- group = group_model(emotion_g, depress, latinx, 2) -->
+<!-- group = group_model(emotion_g, depress, latinx, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -344,7 +345,7 @@ emotion_g %>%
 <!-- ### Poverty -->
 
 <!-- ```{r curve-32 } -->
-<!-- group = group_model(emotion_g, depress, poverty150, 2) -->
+<!-- group = group_model(emotion_g, depress, poverty150, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -355,7 +356,7 @@ emotion_g %>%
 <!-- ### Single Parents -->
 
 <!-- ```{r curve-34 } -->
-<!-- group = group_model(emotion_g, depress, single, 2) -->
+<!-- group = group_model(emotion_g, depress, single, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -366,7 +367,7 @@ emotion_g %>%
 <!-- ### Children with disabilites -->
 
 <!-- ```{r curve-36 } -->
-<!-- group = group_model(emotion_g, depress, disability, 2) -->
+<!-- group = group_model(emotion_g, depress, disability, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -377,7 +378,7 @@ emotion_g %>%
 <!-- ### 3+ Children -->
 
 <!-- ```{r curve-38 } -->
-<!-- group = group_model(emotion_g, depress, child3, 2) -->
+<!-- group = group_model(emotion_g, depress, child3, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -467,14 +468,14 @@ emotion_g %>%
 <!-- ### Overall -->
 
 <!-- ```{r curve-53 } -->
-<!-- overall = overall_model(emotion, lonely, 2) -->
+<!-- overall = overall_model(emotion, lonely, 6) -->
 <!-- overall$plot -->
 <!-- ``` -->
 
 <!-- ### Black/African American -->
 
 <!-- ```{r curve-54 } -->
-<!-- group = group_model(emotion_g, lonely, black, 2) -->
+<!-- group = group_model(emotion_g, lonely, black, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -485,7 +486,7 @@ emotion_g %>%
 <!-- ### Latinx -->
 
 <!-- ```{r curve-56 } -->
-<!-- group = group_model(emotion_g, lonely, latinx, 2) -->
+<!-- group = group_model(emotion_g, lonely, latinx, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -496,7 +497,7 @@ emotion_g %>%
 <!-- ### Poverty -->
 
 <!-- ```{r curve-58 } -->
-<!-- group = group_model(emotion_g, lonely, poverty150, 2) -->
+<!-- group = group_model(emotion_g, lonely, poverty150, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -507,7 +508,7 @@ emotion_g %>%
 <!-- ### Single Parents -->
 
 <!-- ```{r curve-60 } -->
-<!-- group = group_model(emotion_g, lonely, single, 2) -->
+<!-- group = group_model(emotion_g, lonely, single, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -518,7 +519,7 @@ emotion_g %>%
 <!-- ### Children with disabilites -->
 
 <!-- ```{r curve-62 } -->
-<!-- group = group_model(emotion_g, lonely, disability, 2) -->
+<!-- group = group_model(emotion_g, lonely, disability, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -529,7 +530,7 @@ emotion_g %>%
 <!-- ### 3+ Children -->
 
 <!-- ```{r curve-64 } -->
-<!-- group = group_model(emotion_g, lonely, child3, 2) -->
+<!-- group = group_model(emotion_g, lonely, child3, 6) -->
 <!-- group$plot -->
 <!-- ``` -->
 
@@ -697,7 +698,7 @@ emotion_g %>%
 ### Overall
 
 ```{r curve-92 }
-fit = splines.overall(emotion_g, anxiety, 2)
+fit = splines.overall(emotion_g, anxiety, 6)
 fit$plot
 ```
 
@@ -708,7 +709,7 @@ fit$summary
 ### Black/African American
 
 ```{r curve-94 }
-fit = splines.groups(emotion_g, anxiety, black, 2)
+fit = splines.groups(emotion_g, anxiety, black, 6)
 fit$plot
 ```
 
@@ -719,7 +720,7 @@ fit$summary
 ### LatinX
 
 ```{r curve-96 }
-fit = splines.groups(emotion_g, anxiety, latinx, 2)
+fit = splines.groups(emotion_g, anxiety, latinx, 6)
 fit$plot
 ```
 
@@ -730,7 +731,7 @@ fit$summary
 ### Poverty
 
 ```{r curve-98 }
-fit = splines.groups(emotion_g, anxiety, poverty150, 2)
+fit = splines.groups(emotion_g, anxiety, poverty150, 6)
 fit$plot
 ```
 
@@ -741,7 +742,7 @@ fit$summary
 ### Single Parents
 
 ```{r curve-100 }
-fit = splines.groups(emotion_g, anxiety, single, 2)
+fit = splines.groups(emotion_g, anxiety, single, 6)
 fit$plot
 ```
 
@@ -752,7 +753,7 @@ fit$summary
 ### Children with disabilites
 
 ```{r curve-102 }
-fit = splines.groups(emotion_g, anxiety, disability, 2)
+fit = splines.groups(emotion_g, anxiety, disability, 6)
 fit$plot
 ```
 
@@ -763,7 +764,7 @@ fit$summary
 ### 3+ Children
 
 ```{r curve-104 }
-fit = splines.groups(emotion_g, anxiety, child3, 2)
+fit = splines.groups(emotion_g, anxiety, child3, 6)
 fit$plot
 ```
 
@@ -776,7 +777,7 @@ fit$summary
 ### Overall
 
 ```{r curve-106 }
-fit = splines.overall(emotion_g, depress, 2)
+fit = splines.overall(emotion_g, depress, 6)
 fit$plot
 ```
 
@@ -787,7 +788,7 @@ fit$summary
 ### Black/African American
 
 ```{r curve-108 }
-fit = splines.groups(emotion_g, depress, black, 2)
+fit = splines.groups(emotion_g, depress, black, 6)
 fit$plot
 ```
 
@@ -798,7 +799,7 @@ fit$summary
 ### LatinX
 
 ```{r curve-110 }
-fit = splines.groups(emotion_g, depress, latinx, 2)
+fit = splines.groups(emotion_g, depress, latinx, 6)
 fit$plot
 ```
 
@@ -809,7 +810,7 @@ fit$summary
 ### Poverty
 
 ```{r curve-112 }
-fit = splines.groups(emotion_g, depress, poverty150, 2)
+fit = splines.groups(emotion_g, depress, poverty150, 6)
 fit$plot
 ```
 
@@ -820,7 +821,7 @@ fit$summary
 ### Single Parents
 
 ```{r curve-114 }
-fit = splines.groups(emotion_g, depress, single, 2)
+fit = splines.groups(emotion_g, depress, single, 6)
 fit$plot
 ```
 
@@ -831,7 +832,7 @@ fit$summary
 ### Children with disabilites
 
 ```{r curve-116 }
-fit = splines.groups(emotion_g, depress, disability, 2)
+fit = splines.groups(emotion_g, depress, disability, 6)
 fit$plot
 ```
 
@@ -842,7 +843,7 @@ fit$summary
 ### 3+ Children
 
 ```{r curve-118 }
-fit = splines.groups(emotion_g, depress, child3, 2)
+fit = splines.groups(emotion_g, depress, child3, 6)
 fit$plot
 ```
 
@@ -855,7 +856,7 @@ fit$summary
 ### Overall
 
 ```{r curve-120 }
-fit = splines.overall(emotion_g, stress, 2)
+fit = splines.overall(emotion_g, stress, 6)
 fit$plot
 ```
 
@@ -866,7 +867,7 @@ fit$summary
 ### Black/African American
 
 ```{r curve-122 }
-fit = splines.groups(emotion_g, stress, black, 2)
+fit = splines.groups(emotion_g, stress, black, 6)
 fit$plot
 ```
 
@@ -877,7 +878,7 @@ fit$summary
 ### LatinX
 
 ```{r curve-124 }
-fit = splines.groups(emotion_g, stress, latinx, 2)
+fit = splines.groups(emotion_g, stress, latinx, 6)
 fit$plot
 ```
 
@@ -888,7 +889,7 @@ fit$summary
 ### Poverty
 
 ```{r curve-126 }
-fit = splines.groups(emotion_g, stress, poverty150, 2)
+fit = splines.groups(emotion_g, stress, poverty150, 6)
 fit$plot
 ```
 
@@ -899,7 +900,7 @@ fit$summary
 ### Single Parents
 
 ```{r curve-128 }
-fit = splines.groups(emotion_g, stress, single, 2)
+fit = splines.groups(emotion_g, stress, single, 6)
 fit$plot
 ```
 
@@ -910,7 +911,7 @@ fit$summary
 ### Children with disabilites
 
 ```{r curve-130 }
-fit = splines.groups(emotion_g, stress, disability, 2)
+fit = splines.groups(emotion_g, stress, disability, 6)
 fit$plot
 ```
 
@@ -921,7 +922,7 @@ fit$summary
 ### 3+ Children
 
 ```{r curve-132 }
-fit = splines.groups(emotion_g, stress, child3, 2)
+fit = splines.groups(emotion_g, stress, child3, 6)
 fit$plot
 ```
 
@@ -934,7 +935,7 @@ fit$summary
 ### Overall
 
 ```{r curve-134 }
-fit = splines.overall(emotion_g, lonely, 2)
+fit = splines.overall(emotion_g, lonely, 6)
 fit$plot
 ```
 
@@ -945,7 +946,7 @@ fit$summary
 ### Black/African American
 
 ```{r curve-136 }
-fit = splines.groups(emotion_g, lonely, black, 2)
+fit = splines.groups(emotion_g, lonely, black, 6)
 fit$plot
 ```
 
@@ -956,7 +957,7 @@ fit$summary
 ### LatinX
 
 ```{r curve-138 }
-fit = splines.groups(emotion_g, lonely, latinx, 2)
+fit = splines.groups(emotion_g, lonely, latinx, 6)
 fit$plot
 ```
 
@@ -967,7 +968,7 @@ fit$summary
 ### Poverty
 
 ```{r curve-140 }
-fit = splines.groups(emotion_g, lonely, poverty150, 2)
+fit = splines.groups(emotion_g, lonely, poverty150, 6)
 fit$plot
 ```
 
@@ -978,7 +979,7 @@ fit$summary
 ### Single Parents
 
 ```{r curve-142 }
-fit = splines.groups(emotion_g, lonely, single, 2)
+fit = splines.groups(emotion_g, lonely, single, 6)
 fit$plot
 ```
 
@@ -989,7 +990,7 @@ fit$summary
 ### Children with disabilites
 
 ```{r curve-144 }
-fit = splines.groups(emotion_g, lonely, disability, 2)
+fit = splines.groups(emotion_g, lonely, disability, 6)
 fit$plot
 ```
 
@@ -1000,7 +1001,7 @@ fit$summary
 ### 3+ Children
 
 ```{r curve-146 }
-fit = splines.groups(emotion_g, lonely, child3, 2)
+fit = splines.groups(emotion_g, lonely, child3, 6)
 fit$plot
 ```
 
@@ -1013,7 +1014,7 @@ fit$summary
 ### Overall
 
 ```{r curve-148 }
-fit = splines.overall(emotion_g, fussy, 2)
+fit = splines.overall(emotion_g, fussy, 6)
 fit$plot
 ```
 
@@ -1024,7 +1025,7 @@ fit$summary
 ### Black/African American
 
 ```{r curve-150 }
-fit = splines.groups(emotion_g, fussy, black, 2)
+fit = splines.groups(emotion_g, fussy, black, 6)
 fit$plot
 ```
 
@@ -1035,7 +1036,7 @@ fit$summary
 ### LatinX
 
 ```{r curve-152 }
-fit = splines.groups(emotion_g, fussy, latinx, 2)
+fit = splines.groups(emotion_g, fussy, latinx, 6)
 fit$plot
 ```
 
@@ -1046,7 +1047,7 @@ fit$summary
 ### Poverty
 
 ```{r curve-154 }
-fit = splines.groups(emotion_g, fussy, poverty150, 2)
+fit = splines.groups(emotion_g, fussy, poverty150, 6)
 fit$plot
 ```
 
@@ -1057,7 +1058,7 @@ fit$summary
 ### Single Parents
 
 ```{r curve-156 }
-fit = splines.groups(emotion_g, fussy, single, 2)
+fit = splines.groups(emotion_g, fussy, single, 6)
 fit$plot
 ```
 
@@ -1068,7 +1069,7 @@ fit$summary
 ### Children with disabilites
 
 ```{r curve-158 }
-fit = splines.groups(emotion_g, fussy, disability, 2)
+fit = splines.groups(emotion_g, fussy, disability, 6)
 fit$plot
 ```
 
@@ -1079,7 +1080,7 @@ fit$summary
 ### 3+ Children
 
 ```{r curve-160 }
-fit = splines.groups(emotion_g, fussy, child3, 2)
+fit = splines.groups(emotion_g, fussy, child3, 6)
 fit$plot
 ```
 
@@ -1092,7 +1093,7 @@ fit$summary
 ### Overall
 
 ```{r curve-162 }
-fit = splines.overall(emotion_g, fear, 2)
+fit = splines.overall(emotion_g, fear, 6)
 fit$plot
 ```
 
@@ -1103,7 +1104,7 @@ fit$summary
 ### Black/African American
 
 ```{r curve-164 }
-fit = splines.groups(emotion_g, fear, black, 2)
+fit = splines.groups(emotion_g, fear, black, 6)
 fit$plot
 ```
 
@@ -1114,7 +1115,7 @@ fit$summary
 ### LatinX
 
 ```{r curve-166 }
-fit = splines.groups(emotion_g, fear, latinx, 2)
+fit = splines.groups(emotion_g, fear, latinx, 6)
 fit$plot
 ```
 
@@ -1125,7 +1126,7 @@ fit$summary
 ### Poverty
 
 ```{r curve-168 }
-fit = splines.groups(emotion_g, fear, poverty150, 2)
+fit = splines.groups(emotion_g, fear, poverty150, 6)
 fit$plot
 ```
 
@@ -1136,7 +1137,7 @@ fit$summary
 ### Single Parents
 
 ```{r curve-170 }
-fit = splines.groups(emotion_g, fear, single, 2)
+fit = splines.groups(emotion_g, fear, single, 6)
 fit$plot
 ```
 
@@ -1147,7 +1148,7 @@ fit$summary
 ### Children with disabilites
 
 ```{r curve-172 }
-fit = splines.groups(emotion_g, fear, disability, 2)
+fit = splines.groups(emotion_g, fear, disability, 6)
 fit$plot
 ```
 
@@ -1158,7 +1159,7 @@ fit$summary
 ### 3+ Children
 
 ```{r curve-174 }
-fit = splines.groups(emotion_g, fear, child3, 2)
+fit = splines.groups(emotion_g, fear, child3, 6)
 fit$plot
 ```
 
