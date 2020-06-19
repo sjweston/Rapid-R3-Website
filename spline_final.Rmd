@@ -1,0 +1,937 @@
+---
+title: "Charting the curve"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r curve-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+#re-run all the machine learning models?
+rerun = FALSE
+dontrerun = !rerun
+```
+
+```{r curve-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+#library(tidymodels)
+library(brolgar)
+library(lme4)
+#library(modelr)
+library(caret)
+library(knitr)
+library(kableExtra)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+library(sjPlot)
+```
+
+```{r curve-3 }
+if(rerun) options(mc.cores = parallel::detectCores())
+```
+
+
+```{r curve-4 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r curve-9 }
+source(here("Functions/pomp.R"))
+source(here("Functions/splines.R"))
+```
+
+```{r}
+#pomp scoring
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp)
+```
+
+
+```{r curve-5 }
+#Center emotion variables on caregiver baseline (Week 0)
+# identify "baseline" values
+baseline = scored %>%
+  filter(Week == 0) %>% # only Week 0
+  select(CaregiverID, anxiety, depress, stress, lonely, fussy, fear) #only these variables
+names(baseline)[-1] = paste(names(baseline)[-1], "pre", sep = "_")  # rename
+
+emotion = scored %>%
+  group_by(CaregiverID) %>%
+  mutate(conflict_total = max(conflict_total,na.rm = T),
+         conflict_parent = max(conflict_parent,na.rm = T),
+         conflict_child = max(conflict_child,na.rm = T)) %>%
+  ungroup() %>%
+  select(CaregiverID, Week, anxiety, depress, stress, lonely, 
+         fussy, fear, 
+         lost_free_lunch, contains("conflict_")) %>% #only these variables
+  filter(Week > 0 & Week <= 10) %>% # remove week 0 and any week after 10
+  full_join(baseline) %>% # join with baseline data -- creates columns of "pre" variables
+  gather(key, value, -CaregiverID, -Week) %>% 
+  mutate(time = ifelse(grepl("_pre", key), "Pre", "Now"),
+         key = gsub("_pre","",key)) %>%
+  spread(time, value) %>% #now one row per emotion per week per caregiver
+  #mutate(value = Now-Pre) %>% # subtract
+  mutate(value = Now) %>% # subtract
+  select(-Now, -Pre) %>% # remove extra variables
+  spread(key, value) # now one row per week per caregiver
+```
+
+```{r curve-6 }
+groups = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  mutate(child2 = ifelse(num_children_raw >= 2, 1, 0),
+         child3 = ifelse(num_children_raw >= 3, 1, 0)) %>%
+  select(CaregiverID, black, poverty150, single, latinx, disability,
+         child2, child3) %>%
+  mutate_at(vars(-CaregiverID),
+            .funs = function(x) 1-x) %>%
+  mutate_at(vars(-CaregiverID), factor)
+
+emotion_g = full_join(emotion, groups)
+
+```
+
+# Representativeness disclaimer
+
+```{r curve-7 }
+n_care = length(unique(emotion$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+# Descriptives
+
+```{r curve-8 }
+emotion_g %>%
+  select_if(is.numeric) %>%
+  psych::describeBy(group = emotion_g$Week, fast = T) 
+```
+
+
+# Spline models
+
+Spline models are fit with nodes at Week 6; Week 7 is the week ending on May 25th, 2020.
+
+
+<!-- ## Anxiety{.tabset} -->
+
+<!-- ### Overall -->
+
+<!-- ```{r curve-92 } -->
+<!-- fit = splines.overall(emotion_g, anxiety, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-93, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Black/African American -->
+
+<!-- ```{r curve-94 } -->
+<!-- fit = splines.groups(emotion_g, anxiety, black, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-95, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### LatinX -->
+
+<!-- ```{r curve-96 } -->
+<!-- fit = splines.groups(emotion_g, anxiety, latinx, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-97, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Poverty -->
+
+<!-- ```{r curve-98 } -->
+<!-- fit = splines.groups(emotion_g, anxiety, poverty150, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-99, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Single Parents -->
+
+<!-- ```{r curve-100 } -->
+<!-- fit = splines.groups(emotion_g, anxiety, single, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-101, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Children with disabilites -->
+
+<!-- ```{r curve-102 } -->
+<!-- fit = splines.groups(emotion_g, anxiety, disability, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-103, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### 3+ Children -->
+
+<!-- ```{r curve-104 } -->
+<!-- fit = splines.groups(emotion_g, anxiety, child3, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-105, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ## Depression{.tabset} -->
+
+<!-- ### Overall -->
+
+<!-- ```{r curve-106 } -->
+<!-- fit = splines.overall(emotion_g, depress, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-107, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Black/African American -->
+
+<!-- ```{r curve-108 } -->
+<!-- fit = splines.groups(emotion_g, depress, black, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-109, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### LatinX -->
+
+<!-- ```{r curve-110 } -->
+<!-- fit = splines.groups(emotion_g, depress, latinx, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-111, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Poverty -->
+
+<!-- ```{r curve-112 } -->
+<!-- fit = splines.groups(emotion_g, depress, poverty150, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-113, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Single Parents -->
+
+<!-- ```{r curve-114 } -->
+<!-- fit = splines.groups(emotion_g, depress, single, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-115, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Children with disabilites -->
+
+<!-- ```{r curve-116 } -->
+<!-- fit = splines.groups(emotion_g, depress, disability, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-117, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### 3+ Children -->
+
+<!-- ```{r curve-118 } -->
+<!-- fit = splines.groups(emotion_g, depress, child3, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-119, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+## Stress{.tabset}
+
+### Overall
+
+```{r curve-120 }
+fit = splines.overall(emotion_g, stress, 6)
+fit$plot
+```
+
+```{r curve-121, results = 'asis'}
+fit$summary
+```
+
+### Black/African American
+
+```{r curve-122 }
+fit = splines.groups(emotion_g, stress, black, 6)
+fit$plot
+```
+
+```{r curve-123, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, stress, black, 1)
+```
+
+```{r}
+group.diff(emotion_g, stress, black, 10)
+```
+
+### LatinX
+
+```{r curve-124 }
+fit = splines.groups(emotion_g, stress, latinx, 6)
+fit$plot
+```
+
+```{r curve-125, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, stress, latinx, 1)
+```
+
+```{r}
+group.diff(emotion_g, stress, latinx, 10)
+```
+
+### Poverty
+
+```{r curve-126 }
+fit = splines.groups(emotion_g, stress, poverty150, 6)
+fit$plot
+```
+
+```{r curve-127, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, stress, poverty150, 1)
+```
+
+```{r}
+group.diff(emotion_g, stress, poverty150, 10)
+```
+
+### Single Parents
+
+```{r curve-128 }
+fit = splines.groups(emotion_g, stress, single, 6)
+fit$plot
+```
+
+```{r curve-129, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, stress, single, 1)
+```
+
+```{r}
+group.diff(emotion_g, stress, single, 10)
+```
+
+
+### Children with disabilites
+
+```{r curve-130 }
+fit = splines.groups(emotion_g, stress, disability, 6)
+fit$plot
+```
+
+```{r curve-131, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, stress, disability, 1)
+```
+
+```{r}
+group.diff(emotion_g, stress, disability, 10)
+```
+
+
+### 3+ Children
+
+```{r curve-132 }
+fit = splines.groups(emotion_g, stress, child3, 6)
+fit$plot
+```
+
+```{r curve-133, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, stress, child3, 1)
+```
+
+```{r}
+group.diff(emotion_g, stress, child3, 10)
+```
+
+
+<!-- ## Loneliness{.tabset} -->
+
+<!-- ### Overall -->
+
+<!-- ```{r curve-134 } -->
+<!-- fit = splines.overall(emotion_g, lonely, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-135, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Black/African American -->
+
+<!-- ```{r curve-136 } -->
+<!-- fit = splines.groups(emotion_g, lonely, black, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-137, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### LatinX -->
+
+<!-- ```{r curve-138 } -->
+<!-- fit = splines.groups(emotion_g, lonely, latinx, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-139, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Poverty -->
+
+<!-- ```{r curve-140 } -->
+<!-- fit = splines.groups(emotion_g, lonely, poverty150, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-141, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Single Parents -->
+
+<!-- ```{r curve-142 } -->
+<!-- fit = splines.groups(emotion_g, lonely, single, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-143, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### Children with disabilites -->
+
+<!-- ```{r curve-144 } -->
+<!-- fit = splines.groups(emotion_g, lonely, disability, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-145, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+<!-- ### 3+ Children -->
+
+<!-- ```{r curve-146 } -->
+<!-- fit = splines.groups(emotion_g, lonely, child3, 6) -->
+<!-- fit$plot -->
+<!-- ``` -->
+
+<!-- ```{r curve-147, results = 'asis'} -->
+<!-- fit$summary -->
+<!-- ``` -->
+
+## Child Externalizing{.tabset}
+
+### Overall
+
+```{r curve-148 }
+fit = splines.overall(emotion_g, fussy, 6)
+fit$plot
+```
+
+```{r curve-149, results = 'asis'}
+fit$summary
+```
+
+### Black/African American
+
+```{r curve-150 }
+fit = splines.groups(emotion_g, fussy, black, 6)
+fit$plot
+```
+
+```{r curve-151, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, fussy, black, 1)
+```
+
+```{r}
+group.diff(emotion_g, fussy, black, 10)
+```
+
+
+### LatinX
+
+```{r curve-152 }
+fit = splines.groups(emotion_g, fussy, latinx, 6)
+fit$plot
+```
+
+```{r curve-153, results = 'asis'}
+fit$summary
+```
+
+
+```{r}
+group.diff(emotion_g, fussy, latinx, 1)
+```
+
+```{r}
+group.diff(emotion_g, fussy, latinx, 10)
+```
+
+### Poverty
+
+```{r curve-154 }
+fit = splines.groups(emotion_g, fussy, poverty150, 6)
+fit$plot
+```
+
+```{r curve-155, results = 'asis'}
+fit$summary
+```
+
+
+```{r}
+group.diff(emotion_g, fussy, poverty150, 1)
+```
+
+```{r}
+group.diff(emotion_g, fussy, poverty150, 10)
+```
+
+### Single Parents
+
+```{r curve-156 }
+fit = splines.groups(emotion_g, fussy, single, 6)
+fit$plot
+```
+
+```{r curve-157, results = 'asis'}
+fit$summary
+```
+
+
+```{r}
+group.diff(emotion_g, fussy, single, 1)
+```
+
+```{r}
+group.diff(emotion_g, fussy, single, 10)
+```
+
+### Children with disabilites
+
+```{r curve-158 }
+fit = splines.groups(emotion_g, fussy, disability, 6)
+fit$plot
+```
+
+```{r curve-159, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, fussy, disability, 1)
+```
+
+```{r}
+group.diff(emotion_g, fussy, disability, 10)
+```
+### 3+ Children
+
+```{r curve-160 }
+fit = splines.groups(emotion_g, fussy, child3, 6)
+fit$plot
+```
+
+```{r curve-161, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, fussy, child3, 1)
+```
+
+```{r}
+group.diff(emotion_g, fussy, child3, 10)
+```
+## Child Internalizing{.tabset}
+
+### Overall
+
+```{r curve-162 }
+fit = splines.overall(emotion_g, fear, 6)
+fit$plot
+```
+
+```{r curve-163, results = 'asis'}
+fit$summary
+```
+
+### Black/African American
+
+```{r curve-164 }
+fit = splines.groups(emotion_g, fear, black, 6)
+fit$plot
+```
+
+```{r curve-165, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, fear, black, 1)
+```
+
+```{r}
+group.diff(emotion_g, fear, black, 10)
+```
+
+### LatinX
+
+```{r curve-166 }
+fit = splines.groups(emotion_g, fear, latinx, 6)
+fit$plot
+```
+
+```{r curve-167, results = 'asis'}
+fit$summary
+```
+
+```{r}
+group.diff(emotion_g, fear, latinx, 1)
+```
+
+```{r}
+group.diff(emotion_g, fear, latinx, 10)
+```
+
+### Poverty
+
+```{r curve-168 }
+fit = splines.groups(emotion_g, fear, poverty150, 6)
+fit$plot
+```
+
+```{r curve-169, results = 'asis'}
+fit$summary
+```
+
+
+```{r}
+group.diff(emotion_g, fear, poverty150, 1)
+```
+
+```{r}
+group.diff(emotion_g, fear, poverty150, 10)
+```
+
+### Single Parents
+
+```{r curve-170 }
+fit = splines.groups(emotion_g, fear, single, 6)
+fit$plot
+```
+
+```{r curve-171, results = 'asis'}
+fit$summary
+```
+
+
+```{r}
+group.diff(emotion_g, fear, single, 1)
+```
+
+```{r}
+group.diff(emotion_g, fear, single, 10)
+```
+
+### Children with disabilites
+
+```{r curve-172 }
+fit = splines.groups(emotion_g, fear, disability, 6)
+fit$plot
+```
+
+```{r curve-173, results = 'asis'}
+fit$summary
+```
+
+
+```{r}
+group.diff(emotion_g, fear, disability, 1)
+```
+
+```{r}
+group.diff(emotion_g, fear, disability, 10)
+```
+
+### 3+ Children
+
+```{r curve-174 }
+fit = splines.groups(emotion_g, fear, child3, 6)
+fit$plot
+```
+
+```{r curve-175, results = 'asis'}
+fit$summary
+```
+
+
+```{r}
+group.diff(emotion_g, fear, child3, 1)
+```
+
+```{r}
+group.diff(emotion_g, fear, child3, 10)
+```
+
+# Comparing change
+
+## No modeling{.tabset}
+
+### Overall
+
+```{r}
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  ggplot(aes(x = Week)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)", breaks = c(-2:3)) +
+  theme_pubclean()
+  
+```
+
+### Black/African American
+
+```{r}
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  mutate(black = factor(black, labels = c("Black", "Everyone else"))) %>%
+  ggplot(aes(x = Week, group = black)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)") +
+  facet_wrap(~black, ncol = 1) +
+  theme_pubclean()
+  
+```
+
+### Latinx
+
+```{r}
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  mutate(latinx = factor(latinx, labels = c("Latinx", "Everyone else"))) %>%
+  filter(!is.na(latinx)) %>%
+  ggplot(aes(x = Week, group = latinx)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)") +
+  facet_wrap(~latinx, ncol = 1) +
+  theme_pubclean()
+  
+```
+
+### Poverty
+
+```{r}
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  mutate(poverty150 = factor(poverty150, labels = c("Low Income", "Everyone else"))) %>%
+  filter(!is.na(poverty150)) %>%
+  ggplot(aes(x = Week, group = poverty150)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)") +
+  facet_wrap(~poverty150, ncol = 1) +
+  theme_pubclean()
+  
+```
+
+
+### Single Parents
+
+```{r}
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  mutate(single = factor(single, labels = c("Single Caregivers", "Everyone else"))) %>%
+  filter(!is.na(single)) %>%
+  ggplot(aes(x = Week, group = single)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)") +
+  facet_wrap(~single, ncol = 1) +
+  theme_pubclean()
+  
+```
+
+
+### Children with disabilites
+
+```{r}
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  mutate(disability = factor(disability, labels = c("Chidlren with Disabilites", "Everyone else"))) %>%
+  filter(!is.na(disability)) %>%
+  ggplot(aes(x = Week, group = disability)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)") +
+  facet_wrap(~disability, ncol = 1) +
+  theme_pubclean()
+  
+```
+
+
+### 3+ Children
+
+```{r}
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  mutate(child3 = factor(child3, labels = c("3+ children", "Everyone else"))) %>%
+  filter(!is.na(child3)) %>%
+  ggplot(aes(x = Week, group = child3)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)") +
+  facet_wrap(~child3, ncol = 1) +
+  theme_pubclean()
+  
+```
+
+

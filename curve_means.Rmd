@@ -54,7 +54,14 @@ baseline = scored %>%
 names(baseline)[-1] = paste(names(baseline)[-1], "pre", sep = "_")  # rename
 
 emotion = scored %>%
-  select(CaregiverID, Week, anxiety, depress, stress, lonely, fussy, fear) %>% #only these variables
+  group_by(CaregiverID) %>%
+  mutate(conflict_total = max(conflict_total,na.rm = T),
+         conflict_parent = max(conflict_parent,na.rm = T),
+         conflict_child = max(conflict_child,na.rm = T)) %>%
+  ungroup() %>%
+  select(CaregiverID, Week, anxiety, depress, stress, lonely, 
+         fussy, fear, 
+         lost_free_lunch, contains("conflict_")) %>% #only these variables
   filter(Week > 0 & Week <= 10) %>% # remove week 0 and any week after 10
   full_join(baseline) %>% # join with baseline data -- creates columns of "pre" variables
   gather(key, value, -CaregiverID, -Week) %>% 
@@ -75,8 +82,7 @@ groups = scored %>%
   mutate(child2 = ifelse(num_children_raw >= 2, 1, 0),
          child3 = ifelse(num_children_raw >= 3, 1, 0)) %>%
   select(CaregiverID, black, poverty150, single, latinx, disability,
-         child2, child3,
-         lost_free_lunch) %>%
+         child2, child3) %>%
   mutate_at(vars(-CaregiverID),
             .funs = function(x) 1-x) %>%
   mutate_at(vars(-CaregiverID), factor)
@@ -117,580 +123,550 @@ emotion_g %>%
 
 
 
-<!-- # Plots{.tabset} -->
-
-<!-- ```{r} -->
-<!-- emotion.p <- as_tsibble(emotion, -->
-<!--                       index = Week, -->
-<!--                       key = CaregiverID, -->
-<!--                       regular = FALSE) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- control = lmerControl(check.conv.grad = F, check.nobs.vs.nRE = F) -->
-<!-- ``` -->
-
-
-
-<!-- ## Anxiety -->
-
-<!-- ```{r} -->
-<!-- anxiety_fit <- lmer(anxiety ~ Week + (1 + Week|CaregiverID),  -->
-<!--                     data = emotion,  -->
-<!--                     control = lmerControl( -->
-<!--                       check.conv.grad = "ignore", -->
-<!--                       check.nobs.vs.nlev = "ignore")) -->
-<!-- emotion %>% -->
-<!--   add_predictions(anxiety_fit, type = "pred") %>% -->
-<!--   ggplot(aes(x = Week, y = anxiety)) + -->
-<!--   geom_smooth(method = "loess", se= F) + -->
-<!--   facet_strata(along = -anxiety) -->
-<!-- ``` -->
-
-
-<!-- # Polynomials -->
-
-<!-- ## Identify best model -->
-
-
-<!-- ```{r curve-10, eval = F} -->
-<!-- emotion.recipe = recipe(anxiety + depress + stress + lonely + fussy + fear ~ Week, data = emotion) -->
-<!-- emotion.prepped = bake(emotion.recipe, emotion) -->
 
-<!-- anx_fit1 = linear_reg() %>% -->
-<!--   set_engine(engine = "lm") %>% -->
-<!--   fit(anxiety ~ poly(Week, 1), data = emotion.prepped) -->
-
-<!-- anx_fit2 = linear_reg() %>% -->
-<!--   set_engine(engine = "lm") %>% -->
-<!--   fit(anxiety ~ poly(Week, 6), data = emotion.prepped) -->
-
-<!-- anx_fit3 = linear_reg() %>% -->
-<!--   set_engine(engine = "lm") %>% -->
-<!--   fit(anxiety ~ poly(Week, 3), data = emotion.prepped) -->
+# Polynomials
+
+## Identify best model
 
-<!-- anx_fit4 = linear_reg() %>% -->
-<!--   set_engine(engine = "lm") %>% -->
-<!--   fit(anxiety ~ poly(Week, 4), data = emotion.prepped) -->
+
+```{r curve-10, eval = F}
+emotion.recipe = recipe(anxiety + depress + stress + lonely + fussy + fear ~ Week, data = emotion)
+emotion.prepped = bake(emotion.recipe, emotion)
 
+anx_fit1 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 1), data = emotion.prepped)
+
+anx_fit2 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 6), data = emotion.prepped)
+
+anx_fit3 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 3), data = emotion.prepped)
 
-<!-- ``` -->
-
+anx_fit4 = linear_reg() %>%
+  set_engine(engine = "lm") %>%
+  fit(anxiety ~ poly(Week, 4), data = emotion.prepped)
 
-<!-- ```{r curve-11 } -->
-<!-- if(rerun){ -->
-<!--   set.seed(115) -->
 
-<!--   fit_models = emotion %>% -->
-<!--     gather("emotion", "value", -CaregiverID, -Week) %>% -->
-<!--     filter(!is.na(value)) %>% -->
-<!--     group_by(emotion) %>% -->
-<!--     nest() %>% -->
-<!--     mutate(train1 = map(data, train_fun, 1), -->
-<!--            train2 = map(data, train_fun, 6), -->
-<!--            train3 = map(data, train_fun, 3), -->
-<!--            train4 = map(data, train_fun, 4)) -->
+```
 
-<!--   train_perf = fit_models %>% -->
-<!--     gather("model", "output", contains("train")) %>% -->
-<!--     mutate(performance = map(output, "results"))  -->
 
+```{r curve-11 }
+if(rerun){
+  set.seed(115)
 
-<!--   save(fit_models, train_perf, file = here("curve_data/fit_models_means.Rdata")) -->
-<!-- } -->
-<!-- ``` -->
+  fit_models = emotion %>%
+    gather("emotion", "value", -CaregiverID, -Week) %>%
+    filter(!is.na(value)) %>%
+    group_by(emotion) %>%
+    nest() %>%
+    mutate(train1 = map(data, train_fun, 1),
+           train2 = map(data, train_fun, 6),
+           train3 = map(data, train_fun, 3),
+           train4 = map(data, train_fun, 4))
 
-<!-- ```{r curve-12 } -->
-<!-- if(dontrerun){load(file = here("curve_data/fit_models_means.Rdata"))} -->
-<!-- ``` -->
+  train_perf = fit_models %>%
+    gather("model", "output", contains("train")) %>%
+    mutate(performance = map(output, "results"))
 
-<!-- ```{r curve-13, results = 'asis'} -->
-<!-- train_perf %>% -->
-<!--   dplyr::select(emotion, model, performance) %>% -->
-<!--   unnest(cols = c(performance)) %>% -->
-<!--   dplyr::select(-intercept, -contains("SD")) %>% -->
-<!--   arrange(emotion, model) %>% -->
-<!--   mutate(model = factor(model, -->
-<!--                         levels = paste0("train",1:4), -->
-<!--                         labels = c("Linear", "Quadratic", "Cubic", "Quartic"))) %>% -->
-<!--   ungroup() %>% -->
-<!--   dplyr::select(-emotion) %>% -->
-<!--   kable(., digits = 4) %>% -->
-<!--   kable_styling(full_width = T) %>% -->
-<!--   group_rows("Anxiety", 1,4) %>% -->
-<!--   group_rows("Depression", 5,8) %>% -->
-<!--   group_rows("Child Internalizing", 9,16) %>% -->
-<!--   group_rows("Child Externalizing", 13,16) %>% -->
-<!--   group_rows("Loneliness", 17,20) %>% -->
-<!--   group_rows("Stress", 21,24) -->
-<!-- ``` -->
 
-<!-- Based on these results, we will run the following models: -->
+  save(fit_models, train_perf, file = here("curve_data/fit_models_means.Rdata"))
+}
+```
 
-<!-- - anxiety: quartic -->
-<!-- - depression: quadratic -->
-<!-- - stress: linear -->
-<!-- - loneliness: quadratic -->
-<!-- - child externalizing: linear -->
-<!-- - child internalizing: linear -->
+```{r curve-12 }
+if(dontrerun){load(file = here("curve_data/fit_models_means.Rdata"))}
+```
 
-<!-- ## Anxiety{.tabset} -->
+```{r curve-13, results = 'asis'}
+train_perf %>%
+  dplyr::select(emotion, model, performance) %>%
+  unnest(cols = c(performance)) %>%
+  dplyr::select(-intercept, -contains("SD")) %>%
+  arrange(emotion, model) %>%
+  mutate(model = factor(model,
+                        levels = paste0("train",1:4),
+                        labels = c("Linear", "Quadratic", "Cubic", "Quartic"))) %>%
+  ungroup() %>%
+  dplyr::select(-emotion) %>%
+  kable(., digits = 4) %>%
+  kable_styling(full_width = T) %>%
+  group_rows("Anxiety", 1,4) %>%
+  group_rows("Depression", 5,8) %>%
+  group_rows("Child Internalizing", 9,16) %>%
+  group_rows("Child Externalizing", 13,16) %>%
+  group_rows("Loneliness", 17,20) %>%
+  group_rows("Stress", 21,24)
+```
 
-<!-- ### Overall -->
+Based on these results, we will run the following models:
 
-<!-- ```{r curve-14 } -->
-<!-- overall = overall_model(emotion, anxiety, 4) -->
-<!-- overall$plot -->
-<!-- ``` -->
+- anxiety: quartic
+- depression: quadratic
+- stress: linear
+- loneliness: quadratic
+- child externalizing: linear
+- child internalizing: linear
 
-<!-- ### Black/African American -->
+## Anxiety{.tabset}
 
-<!-- ```{r curve-15 } -->
-<!-- group = group_model(emotion_g, anxiety, black, 4) -->
-<!-- group$plot -->
-<!-- ``` -->
+### Overall
 
-<!-- ```{r curve-16, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-14 }
+overall = overall_model(emotion, anxiety, 4)
+overall$plot
+```
 
-<!-- ### Latinx -->
+### Black/African American
 
-<!-- ```{r curve-17 } -->
-<!-- group = group_model(emotion_g, anxiety, latinx, 4) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-15 }
+group = group_model(emotion_g, anxiety, black, 4)
+group$plot
+```
 
-<!-- ```{r curve-18, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-16, results = 'asis'}
+group$summary
+```
 
-<!-- ### Poverty -->
+### Latinx
 
-<!-- ```{r curve-19 } -->
-<!-- group = group_model(emotion_g, anxiety, poverty150, 4) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-17 }
+group = group_model(emotion_g, anxiety, latinx, 4)
+group$plot
+```
 
-<!-- ```{r curve-20, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-18, results = 'asis'}
+group$summary
+```
 
-<!-- ### Single Parents -->
+### Poverty
 
-<!-- ```{r curve-21 } -->
-<!-- group = group_model(emotion_g, anxiety, single, 4) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-19 }
+group = group_model(emotion_g, anxiety, poverty150, 4)
+group$plot
+```
 
-<!-- ```{r curve-22, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-20, results = 'asis'}
+group$summary
+```
 
-<!-- ### Children with disabilites -->
+### Single Parents
 
-<!-- ```{r curve-23 } -->
-<!-- group = group_model(emotion_g, anxiety, disability, 4) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-21 }
+group = group_model(emotion_g, anxiety, single, 4)
+group$plot
+```
 
-<!-- ```{r curve-24, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-22, results = 'asis'}
+group$summary
+```
 
-<!-- ### 3+ Children -->
+### Children with disabilites
 
-<!-- ```{r curve-25 } -->
-<!-- group = group_model(emotion_g, anxiety, child3, 4) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-23 }
+group = group_model(emotion_g, anxiety, disability, 4)
+group$plot
+```
 
-<!-- ```{r curve-26, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-24, results = 'asis'}
+group$summary
+```
 
+### 3+ Children
 
+```{r curve-25 }
+group = group_model(emotion_g, anxiety, child3, 4)
+group$plot
+```
 
-<!-- ## Depression{.tabset} -->
+```{r curve-26, results = 'asis'}
+group$summary
+```
 
-<!-- ### Overall -->
 
-<!-- ```{r curve-27 } -->
-<!-- overall = overall_model(emotion, depress, 6) -->
-<!-- overall$plot -->
-<!-- ``` -->
 
-<!-- ### Black/African American -->
+## Depression{.tabset}
 
-<!-- ```{r curve-28 } -->
-<!-- group = group_model(emotion_g, depress, black, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+### Overall
 
-<!-- ```{r curve-29, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-27 }
+overall = overall_model(emotion, depress, 6)
+overall$plot
+```
 
-<!-- ### Latinx -->
+### Black/African American
 
-<!-- ```{r curve-30 } -->
-<!-- group = group_model(emotion_g, depress, latinx, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-28 }
+group = group_model(emotion_g, depress, black, 6)
+group$plot
+```
 
-<!-- ```{r curve-31, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-29, results = 'asis'}
+group$summary
+```
 
-<!-- ### Poverty -->
+### Latinx
 
-<!-- ```{r curve-32 } -->
-<!-- group = group_model(emotion_g, depress, poverty150, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-30 }
+group = group_model(emotion_g, depress, latinx, 6)
+group$plot
+```
 
-<!-- ```{r curve-33, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-31, results = 'asis'}
+group$summary
+```
 
-<!-- ### Single Parents -->
+### Poverty
 
-<!-- ```{r curve-34 } -->
-<!-- group = group_model(emotion_g, depress, single, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-32 }
+group = group_model(emotion_g, depress, poverty150, 6)
+group$plot
+```
 
-<!-- ```{r curve-35, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-33, results = 'asis'}
+group$summary
+```
 
-<!-- ### Children with disabilites -->
+### Single Parents
 
-<!-- ```{r curve-36 } -->
-<!-- group = group_model(emotion_g, depress, disability, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-34 }
+group = group_model(emotion_g, depress, single, 6)
+group$plot
+```
 
-<!-- ```{r curve-37, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-35, results = 'asis'}
+group$summary
+```
 
-<!-- ### 3+ Children -->
+### Children with disabilites
 
-<!-- ```{r curve-38 } -->
-<!-- group = group_model(emotion_g, depress, child3, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-36 }
+group = group_model(emotion_g, depress, disability, 6)
+group$plot
+```
 
-<!-- ```{r curve-39, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-37, results = 'asis'}
+group$summary
+```
 
-<!-- ## Stress{.tabset} -->
+### 3+ Children
 
-<!-- ### Overall -->
+```{r curve-38 }
+group = group_model(emotion_g, depress, child3, 6)
+group$plot
+```
 
-<!-- ```{r curve-40 } -->
-<!-- overall = overall_model(emotion, stress, 1) -->
-<!-- overall$plot -->
-<!-- ``` -->
+```{r curve-39, results = 'asis'}
+group$summary
+```
 
-<!-- ### Black/African American -->
+## Stress{.tabset}
 
-<!-- ```{r curve-41 } -->
-<!-- group = group_model(emotion_g, stress, black, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+### Overall
 
+```{r curve-40 }
+overall = overall_model(emotion, stress, 1)
+overall$plot
+```
 
-<!-- ```{r curve-42, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+### Black/African American
 
-<!-- ### Latinx -->
+```{r curve-41 }
+group = group_model(emotion_g, stress, black, 1)
+group$plot
+```
 
-<!-- ```{r curve-43 } -->
-<!-- group = group_model(emotion_g, stress, latinx, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
 
+```{r curve-42, results = 'asis'}
+group$summary
+```
 
-<!-- ```{r curve-44, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+### Latinx
 
-<!-- ### Poverty -->
+```{r curve-43 }
+group = group_model(emotion_g, stress, latinx, 1)
+group$plot
+```
 
-<!-- ```{r curve-45 } -->
-<!-- group = group_model(emotion_g, stress, poverty150, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
 
-<!-- ```{r curve-46, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-44, results = 'asis'}
+group$summary
+```
 
-<!-- ### Single Parents -->
+### Poverty
 
-<!-- ```{r curve-47 } -->
-<!-- group = group_model(emotion_g, stress, single, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-45 }
+group = group_model(emotion_g, stress, poverty150, 1)
+group$plot
+```
 
-<!-- ```{r curve-48, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-46, results = 'asis'}
+group$summary
+```
 
-<!-- ### Children with disabilites -->
+### Single Parents
 
-<!-- ```{r curve-49 } -->
-<!-- group = group_model(emotion_g, stress, disability, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-47 }
+group = group_model(emotion_g, stress, single, 1)
+group$plot
+```
 
-<!-- ```{r curve-50, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-48, results = 'asis'}
+group$summary
+```
 
-<!-- ### 3+ Children -->
+### Children with disabilites
 
-<!-- ```{r curve-51 } -->
-<!-- group = group_model(emotion_g, stress, child3, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-49 }
+group = group_model(emotion_g, stress, disability, 1)
+group$plot
+```
 
-<!-- ```{r curve-52, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-50, results = 'asis'}
+group$summary
+```
 
-<!-- ## Loneliness{.tabset} -->
+### 3+ Children
 
-<!-- ### Overall -->
+```{r curve-51 }
+group = group_model(emotion_g, stress, child3, 1)
+group$plot
+```
 
-<!-- ```{r curve-53 } -->
-<!-- overall = overall_model(emotion, lonely, 6) -->
-<!-- overall$plot -->
-<!-- ``` -->
+```{r curve-52, results = 'asis'}
+group$summary
+```
 
-<!-- ### Black/African American -->
+## Loneliness{.tabset}
 
-<!-- ```{r curve-54 } -->
-<!-- group = group_model(emotion_g, lonely, black, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+### Overall
 
-<!-- ```{r curve-55, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-53 }
+overall = overall_model(emotion, lonely, 6)
+overall$plot
+```
 
-<!-- ### Latinx -->
+### Black/African American
 
-<!-- ```{r curve-56 } -->
-<!-- group = group_model(emotion_g, lonely, latinx, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-54 }
+group = group_model(emotion_g, lonely, black, 6)
+group$plot
+```
 
-<!-- ```{r curve-57, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-55, results = 'asis'}
+group$summary
+```
 
-<!-- ### Poverty -->
+### Latinx
 
-<!-- ```{r curve-58 } -->
-<!-- group = group_model(emotion_g, lonely, poverty150, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-56 }
+group = group_model(emotion_g, lonely, latinx, 6)
+group$plot
+```
 
-<!-- ```{r curve-59, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-57, results = 'asis'}
+group$summary
+```
 
-<!-- ### Single Parents -->
+### Poverty
 
-<!-- ```{r curve-60 } -->
-<!-- group = group_model(emotion_g, lonely, single, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-58 }
+group = group_model(emotion_g, lonely, poverty150, 6)
+group$plot
+```
 
-<!-- ```{r curve-61, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-59, results = 'asis'}
+group$summary
+```
 
-<!-- ### Children with disabilites -->
+### Single Parents
 
-<!-- ```{r curve-62 } -->
-<!-- group = group_model(emotion_g, lonely, disability, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-60 }
+group = group_model(emotion_g, lonely, single, 6)
+group$plot
+```
 
-<!-- ```{r curve-63, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-61, results = 'asis'}
+group$summary
+```
 
-<!-- ### 3+ Children -->
+### Children with disabilites
 
-<!-- ```{r curve-64 } -->
-<!-- group = group_model(emotion_g, lonely, child3, 6) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-62 }
+group = group_model(emotion_g, lonely, disability, 6)
+group$plot
+```
 
-<!-- ```{r curve-65, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-63, results = 'asis'}
+group$summary
+```
 
-<!-- ## Child Externalizing{.tabset} -->
+### 3+ Children
 
-<!-- ### Overall -->
+```{r curve-64 }
+group = group_model(emotion_g, lonely, child3, 6)
+group$plot
+```
 
-<!-- ```{r curve-66 } -->
-<!-- overall = overall_model(emotion, fussy, 1) -->
-<!-- overall$plot -->
-<!-- ``` -->
+```{r curve-65, results = 'asis'}
+group$summary
+```
 
-<!-- ### Black/African American -->
+## Child Externalizing{.tabset}
 
-<!-- ```{r curve-67 } -->
-<!-- group = group_model(emotion_g, fussy, black, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+### Overall
 
-<!-- ```{r curve-68, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-66 }
+overall = overall_model(emotion, fussy, 1)
+overall$plot
+```
 
-<!-- ### Latinx -->
+### Black/African American
 
-<!-- ```{r curve-69 } -->
-<!-- group = group_model(emotion_g, fussy, latinx, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-67 }
+group = group_model(emotion_g, fussy, black, 1)
+group$plot
+```
 
-<!-- ```{r curve-70, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-68, results = 'asis'}
+group$summary
+```
 
-<!-- ### Poverty -->
+### Latinx
 
-<!-- ```{r curve-71 } -->
-<!-- group = group_model(emotion_g, fussy, poverty150, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-69 }
+group = group_model(emotion_g, fussy, latinx, 1)
+group$plot
+```
 
-<!-- ```{r curve-72, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-70, results = 'asis'}
+group$summary
+```
 
-<!-- ### Single Parents -->
+### Poverty
 
-<!-- ```{r curve-73 } -->
-<!-- group = group_model(emotion_g, fussy, single, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-71 }
+group = group_model(emotion_g, fussy, poverty150, 1)
+group$plot
+```
 
-<!-- ```{r curve-74, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-72, results = 'asis'}
+group$summary
+```
 
-<!-- ### Children with disabilites -->
+### Single Parents
 
-<!-- ```{r curve-75 } -->
-<!-- group = group_model(emotion_g, fussy, disability, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-73 }
+group = group_model(emotion_g, fussy, single, 1)
+group$plot
+```
 
-<!-- ```{r curve-76, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-74, results = 'asis'}
+group$summary
+```
 
-<!-- ### 3+ Children -->
+### Children with disabilites
 
-<!-- ```{r curve-77 } -->
-<!-- group = group_model(emotion_g, fussy, child3, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-75 }
+group = group_model(emotion_g, fussy, disability, 1)
+group$plot
+```
 
-<!-- ```{r curve-78, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-76, results = 'asis'}
+group$summary
+```
 
-<!-- ## Child Internalizing{.tabset} -->
+### 3+ Children
 
-<!-- ### Overall -->
+```{r curve-77 }
+group = group_model(emotion_g, fussy, child3, 1)
+group$plot
+```
 
-<!-- ```{r curve-79 } -->
-<!-- overall = overall_model(emotion, fear, 1) -->
-<!-- overall$plot -->
-<!-- ``` -->
+```{r curve-78, results = 'asis'}
+group$summary
+```
 
-<!-- ### Black/African American -->
+## Child Internalizing{.tabset}
 
-<!-- ```{r curve-80 } -->
-<!-- group = group_model(emotion_g, fear, black, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+### Overall
 
-<!-- ```{r curve-81, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-79 }
+overall = overall_model(emotion, fear, 1)
+overall$plot
+```
 
-<!-- ### Latinx -->
+### Black/African American
 
-<!-- ```{r curve-82 } -->
-<!-- group = group_model(emotion_g, fear, latinx, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-80 }
+group = group_model(emotion_g, fear, black, 1)
+group$plot
+```
 
-<!-- ```{r curve-83, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-81, results = 'asis'}
+group$summary
+```
 
-<!-- ### Poverty -->
+### Latinx
 
-<!-- ```{r curve-84 } -->
-<!-- group = group_model(emotion_g, fear, poverty150, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-82 }
+group = group_model(emotion_g, fear, latinx, 1)
+group$plot
+```
 
-<!-- ```{r curve-85, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-83, results = 'asis'}
+group$summary
+```
 
-<!-- ### Single Parents -->
+### Poverty
 
-<!-- ```{r curve-86 } -->
-<!-- group = group_model(emotion_g, fear, single, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-84 }
+group = group_model(emotion_g, fear, poverty150, 1)
+group$plot
+```
 
-<!-- ```{r curve-87, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-85, results = 'asis'}
+group$summary
+```
 
-<!-- ### Children with disabilites -->
+### Single Parents
 
-<!-- ```{r curve-88 } -->
-<!-- group = group_model(emotion_g, fear, disability, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-86 }
+group = group_model(emotion_g, fear, single, 1)
+group$plot
+```
 
-<!-- ```{r curve-89, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-87, results = 'asis'}
+group$summary
+```
 
-<!-- ### 3+ Children -->
+### Children with disabilites
 
-<!-- ```{r curve-90 } -->
-<!-- group = group_model(emotion_g, fear, child3, 1) -->
-<!-- group$plot -->
-<!-- ``` -->
+```{r curve-88 }
+group = group_model(emotion_g, fear, disability, 1)
+group$plot
+```
 
-<!-- ```{r curve-91, results = 'asis'} -->
-<!-- group$summary -->
-<!-- ``` -->
+```{r curve-89, results = 'asis'}
+group$summary
+```
+
+### 3+ Children
+
+```{r curve-90 }
+group = group_model(emotion_g, fear, child3, 1)
+group$plot
+```
+
+```{r curve-91, results = 'asis'}
+group$summary
+```
 
 # Spline models
 
-<!-- Spline models are fit with nodes at Week 7, which is the week ending on May 25th, 2020. -->
+Spline models are fit with nodes at Week 6; Week 7 is the week ending on May 25th, 2020.
 
 
 ## Anxiety{.tabset}

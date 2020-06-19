@@ -35,6 +35,11 @@ library(lme4)
 ```{r score datafile, echo = F, warning = F, message = F}
 # score master --------------------------------------------------------
 source(here("Scripts/score data.R"))
+
+conflicted::conflict_prefer("chisq.test", "stats")
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("group_rows", "kableExtra")
+
 scored = scored %>%
   filter(Week > 0)
 ```
