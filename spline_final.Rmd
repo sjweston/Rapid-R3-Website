@@ -97,6 +97,13 @@ groups = scored %>%
 
 emotion_g = full_join(emotion, groups)
 
+contrasts(emotion_g$black) = contr.sum(2)
+contrasts(emotion_g$poverty150) = contr.sum(2)
+contrasts(emotion_g$single) = contr.sum(2)
+contrasts(emotion_g$latinx) = contr.sum(2)
+contrasts(emotion_g$child2) = contr.sum(2)
+contrasts(emotion_g$child3) = contr.sum(2)
+
 ```
 
 # Representativeness disclaimer
@@ -319,6 +326,7 @@ group.diff(emotion_g, stress, black, 1)
 group.diff(emotion_g, stress, black, 10)
 ```
 
+
 ### LatinX
 
 ```{r curve-124 }
@@ -528,6 +536,18 @@ group.diff(emotion_g, fussy, black, 1)
 group.diff(emotion_g, fussy, black, 10)
 ```
 
+```{r}
+# are group differences due to caregiver stress?
+emotion_g_sL = emotion_g %>%
+  mutate(SL1 = ifelse(Week <= 6, Week-6, 0),
+           SL2 = ifelse(Week > 6, Week-6, 0))
+
+mod.ext.black = lmer(fussy ~ black*SL1 + black*SL2 + 
+                       stress*SL1 + stress*SL2 + (1|CaregiverID),
+                     data = emotion_g_sL)
+
+summary(mod.ext.black)
+```
 
 ### LatinX
 
@@ -569,6 +589,15 @@ group.diff(emotion_g, fussy, poverty150, 1)
 group.diff(emotion_g, fussy, poverty150, 10)
 ```
 
+```{r}
+# are group differences due to caregiver stress?
+mod.ext.poverty150 = lmer(fussy ~ poverty150*SL1 + poverty150*SL2 + 
+                       stress*SL1 + stress*SL2 + (1|CaregiverID),
+                     data = emotion_g_sL)
+
+summary(mod.ext.poverty150)
+```
+
 ### Single Parents
 
 ```{r curve-156 }
@@ -587,6 +616,15 @@ group.diff(emotion_g, fussy, single, 1)
 
 ```{r}
 group.diff(emotion_g, fussy, single, 10)
+```
+
+```{r}
+# are group differences due to caregiver stress?
+mod.ext.single = lmer(fussy ~ single*SL1 + single*SL2 + 
+                       stress*SL1 + stress*SL2 + (1|CaregiverID),
+                     data = emotion_g_sL)
+
+summary(mod.ext.single)
 ```
 
 ### Children with disabilites
@@ -734,6 +772,15 @@ group.diff(emotion_g, fear, disability, 1)
 
 ```{r}
 group.diff(emotion_g, fear, disability, 10)
+```
+
+```{r}
+# are group differences due to caregiver stress?
+mod.int.disability = lmer(fear ~ disability*SL1 + disability*SL2 + 
+                       stress*SL1 + stress*SL2 + (1|CaregiverID),
+                     data = emotion_g_sL)
+
+summary(mod.int.disability)
 ```
 
 ### 3+ Children
@@ -934,4 +981,42 @@ emotion_g %>%
   
 ```
 
+
+## Grouping 
+
+This group represents the combination of Black, low income, and single caregivers. 
+
+```{r}
+emotion_g = emotion_g %>%
+  mutate(newgroup = case_when(
+    black == 1 ~ 1,
+    poverty150 == 1 ~ 1,
+    single == 1 ~ 1, 
+    !is.na(black) ~ 0,
+    !is.na(poverty150) ~ 0,
+    !is.na(single) ~ 0,
+    TRUE ~ NA_real_)) 
+
+emotion_g %>%
+  mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
+  mutate(newgroup = factor(newgroup, labels = c("Everyone else", "New Group"))) %>%
+  filter(!is.na(newgroup)) %>%
+  ggplot(aes(x = Week, group = newgroup)) +
+  geom_line(aes(y = fussy, 
+                color = "Child Internalizing"), 
+            stat = "summary", fun = "mean") + 
+  geom_line(aes(y = fear, 
+                color = "Child Externalizing"), 
+            stat = "summary", 
+            fun = "mean") + 
+  geom_line(aes(y = stress, 
+                color = "Caregiver Stress"), 
+            stat = "summary", fun = "mean") +
+  scale_x_continuous(breaks = c(1:10))+
+  scale_y_continuous("Response (centered)") +
+  facet_wrap(~newgroup, ncol = 1) +
+  theme_pubclean()
+
+
+```
 

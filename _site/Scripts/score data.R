@@ -13,7 +13,8 @@ library(readr)
 library(zoo) # for rolling averages and sums!
 
 data(zipcode)
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 10 MasterFile/MasterFile_groupings.sav"))
+#master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
 master = filter(master, CaregiverID != "") 
 #master = unique(master)
