@@ -989,9 +989,9 @@ This group represents the combination of Black, low income, and single caregiver
 ```{r}
 emotion_g = emotion_g %>%
   mutate(newgroup = case_when(
-    black == 1 ~ 1,
-    poverty150 == 1 ~ 1,
-    single == 1 ~ 1, 
+    black == 0 ~ 1,
+    poverty150 == 0 ~ 1,
+    single == 0 ~ 1, 
     !is.na(black) ~ 0,
     !is.na(poverty150) ~ 0,
     !is.na(single) ~ 0,
