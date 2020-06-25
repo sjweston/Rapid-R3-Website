@@ -103,8 +103,24 @@ contrasts(emotion_g$single) = contr.sum(2)
 contrasts(emotion_g$latinx) = contr.sum(2)
 contrasts(emotion_g$child2) = contr.sum(2)
 contrasts(emotion_g$child3) = contr.sum(2)
-
 ```
+
+```{r}
+# potential mediators
+meds = c("insurance", 
+         "child_insurance", 
+         "support_decrease", 
+         "lost_free_lunch", 
+         "employment_decreased", 
+         "losejob_sickleave", 
+         "income_decreaed", 
+         "difficulty_basics")
+
+emotion_g = scored %>%
+  select(CaregiverID, Week, all_of(meds)) %>%
+  right_join(emotion_g)
+```
+
 
 # Representativeness disclaimer
 
@@ -160,6 +176,29 @@ fit$plot
 fit$summary
 ```
 
+#### Can we explain this difference?
+
+```{r, results = 'asis'}
+emotion_g %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(model = map(data, 
+                     .f = function(x) splines.mediation(
+                       x, 
+                       anxiety, 
+                       black, 
+                       m.value, 
+                       6))) %>%
+  select(mediator, model) %>%
+  unnest(cols = c(model)) %>%
+  spread(statistic, value) %>%
+  kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
+  kable_styling(full_width = T)
+
+```
+
+
 ### LatinX
 
 ```{r curve-96 }
@@ -204,6 +243,28 @@ fit$plot
 fit$summary
 ```
 
+#### Can we explain this difference?
+
+```{r, results = 'asis'}
+emotion_g %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(model = map(data, 
+                     .f = function(x) splines.mediation(
+                       x, 
+                       anxiety, 
+                       disability, 
+                       m.value, 
+                       6))) %>%
+  select(mediator, model) %>%
+  unnest(cols = c(model)) %>%
+  spread(statistic, value) %>%
+  kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
+  kable_styling(full_width = T)
+
+```
+
 ### 3+ Children
 
 ```{r curve-104 }
@@ -237,6 +298,28 @@ fit$plot
 
 ```{r curve-109, results = 'asis'}
 fit$summary
+```
+
+#### Can we explain this difference?
+
+```{r, results = 'asis'}
+emotion_g %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(model = map(data, 
+                     .f = function(x) splines.mediation(
+                       x, 
+                       depress, 
+                       black, 
+                       m.value, 
+                       6))) %>%
+  select(mediator, model) %>%
+  unnest(cols = c(model)) %>%
+  spread(statistic, value) %>%
+  kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
+  kable_styling(full_width = T)
+
 ```
 
 ### LatinX
@@ -283,6 +366,29 @@ fit$plot
 fit$summary
 ```
 
+#### Can we explain this difference?
+
+```{r, results = 'asis'}
+emotion_g %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(model = map(data, 
+                     .f = function(x) splines.mediation(
+                       x, 
+                       depress, 
+                       disability, 
+                       m.value, 
+                       6))) %>%
+  select(mediator, model) %>%
+  unnest(cols = c(model)) %>%
+  spread(statistic, value) %>%
+  kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
+  kable_styling(full_width = T)
+
+```
+
+
 ### 3+ Children
 
 ```{r curve-118 }
@@ -326,22 +432,27 @@ group.diff(emotion_g, stress, black, 1)
 group.diff(emotion_g, stress, black, 10)
 ```
 
-```{r}
-# export data for soapbox
-#lines
-fit$pdata %>%
-  select(Week, black, fit) %>%
-  mutate(fit = round(fit,2)) %>%
-  rename(problems = fit) %>%
-  write.csv(., file = here("figure data/0623_black_Ext.csv"))
-#dots
-fit$plot$data %>%
-  select(Week, black, m) %>%
-  mutate(m = round(m,2)) %>%
-  rename(problems = m) %>%
-  write.csv(., file = here("figure data/0623_black_Ext_dots.csv"))
-```
+#### Can we explain this difference?
 
+```{r, results = 'asis'}
+emotion_g %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(model = map(data, 
+                     .f = function(x) splines.mediation(
+                       x, 
+                       stress,
+                       black, 
+                       m.value, 
+                       6))) %>%
+  select(mediator, model) %>%
+  unnest(cols = c(model)) %>%
+  spread(statistic, value) %>%
+  kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
+  kable_styling(full_width = T)
+
+```
 
 ### LatinX
 
@@ -381,19 +492,6 @@ group.diff(emotion_g, stress, poverty150, 1)
 group.diff(emotion_g, stress, poverty150, 10)
 ```
 
-```{r}
-fit$pdata %>%
-  select(Week, poverty150, fit) %>%
-  mutate(fit = round(fit,2)) %>%
-  rename(problems = fit) %>%
-  write.csv(., file = here("figure data/0623_lowIncome_Ext.csv"))
-#dots
-fit$plot$data %>%
-  select(Week, poverty150, m) %>%
-  mutate(m = round(m,2)) %>%
-  rename(problems = m) %>%
-  write.csv(., file = here("figure data/0623_lowIncome_Ext_dots.csv"))
-```
 
 
 ### Single Parents
@@ -524,6 +622,27 @@ fit$plot
 fit$summary
 ```
 
+#### Can we explain this difference?
+
+```{r, results = 'asis'}
+emotion_g %>%
+  gather("mediator", "m.value", all_of(meds)) %>%
+  group_by(mediator) %>%
+  nest() %>%
+  mutate(model = map(data, 
+                     .f = function(x) splines.mediation(
+                       x, 
+                       lonely, 
+                       disability, 
+                       m.value, 
+                       6))) %>%
+  select(mediator, model) %>%
+  unnest(cols = c(model)) %>%
+  spread(statistic, value) %>%
+  kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
+  kable_styling(full_width = T)
+
+```
 ### 3+ Children
 
 ```{r curve-146 }
@@ -595,6 +714,23 @@ mod.ext.black = lmer(fussy ~ black*SL1 + black*SL2 +
 summary(mod.ext.black)
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, black, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  write.csv(., file = here("figure data/0623_black_Ext.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, black, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  write.csv(., file = here("figure data/0623_black_Ext_dots.csv"))
+```
+
+
 ### LatinX
 
 ```{r curve-152 }
@@ -642,6 +778,20 @@ mod.ext.poverty150 = lmer(fussy ~ poverty150*SL1 + poverty150*SL2 +
                      data = emotion_g_sL)
 
 summary(mod.ext.poverty150)
+```
+
+```{r}
+fit$pdata %>%
+  select(Week, poverty150, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  write.csv(., file = here("figure data/0623_lowIncome_Ext.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, poverty150, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  write.csv(., file = here("figure data/0623_lowIncome_Ext_dots.csv"))
 ```
 
 ### Single Parents

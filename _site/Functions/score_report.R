@@ -658,7 +658,15 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   if(contains_items("EHQ.001", data)){
     newdata$income_change = data$EHQ.001
-    newdata$income_decreaed = ifelse(data$EHQ.001 == 1, 1, 0)
+    data = data %>%
+      mutate(income_decreased = case_when(
+        EHQ.001 == 1 ~ 1,
+        EHQ.001.2 == 1 ~ 1,
+        !is.na(EHQ.001) ~ 0, 
+        !is.na(EHQ.001.2) ~ 0, 
+        TRUE ~ NA_real_
+      ))
+    newdata$income_decreaed = data$income_decreased
     }
   
   if(contains_items("EHQ.002", data)){
