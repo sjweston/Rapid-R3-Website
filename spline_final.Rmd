@@ -116,6 +116,16 @@ meds = c("insurance",
          "income_decreaed", 
          "difficulty_basics")
 
+black_meds = c("support_decrease", 
+               "employment_decreased", 
+               "losejob_sickleave", 
+               "difficulty_basics")
+
+disability_meds = c( 
+                 "employment_decreased", 
+                 "losejob_sickleave", 
+                 "difficulty_basics")
+
 emotion_g = scored %>%
   select(CaregiverID, Week, all_of(meds)) %>%
   right_join(emotion_g)
@@ -137,6 +147,12 @@ perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
 ```
 
 These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+# Information about mediators
+
+Black families are less likely to report that the feel they have less support during COVID, and more likely to report that their employment has decreased, that they're worried they might lose their jobs if they take sick leave, and that they have difficulty paying for basics. 
+
+Caregivers of children with disabilities are more likley to report that their employment has decreased, that they're worried they might lose their jobs if they take sick leave, and that they have difficulty paying for basics.
 
 # Descriptives
 
@@ -180,7 +196,7 @@ fit$summary
 
 ```{r, results = 'asis'}
 emotion_g %>%
-  gather("mediator", "m.value", all_of(meds)) %>%
+  gather("mediator", "m.value", all_of(black_meds)) %>%
   group_by(mediator) %>%
   nest() %>%
   mutate(model = map(data, 
@@ -247,7 +263,7 @@ fit$summary
 
 ```{r, results = 'asis'}
 emotion_g %>%
-  gather("mediator", "m.value", all_of(meds)) %>%
+  gather("mediator", "m.value", all_of(disability_meds)) %>%
   group_by(mediator) %>%
   nest() %>%
   mutate(model = map(data, 
@@ -304,7 +320,7 @@ fit$summary
 
 ```{r, results = 'asis'}
 emotion_g %>%
-  gather("mediator", "m.value", all_of(meds)) %>%
+  gather("mediator", "m.value", all_of(black_meds)) %>%
   group_by(mediator) %>%
   nest() %>%
   mutate(model = map(data, 
@@ -370,7 +386,7 @@ fit$summary
 
 ```{r, results = 'asis'}
 emotion_g %>%
-  gather("mediator", "m.value", all_of(meds)) %>%
+  gather("mediator", "m.value", all_of(disability_meds)) %>%
   group_by(mediator) %>%
   nest() %>%
   mutate(model = map(data, 
@@ -436,7 +452,7 @@ group.diff(emotion_g, stress, black, 10)
 
 ```{r, results = 'asis'}
 emotion_g %>%
-  gather("mediator", "m.value", all_of(meds)) %>%
+  gather("mediator", "m.value", all_of(black_meds)) %>%
   group_by(mediator) %>%
   nest() %>%
   mutate(model = map(data, 
@@ -626,7 +642,7 @@ fit$summary
 
 ```{r, results = 'asis'}
 emotion_g %>%
-  gather("mediator", "m.value", all_of(meds)) %>%
+  gather("mediator", "m.value", all_of(disability_meds)) %>%
   group_by(mediator) %>%
   nest() %>%
   mutate(model = map(data, 
