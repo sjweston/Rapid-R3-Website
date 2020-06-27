@@ -1,0 +1,131 @@
+---
+title: "Policy-relevant questions"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r curve-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+#re-run all the machine learning models?
+rerun = FALSE
+dontrerun = !rerun
+```
+
+```{r curve-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+library(plotly)
+library(emmeans)
+```
+
+```{r curve-4 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r curve-9 }
+source(here("Functions/pomp.R"))
+```
+
+```{r}
+#pomp scoring
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
+  rowwise() %>%
+  #well-being composite
+  mutate(wellbeing = mean(c(anxiety, depress, stress, lonely), na.rm=T)) %>%
+  ungroup()
+```
+
+
+# Representativeness disclaimer
+
+```{r curve-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+```{r}
+source(here("Functions/policy_fun.R"))
+```
+
+
+# Public benefits{.tabset}
+
+**Are you receiving any sort of public or employment benefits? ex. Federal cash assistance programs such as the Temporary Assistance for Needy Families (TANF), Social Security Income (SSI). OR, Federal-in kind benefit programs such as Medicaid, Food Stamps and Housing.**
+
+Options:
+
+  - Yes
+  - No
+  - Didn't Qualify
+  - Intend to apply
+
+## Overall
+
+```{r}
+overall_figure(scored, public_benefits)
+```
+
+
+## Over time
+
+```{r}
+long_plot(scored, public_benefits)
+```
+
+
+## By region
+
+```{r}
+region_plot(scored, public_benefits)
+```
+
+
+## Black/African American
+
+```{r}
+bygroup_plot(scored, public_benefits, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
+```
+
+## LatinX
+
+```{r}
+bygroup_plot(scored, public_benefits, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+## Low income
+
+```{r}
+bygroup_plot(scored, public_benefits, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
+```
+
+## Related to well-being
+
+```{r}
+bycont_plot(scored, public_benefits, wellbeing)
+```
+
+```{r, results = 'asis'}
+bcont_table(scored, public_benefits, wellbeing)
+```
+
+

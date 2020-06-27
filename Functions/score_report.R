@@ -654,7 +654,19 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   } 
   
   
-  if(contains_items("JOB.015", data)) newdata$unemployment = ifelse(data$JOB.015 == 1, 1, 0)
+  if(contains_items("JOB.015", data)){
+    newdata$unemployment = ifelse(data$JOB.015 == 1, 1, 0)
+    
+    data = data %>%
+      mutate(public_benefits = case_when(
+        JOB.015 == 1 ~ "Yes",
+        JOB.015 == 0 ~ "No",
+        JOB.015 == 2  ~ "Didn't Qualify",
+        JOB.015 == 3 ~ "Intend to apply",
+        TRUE ~ NA_character_
+      ))
+    newdata$public_benefits = data$public_benefits
+    }
   
   if(contains_items("EHQ.001", data)){
     newdata$income_change = data$EHQ.001

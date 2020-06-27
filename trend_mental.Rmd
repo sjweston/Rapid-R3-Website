@@ -24,6 +24,7 @@ library(haven)
 # install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
 library(zipcode)
 library(ggthemr)
+library(plotly)
 ```
 
 
@@ -62,7 +63,7 @@ anxiety_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(anxiety_current_some, na.rm=T)/total) 
 
-anxiety_date_demo %>%
+anxiety_date_demo = anxiety_date_demo %>%
   ggplot(aes(x = Week, y = percent)) +
   geom_point(aes(color = demo)) + 
   geom_line(aes(color = demo)) +
@@ -75,6 +76,8 @@ anxiety_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(anxiety_date_demo)
 ```
 
 ## By date
@@ -98,7 +101,7 @@ anxiety_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(anxiety_current_some, na.rm=T)/total) 
 
-anxiety_date_demo %>%
+anxiety_date_demo = anxiety_date_demo %>%
   ggplot(aes(x = Date, y = percent)) +
   geom_smooth(aes(color = demo),se = F) +
   geom_smooth(data = anxiety_date_all, linetype = "dashed", se = F, color = "black") +
@@ -109,6 +112,8 @@ anxiety_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(anxiety_date_demo)
 ```
 
 ## By days sheltering in place
@@ -128,7 +133,7 @@ anxiety_plot = trend_days_sheltering_binary(variable = "anxiety_current_some",
                                      label = "some or a lot of anxiety",
                                      groups = binary_demos,
                                      group_labels = binary_labels)
-anxiety_plot$plot
+ggplotly(anxiety_plot$plot)
 ```
 
 ```{r}
@@ -140,7 +145,7 @@ anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
                                      label = "some or a lot of anxiety",
                                      groups = c("region"),
                                      group_levels = unique(after_shelter$region))
-anxiety_plot$plot
+ggplotly(anxiety_plot$plot)
 ```
 
 # Depression {.tabset}
@@ -166,7 +171,7 @@ depress_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(depress_current_some, na.rm=T)/total) 
 
-depress_date_demo %>%
+depress_date_demo = depress_date_demo %>%
   ggplot(aes(x = Week, y = percent)) +
   geom_point(aes(color = demo)) + 
   geom_line(aes(color = demo)) +
@@ -179,6 +184,8 @@ depress_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(depress_date_demo)
 ```
 
 ## By date
@@ -202,7 +209,7 @@ depress_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(depress_current_some, na.rm=T)/total) 
 
-depress_date_demo %>%
+depress_date_demo = depress_date_demo %>%
   ggplot(aes(x = Date, y = percent)) +
   geom_smooth(aes(color = demo),se = F) +
   geom_smooth(data = depress_date_all, linetype = "dashed", se = F, color = "black") +
@@ -213,6 +220,8 @@ depress_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(depress_date_demo)
 ```
 
 ## By days sheltering in place
@@ -226,7 +235,7 @@ depress_plot = trend_days_sheltering_binary(variable = "depress_current_some",
                                      label = "some or a lot of depression",
                                      groups = binary_demos,
                                      group_labels = binary_labels)
-depress_plot$plot
+ggplotly(depress_plot$plot)
 ```
 
 ```{r}
@@ -238,7 +247,7 @@ depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
                                      label = "some or a lot of depression",
                                      groups = c("region"),
                                      group_levels = unique(after_shelter$region))
-depress_plot$plot
+ggplotly(depress_plot$plot)
 ```
 
 # Stress {.tabset}
@@ -264,7 +273,7 @@ stress_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(stress_current_some, na.rm=T)/total) 
 
-stress_date_demo %>%
+stress_date_demo = stress_date_demo %>%
   ggplot(aes(x = Week, y = percent)) +
   geom_point(aes(color = demo)) + 
   geom_line(aes(color = demo)) +
@@ -277,6 +286,8 @@ stress_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(stress_date_demo)
 ```
 
 ## By date
@@ -300,7 +311,7 @@ stress_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(stress_current_some, na.rm=T)/total) 
 
-stress_date_demo %>%
+stress_date_demo = stress_date_demo %>%
   ggplot(aes(x = Date, y = percent)) +
   geom_smooth(aes(color = demo),se = F) +
   geom_smooth(data = stress_date_all, linetype = "dashed", se = F, color = "black") +
@@ -311,6 +322,8 @@ stress_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(stress_date_demo)
 ```
 
 ## By days sheltering in place
@@ -324,7 +337,7 @@ stress_plot = trend_days_sheltering_binary(variable = "stress_current_some",
                                      label = "some or a lot of stress",
                                      groups = binary_demos,
                                      group_labels = binary_labels)
-stress_plot$plot
+ggplotly(stress_plot$plot)
 ```
 
 ```{r}
@@ -336,7 +349,7 @@ stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
                                      label = "some or a lot of stress",
                                      groups = c("region"),
                                      group_levels = unique(after_shelter$region))
-stress_plot$plot
+ggplotly(stress_plot$plot)
 ```
 
 # Loneliness {.tabset}
@@ -362,7 +375,7 @@ lonely_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(lonely_current_some, na.rm=T)/total) 
 
-lonely_date_demo %>%
+lonely_date_demo = lonely_date_demo %>%
   ggplot(aes(x = Week, y = percent)) +
   geom_point(aes(color = demo)) + 
   geom_line(aes(color = demo)) +
@@ -375,6 +388,8 @@ lonely_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(lonely_date_demo)
 ```
 
 ## By date
@@ -398,7 +413,7 @@ lonely_date_all = scored %>%
   summarize(total = n(),
             percent = 100*sum(lonely_current_some, na.rm=T)/total) 
 
-lonely_date_demo %>%
+lonely_date_demo = lonely_date_demo %>%
   ggplot(aes(x = Date, y = percent)) +
   geom_smooth(aes(color = demo),se = F) +
   geom_smooth(data = lonely_date_all, linetype = "dashed", se = F, color = "black") +
@@ -409,6 +424,8 @@ lonely_date_demo %>%
        caption = "Entire sample is represented by the black, dashed line.") +
   theme_minimal() +
   theme(plot.title.position = "plot")
+
+ggplotly(lonely_date_demo)
 ```
 
 ## By days sheltering in place
@@ -422,7 +439,7 @@ lonely_plot = trend_days_sheltering_binary(variable = "lonely_current_some",
                                      label = "some or a lot of loneliness",
                                      groups = binary_demos,
                                      group_labels = binary_labels)
-lonely_plot$plot
+ggplotly(lonely_plot$plot)
 ```
 
 ```{r}
@@ -434,7 +451,7 @@ lonely_plot = trend_days_sheltering_cat(variable = "lonely_current_some",
                                      label = "some or a lot of loneliness",
                                      groups = c("region"),
                                      group_levels = unique(after_shelter$region))
-lonely_plot$plot
+ggplotly(lonely_plot$plot)
 ```
 
 
