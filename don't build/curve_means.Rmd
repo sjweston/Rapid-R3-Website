@@ -7,10 +7,11 @@ output:
 ---
 
 ```{r curve-1, echo = F}
+rm(list=ls())
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 #re-run all the machine learning models?
-rerun = FALSE
+rerun = TRUE
 dontrerun = !rerun
 ```
 
@@ -63,7 +64,7 @@ emotion = scored %>%
          fussy, fear, 
          lost_free_lunch, contains("conflict_")) %>% #only these variables
   filter(Week > 0 & Week <= 10) %>% # remove week 0 and any week after 10
-  full_join(baseline) %>% # join with baseline data -- creates columns of "pre" variables
+  left_join(baseline) %>% # join with baseline data -- creates columns of "pre" variables
   gather(key, value, -CaregiverID, -Week) %>% 
   mutate(time = ifelse(grepl("_pre", key), "Pre", "Now"),
          key = gsub("_pre","",key)) %>%
@@ -87,7 +88,7 @@ groups = scored %>%
             .funs = function(x) 1-x) %>%
   mutate_at(vars(-CaregiverID), factor)
 
-emotion_g = full_join(emotion, groups)
+emotion_g = left_join(emotion, groups)
 # 
 # contrasts(emotion_g$black) = contr.sum(6)
 # contrasts(emotion_g$poverty150) = contr.sum(6)

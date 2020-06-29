@@ -13,6 +13,8 @@ train_fun = function(train.data, poly){
 
 overall_model = function(data, outcome, poly){
   
+  data = filter(data, !is.na({{outcome}})) %>% filter(!is.na(Week))
+  
   if(poly > 1){
     reg.formula = as.formula(paste0(deparse(substitute(outcome)),
                                     " ~ poly(Week,",
