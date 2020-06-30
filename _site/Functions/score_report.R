@@ -472,8 +472,19 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$miss_vaccine.3 = data$HEALTH.011.b
     newdata$miss_vaccine.4 = data$HEALTH.012.b
     newdata$miss_vaccine.5 = data$HEALTH.013.b
-
-  }
+    
+    data = combine.cat(x = data, 
+                       cols = find_items("HEALTH.004\\.a_.{1}$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.004a_cat")
+    newdata$missed_wb_cost = ifelse(grepl("1", data$HEALTH.004a_cat), 1, 0)
+    newdata$missed_wb_time.away.from.work = ifelse(grepl("2", data$HEALTH.004a_cat), 1, 0)
+    newdata$missed_wb_inability.find.childcare = ifelse(grepl("3", data$HEALTH.004a_cat), 1, 0)
+    newdata$missed_wb_concern.for.covid = ifelse(grepl("4", data$HEALTH.004a_cat), 1, 0)
+    newdata$missed_wb_caring.for.family = ifelse(grepl("5", data$HEALTH.004a_cat), 1, 0)
+    newdata$missed_wb_vaccine.hesitancy = ifelse(grepl("6", data$HEALTH.004a_cat), 1, 0)
+    newdata$missed_wb_other = ifelse(grepl("7", data$HEALTH.004a_cat), 1, 0)
+    }
   
   if(contains_items("HEALTH\\.014", data)){
     data = combine.cat(x = data, 
@@ -607,6 +618,12 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        id = "CaregiverID",
                        newvar.name = "Job.005_cat")
     newdata$free_food = ifelse(grepl("1", data$Job.005_cat), 1, 0)
+    newdata$free_food_cat = case_when(
+      grepl("1", data$Job.005_cat) ~ "Yes",
+      grepl("2", data$Job.005_cat) ~ "No, know how",
+      grepl("3", data$Job.005_cat) ~ "No, not eligible",
+      grepl("4", data$Job.005_cat) ~ "Unsure",
+      TRUE ~ NA_character_)
   }
   
   
@@ -616,16 +633,36 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        id = "CaregiverID",
                        newvar.name = "Job.007_cat")
     free_lunch_current = ifelse(grepl("2",data$Job.007_cat), 1, 0)
-    newdata$free_lunch_current = free_lunch_current}
+    newdata$free_lunch_current = free_lunch_current
+    
+    newdata$free_lunch_now_cat = case_when(
+      grepl("0", data$Job.007_cat) ~ "No, but available",
+      grepl("1", data$Job.007_cat) ~ "Yes",
+      grepl("2", data$Job.007_cat) ~ "No, not available",
+      grepl("3", data$Job.007_cat) ~ "No, planned",
+      grepl("4", data$Job.007_cat) ~ "No, didn't know how",
+      grepl("5", data$Job.007_cat) ~ "N/A")
+    
+    }
   
   if(contains_items("JOB.006", data)){
+    
     data = combine.cat(x = data, 
                        cols = find_items("JOB.006", data), 
                        id = "CaregiverID",
                        newvar.name = "Job.006_cat")
+    
     free_lunch_pre = ifelse(grepl("2",data$Job.006_cat), 1, 0)
     
     newdata$free_lunch_pre = free_lunch_pre
+    
+    # newdata$free_lunch_pre_cat = case_when(
+    #   grepl("0", data$Job.006_cat) ~ "No, but available",
+    #   grepl("1", data$Job.006_cat) ~ "Yes",
+    #   grepl("2", data$Job.006_cat) ~ "No, not available",
+    #   grepl("3", data$Job.006_cat) ~ "No, planned",
+    #   grepl("4", data$Job.006_cat) ~ "No, didn't know how",
+    #   grepl("5", data$Job.006_cat) ~ "N/A")
     
     newdata$lost_free_lunch = case_when(free_lunch_pre == 0 ~ 0,
                                         free_lunch_pre == 1 & free_lunch_current == 1 ~ 0,
@@ -666,6 +703,106 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
         TRUE ~ NA_character_
       ))
     newdata$public_benefits = data$public_benefits
+    
+    data = combine.cat(x = data, 
+                       cols = find_items("JOB.015a_[0-9]{1,2}$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "Job.015a1_cat")
+    data = combine.cat(x = data, 
+                       cols = find_items("JOB.015a\\.2_[0-9]{1,2}$", data), 
+                       id = "CaregiverID",
+                       newvar.name = "Job.015a2_cat")
+    data = data %>%
+      mutate(
+        pb_health = case_when(
+          grepl("1$", Job.015a1_cat) ~ 1, 
+          grepl("1,", Job.015a1_cat) ~ 1, 
+          grepl("1$", Job.015a2_cat) ~ 1, 
+          grepl("1,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),
+        pb_food = case_when(
+          grepl("2$", Job.015a1_cat) ~ 1, 
+          grepl("2,", Job.015a1_cat) ~ 1, 
+          grepl("2$", Job.015a2_cat) ~ 1, 
+          grepl("2,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),
+        pb_income = case_when(
+          grepl("3$", Job.015a1_cat) ~ 1, 
+          grepl("3,", Job.015a1_cat) ~ 1, 
+          grepl("3$", Job.015a2_cat) ~ 1, 
+          grepl("3,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),
+        pb_disability = case_when(
+          grepl("4$", Job.015a1_cat) ~ 1, 
+          grepl("4,", Job.015a1_cat) ~ 1, 
+          grepl("4$", Job.015a2_cat) ~ 1, 
+          grepl("4,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),
+        pb_military.pension = case_when(
+          grepl("5$", Job.015a1_cat) ~ 1, 
+          grepl("5,", Job.015a1_cat) ~ 1,  
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),
+        pb_military.disability = case_when(
+          grepl("6$", Job.015a1_cat) ~ 1, 
+          grepl("6,", Job.015a1_cat) ~ 1,  
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),
+        pb_military.medical = case_when(
+          grepl("7$", Job.015a1_cat) ~ 1, 
+          grepl("7,", Job.015a1_cat) ~ 1,  
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),
+        pb_military = case_when(
+          grepl("5$", Job.015a1_cat) ~ 1, 
+          grepl("5,", Job.015a1_cat) ~ 1, 
+          grepl("6$", Job.015a1_cat) ~ 1, 
+          grepl("6,", Job.015a1_cat) ~ 1, 
+          grepl("7$", Job.015a1_cat) ~ 1, 
+          grepl("7,", Job.015a1_cat) ~ 1, 
+          grepl("5$", Job.015a2_cat) ~ 1, 
+          grepl("5,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0,
+          TRUE ~ NA_real_),
+        pb_housing = case_when(
+          grepl("8$", Job.015a1_cat) ~ 1, 
+          grepl("8,", Job.015a1_cat) ~ 1, 
+          grepl("8$", Job.015a2_cat) ~ 1, 
+          grepl("8,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),        
+        pb_childcare = case_when(
+          grepl("9$", Job.015a1_cat) ~ 1, 
+          grepl("9,", Job.015a1_cat) ~ 1, 
+          grepl("9$", Job.015a2_cat) ~ 1, 
+          grepl("9,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_),  
+        pb_other = case_when(
+          grepl("10$", Job.015a1_cat) ~ 1, 
+          grepl("10,", Job.015a1_cat) ~ 1, 
+          grepl("10$", Job.015a2_cat) ~ 1, 
+          grepl("10,", Job.015a2_cat) ~ 1, 
+          !is.na(JOB.015) ~ 0, 
+          TRUE ~ NA_real_) 
+        )
+    
+    newdata$pb_health = data$pb_health
+    newdata$pb_food = data$pb_food
+    newdata$pb_income = data$pb_income
+    newdata$pb_disability = data$pb_disability
+    newdata$pb_military.pension = data$pb_military.pension
+    newdata$pb_military.disability = data$pb_military.disability
+    newdata$pb_military.medical = data$pb_military.medical
+    newdata$pb_military = data$pb_military
+    newdata$pb_housing = data$pb_housing
+    newdata$pb_childcare = data$pb_childcare
+    newdata$pb_other = data$pb_other
+    
     }
   
   if(contains_items("EHQ.001", data)){
@@ -676,17 +813,58 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
         EHQ.001.2 == 1 ~ 1,
         !is.na(EHQ.001) ~ 0, 
         !is.na(EHQ.001.2) ~ 0, 
-        TRUE ~ NA_real_
-      ))
+        TRUE ~ NA_real_),
+        income_change = case_when(
+          EHQ.001 %in% c(0, 1) ~ "Decreased",
+          EHQ.001 == 2 ~ "Stayed the same",
+          EHQ.001 %in% c(3, 4) ~ "Increased",
+          EHQ.001.2 == 1 ~ "Decreased",
+          EHQ.001.2 == 2 ~ "Stayed the same",
+          EHQ.001.2 == 3 ~ "Increased",
+          TRUE ~ NA_character_
+        ))
     newdata$income_decreaed = data$income_decreased
-    }
+    newdata$income_change = data$income_change
+  }
+  
+  if(contains_items("JOB.016", data)){
+    data = data %>%
+      mutate(
+        federal_stim = case_when(
+          JOB.016.2 == 1 ~ "Yes",
+          JOB.016.2 == 2 ~ "No, expected",
+          JOB.016.2 == 3 ~ "No, not expected",
+          JOB.016.2 == 4 ~ "Unsure",
+          JOB.016.2 == 5 ~ "Other",
+          JOB.016 == 1 ~ "Yes",
+          JOB.016 == 2 ~ "Unsure",
+          JOB.016 == 3 ~ "Other",
+          JOB.016 == 0 & JOB.017.a == 0 ~ "No, not expected",
+          JOB.016 == 0 & JOB.017.a == 1 ~ "No, expected",
+          TRUE ~ NA_character_)
+        )
+    newdata$federal_stim = data$federal_stim
+  }
   
   if(contains_items("EHQ.002", data)){
     newdata$financial_prob  = ifelse(data$EHQ.002 == 0, 0, 1)
     newdata$major_financial  = ifelse(data$EHQ.002 %in% c(0,1), 0, 1)
+    
+    newdata$financial_status = factor(data$EHQ.002,
+                                      levels = c(0,1,2,3),
+                                      labels = c("None","Minor","Major","Extreme"))
   }
   
-  if(contains_items("FSTR.001", data))newdata$difficulty_basics  = ifelse(data$FSTR.001 %in% c(3,2), 1, 0)
+  if(contains_items("FSTR.001", data)){
+    newdata$difficulty_basics  = ifelse(data$FSTR.001 %in% c(3,2), 1, 0)
+    
+    newdata$difficulty_basics_cat = factor(data$FSTR.001, 
+                                           levels = c(0,1,2,3),
+                                           labels = c("Not very hard",
+                                                      "Somewhat hard",
+                                                      "Hard",
+                                                      "Very hard"))
+    }
   if(contains_items("FSTR.002", data)){
     data = combine.cat(x = data, 
                        cols = find_items("FSTR.002_.{1}$", data), 

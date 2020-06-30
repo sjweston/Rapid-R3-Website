@@ -8,7 +8,7 @@ moe = function(x){
 }
 
 overall_figure = function(data, variable){
-  data %>%
+  overallp = data %>%
     group_by(CaregiverID) %>%
     filter(!is.na({{variable}})) %>%
     filter(Week == max(Week)) %>%
@@ -16,15 +16,21 @@ overall_figure = function(data, variable){
     summarize(Count = n()) %>%
     ungroup() %>%
     mutate(Percent = 100*Count/sum(Count)) %>%
-    ggplot(aes(x = {{variable}}, y = Percent, fill = {{variable}})) +
+    ggplot(aes(x = {{variable}}, 
+               y = Percent, 
+               fill = {{variable}},
+               group=1,
+               text = paste("\nResponse:", {{variable}},
+                            "\nPercent:", round(Percent,2), 
+                            "\nCount:", Count))) +
     geom_bar(stat = "identity") +
-    geom_label(aes(y = max(Percent)*1.3, label = Count), fill = "white") +
-    geom_text(aes(y = Percent - min(Percent)*.5, label = round(Percent)), color = "white") +
     scale_fill_brewer(palette = "Dark2") +
     labs(x = "")+
     guides(fill = F) +
     coord_flip()+
     theme_pubclean()
+  
+  ggplotly(overallp, tooltip = "text")
 }
 
 long_plot = function(data, variable){
@@ -47,6 +53,7 @@ long_plot = function(data, variable){
     geom_point() + 
     geom_line() +
     scale_color_brewer(palette = "Dark2")+
+    scale_x_continuous(breaks = unique(data$Week)) +
     labs(x = "Week", 
          y = "Percent by week")+
     theme_pubclean()
@@ -182,3 +189,196 @@ bcont_table = function(data, variable, outcome){
     add_header_above(c(" " = 2, "Confidence Interval" =2 , " " = 1))
   return(contrast.table)
 }
+
+overall_c_figure = function(data, variables, labels){
+  
+  n_caregivers = length(unique(data$CaregiverID))
+  
+  overallp = data %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    ungroup() %>%
+    summarize_at(.vars = variables, .funs = list(sum), na.rm=T) %>%
+    gather("key", "Count") %>%
+    mutate(Percent = 100*Count/n_caregivers,
+           key = factor(key, 
+                        levels = variables,
+                        labels = labels)) %>%
+    ggplot(aes(x = reorder(key,Percent), 
+               y = Percent, 
+               fill = key, 
+               group=1,
+               text = paste("\nResponse:", key,
+                            "\nPercent:", round(Percent,2), 
+                            "\nCount:", Count))) +
+    geom_bar(stat = "identity") +
+    #scale_fill_brewer(palette = "Set2") +
+    labs(x = "")+
+    guides(fill = F) +
+    coord_flip()+
+    theme_pubclean()
+  
+  ggplotly(overallp, tooltip = "text")
+}
+
+long_c_plot = function(data, variables, labels){
+  
+  n_caregivers_week = data %>%
+    filter(Week > 0) %>%
+    group_by(Week) %>%
+    summarize(N = n())
+  
+  longp = data %>%
+    group_by(Week) %>%
+    summarize_at(.vars = variables, .funs = list(sum), na.rm=T) %>%
+    gather(key, Count, -Week) %>%
+    right_join(n_caregivers_week) %>%
+    mutate(Percent = 100*Count/N,
+           key = factor(key,
+                        levels = variables, 
+                        labels = labels)) %>%
+    ungroup() %>%
+    ggplot(aes(x = Week, 
+               y = Percent, 
+               color = key,
+               group=1,
+               text = paste("Week:", Week, 
+                            "\nResponse:", key,
+                            "\nPercent:", round(Percent,2), "\nCount:", Count)
+    )) +
+    geom_point() + 
+    geom_line() +
+    labs(x = "Week", 
+         y = "Percent by week")+
+    scale_x_continuous(breaks = unique(n_caregivers_week$Week)) +
+    theme_pubclean()
+  
+  ggplotly(longp, tooltip = "text")
+}
+
+region_c_plot = function(data, variables, labels, group = region){
+  
+  n_caregivers_region = data %>%
+    filter(Week > 0) %>%
+    filter(!is.na({{group}})) %>%
+    group_by(Week, {{group}}) %>%
+    summarize(N = n())
+  
+  long_plotd = data %>%
+    filter(!is.na({{group}})) %>%
+    group_by(Week, {{group}}) %>%
+    summarize_at(.vars = variables, .funs = list(sum), na.rm=T) %>%
+    gather(key, Count, -Week, -{{group}}) %>%
+    right_join(n_caregivers_region) %>%
+    mutate(Percent = 100*Count/N,
+           key = factor(key, 
+                        levels = variables, 
+                        labels = labels)) %>%
+    ungroup() %>%
+    ggplot(aes(x = Week, 
+               y = Percent, 
+               color ={{group}},
+               group=1,
+               text = paste("Week:", Week, 
+                            "\nGroup:", key,
+                            "\nPercent:", round(Percent,2), "\nCount:", Count)
+    )) +
+    geom_point() + 
+    geom_line() +
+    labs(x = "Week", 
+         y = "Percent by week")+
+    scale_x_continuous(breaks = unique(data$Week)) +
+    facet_wrap(~key, scales = "free")+
+    theme_pubclean()
+  
+  
+  ggplotly(long_plotd, tooltip = "text")
+}
+
+
+bygroup_c_plot = function(data, variables, labels, group, g.levels = NULL, g.labels = NULL){
+  
+  ncaregivers_group = data %>%
+    group_by(CaregiverID) %>%
+    filter(!is.na({{group}})) %>%
+    filter(Week == max(Week)) %>%
+    group_by({{group}}) %>%
+    summarize(N = n())
+  
+  long_plotd = data %>%
+    dplyr::group_by(CaregiverID) %>%
+    filter(!is.na({{group}})) %>%
+    filter(Week == max(Week)) %>%
+    group_by({{group}}) %>%
+    summarize_at(.vars = variables, .funs = list(sum), na.rm=T) %>%
+    gather(key, Count, -{{group}}) %>%
+    right_join(ncaregivers_group) %>%
+    mutate(Percent = 100*Count/N,
+           key = factor(key, 
+                        levels = variables, 
+                        labels = labels)) %>%
+    ungroup()
+  
+  if(!is.null(g.levels)){
+    long_plotd = 
+      mutate_at(long_plotd, vars({{group}}), .f = function(x) factor(x, 
+                                                                     levels = g.levels, 
+                                                                     labels = g.labels)) }
+  
+  
+  
+  long_plotd = long_plotd %>%
+    ggplot(aes(x = reorder(key, Percent),
+               y = Percent,
+               fill = {{group}},
+               group=1,
+               text = paste("\nGroup:", {{group}},
+                            "\nResponse:", key,
+                            "\nPercent:", round(Percent,2), "\nCount:", Count))) +
+    geom_bar(stat = "identity") +
+    #scale_fill_brewer(palette = "Dark2") +
+    labs(x = "")+
+    guides(fill = F) +
+    coord_flip()+
+    facet_grid(cols = vars({{group}})) +
+    theme_pubclean()
+  
+  
+  
+  ggplotly(long_plotd, tooltip = "text") 
+  
+}
+
+bycont_c_plot = function(data, variables, labels, outcome){
+  
+  
+  long_plotd = data %>%
+    dplyr::group_by(CaregiverID) %>%
+    filter(!is.na({{outcome}})) %>%
+    filter(Week == max(Week)) %>%
+    gather("key", "value", all_of(variables)) %>%
+    filter(value == 1) %>%
+    dplyr::group_by(key) %>%
+    summarize(Average = mean({{outcome}}),
+              MOE = moe({{outcome}})) %>%
+    mutate(key = factor(key, 
+                        levels = variables, 
+                        labels = labels)) %>%
+    ggplot(aes(x = reorder(key, Average),
+               y = Average,
+               fill = key,
+               group=1,
+               text = paste("\nGroup:", key,
+                            "\nAverage Response:", round(Average,2),
+                            "\n Lower CI:", round(Average-MOE,2),
+                            "\n Upper CI:", round(Average+MOE),2))) +
+    geom_bar(stat = "identity") +
+    geom_errorbar(aes(ymin = Average-MOE, ymax = Average + MOE)) +
+    labs(x = "")+
+    guides(fill = F) +
+    coord_flip()+
+    theme_pubclean()
+  ggplotly(long_plotd, tooltip = "text")
+  
+}
+

@@ -215,6 +215,24 @@ emotion_g %>%
 
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, black, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(black = ifelse(black == 0, "Black/African American", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_black_anxiety.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, black, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(black = ifelse(black == 0, "Black/African American", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_black_anxiety_dots.csv"))
+```
+
 
 ### LatinX
 
@@ -236,6 +254,24 @@ fit$plot
 
 ```{r curve-99, results = 'asis'}
 fit$summary
+```
+
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, poverty150, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(poverty150 = ifelse(poverty150 == 0, "Low Income", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_lowincome_anxiety.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, poverty150, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(poverty150 = ifelse(poverty150 == 0, "Low Income", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_lowincome_anxiety_dots.csv"))
 ```
 
 ### Single Parents
@@ -280,6 +316,24 @@ emotion_g %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
   kable_styling(full_width = T)
 
+```
+
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, disability, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_anxiety.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, disability, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_anxiety_dots.csv"))
 ```
 
 ### 3+ Children
@@ -361,6 +415,24 @@ fit$plot
 fit$summary
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, poverty150, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(poverty150 = ifelse(poverty150 == 0, "Low Income", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_lowincome_depress.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, poverty150, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(poverty150 = ifelse(poverty150 == 0, "Low Income", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_lowincome_depress_dots.csv"))
+```
+
 ### Single Parents
 
 ```{r curve-114 }
@@ -405,6 +477,24 @@ emotion_g %>%
 
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, disability, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_depress.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, disability, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_depress_dots.csv"))
+```
+
 
 ### 3+ Children
 
@@ -415,6 +505,24 @@ fit$plot
 
 ```{r curve-119, results = 'asis'}
 fit$summary
+```
+
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, child3, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(child3 = ifelse(child3 == 0, "3+ Children", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_child3_anxiety.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, child3, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(child3 = ifelse(child3 == 0, "3+ Children", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_child3_anxiety_dots.csv"))
 ```
 
 ## Stress{.tabset}
@@ -469,6 +577,24 @@ emotion_g %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
   kable_styling(full_width = T)
 
+```
+
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, black, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(black = ifelse(black == 0, "Black/African American", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_black_stress.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, black, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(black = ifelse(black == 0, "Black/African American", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_black_stress_dots.csv"))
 ```
 
 ### LatinX
@@ -550,6 +676,23 @@ group.diff(emotion_g, stress, disability, 1)
 group.diff(emotion_g, stress, disability, 10)
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, disability, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_stress.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, disability, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_stress_dots.csv"))
+```
 
 ### 3+ Children
 
@@ -568,6 +711,24 @@ group.diff(emotion_g, stress, child3, 1)
 
 ```{r}
 group.diff(emotion_g, stress, child3, 10)
+```
+
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, child3, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(child3 = ifelse(child3 == 0, "3+ Children", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_child3_stress.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, child3, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(child3 = ifelse(child3 == 0, "3+ Children", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_child3_stress_dots.csv"))
 ```
 
 
