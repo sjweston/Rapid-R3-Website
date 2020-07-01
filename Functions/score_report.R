@@ -1,12 +1,12 @@
 combine.cat = function(x, cols, id, newvar.name){
-  subset = x[,c(id, cols)]
-  names(subset) = c("id", paste0("X",1:length(cols)))
-  subset = suppressWarnings(gather(subset, "key", "value", -id))
+  subset = x[,c(id, "Week", cols)]
+  names(subset) = c("id", "Week", paste0("X",1:length(cols)))
+  subset = suppressWarnings(gather(subset, "key", "value", -id, -Week))
   subset = filter(subset, !is.na(value))
   subset$key = gsub("X", "", subset$key)
-  subset = group_by(subset, id)
-  subset = summarize(subset, newvar = paste(key, collapse = ","))
-  names(subset) = c(id,newvar.name)
+  subset = group_by(subset, id, Week)
+  subset = summarize(subset, newvar = paste(key, collapse = ",")) %>% ungroup()
+  names(subset) = c(id,"Week", newvar.name)
   x = suppressMessages(full_join(x, subset))
   return(x)
 }
@@ -681,7 +681,6 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        cols = find_items("JOB.009", data), 
                        id = "CaregiverID",
                        newvar.name = "Job.009_cat")
-    newdata$unemployed = ifelse(grepl("5", data$Job.009_cat), 1, 0)
     }
   
   if(contains_items("JOB.011", data)) newdata$employment_decreased = ifelse(data$JOB.011 == 2, NA, data$JOB.011)
@@ -956,7 +955,48 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        id = "CaregiverID",
                        newvar.name = "JOB.008_cat")
     data$JOB.008_cat = gsub("10", "0", data$JOB.008_cat)
+    
     newdata$working_current = ifelse(grepl("[1,2,6]", data$JOB.008_cat), 1, 0)
+    
+    data = data %>%
+      mutate(
+        work_status = case_when(
+          grepl("1", JOB.008_cat) ~ "Employed",
+          grepl("2", JOB.008_cat) ~ "Employed",
+          grepl("3", JOB.008_cat) ~ "Unemployed",
+          grepl("4", JOB.008_cat) ~ "Unemployed",
+          grepl("5", JOB.008_cat) ~ "Employed",
+          JOB.008.2 == 1 ~ "Employed",
+          JOB.008.2 %in% c(2,3) ~ "Unemployed",
+          TRUE ~ NA_character_),
+        work_status_pre = case_when(
+          grepl("1", JOB.010_cat) ~ "Employed",
+          grepl("2", JOB.010_cat) ~ "Employed",
+          grepl("3", JOB.010_cat) ~ "Unemployed",
+          grepl("4", JOB.010_cat) ~ "Unemployed",
+          grepl("5", JOB.010_cat) ~ "Employed",
+          TRUE ~ NA_character_),
+        employment_change = case_when(
+          work_status == "Employed" & work_status_pre == "Employed" ~ "Stable Employed",
+          work_status == "Employed" & work_status_pre == "Unemployed" ~ "Became Unemployed",
+          work_status == "Unemployed" & work_status_pre == "Employed" ~ "Became Employed",
+          work_status == "Unemployed" & work_status_pre == "Unemployed" ~ "Stable Unemployed",
+          TRUE ~ NA_character_))
+    
+    newdata$work_status = data$work_status
+    newdata$work_status_pre = data$work_status_pre
+    newdata$employment_change = data$employment_change
+    
+    data = data %>%
+      mutate(unemployed = case_when(
+        grepl("3", JOB.008_cat) ~ 1,
+        grepl("4", JOB.008_cat) ~ 1,
+        JOB.008.2 == 2 ~ 1,
+        !is.na(JOB.008_cat) ~ 0,
+        !is.na(JOB.008.2) ~ 0,
+        TRUE ~ NA_real_
+      ))
+    newdata$unemployed = data$unemployed
   }
   
   
