@@ -46,6 +46,9 @@ source(here("Functions/state_abbr.R"))
 score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FALSE){
   
   items = names(data)
+  
+  data = zap_labels(data)
+  
   if(!master){
     newdata = data.frame(CaregiverID = data$CaregiverID, Week = week)
     newdata$CaregiverID = as.character(newdata$CaregiverID)

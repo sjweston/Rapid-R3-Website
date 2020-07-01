@@ -182,6 +182,22 @@ fit$plot
 fit$summary
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  write.csv(., file = here("figure data/0629_overall_anxiety.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  write.csv(., file = here("figure data/0629_overall_anxiety_dots.csv"))
+```
+
 ### Black/African American
 
 ```{r curve-94 }
@@ -360,6 +376,22 @@ fit$plot
 fit$summary
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  write.csv(., file = here("figure data/0629_overall_depress.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  write.csv(., file = here("figure data/0629_overall_depress_dots.csv"))
+```
+
 ### Black/African American
 
 ```{r curve-108 }
@@ -536,6 +568,22 @@ fit$plot
 
 ```{r curve-121, results = 'asis'}
 fit$summary
+```
+
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  write.csv(., file = here("figure data/0629_overall_stress.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  write.csv(., file = here("figure data/0629_overall_stress_dots.csv"))
 ```
 
 ### Black/African American
@@ -745,6 +793,22 @@ fit$plot
 fit$summary
 ```
 
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  write.csv(., file = here("figure data/0629_overall_lonely.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  write.csv(., file = here("figure data/0629_overall_lonely_dots.csv"))
+```
+
 ### Black/African American
 
 ```{r curve-136 }
@@ -820,6 +884,24 @@ emotion_g %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
   kable_styling(full_width = T)
 
+```
+
+```{r}
+# export data for soapbox
+#lines
+fit$pdata %>%
+  select(Week, disability, fit) %>%
+  mutate(fit = round(fit,2)) %>%
+  rename(problems = fit) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_lonely.csv"))
+#dots
+fit$plot$data %>%
+  select(Week, disability, m) %>%
+  mutate(m = round(m,2)) %>%
+  rename(problems = m) %>%
+  mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
+  write.csv(., file = here("figure data/0629_disability_lonely_dots.csv"))
 ```
 ### 3+ Children
 
