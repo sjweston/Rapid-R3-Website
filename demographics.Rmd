@@ -7,7 +7,7 @@ output:
     theme: paper
 ---
 
-```{r, echo = F}
+```{r demographics-1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 ```
@@ -18,16 +18,16 @@ library(tsibble)
 library(brolgar)
 ```
 
-```{r score datafile, echo = F, warning = F, message = F}
+```{r score_datafile, echo = F, warning = F, message = F}
 source(here("Scripts/score data.R"))
 ```
 
 
-```{r, key demographics}
+```{r demographics-2, key_demographics}
 source(here("Scripts/demo groups.R"))
 ```
 
-```{r}
+```{r demographics-3}
 max_weeks = max(scored$Week, na.rm=T)
 start_dates = seq(as.Date("2020-04-07"), by = 7, length.out = max_weeks)
 end_dates = seq(as.Date("2020-04-13"), by = 7, length.out = max_weeks)
@@ -41,7 +41,7 @@ all_dates = paste(start_dates, "-", end_dates)
 
 # Across all parents sampled
 
-```{r, results = 'asis'}
+```{r demographics-4, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -65,11 +65,11 @@ scored %>%
 
 ## Income (Self-reported)
 
-```{r}
+```{r demographics-5}
 source(here("Functions/income_levels.R"))
 ```
 
-```{r, results = 'asis'}
+```{r demographics-6, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -85,7 +85,7 @@ scored %>%
 ```
 
 
-```{r, results = 'asis'}
+```{r demographics-7, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -105,11 +105,11 @@ scored %>%
 
 ## Income (Median household in zip)
 
-```{r}
+```{r demographics-8}
 source(here("Functions/income_levels.R"))
 ```
 
-```{r, results = 'asis'}
+```{r demographics-9, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -125,7 +125,7 @@ scored %>%
 ```
 
 
-```{r, results = 'asis'}
+```{r demographics-10, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -145,7 +145,7 @@ scored %>%
 
 ## Healthcare
 
-```{r, results = 'asis'}
+```{r demographics-11, results = 'asis'}
 source(here("Scripts/health variables.R"))
 scored %>%
   filter(Week > 0) %>%
@@ -171,33 +171,33 @@ scored %>%
 
 ## Comparisons with national demographics {.tabset}
 
-```{r}
+```{r demographics-12}
 source(here("Scripts/compare nation/load_pop.R"))
 ```
 
 ### Gender
 
-```{r, out.width='100%', code = readLines(here("Scripts/compare nation/gender.R"))}
+```{r demographics-13, out.width='100%', code = readLines(here("Scripts/compare nation/gender.R"))}
 ```
 
 ### Nationality
 
-```{r, out.width='100%', code = readLines(here("Scripts/compare nation/nationality.R"))}
+```{r demographics-14, out.width='100%', code = readLines(here("Scripts/compare nation/nationality.R"))}
 ```
 
 ### Nationality by region
 
-```{r, out.width='100%', code = readLines(here("Scripts/compare nation/nationality_region.R"))}
+```{r demographics-15, out.width='100%', code = readLines(here("Scripts/compare nation/nationality_region.R"))}
 ```
 
 ### Ethnicity by region
 
-```{r, out.width='100%', code = readLines(here("Scripts/compare nation/ethnicity.R"))}
+```{r demographics-16, out.width='100%', code = readLines(here("Scripts/compare nation/ethnicity.R"))}
 ```
 
 # Numbers by the week
 
-```{r, results = 'asis'}
+```{r demographics-17, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   select(Week, all_of(binary_demos)) %>%
@@ -218,7 +218,7 @@ scored %>%
 
 ## Self-reported Income
 
-```{r, results = 'asis'}
+```{r demographics-18, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   select(Week, income) %>%
@@ -233,7 +233,7 @@ scored %>%
 ```
 
 
-```{r, results = 'asis'}
+```{r demographics-19, results = 'asis'}
 tab.inc = scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -259,7 +259,7 @@ header = paste0("add_header_above( c( \" \" = 1", header, ")) %>% scroll_box(wid
 eval(parse(text = paste0(beginning, header)))
 ```
 
-```{r}
+```{r demographics-20}
 ts_income = scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -280,8 +280,8 @@ ts_income <- as_tsibble(ts_income,
 ts_income %>%
   ggplot(aes(x = Week, y = Percent, color = income_cat)) +
   geom_line() +
-  facet_wrap(~income_facet) +
-  facet_strata(n_strata = 6, along = income_cat) +
+  #facet_wrap(~income_cat) +
+  facet_strata(n_strata = 6) +
   labs(color = "Yearly income (in thousands)")+
   theme_minimal() +
   theme(legend.position = "bottom")
@@ -289,7 +289,7 @@ ts_income %>%
 
 ## Average household income in zip
 
-```{r, results = 'asis'}
+```{r demographics-21, results = 'asis'}
 scored %>%
   filter(Week > 0) %>%
   select(Week, median_income) %>%
@@ -305,7 +305,7 @@ scored %>%
 ```
 
 
-```{r, results = 'asis'}
+```{r demographics-22, results = 'asis'}
 tab.inc = scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -331,7 +331,7 @@ header = paste0("add_header_above( c( \" \" = 1", header, ")) %>% scroll_box(wid
 eval(parse(text = paste0(beginning, header)))
 ```
 
-```{r}
+```{r demographics-23}
 ts_income = scored %>%
   filter(Week > 0) %>%
   group_by(CaregiverID) %>%
@@ -353,7 +353,7 @@ ts_income %>%
   ggplot(aes(x = Week, y = Percent, color = income_cat)) +
   geom_line() +
   facet_wrap(~income_facet) +
-  facet_strata(n_strata = 6, along = income_cat) +
+  facet_strata(n_strata = 6) +
   labs(color = "Yearly income (in thousands)")+
   theme_minimal() +
   theme(legend.position = "bottom")
@@ -363,7 +363,7 @@ ts_income %>%
 
 ## Healthcare
 
-```{r, results = 'asis'}
+```{r demographics-24, results = 'asis'}
 source(here("Scripts/health variables.R"))
 tab.hc = scored %>%
   filter(Week > 0) %>%
@@ -389,7 +389,7 @@ header = paste0("add_header_above( c( \" \" = 1", header, ")) %>% scroll_box(wid
 eval(parse(text = paste0(beginning, header)))
 ```
 
-```{r}
+```{r demographics-25}
 scored %>%
   filter(Week > 0) %>%
   select(Week, healthcare_vars) %>%
@@ -408,7 +408,7 @@ scored %>%
 
 ## Table
 
-```{r, results = 'asis', out.width='100%'}
+```{r demographics-26, results = 'asis', out.width='100%'}
 total = scored %>%
   filter(Week > 0) %>%
   group_by(Week) %>%
@@ -435,7 +435,7 @@ scored %>%
 
 ## Compare to national demographics
 
-```{r}
+```{r demographics-27}
 nation_race = pop %>%
   select(TotalPop.Count, 
          (contains("Race") & contains("Count"))) %>%

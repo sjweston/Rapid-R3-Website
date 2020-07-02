@@ -1190,12 +1190,12 @@ pb.table = scored %>%
   - 7 $(N = `r pb.table[pb.table$material_hardship == 7,"N"]`)$
   - 8 $(N = `r pb.table[pb.table$material_hardship == 8,"N"]`)$
   
-For these analyses, we censor responses at 4 (creating a 4+ category).
+For these analyses, we censor responses at 1 (creating a 1+ category).
 
 ```{r policy-132 }
 scored = scored %>%
   mutate(material_hardship = case_when(
-    material_hardship >= 4 ~ "4+",
+    material_hardship >= 1 ~ "1+",
     !is.na(material_hardship) ~ as.character(material_hardship),
     TRUE ~ NA_character_
   ))
