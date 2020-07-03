@@ -134,6 +134,37 @@ bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL)
   
 }
 
+bygroup_ttest = function(data, variable, group){
+  
+  
+  long_plotd = data %>%
+    dplyr::group_by(CaregiverID) %>%
+    filter(!is.na({{variable}}) & !is.na({{group}})) %>%
+    filter(Week == max(Week)) %>%
+    dplyr::group_by({{variable}}, {{group}}) %>%
+    summarize(Count = n()) %>%
+    dplyr::group_by({{group}}) %>%
+    mutate(Percent = 100*Count/sum(Count),
+           Total = sum(Count)) %>%
+    group_by({{variable}}) %>%
+    nest() %>%
+    mutate(prop = map(data, .f = function(x)
+      prop.test(x$Count, x$Total))) %>%
+    mutate(prop = map(prop, broom::tidy)) %>%
+    unnest(prop) %>%
+    select({{variable}}, statistic, p.value) %>% 
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(digits = 2) %>%
+    kable_styling(full_width = T)
+  
+  return(long_plotd)
+  #test = prop.test(x = long_plotd$Count)
+  
+
+ 
+    
+}
+
 bycont_plot = function(data, variable, outcome){
   
   
@@ -379,6 +410,47 @@ bycont_c_plot = function(data, variables, labels, outcome){
     coord_flip()+
     theme_pubclean()
   ggplotly(long_plotd, tooltip = "text")
+  
+}
+
+bygroup_c_ttest = function(data, variables, labels, group){
+
+  
+  ncaregivers_group = data %>%
+    group_by(CaregiverID) %>%
+    filter(!is.na({{group}})) %>%
+    filter(Week == max(Week)) %>%
+    group_by({{group}}) %>%
+    summarize(N = n())
+  
+  long_plotd = data %>%
+    dplyr::group_by(CaregiverID) %>%
+    filter(!is.na({{group}})) %>%
+    filter(Week == max(Week)) %>%
+    group_by({{group}}) %>%
+    summarize_at(.vars = variables, .funs = list(sum), na.rm=T) %>%
+    gather(key, Count, -{{group}}) %>%
+    right_join(ncaregivers_group) %>%
+    mutate(Percent = 100*Count/N,
+           key = factor(key, 
+                        levels = variables, 
+                        labels = labels)) %>%
+    group_by(key) %>%
+    nest() %>%
+    mutate(prop = map(data, .f = function(x)
+      prop.test(x$Count, x$N))) %>%
+    mutate(prop = map(prop, broom::tidy)) %>%
+    unnest(prop) %>%
+    select(key, statistic, p.value) %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(digits = 2) %>%
+    kable_styling(full_width = T)
+  
+  return(long_plotd)
+  #test = prop.test(x = long_plotd$Count)
+  
+  
+  
   
 }
 

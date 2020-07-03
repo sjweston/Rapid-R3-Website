@@ -127,22 +127,35 @@ region_plot(scored, public_benefits)
 bygroup_plot(scored, public_benefits, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, public_benefits, black)
+```
+
 ### LatinX
 
 ```{r policy-13 }
 bygroup_plot(scored, public_benefits, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
-
+```{r}
+bygroup_ttest(scored, public_benefits, latinx)
+```
 ### Low income
 
 ```{r policy-14 }
 bygroup_plot(scored, public_benefits, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
+```
+```{r}
+bygroup_ttest(scored, public_benefits, poverty150)
 ```
 
 ### Income by Employment
 
 ```{r policy-15 }
 bygroup_plot(scored, public_benefits, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, public_benefits, employ_inc1)
 ```
 
 
@@ -222,11 +235,21 @@ region_c_plot(scored, pb_vars, pb_labels)
 bygroup_c_plot(scored, pb_vars, pb_labels, black, g.levels = c(0,1), g.labels = c("Everyone else", "Black"))
 ```
 
+```{r  }
+bygroup_c_ttest(scored, pb_vars, pb_labels, black)
+```
+
+
 ### LatinX
 
 ```{r policy-24 }
 bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels = c("Everyone else", "LatinX"))
 ```
+
+```{r }
+bygroup_c_ttest(scored, pb_vars, pb_labels, latinx)
+```
+
 
 ### Low income
 
@@ -234,11 +257,21 @@ bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels =
 bygroup_c_plot(scored, pb_vars, pb_labels, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r  }
+bygroup_c_ttest(scored, pb_vars, pb_labels, poverty150)
+```
+
+
 ### Income by Employment
 
 ```{r policy-26}
 bygroup_c_plot(scored, pb_vars, pb_labels, employ_inc1)
 ```
+
+```{r }
+bygroup_c_ttest(scored, pb_vars, pb_labels, employ_inc1)
+```
+
 
 ### Related to well-being
 
@@ -303,10 +336,18 @@ region_plot(scored, federal_stim)
 bygroup_plot(scored, federal_stim, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, federal_stim, black)
+```
+
 ### LatinX
 
 ```{r policy-34 }
 bygroup_plot(scored, federal_stim, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, federal_stim, latinx)
 ```
 
 ### Low income
@@ -315,10 +356,17 @@ bygroup_plot(scored, federal_stim, latinx, g.levels = c(0,1),g.labels = c("Every
 bygroup_plot(scored, federal_stim, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, federal_stim, poverty150)
+```
 ### Income by Employment
 
 ```{r policy-36}
 bygroup_plot(scored, federal_stim, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, federal_stim, employ_inc1)
 ```
 
 
@@ -382,10 +430,18 @@ region_plot(scored, income_change)
 bygroup_plot(scored, income_change, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, income_change, black)
+```
+
 ### LatinX
 
 ```{r policy-44 }
 bygroup_plot(scored, income_change, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, income_change, latinx)
 ```
 
 ### Low income
@@ -394,10 +450,18 @@ bygroup_plot(scored, income_change, latinx, g.levels = c(0,1),g.labels = c("Ever
 bygroup_plot(scored, income_change, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, income_change, poverty)
+```
+
 ### Income by Employment
 
 ```{r policy-46}
 bygroup_plot(scored, income_change, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, income_change, employ_inc1)
 ```
 
 ### Related to well-being
@@ -461,10 +525,18 @@ region_plot(scored, financial_status)
 bygroup_plot(scored, financial_status, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, financial_status, black)
+```
+
 ### LatinX
 
 ```{r policy-54 }
 bygroup_plot(scored, financial_status, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, financial_status, latinx)
 ```
 
 ### Low income
@@ -473,10 +545,18 @@ bygroup_plot(scored, financial_status, latinx, g.levels = c(0,1),g.labels = c("E
 bygroup_plot(scored, financial_status, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, financial_status, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-56}
 bygroup_plot(scored, financial_status, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, financial_status, employ_inc1)
 ```
 
 ### Related to well-being
@@ -543,10 +623,18 @@ region_plot(scored, missed_wellbaby)
 bygroup_plot(scored, missed_wellbaby, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, missed_wellbaby, black)
+```
+
 ### LatinX
 
 ```{r policy-64 }
 bygroup_plot(scored, missed_wellbaby, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, missed_wellbaby, latinx)
 ```
 
 ### Low income
@@ -555,10 +643,18 @@ bygroup_plot(scored, missed_wellbaby, latinx, g.levels = c(0,1),g.labels = c("Ev
 bygroup_plot(scored, missed_wellbaby, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, missed_wellbaby, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-66}
 bygroup_plot(scored, missed_wellbaby, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, missed_wellbaby, employ_inc1)
 ```
 
 ### Related to well-being
@@ -636,10 +732,18 @@ region_plot(scored, missed_vaccine)
 bygroup_plot(scored, missed_vaccine, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, missed_vaccine, black)
+```
+
 ### LatinX
 
 ```{r policy-74 }
 bygroup_plot(scored, missed_vaccine, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, missed_vaccine, latinx)
 ```
 
 ### Low income
@@ -648,10 +752,18 @@ bygroup_plot(scored, missed_vaccine, latinx, g.levels = c(0,1),g.labels = c("Eve
 bygroup_plot(scored, missed_vaccine, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, missed_vaccine, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-76}
 bygroup_plot(scored, missed_vaccine, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, missed_vaccine, employ_inc1)
 ```
 
 ### Related to well-being
@@ -725,10 +837,19 @@ region_c_plot(scored, pb_vars, pb_labels)
 bygroup_c_plot(scored, pb_vars, pb_labels, black, g.levels = c(0,1), g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, black)
+```
+
 ### LatinX
 
 ```{r policy-85 }
 bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels = c("Everyone else", "LatinX"))
+```
+
+
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, latinx)
 ```
 
 ### Low income
@@ -737,10 +858,19 @@ bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels =
 bygroup_c_plot(scored, pb_vars, pb_labels, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, poverty150)
+```
 ### Income by Employment
 
 ```{r policy-87}
 bygroup_c_plot(scored, pb_vars, pb_labels, employ_inc1)
+```
+
+
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, employ_inc1)
 ```
 
 ### Related to well-being
@@ -805,11 +935,18 @@ region_plot(scored, free_food_cat)
 ```{r policy-94 }
 bygroup_plot(scored, free_food_cat, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
+```{r}
+bygroup_ttest(scored, free_food_cat, black)
+```
 
 ### LatinX
 
 ```{r policy-95 }
 bygroup_plot(scored, free_food_cat, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, free_food_cat, latinx)
 ```
 
 ### Low income
@@ -818,10 +955,18 @@ bygroup_plot(scored, free_food_cat, latinx, g.levels = c(0,1),g.labels = c("Ever
 bygroup_plot(scored, free_food_cat, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, free_food_cat, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-97}
 bygroup_plot(scored, free_food_cat, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, free_food_cat, employ_inc1)
 ```
 
 ### Related to well-being
@@ -966,10 +1111,18 @@ region_plot(scored, free_lunch_now_cat)
 bygroup_plot(scored, free_lunch_now_cat, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+
+```{r}
+bygroup_ttest(scored, free_lunch_now_cat, black)
+```
 ### LatinX
 
 ```{r policy-105 }
 bygroup_plot(scored, free_lunch_now_cat, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, free_lunch_now_cat, latinx)
 ```
 
 ### Low income
@@ -978,10 +1131,22 @@ bygroup_plot(scored, free_lunch_now_cat, latinx, g.levels = c(0,1),g.labels = c(
 bygroup_plot(scored, free_lunch_now_cat, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, free_lunch_now_cat, poverty150)
+```
+
+```{r}
+bygroup_ttest(scored, free_lunch_now_cat, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-107}
 bygroup_plot(scored, free_lunch_now_cat, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, free_lunch_now_cat, employ_inc1)
 ```
 
 ### Related to well-being
@@ -1045,10 +1210,17 @@ region_plot(scored, difficulty_basics_cat)
 bygroup_plot(scored, difficulty_basics_cat, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, difficulty_basics_cat, black)
+```
 ### LatinX
 
 ```{r policy-115 }
 bygroup_plot(scored, difficulty_basics_cat, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, difficulty_basics_cat, latinx)
 ```
 
 ### Low income
@@ -1057,10 +1229,18 @@ bygroup_plot(scored, difficulty_basics_cat, latinx, g.levels = c(0,1),g.labels =
 bygroup_plot(scored, difficulty_basics_cat, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, difficulty_basics_cat, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-117}
 bygroup_plot(scored, difficulty_basics_cat, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, difficulty_basics_cat, employ_inc1)
 ```
 
 ### Related to well-being
@@ -1134,10 +1314,17 @@ region_c_plot(scored, pb_vars, pb_labels)
 bygroup_c_plot(scored, pb_vars, pb_labels, black, g.levels = c(0,1), g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, black)
+```
 ### LatinX
 
 ```{r policy-126 }
 bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, latinx)
 ```
 
 ### Low income
@@ -1146,10 +1333,18 @@ bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels =
 bygroup_c_plot(scored, pb_vars, pb_labels, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-128}
 bygroup_c_plot(scored, pb_vars, pb_labels, employ_inc1)
+```
+
+```{r}
+bygroup_c_ttest(scored, pb_vars, pb_labels, employ_inc1)
 ```
 
 ### Related to well-being
@@ -1232,10 +1427,18 @@ region_plot(scored, material_hardship)
 bygroup_plot(scored, material_hardship, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
+```{r}
+bygroup_ttest(scored, material_hardship, black)
+```
+
 ### LatinX
 
 ```{r policy-137 }
 bygroup_plot(scored, material_hardship, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r}
+bygroup_ttest(scored, material_hardship, latinx)
 ```
 
 ### Low income
@@ -1244,10 +1447,18 @@ bygroup_plot(scored, material_hardship, latinx, g.levels = c(0,1),g.labels = c("
 bygroup_plot(scored, material_hardship, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
+```{r}
+bygroup_ttest(scored, material_hardship, poverty150)
+```
+
 ### Income by Employment
 
 ```{r policy-139}
 bygroup_plot(scored, material_hardship, employ_inc1)
+```
+
+```{r}
+bygroup_ttest(scored, material_hardship, employ_inc1)
 ```
 
 ### Related to well-being
