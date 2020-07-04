@@ -92,7 +92,6 @@ region_plot = function(data, variable, group = region){
 }
 
 bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL){
-  
 
   long_plotd = data %>%
     dplyr::group_by(CaregiverID) %>%
@@ -101,7 +100,10 @@ bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL)
     dplyr::group_by({{variable}}, {{group}}) %>%
     summarize(Count = n()) %>%
     dplyr::group_by({{group}}) %>%
-    mutate(Percent = 100*Count/sum(Count)) %>%
+    mutate(Percent = 100*Count/sum(Count),
+           p = Count/sum(Count),
+           se = sqrt((p*(1-p))/sum(Count)),
+           moe = 100*1.96*se) %>%
     ungroup()
   
   if(!is.null(g.levels)){
@@ -121,6 +123,7 @@ bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL)
                             "\nResponse:", {{variable}},
                             "\nPercent:", round(Percent,2), "\nCount:", Count))) +
     geom_bar(stat = "identity") +
+    geom_errorbar(aes(ymin = Percent-moe, ymax = Percent+moe), width = .5)+
     scale_fill_brewer(palette = "Dark2") +
     labs(x = "")+
     guides(fill = F) +
