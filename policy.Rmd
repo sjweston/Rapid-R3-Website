@@ -805,6 +805,15 @@ Options:
   
 _Sample sizes are based on caregiver response at the most recent week of participation._
 
+```{r}
+scored$financial_status_num = case_when(
+  scored$financial_status %in% c("None", "Minor") ~ 0, 
+  scored$financial_status %in% c("Major", "Extreme") ~ 1, 
+  TRUE ~ NA_real_
+)
+```
+
+
 ### Overall
 
 ```{r policy-122 }
@@ -917,6 +926,18 @@ bygroup_plot(scored, financial_status, black_inc)
 bygroup_ttest(scored, financial_status, black_inc)
 ```
 
+```{r, results = 'asis'}
+max_care = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+
+kable(broom::tidy(pairwise.t.test(max_care$financial_status_num, max_care$black_inc, p.adjust.method = "holm")), 
+      digits = 3, 
+      caption = "Pairwise t-tests with a Holm correction") %>%
+  kable_styling(full_width = T)
+```
+
 ### Income by Latinx
 
 ```{r policy-143  }
@@ -925,6 +946,13 @@ bygroup_plot(scored, financial_status, latinx_inc)
 
 ```{r policy-144}
 bygroup_ttest(scored, financial_status, latinx_inc)
+```
+
+```{r, results = 'asis'}
+kable(broom::tidy(pairwise.t.test(max_care$financial_status_num, max_care$black_inc, p.adjust.method = "holm")), 
+      digits = 3, 
+      caption = "Pairwise t-tests with a Holm correction") %>%
+  kable_styling(full_width = T)
 ```
 
 ### Income by South
@@ -2271,6 +2299,8 @@ pb.table = scored %>%
   - 7 $(N = `r pb.table[pb.table$material_hardship == 7,"N"]`)$
   - 8 $(N = `r pb.table[pb.table$material_hardship == 8,"N"]`)$
   
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
 For these analyses, we censor responses at 1 (creating a 1+ category).
 
 ```{r policy-349 }
@@ -2280,11 +2310,16 @@ scored = scored %>%
     !is.na(material_hardship) ~ as.character(material_hardship),
     TRUE ~ NA_character_
   ))
+
+scored$material_hardship_num = case_when(
+  scored$material_hardship == "0" ~ 0,
+  scored$material_hardship == "1+" ~ 1,
+  TRUE ~ NA_real_
+)
 ```
 
 
 
-_Sample sizes are based on caregiver response at the most recent week of participation._
 
 ### Overall
 
@@ -2399,6 +2434,19 @@ bygroup_plot(scored, material_hardship, black_inc)
 bygroup_ttest(scored, material_hardship, black_inc)
 ```
 
+```{r, results = 'asis'}
+max_care = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+
+kable(broom::tidy(pairwise.t.test(max_care$material_hardship_num, max_care$black_inc, p.adjust.method = "holm")), 
+      digits = 3, 
+      caption = "Pairwise t-tests with a Holm correction") %>%
+  kable_styling(full_width = T)
+```
+
+
 ### Income by Latinx
 
 ```{r policy-371  }
@@ -2408,6 +2456,13 @@ bygroup_plot(scored, material_hardship, latinx_inc)
 ```{r policy-372}
 bygroup_ttest(scored, material_hardship, latinx_inc)
 ```
+
+```{r, results = 'asis'}
+kable(broom::tidy(pairwise.t.test(max_care$material_hardship_num, max_care$latinx_inc, p.adjust.method = "holm")), 
+      digits = 3, caption = "Pairwise t-tests with a Holm correction") %>%
+  kable_styling(full_width = T)
+```
+
 
 ### Income by South
 
