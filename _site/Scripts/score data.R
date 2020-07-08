@@ -12,12 +12,19 @@ library(jsonlite)
 library(readr)
 library(zoo) # for rolling averages and sums!
 
+scored_in_environ = length(which(grepl("scored", ls()))) > 0
+
+if(!scored_in_environ){
+
 data(zipcode)
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 12 MasterFiles/MasterFile_groupings.sav"))
-#master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+#master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 12 MasterFiles/MasterFile_groupings.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
 master = filter(master, CaregiverID != "") 
-#master = unique(master)
+master = master %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup()
 
 # source functions --------------------------------------------------------
 
@@ -206,3 +213,8 @@ zipincome$zip = as.character(zipincome$zip)
 zipincome = filter(zipincome, !is.na(zip))
 
 scored = left_join(scored, zipincome)
+save(scored, file = paste0(here("../../Data Management R3/R Data/"), "scored.Rdata"))
+} else{
+  rm(scored)
+  load(here("../../Data Management R3/R Data/scored.Rdata"))
+}

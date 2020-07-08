@@ -115,9 +115,9 @@ bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL)
   
   
   long_plotd = long_plotd %>%
-    ggplot(aes(x = {{variable}},
+    ggplot(aes(x = {{group}},
                y = Percent,
-               fill = {{group}},
+               fill = {{variable}},
                group=1,
                text = paste("\nGroup:", {{group}},
                             "\nResponse:", {{variable}},
@@ -128,7 +128,7 @@ bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL)
     labs(x = "")+
     guides(fill = F) +
     coord_flip()+
-    facet_grid(cols = vars({{group}})) +
+    facet_grid(cols = vars({{variable}}), scales = "free") +
     theme_pubclean()
   
   
@@ -445,6 +445,7 @@ bygroup_c_ttest = function(data, variables, labels, group){
     mutate(prop = map(prop, broom::tidy)) %>%
     unnest(prop) %>%
     select(key, statistic, p.value) %>%
+    filter(!is.nan(p.value)) %>%
     mutate(p.value = papaja::printp(p.value)) %>%
     kable(digits = 2) %>%
     kable_styling(full_width = T)

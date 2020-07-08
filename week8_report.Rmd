@@ -143,7 +143,6 @@ for(i in demos){
     group_by(group) %>%
     summarize(N = n()) %>%
     full_join(new_perc_vals) %>%
-    ungroup(group) %>%
     mutate(group_label = i) %>%
     mutate(group = as.character(group))
   

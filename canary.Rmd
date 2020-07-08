@@ -22,12 +22,15 @@ library(ggpubr)
 source(here("Scripts/score data.R")) 
 
 completedWeek9 = scored %>%
-  filter(Week == 9) 
+  filter(Week == 9)
 completedWeek9 = completedWeek9$CaregiverID
 
 scored = scored %>%
   filter(CaregiverID %in% completedWeek9) %>%
-  filter(Week %in% c(0,9))
+  filter(Week %in% c(0,9)) %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == 1) %>%
+  ungroup()
 
 # groups
 scored = scored %>%

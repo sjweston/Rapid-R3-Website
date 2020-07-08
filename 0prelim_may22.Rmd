@@ -719,7 +719,8 @@ scored %>%
 # Open-ended questions
 
 ```{r 0prelim-may22-24}
-text_data = cbind(scored[,c("CaregiverID", demo_groups)], master[master$Week == 7,find_items("OPEN", master)])
+text_data = scored[,c("CaregiverID", demo_groups)] %>%
+  left_join(master[master$Week == 7, c("CaregiverID", find_items("OPEN", master))])
 ```
 
 
