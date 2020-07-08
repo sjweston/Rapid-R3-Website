@@ -43,7 +43,10 @@ scored = scored %>%
   rowwise() %>%
   #well-being composite
   mutate(wellbeing = mean(c(anxiety, depress, stress, lonely), na.rm=T),
-         wellbeing = 100-wellbeing) %>%
+         wellbeing = 100-wellbeing,
+         child_wellbeing = mean(c(fear, fussy), na.rm=T),
+         child_wellbeing = 100-child_wellbeing,
+         family_wellbeing = mean(c(wellbeing, child_wellbeing), na.rm=T)) %>%
   ungroup() %>%
   mutate(employ_inc1 = case_when(
     unemployed == 0 & poverty150 == 0 ~ "Employed, High Income",
@@ -2474,7 +2477,7 @@ bygroup_plot(scored, material_hardship, south_inc)
 bygroup_ttest(scored, material_hardship, latinx_inc)
 ```
 
-### Related to well-being
+### Related to caregiver well-being
 
 ```{r policy-375 }
 bycont_plot(scored, material_hardship, wellbeing)
@@ -2482,4 +2485,24 @@ bycont_plot(scored, material_hardship, wellbeing)
 
 ```{r policy-376, results = 'asis'}
 bcont_table(scored, material_hardship, wellbeing)
+```
+
+### Related to child well-being
+
+```{r }
+bycont_plot(scored, material_hardship, child_wellbeing)
+```
+
+```{r, results = 'asis'}
+bcont_table(scored, material_hardship, child_wellbeing)
+```
+
+### Related to family well-being
+
+```{r }
+bycont_plot(scored, material_hardship, family_wellbeing)
+```
+
+```{r, results = 'asis'}
+bcont_table(scored, material_hardship, family_wellbeing)
 ```
