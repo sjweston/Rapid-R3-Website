@@ -91,6 +91,37 @@ region_plot = function(data, variable, group = region){
   ggplotly(long_plotd, tooltip = "text")
 }
 
+region_co_plot = function(data, variable, group = region){
+  
+  long_plotd = data %>%
+    filter(!is.na({{variable}}) & !is.na({{group}})) %>%
+    group_by(Week, {{group}}) %>%
+    summarize(Average = mean({{variable}}),
+              MOE = moe({{variable}}),
+              N = n()) %>%
+    ungroup() %>%
+    ggplot(aes(x = Week, 
+               y = Average, 
+               color = {{group}},
+               group=1,
+               text = paste("Week:", Week, 
+                            "\nGroup:", {{group}},
+                            "\nAverage:", round(Average,2), 
+                            "\nCI Lower:", round(Average-MOE,2), 
+                            "\nCI Upper:", round(Average+MOE,2), 
+                            "\nN:", N)
+    )) +
+    geom_point() + 
+    geom_line() +
+    scale_color_brewer(palette = "Dark2")+
+    labs(x = "Week", 
+         y = "Response by week")+
+    scale_x_continuous(breaks = unique(data$Week)) +
+    theme_pubclean()
+  
+  ggplotly(long_plotd, tooltip = "text")
+}
+
 bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL){
 
   long_plotd = data %>%

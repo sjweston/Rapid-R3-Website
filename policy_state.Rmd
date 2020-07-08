@@ -40,7 +40,6 @@ source(here("Functions/pomp.R"))
 ```{r policy-state-5 }
 #pomp scoring
 scored = scored %>%
-  filter(Date > "2020-06-25") %>%
   mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
   rowwise() %>%
   #well-being composite
@@ -77,6 +76,8 @@ scored = scored %>%
 scored = scored %>%
   mutate(
    states_reopening_status = case_when(
+     Date < "2020-06-25" ~ NA_character_,
+     Week == 0 ~ NA_character_,
       state %in% c("CA", "AZ", "CO", "TX", "FL", "DE") ~ "New restrictions imposed",
       state %in% c("WA", "ID", "NV", "NM", "AR", "LA", 
                    "MS", "AL", "NC", "NJ", "MI") ~ "Paused",
@@ -89,6 +90,8 @@ scored = scored %>%
     TRUE ~ NA_character_) ) %>%
   mutate(
     states_death_restrictions = case_when(
+      Date < "2020-06-25" ~ NA_character_,
+      Week == 0 ~ NA_character_,
       state %in% c("ND", "AR", "SC", "NE", "AL", 
                    "OH", "LA","NV", "FL", "MS", "IN") ~ "Few restrictions, high risk",
       state %in% c("RI", "PA", "IL", "MN","DC", 
@@ -99,7 +102,14 @@ scored = scored %>%
                    "GA", "KY", "AK") ~ "Few restrictions, low risk",
       state %in% c("MI", "CT", "WV","OR", "VT", "WA", 
                    "DE", "NY", "ME", "HI", "CO") ~ "Many restrictions, low risk",
-    TRUE ~ NA_character_))
+    TRUE ~ NA_character_)) %>%
+  mutate(states_groups = case_when(
+    state %in% c("TX", "FL", "AZ") ~ "TX/FL/AZ",
+    state %in% c("ID", "WY", "MN") ~ "ID/WY/MN",
+    state %in% c("NY", "NJ") ~ "NY/NJ",
+    state == "CA" ~ "CA",
+    TRUE ~ NA_character_
+  ))
 ```
 
 # Categorization of states
@@ -130,6 +140,98 @@ These analyses are based on responses collected from `r papaja::printnum(n_care,
 ```{r policy-state-8 }
 source(here("Functions/policy_fun.R"))
 ```
+
+# Well-being
+
+## Caregiver Well-Being{.tabset}
+
+### By reopening status
+
+```{r}
+bycont_plot(scored, states_reopening_status, wellbeing)
+```
+
+```{r}
+bcont_table(scored, states_reopening_status, wellbeing)
+```
+
+### By restriction and risk
+
+```{r}
+bycont_plot(scored, states_death_restrictions, wellbeing)
+```
+
+```{r}
+bcont_table(scored, states_death_restrictions, wellbeing)
+```
+
+### By groups over time
+
+```{r}
+region_co_plot(scored, wellbeing, states_groups)
+```
+
+
+
+
+## Child Externalizing{.tabset}
+
+### By reopening status
+
+```{r}
+bycont_plot(scored, states_reopening_status, fussy)
+```
+
+```{r}
+bcont_table(scored, states_reopening_status, fussy)
+```
+
+### By restriction and risk
+
+```{r}
+bycont_plot(scored, states_death_restrictions, fussy)
+```
+
+```{r}
+bcont_table(scored, states_death_restrictions, fussy)
+```
+
+### By groups over time
+
+```{r}
+region_co_plot(scored, fussy, states_groups)
+```
+
+
+## Child Internalizing{.tabset}
+
+### By reopening status
+
+```{r}
+bycont_plot(scored, states_reopening_status, fear)
+```
+
+```{r}
+bcont_table(scored, states_reopening_status, fear)
+```
+
+
+### By restriction and risk
+
+```{r}
+bycont_plot(scored, states_death_restrictions, fear)
+```
+
+```{r}
+bcont_table(scored, states_death_restrictions, fear)
+```
+
+### By groups over time
+
+```{r}
+region_co_plot(scored, fear, states_groups)
+```
+
 
 
 # Economic Stability
