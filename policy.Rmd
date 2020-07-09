@@ -150,7 +150,7 @@ region_plot(scored, public_benefits)
 bygroup_plot(scored, public_benefits, region_south)
 ```
 
-```{r policy-13}
+```{r policy-13 }
 bygroup_ttest(scored, public_benefits, region_south)
 ```
 
@@ -160,7 +160,7 @@ bygroup_ttest(scored, public_benefits, region_south)
 bygroup_plot(scored, public_benefits, region_west)
 ```
 
-```{r policy-15}
+```{r policy-15 }
 bygroup_ttest(scored, public_benefits, region_west)
 ```
 
@@ -170,7 +170,7 @@ bygroup_ttest(scored, public_benefits, region_west)
 bygroup_plot(scored, public_benefits, region_northeast)
 ```
 
-```{r policy-17}
+```{r policy-17 }
 bygroup_ttest(scored, public_benefits, region_northeast)
 ```
 
@@ -180,7 +180,7 @@ bygroup_ttest(scored, public_benefits, region_northeast)
 bygroup_plot(scored, public_benefits, region_midwest)
 ```
 
-```{r policy-19}
+```{r policy-19 }
 bygroup_ttest(scored, public_benefits, region_midwest)
 ```
 
@@ -190,7 +190,7 @@ bygroup_ttest(scored, public_benefits, region_midwest)
 bygroup_plot(scored, public_benefits, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-21}
+```{r policy-21 }
 bygroup_ttest(scored, public_benefits, black)
 ```
 
@@ -199,7 +199,7 @@ bygroup_ttest(scored, public_benefits, black)
 ```{r policy-22 }
 bygroup_plot(scored, public_benefits, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
-```{r policy-23}
+```{r policy-23 }
 bygroup_ttest(scored, public_benefits, latinx)
 ```
 ### Low income
@@ -207,7 +207,7 @@ bygroup_ttest(scored, public_benefits, latinx)
 ```{r policy-24 }
 bygroup_plot(scored, public_benefits, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
-```{r policy-25}
+```{r policy-25 }
 bygroup_ttest(scored, public_benefits, poverty150)
 ```
 
@@ -217,7 +217,7 @@ bygroup_ttest(scored, public_benefits, poverty150)
 bygroup_plot(scored, public_benefits, employ_inc1)
 ```
 
-```{r policy-27}
+```{r policy-27 }
 bygroup_ttest(scored, public_benefits, employ_inc1)
 ```
 
@@ -228,27 +228,27 @@ bygroup_ttest(scored, public_benefits, employ_inc1)
 bygroup_plot(scored, public_benefits, black_inc)
 ```
 
-```{r policy-29}
+```{r policy-29 }
 bygroup_ttest(scored, public_benefits, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-30  }
+```{r policy-30 }
 bygroup_plot(scored, public_benefits, latinx_inc)
 ```
 
-```{r policy-31}
+```{r policy-31 }
 bygroup_ttest(scored, public_benefits, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-32  }
+```{r policy-32 }
 bygroup_plot(scored, public_benefits, south_inc)
 ```
 
-```{r policy-33}
+```{r policy-33 }
 bygroup_ttest(scored, public_benefits, latinx_inc)
 ```
 
@@ -256,6 +256,7 @@ bygroup_ttest(scored, public_benefits, latinx_inc)
 
 ```{r policy-34 }
 bycont_plot(scored, public_benefits, wellbeing)
+bycont_m_plot(scored, public_benefits, wellbeing, black, c(0,1), c("Not Black", "Black"))
 ```
 
 ```{r policy-35, results = 'asis'}
@@ -331,7 +332,7 @@ region_c_plot(scored, pb_vars, pb_labels)
 bygroup_c_plot(scored, pb_vars, pb_labels, region_south)
 ```
 
-```{r policy-42}
+```{r policy-42 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_south)
 ```
 
@@ -341,7 +342,7 @@ bygroup_c_ttest(scored, pb_vars, pb_labels, region_south)
 bygroup_c_plot(scored, pb_vars, pb_labels, region_west)
 ```
 
-```{r policy-44}
+```{r policy-44 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_west)
 ```
 
@@ -351,7 +352,7 @@ bygroup_c_ttest(scored, pb_vars, pb_labels, region_west)
 bygroup_c_plot(scored, pb_vars, pb_labels, region_northeast)
 ```
 
-```{r policy-46}
+```{r policy-46 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_northeast)
 ```
 
@@ -361,7 +362,7 @@ bygroup_c_ttest(scored, pb_vars, pb_labels, region_northeast)
 bygroup_c_plot(scored, pb_vars, pb_labels, region_midwest)
 ```
 
-```{r policy-48}
+```{r policy-48 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_midwest)
 ```
 
@@ -372,7 +373,7 @@ bygroup_c_ttest(scored, pb_vars, pb_labels, region_midwest)
 bygroup_c_plot(scored, pb_vars, pb_labels, black, g.levels = c(0,1), g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-50  }
+```{r policy-50 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, black)
 ```
 
@@ -394,7 +395,7 @@ bygroup_c_ttest(scored, pb_vars, pb_labels, latinx)
 bygroup_c_plot(scored, pb_vars, pb_labels, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-54  }
+```{r policy-54 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, poverty150)
 ```
 
@@ -504,7 +505,7 @@ region_plot(scored, federal_stim)
 bygroup_plot(scored, federal_stim, region_south)
 ```
 
-```{r policy-70}
+```{r policy-70 }
 bygroup_ttest(scored, federal_stim, region_south)
 ```
 
@@ -514,7 +515,7 @@ bygroup_ttest(scored, federal_stim, region_south)
 bygroup_plot(scored, federal_stim, region_west)
 ```
 
-```{r policy-72}
+```{r policy-72 }
 bygroup_ttest(scored, federal_stim, region_west)
 ```
 
@@ -524,7 +525,7 @@ bygroup_ttest(scored, federal_stim, region_west)
 bygroup_plot(scored, federal_stim, region_northeast)
 ```
 
-```{r policy-74}
+```{r policy-74 }
 bygroup_ttest(scored, federal_stim, region_northeast)
 ```
 
@@ -534,7 +535,7 @@ bygroup_ttest(scored, federal_stim, region_northeast)
 bygroup_plot(scored, federal_stim, region_midwest)
 ```
 
-```{r policy-76}
+```{r policy-76 }
 bygroup_ttest(scored, federal_stim, region_midwest)
 ```
 
@@ -545,7 +546,7 @@ bygroup_ttest(scored, federal_stim, region_midwest)
 bygroup_plot(scored, federal_stim, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-78}
+```{r policy-78 }
 bygroup_ttest(scored, federal_stim, black)
 ```
 
@@ -555,7 +556,7 @@ bygroup_ttest(scored, federal_stim, black)
 bygroup_plot(scored, federal_stim, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-80}
+```{r policy-80 }
 bygroup_ttest(scored, federal_stim, latinx)
 ```
 
@@ -565,7 +566,7 @@ bygroup_ttest(scored, federal_stim, latinx)
 bygroup_plot(scored, federal_stim, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-82}
+```{r policy-82 }
 bygroup_ttest(scored, federal_stim, poverty150)
 ```
 ### Income by Employment
@@ -574,7 +575,7 @@ bygroup_ttest(scored, federal_stim, poverty150)
 bygroup_plot(scored, federal_stim, employ_inc1)
 ```
 
-```{r policy-84}
+```{r policy-84 }
 bygroup_ttest(scored, federal_stim, employ_inc1)
 ```
 
@@ -584,27 +585,27 @@ bygroup_ttest(scored, federal_stim, employ_inc1)
 bygroup_plot(scored, federal_stim, black_inc)
 ```
 
-```{r policy-86}
+```{r policy-86 }
 bygroup_ttest(scored, federal_stim, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-87  }
+```{r policy-87 }
 bygroup_plot(scored, federal_stim, latinx_inc)
 ```
 
-```{r policy-88}
+```{r policy-88 }
 bygroup_ttest(scored, federal_stim, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-89  }
+```{r policy-89 }
 bygroup_plot(scored, federal_stim, south_inc)
 ```
 
-```{r policy-90}
+```{r policy-90 }
 bygroup_ttest(scored, federal_stim, latinx_inc)
 ```
 
@@ -670,7 +671,7 @@ region_plot(scored, income_change)
 bygroup_plot(scored, income_change, region_south)
 ```
 
-```{r policy-98}
+```{r policy-98 }
 bygroup_ttest(scored, income_change, region_south)
 ```
 
@@ -680,7 +681,7 @@ bygroup_ttest(scored, income_change, region_south)
 bygroup_plot(scored, income_change, region_west)
 ```
 
-```{r policy-100}
+```{r policy-100 }
 bygroup_ttest(scored, income_change, region_west)
 ```
 
@@ -690,7 +691,7 @@ bygroup_ttest(scored, income_change, region_west)
 bygroup_plot(scored, income_change, region_northeast)
 ```
 
-```{r policy-102}
+```{r policy-102 }
 bygroup_ttest(scored, income_change, region_northeast)
 ```
 
@@ -700,7 +701,7 @@ bygroup_ttest(scored, income_change, region_northeast)
 bygroup_plot(scored, income_change, region_midwest)
 ```
 
-```{r policy-104}
+```{r policy-104 }
 bygroup_ttest(scored, income_change, region_midwest)
 ```
 
@@ -710,7 +711,7 @@ bygroup_ttest(scored, income_change, region_midwest)
 bygroup_plot(scored, income_change, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-106}
+```{r policy-106 }
 bygroup_ttest(scored, income_change, black)
 ```
 
@@ -720,7 +721,7 @@ bygroup_ttest(scored, income_change, black)
 bygroup_plot(scored, income_change, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-108}
+```{r policy-108 }
 bygroup_ttest(scored, income_change, latinx)
 ```
 
@@ -730,7 +731,7 @@ bygroup_ttest(scored, income_change, latinx)
 bygroup_plot(scored, income_change, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-110}
+```{r policy-110 }
 bygroup_ttest(scored, income_change, poverty)
 ```
 
@@ -740,7 +741,7 @@ bygroup_ttest(scored, income_change, poverty)
 bygroup_plot(scored, income_change, employ_inc1)
 ```
 
-```{r policy-112}
+```{r policy-112 }
 bygroup_ttest(scored, income_change, employ_inc1)
 ```
 
@@ -750,31 +751,33 @@ bygroup_ttest(scored, income_change, employ_inc1)
 bygroup_plot(scored, income_change, black_inc)
 ```
 
-```{r policy-114}
+```{r policy-114 }
 bygroup_ttest(scored, income_change, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-115  }
+```{r policy-115 }
 bygroup_plot(scored, income_change, latinx_inc)
 ```
 
-```{r policy-116}
+```{r policy-116 }
 bygroup_ttest(scored, income_change, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-117  }
+```{r policy-117 }
 bygroup_plot(scored, income_change, south_inc)
 ```
 
-```{r policy-118}
+```{r policy-118 }
 bygroup_ttest(scored, income_change, latinx_inc)
 ```
 
-### Related to caregiver well-being
+### Related to caregiver well-being{.tabset}
+
+#### Overall
 
 ```{r policy-119 }
 bycont_plot(scored, income_change, wellbeing)
@@ -784,29 +787,155 @@ bycont_plot(scored, income_change, wellbeing)
 bcont_table(scored, income_change, wellbeing)
 ```
 
-### Related to child well-being
+#### Black/African American
 
-```{r }
+```{r policy-121}
+bycont_m_plot(scored, income_change, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-122, results = 'asis'}
+bcont_m_table(scored, income_change, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-123}
+bycont_m_plot(scored, income_change, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-124, results = 'asis'}
+bcont_m_table(scored, income_change, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-125}
+bycont_m_plot(scored, income_change, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-126, results = 'asis'}
+bcont_m_table(scored, income_change, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-127}
+bycont_m_plot(scored, income_change, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-128, results = 'asis'}
+bcont_m_table(scored, income_change, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to child well-being{.tabset}
+
+#### Overall
+
+```{r policy-129 }
 bycont_plot(scored, income_change, child_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-130, results = 'asis'}
 bcont_table(scored, income_change, child_wellbeing)
 ```
 
-### Related to family well-being
 
-```{r }
+#### Black/African American
+
+```{r policy-131}
+bycont_m_plot(scored, income_change, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-132, results = 'asis'}
+bcont_m_table(scored, income_change, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-133}
+bycont_m_plot(scored, income_change, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-134, results = 'asis'}
+bcont_m_table(scored, income_change, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-135}
+bycont_m_plot(scored, income_change, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-136, results = 'asis'}
+bcont_m_table(scored, income_change, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-137}
+bycont_m_plot(scored, income_change, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-138, results = 'asis'}
+bcont_m_table(scored, income_change, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to family well-being{.tabset}
+
+#### Overall
+
+```{r policy-139 }
 bycont_plot(scored, income_change, family_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-140, results = 'asis'}
 bcont_table(scored, income_change, family_wellbeing)
+```
+
+
+#### Black/African American
+
+```{r policy-141}
+bycont_m_plot(scored, income_change, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-142, results = 'asis'}
+bcont_m_table(scored, income_change, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-143}
+bycont_m_plot(scored, income_change, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-144, results = 'asis'}
+bcont_m_table(scored, income_change, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-145}
+bycont_m_plot(scored, income_change, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-146, results = 'asis'}
+bcont_m_table(scored, income_change, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-147}
+bycont_m_plot(scored, income_change, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-148, results = 'asis'}
+bcont_m_table(scored, income_change, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
 ```
 
 ## Family Financial Status{.tabset}
 
-```{r policy-121 }
+```{r policy-149 }
 pb.table = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -828,7 +957,7 @@ Options:
   
 _Sample sizes are based on caregiver response at the most recent week of participation._
 
-```{r}
+```{r policy-150 }
 scored$financial_status_num = case_when(
   scored$financial_status %in% c("None", "Minor") ~ 0, 
   scored$financial_status %in% c("Major", "Extreme") ~ 1, 
@@ -839,14 +968,14 @@ scored$financial_status_num = case_when(
 
 ### Overall
 
-```{r policy-122 }
+```{r policy-151 }
 overall_figure(scored, financial_status)
 ```
 
 
 ### Over time
 
-```{r policy-123 }
+```{r policy-152 }
 long_plot(scored, financial_status)
 ```
 
@@ -855,101 +984,101 @@ long_plot(scored, financial_status)
 
 #### All regions
 
-```{r policy-124 }
+```{r policy-153 }
 region_plot(scored, financial_status)
 ```
 
 #### South
 
-```{r policy-125 }
+```{r policy-154 }
 bygroup_plot(scored, financial_status, region_south)
 ```
 
-```{r policy-126}
+```{r policy-155 }
 bygroup_ttest(scored, financial_status, region_south)
 ```
 
 #### West
 
-```{r policy-127 }
+```{r policy-156 }
 bygroup_plot(scored, financial_status, region_west)
 ```
 
-```{r policy-128}
+```{r policy-157 }
 bygroup_ttest(scored, financial_status, region_west)
 ```
 
 #### Northeast
 
-```{r policy-129 }
+```{r policy-158 }
 bygroup_plot(scored, financial_status, region_northeast)
 ```
 
-```{r policy-130}
+```{r policy-159 }
 bygroup_ttest(scored, financial_status, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-131 }
+```{r policy-160 }
 bygroup_plot(scored, financial_status, region_midwest)
 ```
 
-```{r policy-132}
+```{r policy-161 }
 bygroup_ttest(scored, financial_status, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-133 }
+```{r policy-162 }
 bygroup_plot(scored, financial_status, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-134}
+```{r policy-163 }
 bygroup_ttest(scored, financial_status, black)
 ```
 
 ### LatinX
 
-```{r policy-135 }
+```{r policy-164 }
 bygroup_plot(scored, financial_status, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-136}
+```{r policy-165 }
 bygroup_ttest(scored, financial_status, latinx)
 ```
 
 ### Low income
 
-```{r policy-137 }
+```{r policy-166 }
 bygroup_plot(scored, financial_status, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-138}
+```{r policy-167 }
 bygroup_ttest(scored, financial_status, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-139 }
+```{r policy-168 }
 bygroup_plot(scored, financial_status, employ_inc1)
 ```
 
-```{r policy-140}
+```{r policy-169 }
 bygroup_ttest(scored, financial_status, employ_inc1)
 ```
 
 ### Income by Black/African American
 
-```{r policy-141 }
+```{r policy-170 }
 bygroup_plot(scored, financial_status, black_inc)
 ```
 
-```{r policy-142}
+```{r policy-171 }
 bygroup_ttest(scored, financial_status, black_inc)
 ```
 
-```{r, results = 'asis'}
+```{r policy-172, results = 'asis'}
 max_care = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -963,15 +1092,15 @@ kable(broom::tidy(pairwise.t.test(max_care$financial_status_num, max_care$black_
 
 ### Income by Latinx
 
-```{r policy-143  }
+```{r policy-173 }
 bygroup_plot(scored, financial_status, latinx_inc)
 ```
 
-```{r policy-144}
+```{r policy-174 }
 bygroup_ttest(scored, financial_status, latinx_inc)
 ```
 
-```{r, results = 'asis'}
+```{r policy-175, results = 'asis'}
 kable(broom::tidy(pairwise.t.test(max_care$financial_status_num, max_care$black_inc, p.adjust.method = "holm")), 
       digits = 3, 
       caption = "Pairwise t-tests with a Holm correction") %>%
@@ -980,49 +1109,177 @@ kable(broom::tidy(pairwise.t.test(max_care$financial_status_num, max_care$black_
 
 ### Income by South
 
-```{r policy-145  }
+```{r policy-176 }
 bygroup_plot(scored, financial_status, south_inc)
 ```
 
-```{r policy-146}
+```{r policy-177 }
 bygroup_ttest(scored, financial_status, latinx_inc)
 ```
 
-### Related to caregiver well-being
+### Related to caregiver well-being{.tabset}
 
-```{r policy-147 }
+#### Overall
+
+```{r policy-178 }
 bycont_plot(scored, financial_status, wellbeing)
 ```
 
-```{r policy-148, results = 'asis'}
+```{r policy-179, results = 'asis'}
 bcont_table(scored, financial_status, wellbeing)
 ```
 
+#### Black/African American
 
-### Related to child well-being
+```{r policy-180}
+bycont_m_plot(scored, financial_status, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
 
-```{r }
+```{r policy-181, results = 'asis'}
+bcont_m_table(scored, financial_status, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-182}
+bycont_m_plot(scored, financial_status, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-183, results = 'asis'}
+bcont_m_table(scored, financial_status, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-184}
+bycont_m_plot(scored, financial_status, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-185, results = 'asis'}
+bcont_m_table(scored, financial_status, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-186}
+bycont_m_plot(scored, financial_status, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-187, results = 'asis'}
+bcont_m_table(scored, financial_status, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to child well-being{.tabset}
+
+#### Overall
+
+```{r policy-188 }
 bycont_plot(scored, financial_status, child_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-189, results = 'asis'}
 bcont_table(scored, financial_status, child_wellbeing)
 ```
 
-### Related to family well-being
 
-```{r }
+#### Black/African American
+
+```{r policy-190}
+bycont_m_plot(scored, financial_status, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-191, results = 'asis'}
+bcont_m_table(scored, financial_status, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-192}
+bycont_m_plot(scored, financial_status, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-193, results = 'asis'}
+bcont_m_table(scored, financial_status, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-194}
+bycont_m_plot(scored, financial_status, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-195, results = 'asis'}
+bcont_m_table(scored, financial_status, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-196}
+bycont_m_plot(scored, financial_status, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-197, results = 'asis'}
+bcont_m_table(scored, financial_status, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to family well-being{.tabset}
+
+#### Overall
+
+```{r policy-198 }
 bycont_plot(scored, financial_status, family_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-199, results = 'asis'}
 bcont_table(scored, financial_status, family_wellbeing)
 ```
+
+
+#### Black/African American
+
+```{r policy-200}
+bycont_m_plot(scored, financial_status, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-201, results = 'asis'}
+bcont_m_table(scored, financial_status, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-202}
+bycont_m_plot(scored, financial_status, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-203, results = 'asis'}
+bcont_m_table(scored, financial_status, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-204}
+bycont_m_plot(scored, financial_status, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-205, results = 'asis'}
+bcont_m_table(scored, financial_status, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-206}
+bycont_m_plot(scored, financial_status, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-207, results = 'asis'}
+bcont_m_table(scored, financial_status, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
 # Physical Health
 
 ## Well-baby/Well-child Checkup{.tabset}
 
-```{r policy-149 }
+```{r policy-208 }
 scored = scored %>%
   mutate(missed_wellbaby = factor(missed_wellbaby, levels = c(0, 1), labels = c("No", "Yes")))
 
@@ -1047,14 +1304,14 @@ _Sample sizes are based on caregiver response at the most recent week of partici
 
 ### Overall
 
-```{r policy-150 }
+```{r policy-209 }
 overall_figure(scored, missed_wellbaby)
 ```
 
 
 ### Over time
 
-```{r policy-151 }
+```{r policy-210 }
 long_plot(scored, missed_wellbaby)
 ```
 
@@ -1063,134 +1320,134 @@ long_plot(scored, missed_wellbaby)
 
 #### All regions
 
-```{r policy-152 }
+```{r policy-211 }
 region_plot(scored, missed_wellbaby)
 ```
 
 
 #### South
 
-```{r policy-153 }
+```{r policy-212 }
 bygroup_plot(scored, missed_wellbaby, region_south)
 ```
 
-```{r policy-154}
+```{r policy-213 }
 bygroup_ttest(scored, missed_wellbaby, region_south)
 ```
 
 #### West
 
-```{r policy-155 }
+```{r policy-214 }
 bygroup_plot(scored, missed_wellbaby, region_west)
 ```
 
-```{r policy-156}
+```{r policy-215 }
 bygroup_ttest(scored, missed_wellbaby, region_west)
 ```
 
 #### Northeast
 
-```{r policy-157 }
+```{r policy-216 }
 bygroup_plot(scored, missed_wellbaby, region_northeast)
 ```
 
-```{r policy-158}
+```{r policy-217 }
 bygroup_ttest(scored, missed_wellbaby, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-159 }
+```{r policy-218 }
 bygroup_plot(scored, missed_wellbaby, region_midwest)
 ```
 
-```{r policy-160}
+```{r policy-219 }
 bygroup_ttest(scored, missed_wellbaby, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-161 }
+```{r policy-220 }
 bygroup_plot(scored, missed_wellbaby, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-162}
+```{r policy-221 }
 bygroup_ttest(scored, missed_wellbaby, black)
 ```
 
 ### LatinX
 
-```{r policy-163 }
+```{r policy-222 }
 bygroup_plot(scored, missed_wellbaby, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-164}
+```{r policy-223 }
 bygroup_ttest(scored, missed_wellbaby, latinx)
 ```
 
 ### Low income
 
-```{r policy-165 }
+```{r policy-224 }
 bygroup_plot(scored, missed_wellbaby, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-166}
+```{r policy-225 }
 bygroup_ttest(scored, missed_wellbaby, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-167 }
+```{r policy-226 }
 bygroup_plot(scored, missed_wellbaby, employ_inc1)
 ```
 
-```{r policy-168}
+```{r policy-227 }
 bygroup_ttest(scored, missed_wellbaby, employ_inc1)
 ```
 
 ### Income by Black/African American
 
-```{r policy-169 }
+```{r policy-228 }
 bygroup_plot(scored, missed_wellbaby, black_inc)
 ```
 
-```{r policy-170}
+```{r policy-229 }
 bygroup_ttest(scored, missed_wellbaby, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-171  }
+```{r policy-230 }
 bygroup_plot(scored, missed_wellbaby, latinx_inc)
 ```
 
-```{r policy-172}
+```{r policy-231 }
 bygroup_ttest(scored, missed_wellbaby, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-173  }
+```{r policy-232 }
 bygroup_plot(scored, missed_wellbaby, south_inc)
 ```
 
-```{r policy-174}
+```{r policy-233 }
 bygroup_ttest(scored, missed_wellbaby, latinx_inc)
 ```
 
 ### Related to well-being
 
-```{r policy-175 }
+```{r policy-234 }
 bycont_plot(scored, missed_wellbaby, wellbeing)
 ```
 
-```{r policy-176, results = 'asis'}
+```{r policy-235, results = 'asis'}
 bcont_table(scored, missed_wellbaby, wellbeing)
 ```
 
 ## Missed vaccine{.tabset}
 
-```{r policy-177 }
+```{r policy-236 }
 scored = scored %>%
   mutate(missed_vaccine = case_when(
     miss_vaccine.1 == 1 ~ "Yes",
@@ -1228,14 +1485,14 @@ _Sample sizes are based on caregiver response at the most recent week of partici
 
 ### Overall
 
-```{r policy-178 }
+```{r policy-237 }
 overall_figure(scored, missed_vaccine)
 ```
 
 
 ### Over time
 
-```{r policy-179 }
+```{r policy-238 }
 long_plot(scored, missed_vaccine)
 ```
 
@@ -1244,135 +1501,135 @@ long_plot(scored, missed_vaccine)
 
 #### All regions
 
-```{r policy-180 }
+```{r policy-239 }
 region_plot(scored, missed_vaccine)
 ```
 
 
 #### South
 
-```{r policy-181 }
+```{r policy-240 }
 bygroup_plot(scored, missed_vaccine, region_south)
 ```
 
-```{r policy-182}
+```{r policy-241 }
 bygroup_ttest(scored, missed_vaccine, region_south)
 ```
 
 #### West
 
-```{r policy-183 }
+```{r policy-242 }
 bygroup_plot(scored, missed_vaccine, region_west)
 ```
 
-```{r policy-184}
+```{r policy-243 }
 bygroup_ttest(scored, missed_vaccine, region_west)
 ```
 
 #### Northeast
 
-```{r policy-185 }
+```{r policy-244 }
 bygroup_plot(scored, missed_vaccine, region_northeast)
 ```
 
-```{r policy-186}
+```{r policy-245 }
 bygroup_ttest(scored, missed_vaccine, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-187 }
+```{r policy-246 }
 bygroup_plot(scored, missed_vaccine, region_midwest)
 ```
 
-```{r policy-188}
+```{r policy-247 }
 bygroup_ttest(scored, missed_vaccine, region_midwest)
 ```
 
 
 ### Black/African American
 
-```{r policy-189 }
+```{r policy-248 }
 bygroup_plot(scored, missed_vaccine, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-190}
+```{r policy-249 }
 bygroup_ttest(scored, missed_vaccine, black)
 ```
 
 ### LatinX
 
-```{r policy-191 }
+```{r policy-250 }
 bygroup_plot(scored, missed_vaccine, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-192}
+```{r policy-251 }
 bygroup_ttest(scored, missed_vaccine, latinx)
 ```
 
 ### Low income
 
-```{r policy-193 }
+```{r policy-252 }
 bygroup_plot(scored, missed_vaccine, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-194}
+```{r policy-253 }
 bygroup_ttest(scored, missed_vaccine, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-195 }
+```{r policy-254 }
 bygroup_plot(scored, missed_vaccine, employ_inc1)
 ```
 
-```{r policy-196}
+```{r policy-255 }
 bygroup_ttest(scored, missed_vaccine, employ_inc1)
 ```
 
 
 ### Income by Black/African American
 
-```{r policy-197 }
+```{r policy-256 }
 bygroup_plot(scored, missed_vaccine, black_inc)
 ```
 
-```{r policy-198}
+```{r policy-257 }
 bygroup_ttest(scored, missed_vaccine, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-199  }
+```{r policy-258 }
 bygroup_plot(scored, missed_vaccine, latinx_inc)
 ```
 
-```{r policy-200}
+```{r policy-259 }
 bygroup_ttest(scored, missed_vaccine, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-201  }
+```{r policy-260 }
 bygroup_plot(scored, missed_vaccine, south_inc)
 ```
 
-```{r policy-202}
+```{r policy-261 }
 bygroup_ttest(scored, missed_vaccine, latinx_inc)
 ```
 ### Related to well-being
 
-```{r policy-203 }
+```{r policy-262 }
 bycont_plot(scored, missed_vaccine, wellbeing)
 ```
 
-```{r policy-204, results = 'asis'}
+```{r policy-263, results = 'asis'}
 bcont_table(scored, missed_vaccine, wellbeing)
 ```
 
 ## Barriers to well-child{.tabset}
 
-```{r policy-205 }
+```{r policy-264 }
 pb_cat.table = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -1397,7 +1654,7 @@ Options:
 
 _Sample sizes are based on caregiver response at the most recent week of participation._
 
-```{r policy-206 }
+```{r policy-265 }
 pb_vars = find_items("missed_wb", scored)
 pb_labels = pb_vars %>%
   gsub("missed_wb_", "", .) %>%
@@ -1407,13 +1664,13 @@ pb_labels = pb_vars %>%
 
 ### Overall
 
-```{r policy-207 }
+```{r policy-266 }
 overall_c_figure(scored, pb_vars, pb_labels)
 ```
 
 ### Over time
 
-```{r policy-208 }
+```{r policy-267 }
 long_c_plot(scored, pb_vars, pb_labels)
 ```
 
@@ -1422,7 +1679,7 @@ long_c_plot(scored, pb_vars, pb_labels)
 
 #### All regions
 
-```{r policy-209 }
+```{r policy-268 }
 region_c_plot(scored, pb_vars, pb_labels)
 ```
 
@@ -1430,124 +1687,124 @@ region_c_plot(scored, pb_vars, pb_labels)
 
 #### South
 
-```{r policy-210 }
+```{r policy-269 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_south)
 ```
 
-```{r policy-211}
+```{r policy-270 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_south)
 ```
 
 #### West
 
-```{r policy-212 }
+```{r policy-271 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_west)
 ```
 
-```{r policy-213}
+```{r policy-272 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_west)
 ```
 
 #### Northeast
 
-```{r policy-214 }
+```{r policy-273 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_northeast)
 ```
 
-```{r policy-215}
+```{r policy-274 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-216 }
+```{r policy-275 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_midwest)
 ```
 
-```{r policy-217}
+```{r policy-276 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-218 }
+```{r policy-277 }
 bygroup_c_plot(scored, pb_vars, pb_labels, black, g.levels = c(0,1), g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-219}
+```{r policy-278 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, black)
 ```
 
 ### LatinX
 
-```{r policy-220 }
+```{r policy-279 }
 bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels = c("Everyone else", "LatinX"))
 ```
 
 
-```{r policy-221}
+```{r policy-280 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, latinx)
 ```
 
 ### Low income
 
-```{r policy-222 }
+```{r policy-281 }
 bygroup_c_plot(scored, pb_vars, pb_labels, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
 
-```{r policy-223}
+```{r policy-282 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, poverty150)
 ```
 ### Income by Employment
 
-```{r policy-224 }
+```{r policy-283 }
 bygroup_c_plot(scored, pb_vars, pb_labels, employ_inc1)
 ```
 
 
-```{r policy-225}
+```{r policy-284 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, employ_inc1)
 ```
 
 
 ### Income by Black/African American
 
-```{r policy-226 }
+```{r policy-285 }
 bygroup_c_plot(scored, pb_vars, pb_labels, black_inc)
 ```
 
-```{r policy-227 }
+```{r policy-286 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, black_inc)
 ```
 
 ### Income by LatinX
 
-```{r policy-228 }
+```{r policy-287 }
 bygroup_c_plot(scored, pb_vars, pb_labels, latinx_inc)
 ```
 
-```{r policy-229 }
+```{r policy-288 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-230 }
+```{r policy-289 }
 bygroup_c_plot(scored, pb_vars, pb_labels, south_inc)
 ```
 
-```{r policy-231 }
+```{r policy-290 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, south_inc)
 ```
 
 ### Related to well-being
 
-```{r policy-232 }
+```{r policy-291 }
 bycont_c_plot(scored, pb_vars, pb_labels, wellbeing)
 ```
 
-```{r policy-233, results = 'asis'}
+```{r policy-292, results = 'asis'}
 #bcont_table(scored, public_benefits, wellbeing)
 ```
 
@@ -1555,7 +1812,7 @@ bycont_c_plot(scored, pb_vars, pb_labels, wellbeing)
 
 ## Free food (currently){.tabset}
 
-```{r policy-234 }
+```{r policy-293 }
 pb.table = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -1579,14 +1836,14 @@ _Sample sizes are based on caregiver response at the most recent week of partici
 
 ### Overall
 
-```{r policy-235 }
+```{r policy-294 }
 overall_figure(scored, free_food_cat)
 ```
 
 
 ### Over time
 
-```{r policy-236 }
+```{r policy-295 }
 long_plot(scored, free_food_cat)
 ```
 
@@ -1595,126 +1852,126 @@ long_plot(scored, free_food_cat)
 
 #### All regions
 
-```{r policy-237 }
+```{r policy-296 }
 region_plot(scored, free_food_cat)
 ```
 
 #### South
 
-```{r policy-238 }
+```{r policy-297 }
 bygroup_plot(scored, free_food_cat, region_south)
 ```
 
-```{r policy-239}
+```{r policy-298 }
 bygroup_ttest(scored, free_food_cat, region_south)
 ```
 
 #### West
 
-```{r policy-240 }
+```{r policy-299 }
 bygroup_plot(scored, free_food_cat, region_west)
 ```
 
-```{r policy-241}
+```{r policy-300 }
 bygroup_ttest(scored, free_food_cat, region_west)
 ```
 
 #### Northeast
 
-```{r policy-242 }
+```{r policy-301 }
 bygroup_plot(scored, free_food_cat, region_northeast)
 ```
 
-```{r policy-243}
+```{r policy-302 }
 bygroup_ttest(scored, free_food_cat, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-244 }
+```{r policy-303 }
 bygroup_plot(scored, free_food_cat, region_midwest)
 ```
 
-```{r policy-245}
+```{r policy-304 }
 bygroup_ttest(scored, free_food_cat, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-246 }
+```{r policy-305 }
 bygroup_plot(scored, free_food_cat, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
-```{r policy-247}
+```{r policy-306 }
 bygroup_ttest(scored, free_food_cat, black)
 ```
 
 ### LatinX
 
-```{r policy-248 }
+```{r policy-307 }
 bygroup_plot(scored, free_food_cat, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-249}
+```{r policy-308 }
 bygroup_ttest(scored, free_food_cat, latinx)
 ```
 
 ### Low income
 
-```{r policy-250 }
+```{r policy-309 }
 bygroup_plot(scored, free_food_cat, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-251}
+```{r policy-310 }
 bygroup_ttest(scored, free_food_cat, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-252 }
+```{r policy-311 }
 bygroup_plot(scored, free_food_cat, employ_inc1)
 ```
 
-```{r policy-253}
+```{r policy-312 }
 bygroup_ttest(scored, free_food_cat, employ_inc1)
 ```
 
 ### Income by Black/African American
 
-```{r policy-254 }
+```{r policy-313 }
 bygroup_plot(scored, free_food_cat, black_inc)
 ```
 
-```{r policy-255}
+```{r policy-314 }
 bygroup_ttest(scored, free_food_cat, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-256  }
+```{r policy-315 }
 bygroup_plot(scored, free_food_cat, latinx_inc)
 ```
 
-```{r policy-257}
+```{r policy-316 }
 bygroup_ttest(scored, free_food_cat, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-258  }
+```{r policy-317 }
 bygroup_plot(scored, free_food_cat, south_inc)
 ```
 
-```{r policy-259}
+```{r policy-318 }
 bygroup_ttest(scored, free_food_cat, latinx_inc)
 ```
 
 ### Related to well-being
 
-```{r policy-260 }
+```{r policy-319 }
 bycont_plot(scored, free_food_cat, wellbeing)
 ```
 
-```{r policy-261, results = 'asis'}
+```{r policy-320, results = 'asis'}
 bcont_table(scored, free_food_cat, wellbeing)
 ```
 
@@ -1797,7 +2054,7 @@ bcont_table(scored, free_food_cat, wellbeing)
 
 ## Free Lunch (during-COVID){.tabset}
 
-```{r policy-262 }
+```{r policy-321 }
 pb.table = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -1825,14 +2082,14 @@ _Sample sizes are based on caregiver response at the most recent week of partici
 
 ### Overall
 
-```{r policy-263 }
+```{r policy-322 }
 overall_figure(scored, free_lunch_now_cat)
 ```
 
 
 ### Over time
 
-```{r policy-264 }
+```{r policy-323 }
 long_plot(scored, free_lunch_now_cat)
 ```
 
@@ -1841,138 +2098,138 @@ long_plot(scored, free_lunch_now_cat)
 
 #### All regions
 
-```{r policy-265 }
+```{r policy-324 }
 region_plot(scored, free_lunch_now_cat)
 ```
 
 
 #### South
 
-```{r policy-266 }
+```{r policy-325 }
 bygroup_plot(scored, free_lunch_now_cat, region_south)
 ```
 
-```{r policy-267}
+```{r policy-326 }
 bygroup_ttest(scored, free_lunch_now_cat, region_south)
 ```
 
 #### West
 
-```{r policy-268 }
+```{r policy-327 }
 bygroup_plot(scored, free_lunch_now_cat, region_west)
 ```
 
-```{r policy-269}
+```{r policy-328 }
 bygroup_ttest(scored, free_lunch_now_cat, region_west)
 ```
 
 #### Northeast
 
-```{r policy-270 }
+```{r policy-329 }
 bygroup_plot(scored, free_lunch_now_cat, region_northeast)
 ```
 
-```{r policy-271}
+```{r policy-330 }
 bygroup_ttest(scored, free_lunch_now_cat, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-272 }
+```{r policy-331 }
 bygroup_plot(scored, free_lunch_now_cat, region_midwest)
 ```
 
-```{r policy-273}
+```{r policy-332 }
 bygroup_ttest(scored, free_lunch_now_cat, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-274 }
+```{r policy-333 }
 bygroup_plot(scored, free_lunch_now_cat, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
 
-```{r policy-275}
+```{r policy-334 }
 bygroup_ttest(scored, free_lunch_now_cat, black)
 ```
 ### LatinX
 
-```{r policy-276 }
+```{r policy-335 }
 bygroup_plot(scored, free_lunch_now_cat, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-277}
+```{r policy-336 }
 bygroup_ttest(scored, free_lunch_now_cat, latinx)
 ```
 
 ### Low income
 
-```{r policy-278 }
+```{r policy-337 }
 bygroup_plot(scored, free_lunch_now_cat, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-279}
+```{r policy-338 }
 bygroup_ttest(scored, free_lunch_now_cat, poverty150)
 ```
 
-```{r policy-280}
+```{r policy-339 }
 bygroup_ttest(scored, free_lunch_now_cat, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-281 }
+```{r policy-340 }
 bygroup_plot(scored, free_lunch_now_cat, employ_inc1)
 ```
 
-```{r policy-282}
+```{r policy-341 }
 bygroup_ttest(scored, free_lunch_now_cat, employ_inc1)
 ```
 
 ### Income by Black/African American
 
-```{r policy-283 }
+```{r policy-342 }
 bygroup_plot(scored, free_lunch_now_cat, black_inc)
 ```
 
-```{r policy-284}
+```{r policy-343 }
 bygroup_ttest(scored, free_lunch_now_cat, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-285  }
+```{r policy-344 }
 bygroup_plot(scored, free_lunch_now_cat, latinx_inc)
 ```
 
-```{r policy-286}
+```{r policy-345 }
 bygroup_ttest(scored, free_lunch_now_cat, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-287  }
+```{r policy-346 }
 bygroup_plot(scored, free_lunch_now_cat, south_inc)
 ```
 
-```{r policy-288}
+```{r policy-347 }
 bygroup_ttest(scored, free_lunch_now_cat, latinx_inc)
 ```
 
 ### Related to well-being
 
-```{r policy-289 }
+```{r policy-348 }
 bycont_plot(scored, free_lunch_now_cat, wellbeing)
 ```
 
-```{r policy-290, results = 'asis'}
+```{r policy-349, results = 'asis'}
 bcont_table(scored, free_lunch_now_cat, wellbeing)
 ```
 
 ## Paying for basics{.tabset}
 
-```{r policy-291 }
+```{r policy-350 }
 pb.table = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -1996,14 +2253,14 @@ _Sample sizes are based on caregiver response at the most recent week of partici
 
 ### Overall
 
-```{r policy-292 }
+```{r policy-351 }
 overall_figure(scored, difficulty_basics_cat)
 ```
 
 
 ### Over time
 
-```{r policy-293 }
+```{r policy-352 }
 long_plot(scored, difficulty_basics_cat)
 ```
 
@@ -2012,154 +2269,281 @@ long_plot(scored, difficulty_basics_cat)
 
 #### All regions
 
-```{r policy-294 }
+```{r policy-353 }
 region_plot(scored, difficulty_basics_cat)
 ```
 
 
 #### South
 
-```{r policy-295 }
+```{r policy-354 }
 bygroup_plot(scored, difficulty_basics_cat, region_south)
 ```
 
-```{r policy-296}
+```{r policy-355 }
 bygroup_ttest(scored, difficulty_basics_cat, region_south)
 ```
 
 #### West
 
-```{r policy-297 }
+```{r policy-356 }
 bygroup_plot(scored, difficulty_basics_cat, region_west)
 ```
 
-```{r policy-298}
+```{r policy-357 }
 bygroup_ttest(scored, difficulty_basics_cat, region_west)
 ```
 
 #### Northeast
 
-```{r policy-299 }
+```{r policy-358 }
 bygroup_plot(scored, difficulty_basics_cat, region_northeast)
 ```
 
-```{r policy-300}
+```{r policy-359 }
 bygroup_ttest(scored, difficulty_basics_cat, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-301 }
+```{r policy-360 }
 bygroup_plot(scored, difficulty_basics_cat, region_midwest)
 ```
 
-```{r policy-302}
+```{r policy-361 }
 bygroup_ttest(scored, difficulty_basics_cat, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-303 }
+```{r policy-362 }
 bygroup_plot(scored, difficulty_basics_cat, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-304}
+```{r policy-363 }
 bygroup_ttest(scored, difficulty_basics_cat, black)
 ```
 ### LatinX
 
-```{r policy-305 }
+```{r policy-364 }
 bygroup_plot(scored, difficulty_basics_cat, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-306}
+```{r policy-365 }
 bygroup_ttest(scored, difficulty_basics_cat, latinx)
 ```
 
 ### Low income
 
-```{r policy-307 }
+```{r policy-366 }
 bygroup_plot(scored, difficulty_basics_cat, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-308}
+```{r policy-367 }
 bygroup_ttest(scored, difficulty_basics_cat, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-309 }
+```{r policy-368 }
 bygroup_plot(scored, difficulty_basics_cat, employ_inc1)
 ```
 
-```{r policy-310}
+```{r policy-369 }
 bygroup_ttest(scored, difficulty_basics_cat, employ_inc1)
 ```
 
 ### Income by Black/African American
 
-```{r policy-311 }
+```{r policy-370 }
 bygroup_plot(scored, difficulty_basics_cat, black_inc)
 ```
 
-```{r policy-312}
+```{r policy-371 }
 bygroup_ttest(scored, difficulty_basics_cat, black_inc)
 ```
 
 ### Income by Latinx
 
-```{r policy-313  }
+```{r policy-372 }
 bygroup_plot(scored, difficulty_basics_cat, latinx_inc)
 ```
 
-```{r policy-314}
+```{r policy-373 }
 bygroup_ttest(scored, difficulty_basics_cat, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-315  }
+```{r policy-374 }
 bygroup_plot(scored, difficulty_basics_cat, south_inc)
 ```
 
-```{r policy-316}
+```{r policy-375 }
 bygroup_ttest(scored, difficulty_basics_cat, latinx_inc)
 ```
 
-### Related to caregiver well-being
+### Related to caregiver well-being{.tabset}
 
-```{r policy-317 }
+#### Overall
+
+```{r policy-376 }
 bycont_plot(scored, difficulty_basics_cat, wellbeing)
 ```
 
-```{r policy-318, results = 'asis'}
+```{r policy-377, results = 'asis'}
 bcont_table(scored, difficulty_basics_cat, wellbeing)
 ```
 
+#### Black/African American
 
-### Related to child well-being
+```{r policy-378}
+bycont_m_plot(scored, difficulty_basics_cat, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
 
-```{r }
+```{r policy-379, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-380}
+bycont_m_plot(scored, difficulty_basics_cat, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-381, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-382}
+bycont_m_plot(scored, difficulty_basics_cat, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-383, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-384}
+bycont_m_plot(scored, difficulty_basics_cat, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-385, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to child well-being{.tabset}
+
+#### Overall
+
+```{r policy-386 }
 bycont_plot(scored, difficulty_basics_cat, child_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-387, results = 'asis'}
 bcont_table(scored, difficulty_basics_cat, child_wellbeing)
 ```
 
-### Related to family well-being
 
-```{r }
+#### Black/African American
+
+```{r policy-388}
+bycont_m_plot(scored, difficulty_basics_cat, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-389, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-390}
+bycont_m_plot(scored, difficulty_basics_cat, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-391, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-392}
+bycont_m_plot(scored, difficulty_basics_cat, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-393, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-394}
+bycont_m_plot(scored, difficulty_basics_cat, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-395, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to family well-being{.tabset}
+
+#### Overall
+
+```{r policy-396 }
 bycont_plot(scored, difficulty_basics_cat, family_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-397, results = 'asis'}
 bcont_table(scored, difficulty_basics_cat, family_wellbeing)
+```
+
+
+#### Black/African American
+
+```{r policy-398}
+bycont_m_plot(scored, difficulty_basics_cat, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-399, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-400}
+bycont_m_plot(scored, difficulty_basics_cat, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-401, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-402}
+bycont_m_plot(scored, difficulty_basics_cat, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-403, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-404}
+bycont_m_plot(scored, difficulty_basics_cat, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-405, results = 'asis'}
+bcont_m_table(scored, difficulty_basics_cat, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
 ```
 
 ## Which needs{.tabset}
 
-```{r policy-319 }
+```{r policy-406 }
 pb_cat.table = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -2185,7 +2569,7 @@ Options:
 
 _Sample sizes are based on caregiver response at the most recent week of participation._
 
-```{r policy-320 }
+```{r policy-407 }
 pb_vars = find_items("diff_pay_", scored)
 pb_labels = pb_vars %>%
   gsub("diff_pay_", "", .) %>%
@@ -2194,13 +2578,13 @@ pb_labels = pb_vars %>%
 
 ### Overall
 
-```{r policy-321 }
+```{r policy-408 }
 overall_c_figure(scored, pb_vars, pb_labels)
 ```
 
 ### Over time
 
-```{r policy-322 }
+```{r policy-409 }
 long_c_plot(scored, pb_vars, pb_labels)
 ```
 
@@ -2209,7 +2593,7 @@ long_c_plot(scored, pb_vars, pb_labels)
 
 #### All regions
 
-```{r policy-323 }
+```{r policy-410 }
 region_c_plot(scored, pb_vars, pb_labels)
 ```
 
@@ -2217,127 +2601,127 @@ region_c_plot(scored, pb_vars, pb_labels)
 
 #### South
 
-```{r policy-324 }
+```{r policy-411 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_south)
 ```
 
-```{r policy-325}
+```{r policy-412 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_south)
 ```
 
 #### West
 
-```{r policy-326 }
+```{r policy-413 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_west)
 ```
 
-```{r policy-327}
+```{r policy-414 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_west)
 ```
 
 #### Northeast
 
-```{r policy-328 }
+```{r policy-415 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_northeast)
 ```
 
-```{r policy-329}
+```{r policy-416 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-330 }
+```{r policy-417 }
 bygroup_c_plot(scored, pb_vars, pb_labels, region_midwest)
 ```
 
-```{r policy-331}
+```{r policy-418 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-332 }
+```{r policy-419 }
 bygroup_c_plot(scored, pb_vars, pb_labels, black, g.levels = c(0,1), g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-333}
+```{r policy-420 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, black)
 ```
 ### LatinX
 
-```{r policy-334 }
+```{r policy-421 }
 bygroup_c_plot(scored, pb_vars, pb_labels, latinx, g.levels = c(0,1), g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-335}
+```{r policy-422 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, latinx)
 ```
 
 ### Low income
 
-```{r policy-336 }
+```{r policy-423 }
 bygroup_c_plot(scored, pb_vars, pb_labels, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-337}
+```{r policy-424 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-338 }
+```{r policy-425 }
 bygroup_c_plot(scored, pb_vars, pb_labels, employ_inc1)
 ```
 
-```{r policy-339}
+```{r policy-426 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, employ_inc1)
 ```
 
 
 ### Income by Black/African American
 
-```{r policy-340 }
+```{r policy-427 }
 bygroup_c_plot(scored, pb_vars, pb_labels, black_inc)
 ```
 
-```{r policy-341 }
+```{r policy-428 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, black_inc)
 ```
 
 ### Income by LatinX
 
-```{r policy-342 }
+```{r policy-429 }
 bygroup_c_plot(scored, pb_vars, pb_labels, latinx_inc)
 ```
 
-```{r policy-343 }
+```{r policy-430 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, latinx_inc)
 ```
 
 ### Income by South
 
-```{r policy-344 }
+```{r policy-431 }
 bygroup_c_plot(scored, pb_vars, pb_labels, south_inc)
 ```
 
-```{r policy-345 }
+```{r policy-432 }
 bygroup_c_ttest(scored, pb_vars, pb_labels, south_inc)
 ```
 
 ### Related to well-being
 
-```{r policy-346 }
+```{r policy-433 }
 bycont_c_plot(scored, pb_vars, pb_labels, wellbeing)
 ```
 
-```{r policy-347, results = 'asis'}
+```{r policy-434, results = 'asis'}
 #bcont_table(scored, public_benefits, wellbeing)
 ```
 
 ## Material hardship{.tabset}
 
-```{r policy-348 }
+```{r policy-435 }
 scored = scored %>%
   rowwise() %>%
   mutate(material_hardship = sum(c_across(starts_with("diff_pay")), na.rm=T))
@@ -2363,11 +2747,199 @@ pb.table = scored %>%
   - 7 $(N = `r pb.table[pb.table$material_hardship == 7,"N"]`)$
   - 8 $(N = `r pb.table[pb.table$material_hardship == 8,"N"]`)$
   
+
+
+
+### Overall
+
+```{r policy-436 }
+overall_figure(scored, material_hardship)
+```
+
+
+### Over time
+
+```{r policy-437 }
+long_plot(scored, material_hardship)
+```
+
+
+### By region{.tabset}
+
+#### All regions
+
+```{r policy-438 }
+region_plot(scored, material_hardship)
+```
+
+
+#### South
+
+```{r policy-439 }
+bygroup_plot(scored, material_hardship, region_south)
+```
+
+```{r policy-440 }
+bygroup_ttest(scored, material_hardship, region_south)
+```
+
+#### West
+
+```{r policy-441 }
+bygroup_plot(scored, material_hardship, region_west)
+```
+
+```{r policy-442 }
+bygroup_ttest(scored, material_hardship, region_west)
+```
+
+#### Northeast
+
+```{r policy-443 }
+bygroup_plot(scored, material_hardship, region_northeast)
+```
+
+```{r policy-444 }
+bygroup_ttest(scored, material_hardship, region_northeast)
+```
+
+#### Midwest
+
+```{r policy-445 }
+bygroup_plot(scored, material_hardship, region_midwest)
+```
+
+```{r policy-446 }
+bygroup_ttest(scored, material_hardship, region_midwest)
+```
+
+### Black/African American
+
+```{r policy-447 }
+bygroup_plot(scored, material_hardship, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
+```
+
+```{r policy-448 }
+bygroup_ttest(scored, material_hardship, black)
+```
+
+### LatinX
+
+```{r policy-449 }
+bygroup_plot(scored, material_hardship, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
+```
+
+```{r policy-450 }
+bygroup_ttest(scored, material_hardship, latinx)
+```
+
+### Low income
+
+```{r policy-451 }
+bygroup_plot(scored, material_hardship, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
+```
+
+```{r policy-452 }
+bygroup_ttest(scored, material_hardship, poverty150)
+```
+
+### Income by Employment
+
+```{r policy-453 }
+bygroup_plot(scored, material_hardship, employ_inc1)
+```
+
+```{r policy-454 }
+bygroup_ttest(scored, material_hardship, employ_inc1)
+```
+
+### Income by Black/African American
+
+```{r policy-455 }
+bygroup_plot(scored, material_hardship, black_inc)
+```
+
+```{r policy-456 }
+bygroup_ttest(scored, material_hardship, black_inc)
+```
+
+```{r policy-457, results = 'asis'}
+max_care = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+
+kable(broom::tidy(pairwise.t.test(max_care$material_hardship, max_care$black_inc, p.adjust.method = "holm")), 
+      digits = 3, 
+      caption = "Pairwise t-tests with a Holm correction") %>%
+  kable_styling(full_width = T)
+```
+
+
+### Income by Latinx
+
+```{r policy-458 }
+bygroup_plot(scored, material_hardship, latinx_inc)
+```
+
+```{r policy-459 }
+bygroup_ttest(scored, material_hardship, latinx_inc)
+```
+
+```{r policy-460, results = 'asis'}
+kable(broom::tidy(pairwise.t.test(max_care$material_hardship, max_care$latinx_inc, p.adjust.method = "holm")), 
+      digits = 3, caption = "Pairwise t-tests with a Holm correction") %>%
+  kable_styling(full_width = T)
+```
+
+
+### Income by South
+
+```{r policy-461 }
+bygroup_plot(scored, material_hardship, south_inc)
+```
+
+```{r policy-462 }
+bygroup_ttest(scored, material_hardship, latinx_inc)
+```
+
+### Related to caregiver well-being
+
+```{r policy-463 }
+bycont_plot(scored, material_hardship, wellbeing)
+```
+
+```{r policy-464, results = 'asis'}
+bcont_table(scored, material_hardship, wellbeing)
+```
+
+### Related to child well-being
+
+```{r policy-465 }
+bycont_plot(scored, material_hardship, child_wellbeing)
+```
+
+```{r policy-466, results = 'asis'}
+bcont_table(scored, material_hardship, child_wellbeing)
+```
+
+### Related to family well-being
+
+```{r policy-467 }
+bycont_plot(scored, material_hardship, family_wellbeing)
+```
+
+```{r policy-468, results = 'asis'}
+bcont_table(scored, material_hardship, family_wellbeing)
+```
+
+  
 _Sample sizes are based on caregiver response at the most recent week of participation._
 
+## Material hardship dichotomized {.tabset}
 For these analyses, we censor responses at 1 (creating a 1+ category).
 
-```{r policy-349 }
+```{r policy-469 }
 scored = scored %>%
   mutate(material_hardship = case_when(
     material_hardship >= 1 ~ "1+",
@@ -2387,14 +2959,14 @@ scored$material_hardship_num = case_when(
 
 ### Overall
 
-```{r policy-350 }
+```{r policy-470 }
 overall_figure(scored, material_hardship)
 ```
 
 
 ### Over time
 
-```{r policy-351 }
+```{r policy-471 }
 long_plot(scored, material_hardship)
 ```
 
@@ -2403,102 +2975,102 @@ long_plot(scored, material_hardship)
 
 #### All regions
 
-```{r policy-352 }
+```{r policy-472 }
 region_plot(scored, material_hardship)
 ```
 
 
 #### South
 
-```{r policy-353 }
+```{r policy-473 }
 bygroup_plot(scored, material_hardship, region_south)
 ```
 
-```{r policy-354}
+```{r policy-474 }
 bygroup_ttest(scored, material_hardship, region_south)
 ```
 
 #### West
 
-```{r policy-355 }
+```{r policy-475 }
 bygroup_plot(scored, material_hardship, region_west)
 ```
 
-```{r policy-356}
+```{r policy-476 }
 bygroup_ttest(scored, material_hardship, region_west)
 ```
 
 #### Northeast
 
-```{r policy-357 }
+```{r policy-477 }
 bygroup_plot(scored, material_hardship, region_northeast)
 ```
 
-```{r policy-358}
+```{r policy-478 }
 bygroup_ttest(scored, material_hardship, region_northeast)
 ```
 
 #### Midwest
 
-```{r policy-359 }
+```{r policy-479 }
 bygroup_plot(scored, material_hardship, region_midwest)
 ```
 
-```{r policy-360}
+```{r policy-480 }
 bygroup_ttest(scored, material_hardship, region_midwest)
 ```
 
 ### Black/African American
 
-```{r policy-361 }
+```{r policy-481 }
 bygroup_plot(scored, material_hardship, black, g.levels = c(0,1),g.labels = c("Everyone else", "Black"))
 ```
 
-```{r policy-362}
+```{r policy-482 }
 bygroup_ttest(scored, material_hardship, black)
 ```
 
 ### LatinX
 
-```{r policy-363 }
+```{r policy-483 }
 bygroup_plot(scored, material_hardship, latinx, g.levels = c(0,1),g.labels = c("Everyone else", "LatinX"))
 ```
 
-```{r policy-364}
+```{r policy-484 }
 bygroup_ttest(scored, material_hardship, latinx)
 ```
 
 ### Low income
 
-```{r policy-365 }
+```{r policy-485 }
 bygroup_plot(scored, material_hardship, poverty150, g.levels = c(0,1),g.labels = c("High Income", "Low Income"))
 ```
 
-```{r policy-366}
+```{r policy-486 }
 bygroup_ttest(scored, material_hardship, poverty150)
 ```
 
 ### Income by Employment
 
-```{r policy-367 }
+```{r policy-487 }
 bygroup_plot(scored, material_hardship, employ_inc1)
 ```
 
-```{r policy-368}
+```{r policy-488 }
 bygroup_ttest(scored, material_hardship, employ_inc1)
 ```
 
 ### Income by Black/African American
 
-```{r policy-369 }
+```{r policy-489 }
 bygroup_plot(scored, material_hardship, black_inc)
 ```
 
-```{r policy-370}
+```{r policy-490 }
 bygroup_ttest(scored, material_hardship, black_inc)
 ```
 
-```{r, results = 'asis'}
+```{r policy-491, results = 'asis'}
 max_care = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -2513,15 +3085,15 @@ kable(broom::tidy(pairwise.t.test(max_care$material_hardship_num, max_care$black
 
 ### Income by Latinx
 
-```{r policy-371  }
+```{r policy-492 }
 bygroup_plot(scored, material_hardship, latinx_inc)
 ```
 
-```{r policy-372}
+```{r policy-493 }
 bygroup_ttest(scored, material_hardship, latinx_inc)
 ```
 
-```{r, results = 'asis'}
+```{r policy-494, results = 'asis'}
 kable(broom::tidy(pairwise.t.test(max_care$material_hardship_num, max_care$latinx_inc, p.adjust.method = "holm")), 
       digits = 3, caption = "Pairwise t-tests with a Holm correction") %>%
   kable_styling(full_width = T)
@@ -2530,40 +3102,168 @@ kable(broom::tidy(pairwise.t.test(max_care$material_hardship_num, max_care$latin
 
 ### Income by South
 
-```{r policy-373  }
+```{r policy-495 }
 bygroup_plot(scored, material_hardship, south_inc)
 ```
 
-```{r policy-374}
+```{r policy-496 }
 bygroup_ttest(scored, material_hardship, latinx_inc)
 ```
 
-### Related to caregiver well-being
+### Related to caregiver well-being{.tabset}
 
-```{r policy-375 }
+#### Overall
+
+```{r policy-497 }
 bycont_plot(scored, material_hardship, wellbeing)
 ```
 
-```{r policy-376, results = 'asis'}
+```{r policy-498, results = 'asis'}
 bcont_table(scored, material_hardship, wellbeing)
 ```
 
-### Related to child well-being
+#### Black/African American
 
-```{r }
+```{r policy-499}
+bycont_m_plot(scored, material_hardship, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-500, results = 'asis'}
+bcont_m_table(scored, material_hardship, wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-501}
+bycont_m_plot(scored, material_hardship, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-502, results = 'asis'}
+bcont_m_table(scored, material_hardship, wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-503}
+bycont_m_plot(scored, material_hardship, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-504, results = 'asis'}
+bcont_m_table(scored, material_hardship, wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-505}
+bycont_m_plot(scored, material_hardship, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-506, results = 'asis'}
+bcont_m_table(scored, material_hardship, wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to child well-being{.tabset}
+
+#### Overall
+
+```{r policy-507 }
 bycont_plot(scored, material_hardship, child_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-508, results = 'asis'}
 bcont_table(scored, material_hardship, child_wellbeing)
 ```
 
-### Related to family well-being
 
-```{r }
+#### Black/African American
+
+```{r policy-509}
+bycont_m_plot(scored, material_hardship, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-510, results = 'asis'}
+bcont_m_table(scored, material_hardship, child_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-511}
+bycont_m_plot(scored, material_hardship, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-512, results = 'asis'}
+bcont_m_table(scored, material_hardship, child_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-513}
+bycont_m_plot(scored, material_hardship, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-514, results = 'asis'}
+bcont_m_table(scored, material_hardship, child_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-515}
+bycont_m_plot(scored, material_hardship, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-516, results = 'asis'}
+bcont_m_table(scored, material_hardship, child_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+### Related to family well-being{.tabset}
+
+#### Overall
+
+```{r policy-517 }
 bycont_plot(scored, material_hardship, family_wellbeing)
 ```
 
-```{r, results = 'asis'}
+```{r policy-518, results = 'asis'}
 bcont_table(scored, material_hardship, family_wellbeing)
+```
+
+
+#### Black/African American
+
+```{r policy-519}
+bycont_m_plot(scored, material_hardship, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+```{r policy-520, results = 'asis'}
+bcont_m_table(scored, material_hardship, family_wellbeing, black, c(0,1), c("Not Black", "Black"))
+```
+
+#### Latinx
+
+```{r policy-521}
+bycont_m_plot(scored, material_hardship, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+```{r policy-522, results = 'asis'}
+bcont_m_table(scored, material_hardship, family_wellbeing, latinx, c(0,1), c("Not Latinx", "Latinx"))
+```
+
+#### Low Income
+
+```{r policy-523}
+bycont_m_plot(scored, material_hardship, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+```{r policy-524, results = 'asis'}
+bcont_m_table(scored, material_hardship, family_wellbeing, poverty150, c(0,1), c("High Income", "Low Income"))
+```
+
+#### Children with disabilities
+
+```{r policy-525}
+bycont_m_plot(scored, material_hardship, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
+```
+
+```{r policy-526, results = 'asis'}
+bcont_m_table(scored, material_hardship, family_wellbeing, disability, c(0,1), c("No Disability", "Disability"))
 ```

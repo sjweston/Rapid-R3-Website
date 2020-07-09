@@ -7,7 +7,17 @@ moe = function(x){
   return(moe)
 }
 
+moe.p = function(p,n){
+  sqrt(p*(1 - p) / n)
+}
+
+
 overall_figure = function(data, variable){
+  
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
+  
+  
   overallp = data %>%
     group_by(CaregiverID) %>%
     filter(!is.na({{variable}})) %>%
@@ -24,7 +34,38 @@ overall_figure = function(data, variable){
                             "\nPercent:", round(Percent,2), 
                             "\nCount:", Count))) +
     geom_bar(stat = "identity") +
-    scale_fill_brewer(palette = "Dark2") +
+    labs(x = "")+
+    guides(fill = F) +
+    coord_flip()+
+    theme_pubclean()
+  
+  if(check_class != "numeric") overallp = overallp + scale_fill_brewer(palette = "Dark2")
+  
+  ggplotly(overallp, tooltip = "text")
+}
+overall_c_figure = function(data, variables, labels){
+  
+  n_caregivers = length(unique(data$CaregiverID))
+  
+  overallp = data %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    ungroup() %>%
+    summarize_at(.vars = variables, .funs = list(sum), na.rm=T) %>%
+    gather("key", "Count") %>%
+    mutate(Percent = 100*Count/n_caregivers,
+           key = factor(key, 
+                        levels = variables,
+                        labels = labels)) %>%
+    ggplot(aes(x = reorder(key,Percent), 
+               y = Percent, 
+               fill = key, 
+               group=1,
+               text = paste("\nResponse:", key,
+                            "\nPercent:", round(Percent,2), 
+                            "\nCount:", Count))) +
+    geom_bar(stat = "identity") +
+    #scale_fill_brewer(palette = "Set2") +
     labs(x = "")+
     guides(fill = F) +
     coord_flip()+
@@ -33,7 +74,51 @@ overall_figure = function(data, variable){
   ggplotly(overallp, tooltip = "text")
 }
 
+overall_m_figure = function(data, variable, moderator, m.val, m.label){
+  
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
+  
+  
+  overallp = data %>%
+    group_by(CaregiverID) %>%
+    filter(!is.na({{variable}})) %>%
+    filter(!is.na({{moderator}})) %>%
+    filter(Week == max(Week)) %>%
+    mutate_at(.vars = vars({{moderator}}), 
+              .funs = function(x) factor(x, levels = m.val, labels = m.label)) %>%
+    group_by({{variable}}, {{moderator}}) %>%
+    summarize(Count = n()) %>%
+    group_by({{moderator}}) %>%
+    mutate(Percent = 100*Count/sum(Count),
+           MOE = moe.p(Percent/100, sum(Count))) %>%
+    ungroup() %>%
+    ggplot(aes(text = paste("Group:", {{moderator}},
+                            "\nResponse:", {{variable}},
+                            "\nPercent:", round(Percent,2),
+                            "\nCount:", Count),
+               x = {{variable}},
+               y = Percent,
+               fill = {{moderator}})) +
+    geom_bar(stat = "identity", position=position_dodge(1))   +
+    geom_errorbar(aes(ymin = Percent-(100*MOE), ymax = Percent + (100*MOE)),
+                  position=position_dodge(1)) +
+    labs(x = "")+
+    #facet_grid(rows = vars({{variable}})) +
+    guides(fill = F) +
+    coord_flip()+
+    theme_pubclean()
+
+  if(check_class != "numeric") overallp = overallp + scale_fill_brewer(palette = "Dark2")
+
+  ggplotly(overallp, tooltip = "text")
+  #return(overallp)
+}
+
 long_plot = function(data, variable){
+  
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
   
   long_plotd = data %>%
     filter(!is.na({{variable}})) %>%
@@ -52,16 +137,61 @@ long_plot = function(data, variable){
     )) +
     geom_point() + 
     geom_line() +
-    scale_color_brewer(palette = "Dark2")+
     scale_x_continuous(breaks = unique(data$Week)) +
     labs(x = "Week", 
          y = "Percent by week")+
     theme_pubclean()
   
+  if(check_class != "numeric") long_plotd = long_plotd + scale_fill_brewer(palette = "Dark2")
+  
+  
   ggplotly(long_plotd, tooltip = "text")
 }
 
+long_m_plot = function(data, variable, moderator,m.val, m.label){
+  
+  check_class = as.data.frame(data[,deparse(substitute(moderator))])
+  check_class = class(check_class[,1])
+  
+  long_plotd = data %>%
+    mutate_at(.vars = vars({{moderator}}), 
+              .funs = function(x) factor(x, levels = m.val, labels = m.label)) %>%
+    filter(!is.na({{variable}})) %>%
+    filter(!is.na({{moderator}}))  %>%
+    group_by(Week, {{variable}}, {{moderator}}) %>%
+    summarize(Count = n()) %>%
+    group_by(Week, {{moderator}}) %>%
+    mutate(Percent = 100*Count/sum(Count),
+           MOE = moe.p(Percent/100, sum(Count))) %>%
+    ungroup()  %>%
+    ggplot(aes(x = Week,
+               y = Percent,
+               color = {{moderator}},
+               text = paste("Week:", Week,
+                            "\nGroup:", {{moderator}},
+                            "\nResponse:", {{variable}},
+                            "\nPercent:", round(Percent,2), "\nCount:", Count)
+    )) +
+    geom_point() +
+    geom_line(aes(x = Week,
+                  y = Percent,
+                  color = {{moderator}}), inherit.aes = F) +
+    scale_x_continuous(breaks = unique(data$Week)) +
+    labs(x = "Week",
+         y = "Percent by week")+
+    facet_grid(rows = vars({{variable}}))+
+    theme_pubclean()
+
+  long_plotd = long_plotd + scale_color_brewer(palette = "Dark2")
+
+  ggplotly(long_plotd, tooltip = "text")
+#  return(long_plotd)
+}
+
 region_plot = function(data, variable, group = region){
+  
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
   
   long_plotd = data %>%
     filter(!is.na({{variable}}) & !is.na({{group}})) %>%
@@ -80,11 +210,13 @@ region_plot = function(data, variable, group = region){
     )) +
     geom_point() + 
     geom_line() +
-    scale_color_brewer(palette = "Dark2")+
     labs(x = "Week", 
          y = "Percent by week")+
     scale_x_continuous(breaks = unique(data$Week)) +
     theme_pubclean()
+  
+  if(check_class != "numeric") long_plotd = long_plotd + scale_color_brewer(palette = "Dark2")
+  
   
   long_plotd = long_plotd + facet_grid(rows = vars({{variable}}), scales = "free")
   
@@ -92,6 +224,9 @@ region_plot = function(data, variable, group = region){
 }
 
 region_co_plot = function(data, variable, group = region){
+  
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
   
   long_plotd = data %>%
     filter(!is.na({{variable}}) & !is.na({{group}})) %>%
@@ -113,17 +248,24 @@ region_co_plot = function(data, variable, group = region){
     )) +
     geom_point() + 
     geom_line() +
-    scale_color_brewer(palette = "Dark2")+
     labs(x = "Week", 
          y = "Response by week")+
     scale_x_continuous(breaks = unique(data$Week)) +
     theme_pubclean()
+  
+  if(check_class != "numeric") long_plotd = long_plotd + scale_color_brewer(palette = "Dark2")
   
   ggplotly(long_plotd, tooltip = "text")
 }
 
 bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL){
 
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
+  
+  number_outcome = nrow(unique(data[,deparse(substitute(variable))]))
+  
+  
   long_plotd = data %>%
     dplyr::group_by(CaregiverID) %>%
     filter(!is.na({{variable}}) & !is.na({{group}})) %>%
@@ -155,13 +297,14 @@ bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL)
                             "\nPercent:", round(Percent,2), "\nCount:", Count))) +
     geom_bar(stat = "identity") +
     geom_errorbar(aes(ymin = Percent-moe, ymax = Percent+moe), width = .5)+
-    scale_fill_brewer(palette = "Dark2") +
     labs(x = "")+
     guides(fill = F) +
     coord_flip()+
-    facet_grid(cols = vars({{variable}}), scales = "free") +
     theme_pubclean()
   
+  if(check_class != "numeric") long_plotd = long_plotd + scale_fill_brewer(palette = "Dark2")
+  if(number_outcome < 4) long_plotd = long_plotd + facet_grid(cols = vars({{variable}}), scales = "free") 
+  if(number_outcome >= 4) long_plotd = long_plotd + facet_grid(rows = vars({{variable}}), scales = "free") 
   
 
   ggplotly(long_plotd, tooltip = "text") 
@@ -169,7 +312,6 @@ bygroup_plot = function(data, variable, group, g.levels = NULL, g.labels = NULL)
 }
 
 bygroup_ttest = function(data, variable, group){
-  
   
   long_plotd = data %>%
     dplyr::group_by(CaregiverID) %>%
@@ -201,6 +343,8 @@ bygroup_ttest = function(data, variable, group){
 
 bycont_plot = function(data, variable, outcome){
   
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
   
   long_plotd = data %>%
     dplyr::group_by(CaregiverID) %>%
@@ -219,16 +363,61 @@ bycont_plot = function(data, variable, outcome){
                             "\n Upper CI:", round(Average+MOE),2))) +
     geom_bar(stat = "identity") +
     geom_errorbar(aes(ymin = Average-MOE, ymax = Average + MOE)) +
-    scale_fill_brewer(palette = "Dark2") +
     labs(x = "")+
     guides(fill = F) +
     coord_flip()+
     theme_pubclean()
+  
+  if(check_class != "numeric") long_plotd = long_plotd + scale_fill_brewer(palette = "Dark2")
+  
   ggplotly(long_plotd, tooltip = "text")
+  
+  
+}
+
+bycont_m_plot = function(data, variable, outcome, moderator, m.val, m.label){
+  
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
+  
+  long_plotd = data %>%
+    dplyr::group_by(CaregiverID) %>%
+    mutate_at(.vars = vars({{moderator}}), 
+              .funs = function(x) factor(x, levels = m.val, labels = m.label)) %>%
+    filter(!is.na({{variable}}) & !is.na({{outcome}} & !is.na({{moderator}}))) %>%
+    filter(Week == max(Week)) %>%
+    dplyr::group_by({{variable}}, {{moderator}}) %>%
+    summarize(Average = mean({{outcome}}),
+              MOE = moe({{outcome}})) %>%
+    ggplot(aes(x = 1,
+               y = Average,
+               fill = {{moderator}},
+               text = paste("\nGroup:", {{variable}},
+                            "\nModerator:", {{moderator}},
+                            "\nAverage Response:", round(Average,2),
+                            "\n Lower CI:", round(Average-MOE,2),
+                            "\n Upper CI:", round(Average+MOE),2))) +
+    geom_bar(stat = "identity", position = position_dodge(1)) +
+    geom_errorbar(aes(ymin = Average-MOE, ymax = Average + MOE), position = position_dodge(1)) +
+    scale_x_continuous(labels = NULL)+
+    labs(x = "")+
+    guides(fill = F) +
+    facet_grid(rows = vars({{variable}}), scales = "free")+
+    coord_flip()+
+    theme_pubclean()
+  
+  if(check_class != "numeric") long_plotd = long_plotd + scale_fill_brewer(palette = "Dark2")
+  
+  ggplotly(long_plotd, tooltip = "text")
+  
   
 }
 
 bcont_table = function(data, variable, outcome){
+  
+  check_class = as.data.frame(data[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
+  
   formula = as.formula(
     paste0(
       deparse(substitute(outcome)), 
@@ -237,54 +426,84 @@ bcont_table = function(data, variable, outcome){
       ))
   
   model = lm(formula, data)
-  contrast.form = as.formula(
-    paste0(
-      "pairwise~ ",
-      deparse(substitute(variable))
-    ))
-  modelmeans = emmeans(model, contrast.form)
-  contrast.table = modelmeans$contrast %>%
-    as.data.frame() %>%
-    #mutate_at(vars(estimate, SE), as.numeric) %>%
-    mutate(Lower = estimate-1.96*SE, 
-           Upper = estimate+1.96*SE) %>%
-    select(contrast, estimate, Lower, Upper, p.value) %>%
-    mutate(p.value = papaja::printp(p.value)) %>%
-    kable(digits = 2) %>% kable_styling() %>% 
-    add_header_above(c(" " = 2, "Confidence Interval" =2 , " " = 1))
+  
+  if(check_class != "numeric"){
+    contrast.form = as.formula(
+      paste0(
+        "pairwise~ ",
+        deparse(substitute(variable))
+      ))
+    modelmeans = emmeans(model, contrast.form)
+    contrast.table = modelmeans$contrast %>%
+      as.data.frame() %>%
+      #mutate_at(vars(estimate, SE), as.numeric) %>%
+      mutate(Lower = estimate-1.96*SE,
+             Upper = estimate+1.96*SE) %>%
+      select(contrast, estimate, Lower, Upper, p.value) %>%
+      filter(!is.nan(p.value)) %>%
+      filter(!is.na(p.value)) %>%
+      mutate(p.value = papaja::printp(p.value)) %>%
+      kable(digits = 2) %>% kable_styling() %>%
+      add_header_above(c(" " = 2, "Confidence Interval" =2 , " " = 1))
+  }
+  if(check_class == "numeric"){
+    contrast.table = broom::tidy(model) %>%
+      mutate(Lower = estimate-1.96*std.error,
+             Upper = estimate+1.96*std.error) %>%
+      filter(term != "(Intercept)") %>%
+      select(estimate, Lower, Upper, p.value) %>%
+      mutate(p.value = papaja::printp(p.value)) %>%
+      kable(digits = 2) %>% kable_styling() %>%
+      add_header_above(c(" " = 1, "Confidence Interval" =2 , " " = 1))
+  }
   return(contrast.table)
 }
 
-overall_c_figure = function(data, variables, labels){
+bcont_m_table = function(ndata, variable, outcome, moderator, m.val, m.label){
   
-  n_caregivers = length(unique(data$CaregiverID))
+  check_class = as.data.frame(ndata[,deparse(substitute(variable))])
+  check_class = class(check_class[,1])
   
-  overallp = data %>%
-    group_by(CaregiverID) %>%
-    filter(Week == max(Week)) %>%
+  formula = as.formula(
+    paste0(
+      deparse(substitute(outcome)), 
+      " ~ ",
+      deparse(substitute(moderator))
+    ))
+  
+  contrast.table = ndata %>%
+    mutate_at(.vars = vars({{moderator}}), 
+              .funs = function(x) factor(x, levels = m.val, labels = m.label)) %>%
+    group_by({{variable}}) %>%
+    nest() %>%
+    mutate(model = map(data, .f = function(x) lm(formula, data = x))) %>%
+    mutate(model = map(model, broom::tidy)) %>%
+    unnest(model) %>%
+    select(-data) %>%
+    filter(term != "(Intercept)") %>%
+    mutate(Lower = estimate-1.96*std.error,
+           Upper = estimate+1.96*std.error) %>%
     ungroup() %>%
-    summarize_at(.vars = variables, .funs = list(sum), na.rm=T) %>%
-    gather("key", "Count") %>%
-    mutate(Percent = 100*Count/n_caregivers,
-           key = factor(key, 
-                        levels = variables,
-                        labels = labels)) %>%
-    ggplot(aes(x = reorder(key,Percent), 
-               y = Percent, 
-               fill = key, 
-               group=1,
-               text = paste("\nResponse:", key,
-                            "\nPercent:", round(Percent,2), 
-                            "\nCount:", Count))) +
-    geom_bar(stat = "identity") +
-    #scale_fill_brewer(palette = "Set2") +
-    labs(x = "")+
-    guides(fill = F) +
-    coord_flip()+
-    theme_pubclean()
+    mutate(p.value = p.adjust(p.value, method = "holm")) %>%
+    mutate(p.value = papaja::printp(p.value)) 
+
   
-  ggplotly(overallp, tooltip = "text")
+  if(length(m.val) == 2){
+    contrast.table = contrast.table %>%
+      select({{variable}}, estimate, Lower, Upper, p.value) %>%
+      kable(digits = 2) %>% kable_styling() %>%
+      add_header_above(c(" " = 2, "Confidence Interval" =2 , " " = 1))
+  } else {
+    contrast.table = contrast.table %>%
+      mutate(term = gsub(paste0("^", deparse(substitute(moderator))), "", term)) %>%
+      select({{variable}}, term, estimate, Lower, Upper, p.value) %>%
+      kable(digits = 2) %>% kable_styling() %>%
+       add_header_above(c(" " = 3, "Confidence Interval" =2 , " " = 1))
+  }
+
+  return(contrast.table)
 }
+
 
 long_c_plot = function(data, variables, labels){
   
