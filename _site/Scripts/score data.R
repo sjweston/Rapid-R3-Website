@@ -157,6 +157,7 @@ nyt_data = nyt_data %>%
     new_cases_twoweeks = rollapplyr(cases, FUN = sum, partial = T, width = 14),
     new_deaths_twoweeks = rollapplyr(deaths, FUN = sum, partial = T, width = 14),
     growth_cases_oneweek = 100*(rollapplyr(cases, FUN = sum, partial = T, width = 7))/lag(total_cases, 7),
+    growth_deaths_oneweek = 100*(rollapplyr(deaths, FUN = sum, partial = T, width = 7))/lag(total_deaths, 7),
     doubling_time_cases = 7*(70/growth_cases_oneweek),
     total_cases_per1000 = (total_cases/population)*1000,
     total_deaths_per1000 = (total_deaths/population)*1000,

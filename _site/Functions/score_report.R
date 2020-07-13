@@ -811,7 +811,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$income_change = data$EHQ.001
     data = data %>%
       mutate(income_decreased = case_when(
-        EHQ.001 == 1 ~ 1,
+        EHQ.001 %in% c(0,1) ~ 1,
         EHQ.001.2 == 1 ~ 1,
         !is.na(EHQ.001) ~ 0, 
         !is.na(EHQ.001.2) ~ 0, 
