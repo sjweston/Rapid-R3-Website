@@ -43,9 +43,7 @@ scored = scored %>%
   rowwise() %>%
   #well-being composite
   mutate(wellbeing = mean(c(anxiety, depress, stress, lonely), na.rm=T),
-         wellbeing = 100-wellbeing,
          child_wellbeing = mean(c(fear, fussy), na.rm=T),
-         child_wellbeing = 100-child_wellbeing,
          family_wellbeing = mean(c(wellbeing, child_wellbeing), na.rm=T)) %>%
   ungroup() %>%
   mutate(employ_inc1 = case_when(
@@ -780,7 +778,7 @@ bygroup_ttest(scored, income_change, latinx_inc)
 #### Overall
 
 ```{r policy-119 }
-bycont_plot(scored, income_change, wellbeing)
+bycont_plot(scored, income_change, wellbeing, saveData = T)
 ```
 
 ```{r policy-120, results = 'asis'}
@@ -832,7 +830,7 @@ bcont_m_table(scored, income_change, wellbeing, disability, c(0,1), c("No Disabi
 #### Overall
 
 ```{r policy-129 }
-bycont_plot(scored, income_change, child_wellbeing)
+bycont_plot(scored, income_change, child_wellbeing, saveData = T)
 ```
 
 ```{r policy-130, results = 'asis'}
@@ -1122,7 +1120,7 @@ bygroup_ttest(scored, financial_status, latinx_inc)
 #### Overall
 
 ```{r policy-178 }
-bycont_plot(scored, financial_status, wellbeing)
+bycont_plot(scored, financial_status, wellbeing, saveData = T)
 ```
 
 ```{r policy-179, results = 'asis'}
@@ -1174,7 +1172,7 @@ bcont_m_table(scored, financial_status, wellbeing, disability, c(0,1), c("No Dis
 #### Overall
 
 ```{r policy-188 }
-bycont_plot(scored, financial_status, child_wellbeing)
+bycont_plot(scored, financial_status, child_wellbeing, saveData = T)
 ```
 
 ```{r policy-189, results = 'asis'}
@@ -2388,7 +2386,7 @@ bygroup_ttest(scored, difficulty_basics_cat, latinx_inc)
 #### Overall
 
 ```{r policy-376 }
-bycont_plot(scored, difficulty_basics_cat, wellbeing)
+bycont_plot(scored, difficulty_basics_cat, wellbeing, saveData = T)
 ```
 
 ```{r policy-377, results = 'asis'}
@@ -2440,7 +2438,7 @@ bcont_m_table(scored, difficulty_basics_cat, wellbeing, disability, c(0,1), c("N
 #### Overall
 
 ```{r policy-386 }
-bycont_plot(scored, difficulty_basics_cat, child_wellbeing)
+bycont_plot(scored, difficulty_basics_cat, child_wellbeing, saveData = T)
 ```
 
 ```{r policy-387, results = 'asis'}
@@ -2747,6 +2745,12 @@ pb.table = scored %>%
   - 7 $(N = `r pb.table[pb.table$material_hardship == 7,"N"]`)$
   - 8 $(N = `r pb.table[pb.table$material_hardship == 8,"N"]`)$
   
+Material hardship censored at 6, given small sample sizes.
+
+```{r}
+scored = scored %>%
+  mutate(material_hardship = ifelse(material_hardship > 6, 6, material_hardship))
+```
 
 
 
@@ -2906,7 +2910,7 @@ bygroup_ttest(scored, material_hardship, latinx_inc)
 ### Related to caregiver well-being
 
 ```{r policy-463 }
-bycont_plot(scored, material_hardship, wellbeing)
+bycont_plot(scored, material_hardship, wellbeing, saveData = T)
 ```
 
 ```{r policy-464, results = 'asis'}
@@ -2916,7 +2920,7 @@ bcont_table(scored, material_hardship, wellbeing)
 ### Related to child well-being
 
 ```{r policy-465 }
-bycont_plot(scored, material_hardship, child_wellbeing)
+bycont_plot(scored, material_hardship, child_wellbeing, saveData = T)
 ```
 
 ```{r policy-466, results = 'asis'}

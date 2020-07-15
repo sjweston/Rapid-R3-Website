@@ -56,6 +56,16 @@ scored_long = scored %>%
 
 income_wellbeing_model = "
 
+child_wellbeing =~ child_wellbeing_1 + child_wellbeing_2 + child_wellbeing_3 +
+  child_wellbeing_4 + child_wellbeing_5 + child_wellbeing_6 + child_wellbeing_7 + 
+  child_wellbeing_8 + child_wellbeing_9 + child_wellbeing_10 + child_wellbeing_11 +
+  child_wellbeing_12 + child_wellbeing_13 + child_wellbeing_14
+  
+wellbeing =~ wellbeing_1 + wellbeing_2 + wellbeing_3 +
+  wellbeing_4 + wellbeing_5 + wellbeing_6 + wellbeing_7 + 
+  wellbeing_8 + wellbeing_9 + wellbeing_10 + wellbeing_11 +
+  wellbeing_12 + wellbeing_13 + wellbeing_14
+
 child_wellbeing_2 ~ p1*wellbeing_1 + c1*child_wellbeing_1 + i1*income_decreased_1
 child_wellbeing_3 ~ p1*wellbeing_2 + c1*child_wellbeing_2 + i1*income_decreased_2
 child_wellbeing_4 ~ p1*wellbeing_3 + c1*child_wellbeing_3 + i1*income_decreased_3

@@ -341,10 +341,13 @@ bygroup_ttest = function(data, variable, group){
     
 }
 
-bycont_plot = function(data, variable, outcome){
+bycont_plot = function(data, variable, outcome, saveData = F){
   
   check_class = as.data.frame(data[,deparse(substitute(variable))])
   check_class = class(check_class[,1])
+  
+  date = as.character(Sys.Date())
+  file = paste0(deparse(substitute(outcome)), "_", deparse(substitute(variable)), "_", date, ".csv")
   
   long_plotd = data %>%
     dplyr::group_by(CaregiverID) %>%
@@ -352,7 +355,15 @@ bycont_plot = function(data, variable, outcome){
     filter(Week == max(Week)) %>%
     dplyr::group_by({{variable}}) %>%
     summarize(Average = mean({{outcome}}),
-              MOE = moe({{outcome}})) %>%
+              MOE = moe({{outcome}})) 
+  
+  if(saveData){
+    long_plotd %>%
+      mutate_if(is.numeric, round, digits = 2) %>%
+    write.csv(., file = paste0(here("figure data/"),file) )
+  }
+  
+  long_plotd = long_plotd %>%
     ggplot(aes(x = {{variable}},
                y = Average,
                fill = {{variable}},
@@ -415,6 +426,11 @@ bycont_m_plot = function(data, variable, outcome, moderator, m.val, m.label){
 
 bcont_table = function(data, variable, outcome){
   
+  data = data %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    ungroup()
+  
   check_class = as.data.frame(data[,deparse(substitute(variable))])
   check_class = class(check_class[,1])
   
@@ -471,12 +487,23 @@ bcont_m_table = function(ndata, variable, outcome, moderator, m.val, m.label){
       deparse(substitute(moderator))
     ))
   
+  ndata = ndata %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    ungroup()
+  
   contrast.table = ndata %>%
+    filter(!is.na({{moderator}})) %>%
+    filter(!is.na({{variable}})) %>%
+    group_by({{variable}}) %>%
+    mutate(nfactors = length(unique(as.character({{moderator}})))) %>%
+    ungroup() %>%
     mutate_at(.vars = vars({{moderator}}), 
               .funs = function(x) factor(x, levels = m.val, labels = m.label)) %>%
+    filter(nfactors > 1) %>%
     group_by({{variable}}) %>%
-    nest() %>%
-    mutate(model = map(data, .f = function(x) lm(formula, data = x))) %>%
+    nest()   %>%
+    mutate(model = map(data, .f = function(x) lm(formula, data = x)))  %>%
     mutate(model = map(model, broom::tidy)) %>%
     unnest(model) %>%
     select(-data) %>%
@@ -485,9 +512,9 @@ bcont_m_table = function(ndata, variable, outcome, moderator, m.val, m.label){
            Upper = estimate+1.96*std.error) %>%
     ungroup() %>%
     mutate(p.value = p.adjust(p.value, method = "holm")) %>%
-    mutate(p.value = papaja::printp(p.value)) 
+    mutate(p.value = papaja::printp(p.value))
 
-  
+
   if(length(m.val) == 2){
     contrast.table = contrast.table %>%
       select({{variable}}, estimate, Lower, Upper, p.value) %>%
