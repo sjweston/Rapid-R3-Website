@@ -65,6 +65,7 @@ splines.groups = function(data, outcome, group, point){
   contrast = sum(group.levs[,1] %in% c(-1,1)) == 2
   
   data = data %>%
+    filter(Week > 0) %>%
     filter(!is.na({{group}})) %>%
     mutate(SL1 = ifelse(Week <= point, Week-point, 0),
            SL2 = ifelse(Week > point, Week-point, 0))
