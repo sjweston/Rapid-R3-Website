@@ -164,7 +164,7 @@ nyt_data = nyt_data %>%
     new_cases_per1000 = (new_cases_twoweeks/population)*1000,
     new_deaths_per1000 = (new_deaths_twoweeks/population)*1000) %>%
   select(fips, date, total_cases, total_deaths, 
-         new_cases_twoweeks, new_deaths_twoweeks, growth_cases_oneweek, 
+         new_cases_twoweeks, new_deaths_twoweeks, growth_cases_oneweek, growth_deaths_oneweek, 
          doubling_time_cases, total_cases_per1000, total_deaths_per1000, 
          new_cases_per1000, new_deaths_per1000)
 

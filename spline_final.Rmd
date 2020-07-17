@@ -6,7 +6,7 @@ output:
     toc_float: TRUE
 ---
 
-```{r curve-1, echo = F}
+```{r spline-final-1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 #re-run all the machine learning models?
@@ -14,7 +14,7 @@ rerun = FALSE
 dontrerun = !rerun
 ```
 
-```{r curve-2 }
+```{r spline-final-2 }
 library(conflicted)
 library(here)
 library(ggpubr)
@@ -30,31 +30,32 @@ conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
 conflict_prefer("lag", "dplyr")
 conflict_prefer("map", "purrr")
+library(plotly)
 library(sjPlot)
 ```
 
-```{r curve-3 }
+```{r spline-final-3 }
 if(rerun) options(mc.cores = parallel::detectCores())
 ```
 
 
-```{r curve-4 }
+```{r spline-final-4 }
 source(here("Scripts/score data.R")) 
 ```
 
-```{r curve-9 }
+```{r spline-final-5 }
 source(here("Functions/pomp.R"))
 source(here("Functions/splines.R"))
 ```
 
-```{r}
+```{r spline-final-6}
 #pomp scoring
 scored = scored %>%
   mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp)
 ```
 
 
-```{r curve-5 }
+```{r spline-final-7 }
 #Center emotion variables on caregiver baseline (Week 0)
 # identify "baseline" values
 baseline = scored %>%
@@ -83,7 +84,7 @@ emotion = scored %>%
   spread(key, value) # now one row per week per caregiver
 ```
 
-```{r curve-6 }
+```{r spline-final-8 }
 groups = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == min(Week)) %>%
@@ -106,7 +107,7 @@ contrasts(emotion_g$child2) = contr.sum(2)
 contrasts(emotion_g$child3) = contr.sum(2)
 ```
 
-```{r}
+```{r spline-final-9}
 # potential mediators
 meds = c("insurance", 
          "child_insurance", 
@@ -135,7 +136,7 @@ emotion_g = scored %>%
 
 # Representativeness disclaimer
 
-```{r curve-7 }
+```{r spline-final-10 }
 n_care = length(unique(emotion$CaregiverID))
 date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
 date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
@@ -157,7 +158,7 @@ Caregivers of children with disabilities are more likley to report that their em
 
 # Descriptives
 
-```{r curve-8 }
+```{r spline-final-11 }
 emotion_g %>%
   select_if(is.numeric) %>%
   psych::describeBy(group = emotion_g$Week, fast = T) 
@@ -173,16 +174,16 @@ Spline models are fit with nodes at Week 6; Week 7 is the week ending on May 25t
 
 ### Overall
 
-```{r curve-92 }
+```{r spline-final-12 }
 fit = splines.overall(emotion_g, anxiety, 6)
 fit$plot
 ```
 
-```{r curve-93, results = 'asis'}
+```{r spline-final-13, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-14}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -191,7 +192,7 @@ fit$pdata %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0629_overall_anxiety.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -200,18 +201,18 @@ fit$plot$data %>%
 
 ### Black/African American
 
-```{r curve-94 }
+```{r spline-final-15 }
 fit = splines.groups(emotion_g, anxiety, black, 6)
 fit$plot
 ```
 
-```{r curve-95, results = 'asis'}
+```{r spline-final-16, results = 'asis'}
 fit$summary
 ```
 
 #### Can we explain this difference?
 
-```{r, results = 'asis'}
+```{r spline-final-17, results = 'asis'}
 emotion_g %>%
   gather("mediator", "m.value", all_of(black_meds)) %>%
   group_by(mediator) %>%
@@ -231,7 +232,7 @@ emotion_g %>%
 
 ```
 
-```{r}
+```{r spline-final-18}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -241,7 +242,7 @@ fit$pdata %>%
   mutate(black = ifelse(black == 0, "Black/African American", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_black_anxiety.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, black, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -252,27 +253,27 @@ fit$plot$data %>%
 
 ### LatinX
 
-```{r curve-96 }
+```{r spline-final-19 }
 fit = splines.groups(emotion_g, anxiety, latinx, 6)
 fit$plot
 ```
 
-```{r curve-97, results = 'asis'}
+```{r spline-final-20, results = 'asis'}
 fit$summary
 ```
 
 ### Poverty
 
-```{r curve-98 }
+```{r spline-final-21 }
 fit = splines.groups(emotion_g, anxiety, poverty150, 6)
 fit$plot
 ```
 
-```{r curve-99, results = 'asis'}
+```{r spline-final-22, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-23}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -282,7 +283,7 @@ fit$pdata %>%
   mutate(poverty150 = ifelse(poverty150 == 0, "Low Income", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_lowincome_anxiety.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, poverty150, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -292,29 +293,29 @@ fit$plot$data %>%
 
 ### Single Parents
 
-```{r curve-100 }
+```{r spline-final-24 }
 fit = splines.groups(emotion_g, anxiety, single, 6)
 fit$plot
 ```
 
-```{r curve-101, results = 'asis'}
+```{r spline-final-25, results = 'asis'}
 fit$summary
 ```
 
 ### Children with disabilites
 
-```{r curve-102 }
+```{r spline-final-26 }
 fit = splines.groups(emotion_g, anxiety, disability, 6)
 fit$plot
 ```
 
-```{r curve-103, results = 'asis'}
+```{r spline-final-27, results = 'asis'}
 fit$summary
 ```
 
 #### Can we explain this difference?
 
-```{r, results = 'asis'}
+```{r spline-final-28, results = 'asis'}
 emotion_g %>%
   gather("mediator", "m.value", all_of(disability_meds)) %>%
   group_by(mediator) %>%
@@ -334,7 +335,7 @@ emotion_g %>%
 
 ```
 
-```{r}
+```{r spline-final-29}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -344,7 +345,7 @@ fit$pdata %>%
   mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_disability_anxiety.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, disability, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -354,12 +355,12 @@ fit$plot$data %>%
 
 ### 3+ Children
 
-```{r curve-104 }
+```{r spline-final-30 }
 fit = splines.groups(emotion_g, anxiety, child3, 6)
 fit$plot
 ```
 
-```{r curve-105, results = 'asis'}
+```{r spline-final-31, results = 'asis'}
 fit$summary
 ```
 
@@ -367,16 +368,16 @@ fit$summary
 
 ### Overall
 
-```{r curve-106 }
+```{r spline-final-32 }
 fit = splines.overall(emotion_g, depress, 6)
 fit$plot
 ```
 
-```{r curve-107, results = 'asis'}
+```{r spline-final-33, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-34}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -385,7 +386,7 @@ fit$pdata %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0629_overall_depress.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -394,18 +395,18 @@ fit$plot$data %>%
 
 ### Black/African American
 
-```{r curve-108 }
+```{r spline-final-35 }
 fit = splines.groups(emotion_g, depress, black, 6)
 fit$plot
 ```
 
-```{r curve-109, results = 'asis'}
+```{r spline-final-36, results = 'asis'}
 fit$summary
 ```
 
 #### Can we explain this difference?
 
-```{r, results = 'asis'}
+```{r spline-final-37, results = 'asis'}
 emotion_g %>%
   gather("mediator", "m.value", all_of(black_meds)) %>%
   group_by(mediator) %>%
@@ -427,27 +428,27 @@ emotion_g %>%
 
 ### LatinX
 
-```{r curve-110 }
+```{r spline-final-38 }
 fit = splines.groups(emotion_g, depress, latinx, 6)
 fit$plot
 ```
 
-```{r curve-111, results = 'asis'}
+```{r spline-final-39, results = 'asis'}
 fit$summary
 ```
 
 ### Poverty
 
-```{r curve-112 }
+```{r spline-final-40 }
 fit = splines.groups(emotion_g, depress, poverty150, 6)
 fit$plot
 ```
 
-```{r curve-113, results = 'asis'}
+```{r spline-final-41, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-42}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -457,7 +458,7 @@ fit$pdata %>%
   mutate(poverty150 = ifelse(poverty150 == 0, "Low Income", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_lowincome_depress.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, poverty150, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -467,29 +468,29 @@ fit$plot$data %>%
 
 ### Single Parents
 
-```{r curve-114 }
+```{r spline-final-43 }
 fit = splines.groups(emotion_g, depress, single, 6)
 fit$plot
 ```
 
-```{r curve-115, results = 'asis'}
+```{r spline-final-44, results = 'asis'}
 fit$summary
 ```
 
 ### Children with disabilites
 
-```{r curve-116 }
+```{r spline-final-45 }
 fit = splines.groups(emotion_g, depress, disability, 6)
 fit$plot
 ```
 
-```{r curve-117, results = 'asis'}
+```{r spline-final-46, results = 'asis'}
 fit$summary
 ```
 
 #### Can we explain this difference?
 
-```{r, results = 'asis'}
+```{r spline-final-47, results = 'asis'}
 emotion_g %>%
   gather("mediator", "m.value", all_of(disability_meds)) %>%
   group_by(mediator) %>%
@@ -509,7 +510,7 @@ emotion_g %>%
 
 ```
 
-```{r}
+```{r spline-final-48}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -519,7 +520,7 @@ fit$pdata %>%
   mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_disability_depress.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, disability, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -530,16 +531,16 @@ fit$plot$data %>%
 
 ### 3+ Children
 
-```{r curve-118 }
+```{r spline-final-49 }
 fit = splines.groups(emotion_g, depress, child3, 6)
 fit$plot
 ```
 
-```{r curve-119, results = 'asis'}
+```{r spline-final-50, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-51}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -549,7 +550,7 @@ fit$pdata %>%
   mutate(child3 = ifelse(child3 == 0, "3+ Children", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_child3_anxiety.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, child3, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -561,16 +562,16 @@ fit$plot$data %>%
 
 ### Overall
 
-```{r curve-120 }
+```{r spline-final-52 }
 fit = splines.overall(emotion_g, stress, 6)
 fit$plot
 ```
 
-```{r curve-121, results = 'asis'}
+```{r spline-final-53, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-54}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -579,7 +580,7 @@ fit$pdata %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0629_overall_stress.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -588,26 +589,26 @@ fit$plot$data %>%
 
 ### Black/African American
 
-```{r curve-122 }
+```{r spline-final-55 }
 fit = splines.groups(emotion_g, stress, black, 6)
 fit$plot
 ```
 
-```{r curve-123, results = 'asis'}
+```{r spline-final-56, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-57}
 group.diff(emotion_g, stress, black, 1)
 ```
 
-```{r}
+```{r spline-final-58}
 group.diff(emotion_g, stress, black, 10)
 ```
 
 #### Can we explain this difference?
 
-```{r, results = 'asis'}
+```{r spline-final-59, results = 'asis'}
 emotion_g %>%
   gather("mediator", "m.value", all_of(black_meds)) %>%
   group_by(mediator) %>%
@@ -627,7 +628,7 @@ emotion_g %>%
 
 ```
 
-```{r}
+```{r spline-final-60}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -637,7 +638,7 @@ fit$pdata %>%
   mutate(black = ifelse(black == 0, "Black/African American", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_black_stress.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, black, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -647,39 +648,39 @@ fit$plot$data %>%
 
 ### LatinX
 
-```{r curve-124 }
+```{r spline-final-61 }
 fit = splines.groups(emotion_g, stress, latinx, 6)
 fit$plot
 ```
 
-```{r curve-125, results = 'asis'}
+```{r spline-final-62, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-63}
 group.diff(emotion_g, stress, latinx, 1)
 ```
 
-```{r}
+```{r spline-final-64}
 group.diff(emotion_g, stress, latinx, 10)
 ```
 
 ### Poverty
 
-```{r curve-126 }
+```{r spline-final-65 }
 fit = splines.groups(emotion_g, stress, poverty150, 6)
 fit$plot
 ```
 
-```{r curve-127, results = 'asis'}
+```{r spline-final-66, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-67}
 group.diff(emotion_g, stress, poverty150, 1)
 ```
 
-```{r}
+```{r spline-final-68}
 group.diff(emotion_g, stress, poverty150, 10)
 ```
 
@@ -687,44 +688,44 @@ group.diff(emotion_g, stress, poverty150, 10)
 
 ### Single Parents
 
-```{r curve-128 }
+```{r spline-final-69 }
 fit = splines.groups(emotion_g, stress, single, 6)
 fit$plot
 ```
 
-```{r curve-129, results = 'asis'}
+```{r spline-final-70, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-71}
 group.diff(emotion_g, stress, single, 1)
 ```
 
-```{r}
+```{r spline-final-72}
 group.diff(emotion_g, stress, single, 10)
 ```
 
 
 ### Children with disabilites
 
-```{r curve-130 }
+```{r spline-final-73 }
 fit = splines.groups(emotion_g, stress, disability, 6)
 fit$plot
 ```
 
-```{r curve-131, results = 'asis'}
+```{r spline-final-74, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-75}
 group.diff(emotion_g, stress, disability, 1)
 ```
 
-```{r}
+```{r spline-final-76}
 group.diff(emotion_g, stress, disability, 10)
 ```
 
-```{r}
+```{r spline-final-77}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -734,7 +735,7 @@ fit$pdata %>%
   mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_disability_stress.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, disability, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -744,24 +745,24 @@ fit$plot$data %>%
 
 ### 3+ Children
 
-```{r curve-132 }
+```{r spline-final-78 }
 fit = splines.groups(emotion_g, stress, child3, 6)
 fit$plot
 ```
 
-```{r curve-133, results = 'asis'}
+```{r spline-final-79, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-80}
 group.diff(emotion_g, stress, child3, 1)
 ```
 
-```{r}
+```{r spline-final-81}
 group.diff(emotion_g, stress, child3, 10)
 ```
 
-```{r}
+```{r spline-final-82}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -771,7 +772,7 @@ fit$pdata %>%
   mutate(child3 = ifelse(child3 == 0, "3+ Children", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_child3_stress.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, child3, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -784,16 +785,16 @@ fit$plot$data %>%
 
 ### Overall
 
-```{r curve-134 }
+```{r spline-final-83 }
 fit = splines.overall(emotion_g, lonely, 6)
 fit$plot
 ```
 
-```{r curve-135, results = 'asis'}
+```{r spline-final-84, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-85}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -802,7 +803,7 @@ fit$pdata %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0629_overall_lonely.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -811,62 +812,62 @@ fit$plot$data %>%
 
 ### Black/African American
 
-```{r curve-136 }
+```{r spline-final-86 }
 fit = splines.groups(emotion_g, lonely, black, 6)
 fit$plot
 ```
 
-```{r curve-137, results = 'asis'}
+```{r spline-final-87, results = 'asis'}
 fit$summary
 ```
 
 ### LatinX
 
-```{r curve-138 }
+```{r spline-final-88 }
 fit = splines.groups(emotion_g, lonely, latinx, 6)
 fit$plot
 ```
 
-```{r curve-139, results = 'asis'}
+```{r spline-final-89, results = 'asis'}
 fit$summary
 ```
 
 ### Poverty
 
-```{r curve-140 }
+```{r spline-final-90 }
 fit = splines.groups(emotion_g, lonely, poverty150, 6)
 fit$plot
 ```
 
-```{r curve-141, results = 'asis'}
+```{r spline-final-91, results = 'asis'}
 fit$summary
 ```
 
 ### Single Parents
 
-```{r curve-142 }
+```{r spline-final-92 }
 fit = splines.groups(emotion_g, lonely, single, 6)
 fit$plot
 ```
 
-```{r curve-143, results = 'asis'}
+```{r spline-final-93, results = 'asis'}
 fit$summary
 ```
 
 ### Children with disabilites
 
-```{r curve-144 }
+```{r spline-final-94 }
 fit = splines.groups(emotion_g, lonely, disability, 6)
 fit$plot
 ```
 
-```{r curve-145, results = 'asis'}
+```{r spline-final-95, results = 'asis'}
 fit$summary
 ```
 
 #### Can we explain this difference?
 
-```{r, results = 'asis'}
+```{r spline-final-96, results = 'asis'}
 emotion_g %>%
   gather("mediator", "m.value", all_of(disability_meds)) %>%
   group_by(mediator) %>%
@@ -886,7 +887,7 @@ emotion_g %>%
 
 ```
 
-```{r}
+```{r spline-final-97}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -896,7 +897,7 @@ fit$pdata %>%
   mutate(disability = ifelse(disability == 0, "Caregivers of children with disabilities", "Entire Sample")) %>%
   write.csv(., file = here("figure data/0629_disability_lonely.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, disability, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -905,12 +906,12 @@ fit$plot$data %>%
 ```
 ### 3+ Children
 
-```{r curve-146 }
+```{r spline-final-98 }
 fit = splines.groups(emotion_g, lonely, child3, 6)
 fit$plot
 ```
 
-```{r curve-147, results = 'asis'}
+```{r spline-final-99, results = 'asis'}
 fit$summary
 ```
 
@@ -918,23 +919,23 @@ fit$summary
 
 ### Overall
 
-```{r curve-148 }
+```{r spline-final-100 }
 fit = splines.overall(emotion_g, fussy, 6)
 fit$plot
 ```
 
-```{r curve-149, results = 'asis'}
+```{r spline-final-101, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-102}
 fit$pdata %>%
   select(Week, fit) %>%
   mutate(fit = round(fit,2)) %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0623_overall_Ext.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -944,24 +945,24 @@ fit$plot$data %>%
 
 ### Black/African American
 
-```{r curve-150 }
+```{r spline-final-103 }
 fit = splines.groups(emotion_g, fussy, black, 6)
 fit$plot
 ```
 
-```{r curve-151, results = 'asis'}
+```{r spline-final-104, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-105}
 group.diff(emotion_g, fussy, black, 1)
 ```
 
-```{r}
+```{r spline-final-106}
 group.diff(emotion_g, fussy, black, 10)
 ```
 
-```{r}
+```{r spline-final-107}
 # are group differences due to caregiver stress?
 emotion_g_sL = emotion_g %>%
   mutate(SL1 = ifelse(Week <= 6, Week-6, 0),
@@ -974,7 +975,7 @@ mod.ext.black = lmer(fussy ~ black*SL1 + black*SL2 +
 summary(mod.ext.black)
 ```
 
-```{r}
+```{r spline-final-108}
 # export data for soapbox
 #lines
 fit$pdata %>%
@@ -983,7 +984,7 @@ fit$pdata %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0623_black_Ext.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, black, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -993,45 +994,45 @@ fit$plot$data %>%
 
 ### LatinX
 
-```{r curve-152 }
+```{r spline-final-109 }
 fit = splines.groups(emotion_g, fussy, latinx, 6)
 fit$plot
 ```
 
-```{r curve-153, results = 'asis'}
+```{r spline-final-110, results = 'asis'}
 fit$summary
 ```
 
 
-```{r}
+```{r spline-final-111}
 group.diff(emotion_g, fussy, latinx, 1)
 ```
 
-```{r}
+```{r spline-final-112}
 group.diff(emotion_g, fussy, latinx, 10)
 ```
 
 ### Poverty
 
-```{r curve-154 }
+```{r spline-final-113 }
 fit = splines.groups(emotion_g, fussy, poverty150, 6)
 fit$plot
 ```
 
-```{r curve-155, results = 'asis'}
+```{r spline-final-114, results = 'asis'}
 fit$summary
 ```
 
 
-```{r}
+```{r spline-final-115}
 group.diff(emotion_g, fussy, poverty150, 1)
 ```
 
-```{r}
+```{r spline-final-116}
 group.diff(emotion_g, fussy, poverty150, 10)
 ```
 
-```{r}
+```{r spline-final-117}
 # are group differences due to caregiver stress?
 mod.ext.poverty150 = lmer(fussy ~ poverty150*SL1 + poverty150*SL2 + 
                        stress*SL1 + stress*SL2 + (1|CaregiverID),
@@ -1040,14 +1041,14 @@ mod.ext.poverty150 = lmer(fussy ~ poverty150*SL1 + poverty150*SL2 +
 summary(mod.ext.poverty150)
 ```
 
-```{r}
+```{r spline-final-118}
 fit$pdata %>%
   select(Week, poverty150, fit) %>%
   mutate(fit = round(fit,2)) %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0623_lowIncome_Ext.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, poverty150, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -1056,25 +1057,25 @@ fit$plot$data %>%
 
 ### Single Parents
 
-```{r curve-156 }
+```{r spline-final-119 }
 fit = splines.groups(emotion_g, fussy, single, 6)
 fit$plot
 ```
 
-```{r curve-157, results = 'asis'}
+```{r spline-final-120, results = 'asis'}
 fit$summary
 ```
 
 
-```{r}
+```{r spline-final-121}
 group.diff(emotion_g, fussy, single, 1)
 ```
 
-```{r}
+```{r spline-final-122}
 group.diff(emotion_g, fussy, single, 10)
 ```
 
-```{r}
+```{r spline-final-123}
 # are group differences due to caregiver stress?
 mod.ext.single = lmer(fussy ~ single*SL1 + single*SL2 + 
                        stress*SL1 + stress*SL2 + (1|CaregiverID),
@@ -1083,14 +1084,14 @@ mod.ext.single = lmer(fussy ~ single*SL1 + single*SL2 +
 summary(mod.ext.single)
 ```
 
-```{r}
+```{r spline-final-124}
 fit$pdata %>%
   select(Week, single, fit) %>%
   mutate(fit = round(fit,2)) %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0623_single_Ext.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, single, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -1100,61 +1101,61 @@ fit$plot$data %>%
 
 ### Children with disabilites
 
-```{r curve-158 }
+```{r spline-final-125 }
 fit = splines.groups(emotion_g, fussy, disability, 6)
 fit$plot
 ```
 
-```{r curve-159, results = 'asis'}
+```{r spline-final-126, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-127}
 group.diff(emotion_g, fussy, disability, 1)
 ```
 
-```{r}
+```{r spline-final-128}
 group.diff(emotion_g, fussy, disability, 10)
 ```
 ### 3+ Children
 
-```{r curve-160 }
+```{r spline-final-129 }
 fit = splines.groups(emotion_g, fussy, child3, 6)
 fit$plot
 ```
 
-```{r curve-161, results = 'asis'}
+```{r spline-final-130, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-131}
 group.diff(emotion_g, fussy, child3, 1)
 ```
 
-```{r}
+```{r spline-final-132}
 group.diff(emotion_g, fussy, child3, 10)
 ```
 ## Child Internalizing{.tabset}
 
 ### Overall
 
-```{r curve-162 }
+```{r spline-final-133 }
 fit = splines.overall(emotion_g, fear, 6)
 fit$plot
 ```
 
-```{r curve-163, results = 'asis'}
+```{r spline-final-134, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-135}
 fit$pdata %>%
   select(Week, fit) %>%
   mutate(fit = round(fit,2)) %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0623_overall_Int.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -1163,70 +1164,70 @@ fit$plot$data %>%
 
 ### Black/African American
 
-```{r curve-164 }
+```{r spline-final-136 }
 fit = splines.groups(emotion_g, fear, black, 6)
 fit$plot
 ```
 
-```{r curve-165, results = 'asis'}
+```{r spline-final-137, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-138}
 group.diff(emotion_g, fear, black, 1)
 ```
 
-```{r}
+```{r spline-final-139}
 group.diff(emotion_g, fear, black, 10)
 ```
 
 ### LatinX
 
-```{r curve-166 }
+```{r spline-final-140 }
 fit = splines.groups(emotion_g, fear, latinx, 6)
 fit$plot
 ```
 
-```{r curve-167, results = 'asis'}
+```{r spline-final-141, results = 'asis'}
 fit$summary
 ```
 
-```{r}
+```{r spline-final-142}
 group.diff(emotion_g, fear, latinx, 1)
 ```
 
-```{r}
+```{r spline-final-143}
 group.diff(emotion_g, fear, latinx, 10)
 ```
 
 ### Poverty
 
-```{r curve-168 }
+```{r spline-final-144 }
 fit = splines.groups(emotion_g, fear, poverty150, 6)
 fit$plot
 ```
 
-```{r curve-169, results = 'asis'}
+```{r spline-final-145, results = 'asis'}
 fit$summary
 ```
 
 
-```{r}
+```{r spline-final-146}
 group.diff(emotion_g, fear, poverty150, 1)
 ```
 
-```{r}
+```{r spline-final-147}
 group.diff(emotion_g, fear, poverty150, 10)
 ```
 
-```{r}
+```{r spline-final-148}
 fit$pdata %>%
   select(Week, poverty150, fit) %>%
   mutate(fit = round(fit,2)) %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0623_lowIncome_Int.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, poverty150, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -1236,45 +1237,45 @@ fit$plot$data %>%
 
 ### Single Parents
 
-```{r curve-170 }
+```{r spline-final-149 }
 fit = splines.groups(emotion_g, fear, single, 6)
 fit$plot
 ```
 
-```{r curve-171, results = 'asis'}
+```{r spline-final-150, results = 'asis'}
 fit$summary
 ```
 
 
-```{r}
+```{r spline-final-151}
 group.diff(emotion_g, fear, single, 1)
 ```
 
-```{r}
+```{r spline-final-152}
 group.diff(emotion_g, fear, single, 10)
 ```
 
 ### Children with disabilites
 
-```{r curve-172 }
+```{r spline-final-153 }
 fit = splines.groups(emotion_g, fear, disability, 6)
 fit$plot
 ```
 
-```{r curve-173, results = 'asis'}
+```{r spline-final-154, results = 'asis'}
 fit$summary
 ```
 
 
-```{r}
+```{r spline-final-155}
 group.diff(emotion_g, fear, disability, 1)
 ```
 
-```{r}
+```{r spline-final-156}
 group.diff(emotion_g, fear, disability, 10)
 ```
 
-```{r}
+```{r spline-final-157}
 # are group differences due to caregiver stress?
 mod.int.disability = lmer(fear ~ disability*SL1 + disability*SL2 + 
                        stress*SL1 + stress*SL2 + (1|CaregiverID),
@@ -1283,14 +1284,14 @@ mod.int.disability = lmer(fear ~ disability*SL1 + disability*SL2 +
 summary(mod.int.disability)
 ```
 
-```{r}
+```{r spline-final-158}
 fit$pdata %>%
   select(Week, disability, fit) %>%
   mutate(fit = round(fit,2)) %>%
   rename(problems = fit) %>%
   write.csv(., file = here("figure data/0623_disability_Int.csv"))
 #dots
-fit$plot$data %>%
+fit$plotdata %>%
   select(Week, disability, m) %>%
   mutate(m = round(m,2)) %>%
   rename(problems = m) %>%
@@ -1299,21 +1300,21 @@ fit$plot$data %>%
 
 ### 3+ Children
 
-```{r curve-174 }
+```{r spline-final-159 }
 fit = splines.groups(emotion_g, fear, child3, 6)
 fit$plot
 ```
 
-```{r curve-175, results = 'asis'}
+```{r spline-final-160, results = 'asis'}
 fit$summary
 ```
 
 
-```{r}
+```{r spline-final-161}
 group.diff(emotion_g, fear, child3, 1)
 ```
 
-```{r}
+```{r spline-final-162}
 group.diff(emotion_g, fear, child3, 10)
 ```
 
@@ -1323,7 +1324,7 @@ group.diff(emotion_g, fear, child3, 10)
 
 ### Overall
 
-```{r}
+```{r spline-final-163}
 emotion_g %>%
   mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
   ggplot(aes(x = Week)) +
@@ -1345,7 +1346,7 @@ emotion_g %>%
 
 ### Black/African American
 
-```{r}
+```{r spline-final-164}
 emotion_g %>%
   mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
   mutate(black = factor(black, labels = c("Black", "Everyone else"))) %>%
@@ -1369,7 +1370,7 @@ emotion_g %>%
 
 ### Latinx
 
-```{r}
+```{r spline-final-165}
 emotion_g %>%
   mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
   mutate(latinx = factor(latinx, labels = c("Latinx", "Everyone else"))) %>%
@@ -1394,7 +1395,7 @@ emotion_g %>%
 
 ### Poverty
 
-```{r}
+```{r spline-final-166}
 emotion_g %>%
   mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
   mutate(poverty150 = factor(poverty150, labels = c("Low Income", "Everyone else"))) %>%
@@ -1420,7 +1421,7 @@ emotion_g %>%
 
 ### Single Parents
 
-```{r}
+```{r spline-final-167}
 emotion_g %>%
   mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
   mutate(single = factor(single, labels = c("Single Caregivers", "Everyone else"))) %>%
@@ -1446,7 +1447,7 @@ emotion_g %>%
 
 ### Children with disabilites
 
-```{r}
+```{r spline-final-168}
 emotion_g %>%
   mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
   mutate(disability = factor(disability, labels = c("Chidlren with Disabilites", "Everyone else"))) %>%
@@ -1472,7 +1473,7 @@ emotion_g %>%
 
 ### 3+ Children
 
-```{r}
+```{r spline-final-169}
 emotion_g %>%
   mutate_at(vars(fussy, fear, stress), scale, center = T, scale = F) %>%
   mutate(child3 = factor(child3, labels = c("3+ children", "Everyone else"))) %>%
@@ -1500,7 +1501,7 @@ emotion_g %>%
 
 This group represents the combination of Black, low income, and single caregivers. 
 
-```{r}
+```{r spline-final-170}
 emotion_g = emotion_g %>%
   mutate(newgroup = case_when(
     black == 0 ~ 1,

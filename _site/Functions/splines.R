@@ -42,10 +42,13 @@ splines.overall = function(data, outcome, point){
     scale_y_continuous(str_to_title(deparse(substitute(outcome))))+
     theme_pubclean()
   
+  plotdata = plot$data
+  
   return.list = list(model = model,
                      summary = mod.summary,
                      pdata = predicted,
-                     plot = plot)
+                     plot = plot,
+                     plotdata = plotdata)
   return(return.list)
 }
 
@@ -53,7 +56,13 @@ splines.groups = function(data, outcome, group, point){
   
   group.name = deparse(substitute(group))
   
-  color.pal = c("red", "darkgrey")
+  outcome.label = deparse(substitute(outcome))
+  outcome.label = gsub("_", " ", outcome.label)
+  outcome.label = stringr::str_to_sentence(outcome.label)
+  
+  group.levs = unique(as.data.frame(data[,group.name]))
+  ngroups = nrow(group.levs)
+  contrast = sum(group.levs[,1] %in% c(-1,1)) == 2
   
   data = data %>%
     filter(!is.na({{group}})) %>%
@@ -101,18 +110,30 @@ splines.groups = function(data, outcome, group, point){
     geom_point(alpha = .5) +
     geom_line(aes(x = Week, y = fit, color = as.factor({{group}})), 
                   data = predicted, 
-                  inherit.aes = F) +
-    scale_color_manual(str_to_title(deparse(substitute(group))),
-                                   values = color.pal, 
-                                   labels = c("Group", "Sample Average")) +            
+                  inherit.aes = F) +            
     scale_x_continuous(breaks = c(1:10))+
-    scale_y_continuous(str_to_title(deparse(substitute(outcome))))+
+    labs(y = outcome.label) +
     theme_pubclean()
+  
+  if(contrast){
+    plot = plot +
+      scale_color_manual(str_to_title(deparse(substitute(group))),
+                         values = c("red", "darkgrey"), 
+                         labels = c("Group", "Sample Average"))
+  } else{
+    plot = plot + 
+      scale_color_brewer(str_to_title(deparse(substitute(group))), palette = "Set2")
+  }
+  
+  plotdata = plot$data
+  
+  plot = ggplotly(plot)
   
   return.list = list(model = model,
                      summary = mod.summary,
                      pdata = predicted,
-                     plot = plot)
+                     plot = plot,
+                     plotdata = plotdata)
   return(return.list)
 }
 
