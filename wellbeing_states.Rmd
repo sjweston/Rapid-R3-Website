@@ -88,7 +88,9 @@ scored = scored %>%
     state %in% c("ID", "WY", "MN") ~ "ID/WY/MN",
     state %in% c("NY", "NJ") ~ "NY/NJ",
     state == "CA" ~ "CA",
-    TRUE ~ NA_character_))
+    TRUE ~ NA_character_)) %>%
+  mutate(states_groups = as.factor(states_groups),
+         states_groups = relevel(states_groups, ref = "NY/NJ"))
 ```
 
 # Splines at Week 3{.tabset}
@@ -96,7 +98,7 @@ scored = scored %>%
 ## Caregiver mental health
 
 ```{r}
-sp_week3 = state_splines.groups(scored, outcome = mental_health, group = states_groups, point = 3)
+sp_week3 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 3)
 
 sp_week3$plot
 ```
@@ -108,7 +110,7 @@ sp_week3$summary
 ## Anxiety
 
 ```{r}
-sp_week3 = state_splines.groups(scored, outcome = anxiety, group = states_groups, point = 3)
+sp_week3 = splines.groups(scored, outcome = anxiety, group = states_groups, point = 3)
 
 sp_week3$plot
 ```
@@ -120,7 +122,7 @@ sp_week3$summary
 ## Depression
 
 ```{r}
-sp_week3 = state_splines.groups(scored, outcome = depress, group = states_groups, point = 3)
+sp_week3 = splines.groups(scored, outcome = depress, group = states_groups, point = 3)
 
 sp_week3$plot
 ```
@@ -132,7 +134,7 @@ sp_week3$summary
 ## Stress
 
 ```{r}
-sp_week3 = state_splines.groups(scored, outcome = stress, group = states_groups, point = 3)
+sp_week3 = splines.groups(scored, outcome = stress, group = states_groups, point = 3)
 
 sp_week3$plot
 ```
@@ -144,7 +146,7 @@ sp_week3$summary
 ## Loneliness
 
 ```{r}
-sp_week3 = state_splines.groups(scored, outcome = lonely, group = states_groups, point = 3)
+sp_week3 = splines.groups(scored, outcome = lonely, group = states_groups, point = 3)
 
 sp_week3$plot
 ```
@@ -156,7 +158,7 @@ sp_week3$summary
 ## Child externalizing
 
 ```{r}
-sp_week3 = state_splines.groups(scored, outcome = fussy, group = states_groups, point = 3)
+sp_week3 = splines.groups(scored, outcome = fussy, group = states_groups, point = 3)
 
 sp_week3$plot
 ```
@@ -168,7 +170,7 @@ sp_week3$summary
 ## Child internalizing
 
 ```{r}
-sp_week3 = state_splines.groups(scored, outcome = fear, group = states_groups, point = 3)
+sp_week3 = splines.groups(scored, outcome = fear, group = states_groups, point = 3)
 
 sp_week3$plot
 ```
@@ -184,7 +186,7 @@ sp_week3$summary
 ## Caregiver mental health
 
 ```{r}
-sp_week7 = state_splines.groups(scored, outcome = mental_health, group = states_groups, point = 7)
+sp_week7 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 7)
 
 sp_week7$plot
 ```
@@ -196,7 +198,7 @@ sp_week7$summary
 ## Anxiety
 
 ```{r}
-sp_week7 = state_splines.groups(scored, outcome = anxiety, group = states_groups, point = 7)
+sp_week7 = splines.groups(scored, outcome = anxiety, group = states_groups, point = 7)
 
 sp_week7$plot
 ```
@@ -208,7 +210,7 @@ sp_week7$summary
 ## Depression
 
 ```{r}
-sp_week7 = state_splines.groups(scored, outcome = depress, group = states_groups, point = 7)
+sp_week7 = splines.groups(scored, outcome = depress, group = states_groups, point = 7)
 
 sp_week7$plot
 ```
@@ -220,7 +222,7 @@ sp_week7$summary
 ## Stress
 
 ```{r}
-sp_week7 = state_splines.groups(scored, outcome = stress, group = states_groups, point = 7)
+sp_week7 = splines.groups(scored, outcome = stress, group = states_groups, point = 7)
 
 sp_week7$plot
 ```
@@ -232,7 +234,7 @@ sp_week7$summary
 ## Loneliness
 
 ```{r}
-sp_week7 = state_splines.groups(scored, outcome = lonely, group = states_groups, point = 7)
+sp_week7 = splines.groups(scored, outcome = lonely, group = states_groups, point = 7)
 
 sp_week7$plot
 ```
@@ -244,7 +246,7 @@ sp_week7$summary
 ## Child externalizing
 
 ```{r}
-sp_week7 = state_splines.groups(scored, outcome = fussy, group = states_groups, point = 7)
+sp_week7 = splines.groups(scored, outcome = fussy, group = states_groups, point = 7)
 
 sp_week7$plot
 ```
@@ -256,7 +258,7 @@ sp_week7$summary
 ## Child internalizing
 
 ```{r}
-sp_week7 = state_splines.groups(scored, outcome = fear, group = states_groups, point = 7)
+sp_week7 = splines.groups(scored, outcome = fear, group = states_groups, point = 7)
 
 sp_week7$plot
 ```
@@ -265,120 +267,120 @@ sp_week7$plot
 sp_week7$summary
 ```
 
-# All splines{.tabset}
+<!-- # All splines{.tabset} -->
 
-## Caregiver mental health
+<!-- ## Caregiver mental health -->
 
-```{r}
-max.week= max(scored$Week)
+<!-- ```{r} -->
+<!-- max.week= max(scored$Week) -->
 
-spline.df = data.frame(
-  spline = c(1:max.week-1)
-)
-spline.df$data = rep(list(scored), nrow(spline.df))
+<!-- spline.df = data.frame( -->
+<!--   spline = c(1:max.week-1) -->
+<!-- ) -->
+<!-- spline.df$data = rep(list(scored), nrow(spline.df)) -->
 
-spline.df = spline.df %>%
-  mutate(mod = map2(data, spline, .f = function(x,y) state_splines.groups(data = x, 
-                                                                          outcome = mental_health, 
-                                                                          group = states_groups, 
-                                                                          point = y))) %>%
-  mutate(mod = map(mod, "plotdata")) %>%
-  select(spline, mod) %>%
-  unnest(cols = c(mod)) %>%
-  mutate(spline = as.integer(spline))
-  
+<!-- spline.df = spline.df %>% -->
+<!--   mutate(mod = map2(data, spline, .f = function(x,y) splines.groups(data = x,  -->
+<!--                                                                           outcome = mental_health,  -->
+<!--                                                                           group = states_groups,  -->
+<!--                                                                           point = y))) %>% -->
+<!--   mutate(mod = map(mod, "plotdata")) %>% -->
+<!--   select(spline, mod) %>% -->
+<!--   unnest(cols = c(mod)) %>% -->
+<!--   mutate(spline = as.integer(spline)) -->
 
-ggplot(spline.df, aes(Week, colour = states_groups)) +
-  geom_point(aes(y = mental_health), alpha = 0.5) +
-  geom_line(aes(y = pred)) +
-  scale_colour_brewer("Groups", palette = "Set2") +
-  scale_x_continuous(breaks = c(1:max.week))+
-  facet_grid(states_groups~., scales = "free")+
-  theme_pubclean() +
-  # Here comes the gganimate specific bits
-  labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') +
-  transition_time(spline) +
-  ease_aes('linear')
-```
 
-## Child Externalizing
+<!-- ggplot(spline.df, aes(Week, colour = states_groups)) + -->
+<!--   geom_point(aes(y = mental_health), alpha = 0.5) + -->
+<!--   geom_line(aes(y = pred)) + -->
+<!--   scale_colour_brewer("Groups", palette = "Set2") + -->
+<!--   scale_x_continuous(breaks = c(1:max.week))+ -->
+<!--   facet_grid(states_groups~., scales = "free")+ -->
+<!--   theme_pubclean() + -->
+<!--   # Here comes the gganimate specific bits -->
+<!--   labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') + -->
+<!--   transition_time(spline) + -->
+<!--   ease_aes('linear') -->
+<!-- ``` -->
 
-```{r}
-max.week= max(scored$Week)
+<!-- ## Child Externalizing -->
 
-spline.df = data.frame(
-  spline = c(1:max.week-1)
-)
-spline.df$data = rep(list(scored), nrow(spline.df))
+<!-- ```{r} -->
+<!-- max.week= max(scored$Week) -->
 
-spline.df = spline.df %>%
-  mutate(mod = map2(data, spline, .f = function(x,y) state_splines.groups(data = x, 
-                                                                          outcome = fussy, 
-                                                                          group = states_groups, 
-                                                                          point = y))) %>%
-  mutate(mod = map(mod, "plotdata")) %>%
-  select(spline, mod) %>%
-  unnest(cols = c(mod)) %>%
-  mutate(spline = as.integer(spline))
-  
+<!-- spline.df = data.frame( -->
+<!--   spline = c(1:max.week-1) -->
+<!-- ) -->
+<!-- spline.df$data = rep(list(scored), nrow(spline.df)) -->
 
-ggplot(spline.df, aes(Week, colour = states_groups)) +
-  geom_point(aes(y = fussy), alpha = 0.5) +
-  geom_line(aes(y = pred)) +
-  scale_colour_brewer("Groups", palette = "Set2") +
-  scale_x_continuous(breaks = c(1:max.week))+
-  facet_grid(states_groups~., scales = "free")+
-  theme_pubclean() +
-  # Here comes the gganimate specific bits
-  labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') +
-  transition_time(spline) +
-  ease_aes('linear')
-```
+<!-- spline.df = spline.df %>% -->
+<!--   mutate(mod = map2(data, spline, .f = function(x,y) splines.groups(data = x,  -->
+<!--                                                                           outcome = fussy,  -->
+<!--                                                                           group = states_groups,  -->
+<!--                                                                           point = y))) %>% -->
+<!--   mutate(mod = map(mod, "plotdata")) %>% -->
+<!--   select(spline, mod) %>% -->
+<!--   unnest(cols = c(mod)) %>% -->
+<!--   mutate(spline = as.integer(spline)) -->
 
-## Child Internalizing
 
-```{r}
-max.week= max(scored$Week)
+<!-- ggplot(spline.df, aes(Week, colour = states_groups)) + -->
+<!--   geom_point(aes(y = fussy), alpha = 0.5) + -->
+<!--   geom_line(aes(y = pred)) + -->
+<!--   scale_colour_brewer("Groups", palette = "Set2") + -->
+<!--   scale_x_continuous(breaks = c(1:max.week))+ -->
+<!--   facet_grid(states_groups~., scales = "free")+ -->
+<!--   theme_pubclean() + -->
+<!--   # Here comes the gganimate specific bits -->
+<!--   labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') + -->
+<!--   transition_time(spline) + -->
+<!--   ease_aes('linear') -->
+<!-- ``` -->
 
-spline.df = data.frame(
-  spline = c(1:max.week-1)
-)
-spline.df$data = rep(list(scored), nrow(spline.df))
+<!-- ## Child Internalizing -->
 
-spline.df = spline.df %>%
-  mutate(mod = map2(data, spline, .f = function(x,y) state_splines.groups(data = x, 
-                                                                          outcome = fear, 
-                                                                          group = states_groups, 
-                                                                          point = y))) %>%
-  mutate(mod = map(mod, "plotdata")) %>%
-  select(spline, mod) %>%
-  unnest(cols = c(mod)) %>%
-  mutate(spline = as.integer(spline))
-  
+<!-- ```{r} -->
+<!-- max.week= max(scored$Week) -->
 
-ggplot(spline.df, aes(Week, colour = states_groups)) +
-  geom_point(aes(y = fear), alpha = 0.5) +
-  geom_line(aes(y = pred)) +
-  scale_colour_brewer("Groups", palette = "Set2") +
-  scale_x_continuous(breaks = c(1:max.week))+
-  facet_grid(states_groups~., scales = "free")+
-  theme_pubclean() +
-  # Here comes the gganimate specific bits
-  labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') +
-  transition_time(spline) +
-  ease_aes('linear')
-```
+<!-- spline.df = data.frame( -->
+<!--   spline = c(1:max.week-1) -->
+<!-- ) -->
+<!-- spline.df$data = rep(list(scored), nrow(spline.df)) -->
 
-# Caregiver Splines at Week 3{.tabset}
+<!-- spline.df = spline.df %>% -->
+<!--   mutate(mod = map2(data, spline, .f = function(x,y) splines.groups(data = x,  -->
+<!--                                                                           outcome = fear,  -->
+<!--                                                                           group = states_groups,  -->
+<!--                                                                           point = y))) %>% -->
+<!--   mutate(mod = map(mod, "plotdata")) %>% -->
+<!--   select(spline, mod) %>% -->
+<!--   unnest(cols = c(mod)) %>% -->
+<!--   mutate(spline = as.integer(spline)) -->
 
-## Caregiver mental health
 
-```{r}
-sp_week3 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 3)
+<!-- ggplot(spline.df, aes(Week, colour = states_groups)) + -->
+<!--   geom_point(aes(y = fear), alpha = 0.5) + -->
+<!--   geom_line(aes(y = pred)) + -->
+<!--   scale_colour_brewer("Groups", palette = "Set2") + -->
+<!--   scale_x_continuous(breaks = c(1:max.week))+ -->
+<!--   facet_grid(states_groups~., scales = "free")+ -->
+<!--   theme_pubclean() + -->
+<!--   # Here comes the gganimate specific bits -->
+<!--   labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') + -->
+<!--   transition_time(spline) + -->
+<!--   ease_aes('linear') -->
+<!-- ``` -->
 
-sp_week3$plot
-```
+<!-- # Caregiver Splines at Week 3{.tabset} -->
 
-```{r, results = 'asis'}
-sp_week3$summary
-```
+<!-- ## Caregiver mental health -->
+
+<!-- ```{r} -->
+<!-- sp_week3 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 3) -->
+
+<!-- sp_week3$plot -->
+<!-- ``` -->
+
+<!-- ```{r, results = 'asis'} -->
+<!-- sp_week3$summary -->
+<!-- ``` -->
