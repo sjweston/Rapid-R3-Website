@@ -38,6 +38,8 @@ source(here("Scripts/score data.R"))
 ```{r policy-state-4 }
 source(here("Functions/pomp.R"))
 source(here("Functions/spline_state level.R"))
+source(here("Functions/splines.R"))
+
 ```
 
 ```{r}
@@ -367,3 +369,16 @@ ggplot(spline.df, aes(Week, colour = states_groups)) +
   ease_aes('linear')
 ```
 
+# Caregiver Splines at Week 3{.tabset}
+
+## Caregiver mental health
+
+```{r}
+sp_week3 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 3)
+
+sp_week3$plot
+```
+
+```{r, results = 'asis'}
+sp_week3$summary
+```
