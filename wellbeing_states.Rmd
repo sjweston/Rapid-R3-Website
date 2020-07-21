@@ -30,6 +30,7 @@ library(plotly)
 library(emmeans)
 library(gganimate)
 library(stm)
+library(splines)
 ```
 
 ```{r wellbeing-states-3 }
@@ -87,11 +88,11 @@ scored = scored %>%
   mutate(states_groups = case_when(
     state %in% c("TX", "FL", "AZ") ~ "TX/FL/AZ",
     state %in% c("ID", "WY", "MN") ~ "ID/WY/MN",
-    state %in% c("NY", "NJ", "CT") ~ "NY/NJ/CT",
+    state %in% c("NY", "NJ") ~ "NY/NJ",
     state == "CA" ~ "CA",
     TRUE ~ NA_character_)) %>%
   mutate(states_groups = as.factor(states_groups),
-         states_groups = relevel(states_groups, ref = "NY/NJ/CT")) %>%
+         states_groups = relevel(states_groups, ref = "NY/NJ")) %>%
    rowwise() %>%
   mutate(material_hardship = sum(c_across(starts_with("diff_pay")), na.rm=T),
          mh_d = ifelse(material_hardship >0 , 1, 0)) %>%
@@ -195,7 +196,7 @@ sp_week3$summary
 ### Caregiver mental health
 
 ```{r wellbeing-states-23 }
-sp_week3 = splines.moderation(scored, outcome = mental_health, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 3)
+sp_week3 = splines.moderation(scored, outcome = mental_health, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
 
 sp_week3$plot
 ```
@@ -207,7 +208,7 @@ sp_week3$summary
 ### Anxiety
 
 ```{r wellbeing-states-25 }
-sp_week3 = splines.moderation(scored, outcome = anxiety, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 3)
+sp_week3 = splines.moderation(scored, outcome = anxiety, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
 
 sp_week3$plot
 ```
@@ -219,7 +220,7 @@ sp_week3$summary
 ### Depression
 
 ```{r wellbeing-states-27 }
-sp_week3 = splines.moderation(scored, outcome = depress, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 3)
+sp_week3 = splines.moderation(scored, outcome = depress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
 
 sp_week3$plot
 ```
@@ -231,7 +232,7 @@ sp_week3$summary
 ### Stress
 
 ```{r wellbeing-states-29 }
-sp_week3 = splines.moderation(scored, outcome = stress, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 3)
+sp_week3 = splines.moderation(scored, outcome = stress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
 
 sp_week3$plot
 ```
@@ -243,7 +244,7 @@ sp_week3$summary
 ### Loneliness
 
 ```{r wellbeing-states-31 }
-sp_week3 = splines.moderation(scored, outcome = lonely, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 3)
+sp_week3 = splines.moderation(scored, outcome = lonely, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
 
 sp_week3$plot
 ```
@@ -255,7 +256,7 @@ sp_week3$summary
 ### Child externalizing
 
 ```{r wellbeing-states-33 }
-sp_week3 = splines.moderation(scored, outcome = fussy, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 3)
+sp_week3 = splines.moderation(scored, outcome = fussy, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
 
 sp_week3$plot
 ```
@@ -267,7 +268,7 @@ sp_week3$summary
 ### Child internalizing
 
 ```{r wellbeing-states-35 }
-sp_week3 = splines.moderation(scored, outcome = fear, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 3)
+sp_week3 = splines.moderation(scored, outcome = fear, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
 
 sp_week3$plot
 ```
@@ -375,7 +376,7 @@ sp_week7$summary
 ### Caregiver mental health
 
 ```{r wellbeing-states-51 }
-sp_week7 = splines.moderation(scored, outcome = mental_health, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 7)
+sp_week7 = splines.moderation(scored, outcome = mental_health, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
 
 sp_week7$plot
 ```
@@ -387,7 +388,7 @@ sp_week7$summary
 ### Anxiety
 
 ```{r wellbeing-states-53 }
-sp_week7 = splines.moderation(scored, outcome = anxiety, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 7)
+sp_week7 = splines.moderation(scored, outcome = anxiety, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
 
 sp_week7$plot
 ```
@@ -399,7 +400,7 @@ sp_week7$summary
 ### Depression
 
 ```{r wellbeing-states-55 }
-sp_week7 = splines.moderation(scored, outcome = depress, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 7)
+sp_week7 = splines.moderation(scored, outcome = depress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
 
 sp_week7$plot
 ```
@@ -411,7 +412,7 @@ sp_week7$summary
 ### Stress
 
 ```{r wellbeing-states-57 }
-sp_week7 = splines.moderation(scored, outcome = stress, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 7)
+sp_week7 = splines.moderation(scored, outcome = stress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
 
 sp_week7$plot
 ```
@@ -423,7 +424,7 @@ sp_week7$summary
 ### Loneliness
 
 ```{r wellbeing-states-59 }
-sp_week7 = splines.moderation(scored, outcome = lonely, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 7)
+sp_week7 = splines.moderation(scored, outcome = lonely, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
 
 sp_week7$plot
 ```
@@ -435,7 +436,7 @@ sp_week7$summary
 ### Child externalizing
 
 ```{r wellbeing-states-61 }
-sp_week7 = splines.moderation(scored, outcome = fussy, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 7)
+sp_week7 = splines.moderation(scored, outcome = fussy, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
 
 sp_week7$plot
 ```
@@ -447,7 +448,7 @@ sp_week7$summary
 ### Child internalizing
 
 ```{r wellbeing-states-63 }
-sp_week7 = splines.moderation(scored, outcome = fear, group = states_groups, m = mh_d, m.labels = c("High Income", "Low Income"), point = 7)
+sp_week7 = splines.moderation(scored, outcome = fear, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
 
 sp_week7$plot
 ```
@@ -590,4 +591,94 @@ sp_week7$summary
 <!--                     K = 20, prevalence =~ s(Week), data = out$meta,  -->
 <!--                     init.type = "Spectral") -->
 <!-- ``` -->
+
+
+# Two splines
+
+## Overall{.tabset}
+
+### Caregiver mental health
+
+```{r wellbeing-states-65 }
+sp_week7 = splines2.groups(scored, outcome = mental_health, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-66, results = 'asis'}
+sp_week7$summary
+```
+
+### Anxiety
+
+```{r wellbeing-states-67 }
+sp_week7 = splines2.groups(scored, outcome = anxiety, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-68, results = 'asis'}
+sp_week7$summary
+```
+
+### Depression
+
+```{r wellbeing-states-69 }
+sp_week7 = splines2.groups(scored, outcome = depress, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-70, results = 'asis'}
+sp_week7$summary
+```
+
+### Stress
+
+```{r wellbeing-states-71 }
+sp_week7 = splines2.groups(scored, outcome = stress, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-72, results = 'asis'}
+sp_week7$summary
+```
+
+### Loneliness
+
+```{r wellbeing-states-73 }
+sp_week7 = splines2.groups(scored, outcome = lonely, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-74, results = 'asis'}
+sp_week7$summary
+```
+
+### Child externalizing
+
+```{r wellbeing-states-75 }
+sp_week7 = splines2.groups(scored, outcome = fussy, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-76, results = 'asis'}
+sp_week7$summary
+```
+
+### Child internalizing
+
+```{r wellbeing-states-77 }
+sp_week7 = splines2.groups(scored, outcome = fear, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-78, results = 'asis'}
+sp_week7$summary
+```
+
 

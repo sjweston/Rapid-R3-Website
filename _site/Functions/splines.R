@@ -409,3 +409,99 @@ splines.moderation = function(data, outcome, group, m, m.labels = NULL, point){
                      plotdata = plotdata)
   return(return.list)
 }
+
+
+splines2.groups = function(data, outcome, group, point1, point2){
+  
+  group.name = deparse(substitute(group))
+  
+  outcome.label = deparse(substitute(outcome))
+  outcome.label = gsub("_", " ", outcome.label)
+  outcome.label = stringr::str_to_sentence(outcome.label)
+  
+  group.levs = unique(as.data.frame(data[,group.name]))
+  ngroups = nrow(group.levs)
+  contrast = sum(group.levs[,1] %in% c(-1,1)) == 2
+  
+  data = data %>%
+    filter(Week > 0) %>%
+    filter(!is.na({{group}})) 
+  
+  splines = bs(data$Week , knots = c(point1,point2) ,
+                degree =1 , intercept = TRUE )
+  splines = as.data.frame(splines)
+  names(splines) = c("Intercept", "SL1", "SL2", "SL3")
+  data = cbind(data, splines)
+  
+  # %>%
+  #   mutate(SL1 = ifelse(Week <= point1, Week-point1, 0),
+  #          SL2 = ifelse(Week > point1 & Week <= point2, Week-point2, 0),
+  #          SL3 = ifelse(Week > point2, Week-point2, 0))
+  #
+  reg.formula = as.formula(paste0(deparse(substitute(outcome)),
+                                  " ~ SL1*",
+                                  deparse(substitute(group)),
+                                  "+ SL2*",
+                                  deparse(substitute(group)),
+                                  "+ SL3*",
+                                  deparse(substitute(group)),
+                                  "+ (1|CaregiverID)"))
+  model = lmer(reg.formula, data)
+
+  mod.summary = broom::tidy(model)
+  mod.summary = mod.summary %>%
+    mutate(pvalue = pt(abs(statistic),
+                       df = nrow(data)-nrow(mod.summary),
+                       lower.tail = F)*2) %>%
+    filter(grepl(group.name,term)) %>%
+    select(-group) %>%
+    kable(., digits = 2) %>%
+    kable_styling()
+
+  predicted = data %>%
+    group_by(Week, {{group}}, SL1, SL2, SL3) %>%
+    summarize(n=n()) %>%
+    mutate(CaregiverID = 0000)
+
+  predicted$fit = predict(model,
+                          newdata = predicted,
+                          allow.new.levels = T)
+
+  plot = data %>%
+    filter(!is.na({{outcome}})) %>%
+    group_by(Week, {{group}}) %>%
+    summarize(m = mean({{outcome}}),
+              sd = sd({{outcome}}),
+              n = n(),
+              se = sd/sqrt(n),
+              moe = 1.96*se) %>%
+    ggplot(aes(x = Week, y = m, color = as.factor({{group}}))) +
+    geom_point(alpha = .5) +
+    geom_line(aes(x = Week, y = fit, color = as.factor({{group}})),
+              data = predicted,
+              inherit.aes = F) +
+    scale_x_continuous(breaks = c(1:10))+
+    labs(y = outcome.label) +
+    theme_pubclean()
+
+  if(contrast){
+    plot = plot +
+      scale_color_manual(str_to_title(deparse(substitute(group))),
+                         values = c("red", "darkgrey"),
+                         labels = c("Group", "Sample Average"))
+  } else{
+    plot = plot +
+      scale_color_brewer(str_to_title(deparse(substitute(group))), palette = "Set2")
+  }
+
+  plotdata = plot$data
+
+  plot = ggplotly(plot)
+
+  return.list = list(model = model,
+                     summary = mod.summary,
+                     pdata = predicted,
+                     plot = plot,
+                     plotdata = plotdata)
+  return(return.list)
+}
