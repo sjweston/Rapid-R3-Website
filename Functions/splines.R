@@ -453,7 +453,14 @@ splines2.groups = function(data, outcome, group, point1, point2){
     mutate(pvalue = pt(abs(statistic),
                        df = nrow(data)-nrow(mod.summary),
                        lower.tail = F)*2) %>%
-    filter(grepl(group.name,term)) %>%
+    filter(group == "fixed") %>%
+    mutate(group = case_when(
+      grepl("SL1", term) ~ "SL1",
+      grepl("SL2", term) ~ "SL2",
+      grepl("SL3", term) ~ "SL3",
+      TRUE ~ "Intercept"
+    )) %>%
+    arrange(group) %>%
     select(-group) %>%
     kable(., digits = 2) %>%
     kable_styling()
