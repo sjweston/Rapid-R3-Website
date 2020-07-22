@@ -225,6 +225,7 @@ emotion_g %>%
                        m.value, 
                        6))) %>%
   select(mediator, model) %>%
+  mutate(model = map(model, "change")) %>%
   unnest(cols = c(model)) %>%
   spread(statistic, value) %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
@@ -328,6 +329,7 @@ emotion_g %>%
                        m.value, 
                        6))) %>%
   select(mediator, model) %>%
+  mutate(model = map(model, "change")) %>%
   unnest(cols = c(model)) %>%
   spread(statistic, value) %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
@@ -419,6 +421,7 @@ emotion_g %>%
                        m.value, 
                        6))) %>%
   select(mediator, model) %>%
+  mutate(model = map(model, "change")) %>%
   unnest(cols = c(model)) %>%
   spread(statistic, value) %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
@@ -503,7 +506,8 @@ emotion_g %>%
                        m.value, 
                        6))) %>%
   select(mediator, model) %>%
-  unnest(cols = c(model)) %>%
+   mutate(model = map(model, "change")) %>%
+ unnest(cols = c(model)) %>%
   spread(statistic, value) %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
   kable_styling(full_width = T)
@@ -621,6 +625,7 @@ emotion_g %>%
                        m.value, 
                        6))) %>%
   select(mediator, model) %>%
+  mutate(model = map(model, "change")) %>%
   unnest(cols = c(model)) %>%
   spread(statistic, value) %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
@@ -880,6 +885,7 @@ emotion_g %>%
                        m.value, 
                        6))) %>%
   select(mediator, model) %>%
+  mutate(model = map(model, "change")) %>%
   unnest(cols = c(model)) %>%
   spread(statistic, value) %>%
   kable(., digits = c(0, 2,2,2,2,3,3,2,2)) %>%
