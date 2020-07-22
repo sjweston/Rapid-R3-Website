@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Social support</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Weekly Summaries
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 20)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 21 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 28 - May 4)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 5 - May 11)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 12 - May 18)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 25)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 26 - June 1)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 2 - June 8)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 7 - June 15)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 22)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 23 - June 29)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 30 - July 6)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 7 - July 13)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Preliminary analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="0prelim_april27.html">April 27</a>
+    </li>
+    <li>
+      <a href="disability.html">Children with disabilities</a>
+    </li>
+    <li>
+      <a href="single.html">Single parents</a>
+    </li>
+    <li>
+      <a href="poverty.html">Low-income households</a>
+    </li>
+    <li>
+      <a href="childcare.html">Childcare</a>
+    </li>
+    <li>
+      <a href="access_by_race.html">Race/Ethnicity</a>
+    </li>
+    <li>
+      <a href="0prelim_may22.html">May 22</a>
+    </li>
+    <li>
+      <a href="0prelim_may29.html">May 29</a>
+    </li>
+    <li>
+      <a href="inequality.html">racial_inequality</a>
+    </li>
+    <li>
+      <a href="canary.html">Canary</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Social support</h1>
+
+</div>
+
+
+<div id="current-social-support" class="section level1">
+<h1>Current social support</h1>
+<p><img src="social_support_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div id="caregiver-wellbeing" class="section level2 tabset">
+<h2>Caregiver Wellbeing</h2>
+<div id="overall" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-10-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+91.21
+</td>
+<td style="text-align:right;">
+2.78
+</td>
+<td style="text-align:right;">
+32.84
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+current.support
+</td>
+<td style="text-align:right;">
+-13.71
+</td>
+<td style="text-align:right;">
+0.74
+</td>
+<td style="text-align:right;">
+-18.50
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 89.63 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 25.59 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 7.27 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 6.28 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .248 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -13.25 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.92 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -14.47 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.22 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.78 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.25 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .211 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 144.49 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 44.20 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.27 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -53.22 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 45.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .247 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -60.79 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 44.91 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.35 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .176 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -59.20 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 46.59 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.27 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .204 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 588.85 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 562.77 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .296 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -62.19 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 44.93 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.38 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .167 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -48.62 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 44.35 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .273 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -28.58 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.74 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.08 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .038 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.56 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 14.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .338 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 15.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.91 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.11 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .265 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 14.44 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.19 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .235 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -222.89 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 203.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .274 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 16.15 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.92 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .246 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 14.07 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.77 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.02 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .307 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+<div id="child-externalizing" class="section level2 tabset">
+<h2>Child Externalizing</h2>
+<div id="overall-1" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-13-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+83.14
+</td>
+<td style="text-align:right;">
+4.14
+</td>
+<td style="text-align:right;">
+20.11
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+current.support
+</td>
+<td style="text-align:right;">
+-8.97
+</td>
+<td style="text-align:right;">
+1.10
+</td>
+<td style="text-align:right;">
+-8.13
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-1" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 86.04 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 5.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 16.69 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -5.98 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 9.25 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.65 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .518 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -9.52 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.35 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -7.06 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.61 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.51 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .613 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-1" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 78.17 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 65.00 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.20 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .229 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.15 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 67.59 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.00 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .998 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -6.20 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 66.04 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .925 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -19.83 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 68.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.29 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .772 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 871.83 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 827.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .292 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -4.11 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 66.06 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.06 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .950 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 65.21 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.20 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .840 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -8.89 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.20 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.44 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .660 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.79 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .917 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.45 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.15 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .880 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.23 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 21.24 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.39 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .698 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -326.41 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 299.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .276 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.51 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.46 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.02 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .980 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.58 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.25 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.08 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .938 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+<div id="child-internalizing" class="section level2 tabset">
+<h2>Child Internalizing</h2>
+<div id="overall-2" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-16-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+59.72
+</td>
+<td style="text-align:right;">
+4.05
+</td>
+<td style="text-align:right;">
+14.74
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+current.support
+</td>
+<td style="text-align:right;">
+-9.58
+</td>
+<td style="text-align:right;">
+1.08
+</td>
+<td style="text-align:right;">
+-8.86
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-2" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 57.93 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 5.04 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 11.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 5.71 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 9.04 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.63 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .528 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -9.23 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -7.00 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.55 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.45 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .656 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-2" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 68.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 63.87 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.07 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .287 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -32.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 66.41 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.49 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .627 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -8.85 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 64.90 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .892 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -38.68 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 67.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.57 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .566 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -18.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 813.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.02 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .982 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -5.82 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 64.92 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .929 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -5.92 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 64.08 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .926 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -3.72 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 19.85 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.19 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .851 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.43 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.01 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .993 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -5.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.26 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .797 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.87 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .873 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.72 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 294.41 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.01 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .990 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -6.66 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.11 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .741 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:current.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -6.64 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 19.90 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .739 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+</div>
+<div id="prior-social-support" class="section level1">
+<h1>Prior social support</h1>
+<p><img src="social_support_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<div id="caregiver-wellbeing-1" class="section level2 tabset">
+<h2>Caregiver Wellbeing</h2>
+<div id="overall-3" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-20-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+81.78
+</td>
+<td style="text-align:right;">
+3.38
+</td>
+<td style="text-align:right;">
+24.18
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+prior.support
+</td>
+<td style="text-align:right;">
+-10.41
+</td>
+<td style="text-align:right;">
+0.85
+</td>
+<td style="text-align:right;">
+-12.23
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-3" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 78.51 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 4.40 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.85 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.77 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 7.43 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .239 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -9.62 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -8.85 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.07 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .292 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-3" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 96.64 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 41.64 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .021 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -16.48 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 44.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.37 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .709 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -16.63 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 42.66 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.39 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .697 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -5.95 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 45.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.13 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .895 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -136.03 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 82.55 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.65 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .100 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -27.67 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 42.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.65 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .518 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -10.76 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 41.88 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.26 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .797 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -13.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.58 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .295 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.82 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.12 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .890 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.58 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.82 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.12 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .902 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.21 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.49 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .928 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 34.77 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 22.76 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.53 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .127 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 5.22 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.83 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.41 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .684 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.63 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.17 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .864 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+<div id="child-externalizing-1" class="section level2 tabset">
+<h2>Child Externalizing</h2>
+<div id="overall-4" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-23-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+75.44
+</td>
+<td style="text-align:right;">
+4.73
+</td>
+<td style="text-align:right;">
+15.94
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+prior.support
+</td>
+<td style="text-align:right;">
+-6.42
+</td>
+<td style="text-align:right;">
+1.19
+</td>
+<td style="text-align:right;">
+-5.39
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-4" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 79.77 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 6.08 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.12 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -11.71 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 10.27 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .255 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -7.34 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -4.89 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.11 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.71 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.15 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .252 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-4" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 45.01 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 57.42 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.78 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .433 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.07 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 60.89 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .742 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 9.80 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 58.82 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.17 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .868 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.38 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 62.30 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.21 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .830 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -125.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 113.83 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .271 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 14.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 58.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.24 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .810 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 42.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 57.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.74 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .459 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.54 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.35 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .929 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -8.67 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 18.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.48 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .632 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.43 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.68 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .891 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.15 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 18.61 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.12 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .908 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 27.25 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 31.38 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.87 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .385 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -5.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.69 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.30 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .763 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -10.42 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.42 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .550 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+<div id="child-internalizing-1" class="section level2 tabset">
+<h2>Child Internalizing</h2>
+<div id="overall-5" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-26-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+52.64
+</td>
+<td style="text-align:right;">
+4.64
+</td>
+<td style="text-align:right;">
+11.33
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+prior.support
+</td>
+<td style="text-align:right;">
+-7.15
+</td>
+<td style="text-align:right;">
+1.17
+</td>
+<td style="text-align:right;">
+-6.12
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-5" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 49.42 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 5.95 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.31 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.45 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 10.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.84 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .401 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -6.51 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.47 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -4.43 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.52 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.66 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.57 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .568 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-5" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 10.44 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 56.55 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .854 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 24.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 59.97 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.41 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .680 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 34.71 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 57.93 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .549 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 27.62 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 61.35 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.45 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .653 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 39.56 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 112.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.35 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .724 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 32.34 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 58.06 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.56 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .578 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 47.39 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 56.87 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.83 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .405 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 14.12 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.83 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .409 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -17.68 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.82 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.99 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .321 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -18.85 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.41 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.08 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .279 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -16.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 18.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.93 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .355 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -14.12 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 30.90 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.46 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .648 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -18.54 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.42 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.06 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .287 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:prior.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -22.71 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 17.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .186 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+</div>
+<div id="change-in-social-support" class="section level1">
+<h1>Change in social support</h1>
+<p><img src="social_support_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<div id="caregiver-wellbeing-2" class="section level2 tabset">
+<h2>Caregiver Wellbeing</h2>
+<div id="overall-6" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-30-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+38.06
+</td>
+<td style="text-align:right;">
+0.85
+</td>
+<td style="text-align:right;">
+44.79
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+change.support
+</td>
+<td style="text-align:right;">
+-13.85
+</td>
+<td style="text-align:right;">
+1.46
+</td>
+<td style="text-align:right;">
+-9.50
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-6" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 36.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.00 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 36.68 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 6.55 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.07 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .002 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -14.59 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.70 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -8.57 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.19 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.46 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.92 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .356 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-6" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 51.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.66 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 6.00 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -17.69 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 9.30 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.90 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .058 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -15.25 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 9.01 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.69 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .091 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.87 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 9.89 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.29 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .772 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -30.25 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 24.93 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.21 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .225 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -17.70 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 9.15 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.93 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .053 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -13.56 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.72 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.55 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .120 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -26.39 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 24.85 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.06 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .289 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 16.54 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 25.51 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.65 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .517 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 25.17 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.80 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .423 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 27.24 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 25.90 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .293 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 6.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 30.65 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.21 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .832 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 25.29 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .747 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 10.70 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 24.92 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.43 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .668 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+<div id="child-externalizing-2" class="section level2 tabset">
+<h2>Child Externalizing</h2>
+<div id="overall-7" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-33-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+48.10
+</td>
+<td style="text-align:right;">
+1.16
+</td>
+<td style="text-align:right;">
+41.51
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+change.support
+</td>
+<td style="text-align:right;">
+-10.16
+</td>
+<td style="text-align:right;">
+1.99
+</td>
+<td style="text-align:right;">
+-5.11
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-7" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 48.31 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.36 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 35.58 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.82 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.80 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.65 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .515 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -9.46 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.31 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -4.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 4.69 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.63 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .528 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-7" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 47.86 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 11.67 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 4.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -12.40 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.54 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.99 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .323 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.89 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.16 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .876 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 8.36 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.63 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .531 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -46.69 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 33.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.39 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .165 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -7.64 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.62 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .536 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.62 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 11.76 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.22 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .824 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -29.02 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 33.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.87 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .387 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 18.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 34.39 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.55 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .582 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 15.54 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 33.93 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.46 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .647 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 28.91 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 34.91 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.83 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .408 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.51 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 41.32 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.06 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .952 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 11.45 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 34.09 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.34 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .737 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 20.18 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 33.59 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .548 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+<div id="child-internalizing-2" class="section level2 tabset">
+<h2>Child Internalizing</h2>
+<div id="overall-8" class="section level3">
+<h3>Overall</h3>
+$plot <img src="social_support_files/figure-html/unnamed-chunk-36-1.png" width="672" /> $summary
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:left;">
+p.value
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+(Intercept)
+</td>
+<td style="text-align:right;">
+22.50
+</td>
+<td style="text-align:right;">
+1.14
+</td>
+<td style="text-align:right;">
+19.71
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+change.support
+</td>
+<td style="text-align:right;">
+-10.02
+</td>
+<td style="text-align:right;">
+1.96
+</td>
+<td style="text-align:right;">
+-5.12
+</td>
+<td style="text-align:left;">
+&lt; .001
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="income-8" class="section level3">
+<h3>Income</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 21.00 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.33 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 15.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 6.88 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.75 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.50 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .013 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -10.61 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 2.26 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -4.69 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; poverty150Low Income:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 3.61 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 4.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 0.78 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .434 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+<div id="raceethnicity-8" class="section level3">
+<h3>Race/ethnicity</h3>
+<pre><code>## $plot</code></pre>
+<p><img src="social_support_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<pre><code>## 
+## $summary
+## &lt;table class=&quot;table&quot; style=&quot;margin-left: auto; margin-right: auto;&quot;&gt;
+##  &lt;thead&gt;
+##   &lt;tr&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; term &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; estimate &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; std.error &lt;/th&gt;
+##    &lt;th style=&quot;text-align:right;&quot;&gt; statistic &lt;/th&gt;
+##    &lt;th style=&quot;text-align:left;&quot;&gt; p.value &lt;/th&gt;
+##   &lt;/tr&gt;
+##  &lt;/thead&gt;
+## &lt;tbody&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; (Intercept) &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 51.68 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 11.44 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 4.52 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; &amp;lt; .001 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -30.49 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.30 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.48 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .013 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -25.47 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 11.91 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.14 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .033 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -21.97 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 13.07 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.68 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .093 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.68 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 32.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -0.05 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .959 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -31.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 12.10 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.61 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .009 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -30.08 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 11.53 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -2.61 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .009 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -61.94 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 32.86 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; -1.89 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .060 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat2:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 60.77 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 33.73 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.80 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .072 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat3:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 49.73 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 33.28 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.49 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .135 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat4:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 67.13 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 34.24 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.96 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .050 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat5:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 61.94 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 40.53 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.53 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .127 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat6:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 39.28 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 33.44 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.17 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .241 &lt;/td&gt;
+##   &lt;/tr&gt;
+##   &lt;tr&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; race_cat7:change.support &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 52.65 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 32.95 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:right;&quot;&gt; 1.60 &lt;/td&gt;
+##    &lt;td style=&quot;text-align:left;&quot;&gt; .110 &lt;/td&gt;
+##   &lt;/tr&gt;
+## &lt;/tbody&gt;
+## &lt;/table&gt;</code></pre>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

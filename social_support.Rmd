@@ -1,0 +1,353 @@
+---
+title: "Social support"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+#re-run all the machine learning models?
+rerun = FALSE
+dontrerun = !rerun
+```
+
+```{r  }
+library(conflicted)
+library(here)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r }
+source(here("Scripts/score data.R")) 
+```
+
+```{r }
+source(here("Functions/pomp.R"))
+```
+
+```{r}
+#score well-being
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
+  rowwise() %>%
+  mutate(mental_health = mean(c(anxiety, depress, stress, lonely), na.rm=T)) %>%
+  ungroup()
+```
+
+```{r}
+scored = filter(scored, Week == 15)
+```
+
+```{r}
+scored = scored %>%
+  mutate(poverty150 = factor(poverty150, levels = c(0,1), 
+                             labels = c("High Income", "Low Income"))) %>%
+  mutate(race_cat = factor(race_cat))
+
+contrasts(scored$race_cat) = contr.treatment(7)
+```
+
+
+```{r}
+scored = scored %>%
+  mutate(current.support = rowMeans(select(., contains("SOCIALSUPP.001")), na.rm=T),
+         prior.support = rowMeans(select(., contains("SOCIALSUPP.002")), na.rm=T)) %>%
+  mutate(change.support = current.support-prior.support)
+```
+
+
+```{r function wellbeing by continuous predictor}
+wellbeing.con = function(predictor, data = scored, outcome = mental_health, title = NULL){
+  
+  data = data %>%
+    filter(!is.na({{outcome}})) %>%
+    filter(!is.na({{predictor}})) 
+  
+  plot = data %>%
+    ggplot(aes(x = {{predictor}}, y = {{outcome}})) +
+    geom_jitter(alpha = .3, size = .5)  +
+    geom_smooth(method = lm, se = F) +
+    scale_x_continuous("___ of the time", breaks = c(1:5), labels = c("None", "A little", "Some", "A lot", "Most")) +
+    labs(y = "Poor Mental Health", title = title) +
+    theme_pubclean()
+  
+  formula = as.formula(paste(deparse(substitute(outcome)), "~", deparse(substitute(predictor))))
+  
+  model = lm(formula, data) %>%
+    broom::tidy() %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(digits = 2) %>%
+    kable_styling(full_width = T)
+  
+  return.list = list(plot = plot, summary = model)
+  return(return.list)
+}
+```
+
+```{r function wellbeing by continuous predictor moderated by categorical groups}
+wellbeing.con.group = function(predictor, group, outcome = mental_health, data = scored, title = NULL){
+  
+  data = data %>%
+    filter(!is.na({{outcome}})) %>%
+    filter(!is.na({{predictor}})) %>%
+    filter(!is.na({{group}}))
+  
+  plot = data %>%
+    ggplot(aes(x = {{predictor}}, y = {{outcome}}, color = {{group}})) +
+    geom_jitter(alpha = .3, size = .5)  +
+    geom_smooth(method = lm, se = F) +
+    scale_x_continuous("___ of the time", breaks = c(1:5), labels = c("None", "A little", "Some", "A lot", "Most")) +
+    labs(y = "Poor Mental Health", title = title) +
+    theme_pubclean()
+  
+  formula = as.formula(paste(deparse(substitute(outcome)), "~", deparse(substitute(group)), "*", deparse(substitute(predictor))))
+  
+  model = lm(formula, data) %>%
+    broom::tidy() %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(digits = 2) %>%
+    kable_styling(full_width = T)
+  
+  return.list = list(plot = plot, summary = model)
+  return(return.list)
+}
+```
+
+# Current social support
+
+```{r}
+scored %>%
+  ggplot(aes(x = current.support)) +
+  geom_density(fill = "grey") +
+  scale_x_continuous(
+    breaks = c(1:5), 
+    labels = c("None", "A little", "Some", "A lot", "Most")) +
+  labs(title = "Current levels of support", x = NULL) +
+  theme_pubclean()
+```
+
+
+## Caregiver Wellbeing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(current.support)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(current.support, poverty150)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(current.support, race_cat)
+```
+
+
+## Child Externalizing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(current.support, outcome = fussy)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(current.support, poverty150, outcome = fussy)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(current.support, race_cat, outcome = fussy)
+```
+
+## Child Internalizing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(current.support, outcome = fear)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(current.support, poverty150, outcome = fear)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(current.support, race_cat, outcome = fear)
+```
+
+
+# Prior social support
+
+```{r}
+scored %>%
+  ggplot(aes(x = prior.support)) +
+  geom_density(fill = "grey") +
+  scale_x_continuous(
+    breaks = c(1:5), 
+    labels = c("None", "A little", "Some", "A lot", "Most")) +
+  labs(title = "Current levels of support", x = NULL) +
+  theme_pubclean()
+```
+
+
+## Caregiver Wellbeing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(prior.support)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(prior.support, poverty150)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(prior.support, race_cat)
+```
+
+
+## Child Externalizing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(prior.support, outcome = fussy)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(prior.support, poverty150, outcome = fussy)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(prior.support, race_cat, outcome = fussy)
+```
+
+## Child Internalizing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(prior.support, outcome = fear)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(prior.support, poverty150, outcome = fear)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(prior.support, race_cat, outcome = fear)
+```
+
+
+# Change in social support
+
+```{r}
+scored %>%
+  ggplot(aes(x = change.support)) +
+  geom_density(fill = "grey") +
+  scale_x_continuous(
+    breaks = c(1:5), 
+    labels = c("None", "A little", "Some", "A lot", "Most")) +
+  labs(title = "Current levels of support", x = NULL) +
+  theme_pubclean()
+```
+
+
+## Caregiver Wellbeing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(change.support)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(change.support, poverty150)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(change.support, race_cat)
+```
+
+
+## Child Externalizing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(change.support, outcome = fussy)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(change.support, poverty150, outcome = fussy)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(change.support, race_cat, outcome = fussy)
+```
+
+## Child Internalizing{.tabset}
+
+### Overall
+
+```{r, results = 'asis'}
+wellbeing.con(change.support, outcome = fear)
+```
+
+### Income
+
+```{r}
+wellbeing.con.group(change.support, poverty150, outcome = fear)
+```
+
+### Race/ethnicity
+
+```{r}
+wellbeing.con.group(change.support, race_cat, outcome = fear)
+```
+

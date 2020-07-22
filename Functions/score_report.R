@@ -1061,6 +1061,9 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   }
   
   if(contains_items("DEMO.007_.{1}$", data)){
+    data = data %>%
+      mutate_at(vars(contains("DEMO.007")), 
+                .funs = function(x) ifelse(x == 99, NA, x))
     data = combine.cat(x = data, 
                        cols = find_items("DEMO.007_.{1}$", data), 
                        id = "CaregiverID",
@@ -1122,6 +1125,12 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   newdata$poverty125 = data$FPL.125
   newdata$poverty150 = data$FPL.150
   newdata$poverty200 = data$FPL.200
+  
+  ss = data %>%
+    select(contains("SOCIALSUPP")) 
+  newdata = cbind(newdata, ss)
+  
+  
   
   return(newdata)
 }
