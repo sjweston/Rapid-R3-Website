@@ -67,6 +67,50 @@ scored = scored %>%
 ```
 
 
+```{r function wellbeing by categorical predictor}
+compare.support = function(outcome, predictor, data = scored, title = NULL){
+  
+  data = data %>%
+    filter(!is.na({{outcome}})) %>%
+    filter(!is.na({{predictor}})) 
+  
+  plotdata = data %>%
+    group_by({{predictor}}) %>%
+    summarize(m = mean({{outcome}}),
+              s = sd({{outcome}}),
+              n = n(),
+              se = s/sqrt(n),
+              moe = se*qt(.975, df = n-1)) 
+  
+  plot = plotdata %>%
+    ggplot(aes(x = {{predictor}}, y = m,
+               group=1,
+               text = paste("\nResponse:", {{predictor}},
+                            "\nMental Health:", round(m,2),
+                            "\nCount:", n))) +
+    geom_bar(stat = "identity", fill = "grey") +
+    geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .3) +
+    coord_flip() +
+    labs(y = "Poor Mental Health", x = NULL, title = title) +
+    theme_pubclean()
+
+  plot = ggplotly(plot, tooltip = "text")
+
+  data = as.data.frame(data)
+  x = data[, deparse(substitute(outcome))]
+  g = data[, deparse(substitute(predictor))]
+  model = pairwise.t.test(x, g, p.adjust.method = "holm")
+  model = broom::tidy(model) %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable() %>%
+    kable_styling(full_width = T)
+  
+  return.list = list(plot = plot, summary = model)
+  return(return.list)
+}
+```
+
+
 ```{r function wellbeing by continuous predictor}
 wellbeing.con = function(predictor, data = scored, outcome = mental_health, title = NULL){
   
@@ -124,7 +168,9 @@ wellbeing.con.group = function(predictor, group, outcome = mental_health, data =
 }
 ```
 
-# Current social support
+# Current social support{.tabset}
+
+## Distribution
 
 ```{r, results = 'asis'}
 scored %>%
@@ -135,6 +181,30 @@ scored %>%
     labels = c("None", "A little", "Some", "A lot", "Most")) +
   labs(title = "Current levels of support", x = NULL) +
   theme_pubclean()
+```
+
+## By Income
+
+```{r, results = 'asis'}
+mod = compare.support(current.support, poverty150)
+mod$plot
+```
+
+
+```{r, results = 'asis'}
+mod$summary
+```
+
+## By Race/Ethnicity
+
+```{r, results = 'asis'}
+mod = compare.support(current.support, race_cat)
+mod$plot
+```
+
+
+```{r, results = 'asis'}
+mod$summary
 ```
 
 
@@ -149,13 +219,13 @@ wellbeing.con(current.support)
 ### Income
 
 ```{r, results = 'asis'}
-wellbeing.con.group(current.support, poverty150)
+compare.support(current.support, poverty150)
 ```
 
 ### Race/ethnicity
 
 ```{r, results = 'asis'}
-wellbeing.con.group(current.support, race_cat)
+compare.support(current.support, race_cat)
 ```
 
 
@@ -200,7 +270,9 @@ wellbeing.con.group(current.support, race_cat, outcome = fear)
 ```
 
 
-# Prior social support
+# Prior social support{.tabset}
+
+## Distribution
 
 ```{r, results = 'asis'}
 scored %>%
@@ -211,6 +283,30 @@ scored %>%
     labels = c("None", "A little", "Some", "A lot", "Most")) +
   labs(title = "Current levels of support", x = NULL) +
   theme_pubclean()
+```
+
+## By Income
+
+```{r, results = 'asis'}
+mod = compare.support(prior.support, poverty150)
+mod$plot
+```
+
+
+```{r, results = 'asis'}
+mod$summary
+```
+
+## By Race/Ethnicity
+
+```{r, results = 'asis'}
+mod = compare.support(prior.support, race_cat)
+mod$plot
+```
+
+
+```{r, results = 'asis'}
+mod$summary
 ```
 
 
@@ -266,17 +362,27 @@ wellbeing.con(prior.support, outcome = fear)
 ### Income
 
 ```{r, results = 'asis'}
-wellbeing.con.group(prior.support, poverty150, outcome = fear)
+mod = wellbeing.con.group(prior.support, poverty150, outcome = fear)
+mod$plot
+```
+```{r, results = 'asis'}
+mod$summary
 ```
 
 ### Race/ethnicity
 
 ```{r, results = 'asis'}
-wellbeing.con.group(prior.support, race_cat, outcome = fear)
+mod = wellbeing.con.group(prior.support, race_cat, outcome = fear)
+mod$plot
+```
+```{r, results = 'asis'}
+mod$summary
 ```
 
 
-# Change in social support
+# Change in social support{.tabset}
+
+## Distribution
 
 ```{r, results = 'asis'}
 scored %>%
@@ -287,6 +393,30 @@ scored %>%
     labels = c("None", "A little", "Some", "A lot", "Most")) +
   labs(title = "Current levels of support", x = NULL) +
   theme_pubclean()
+```
+
+## By Income
+
+```{r, results = 'asis'}
+mod = compare.support(change.support, poverty150)
+mod$plot
+```
+
+
+```{r, results = 'asis'}
+mod$summary
+```
+
+## By Race/Ethnicity
+
+```{r, results = 'asis'}
+mod = compare.support(change.support, race_cat)
+mod$plot
+```
+
+
+```{r, results = 'asis'}
+mod$summary
 ```
 
 
