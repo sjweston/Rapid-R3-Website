@@ -36,7 +36,7 @@ source(here("Scripts/score data.R"))
 source(here("Functions/pomp.R"))
 ```
 
-```{r}
+```{r, results = 'asis'}
 #score well-being
 scored = scored %>%
   mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
@@ -45,11 +45,11 @@ scored = scored %>%
   ungroup()
 ```
 
-```{r}
+```{r, results = 'asis'}
 scored = filter(scored, Week == 15)
 ```
 
-```{r}
+```{r, results = 'asis'}
 scored = scored %>%
   mutate(poverty150 = factor(poverty150, levels = c(0,1), 
                              labels = c("High Income", "Low Income"))) %>%
@@ -59,7 +59,7 @@ contrasts(scored$race_cat) = contr.treatment(7)
 ```
 
 
-```{r}
+```{r, results = 'asis'}
 scored = scored %>%
   mutate(current.support = rowMeans(select(., contains("SOCIALSUPP.001")), na.rm=T),
          prior.support = rowMeans(select(., contains("SOCIALSUPP.002")), na.rm=T)) %>%
@@ -126,7 +126,7 @@ wellbeing.con.group = function(predictor, group, outcome = mental_health, data =
 
 # Current social support
 
-```{r}
+```{r, results = 'asis'}
 scored %>%
   ggplot(aes(x = current.support)) +
   geom_density(fill = "grey") +
@@ -148,13 +148,13 @@ wellbeing.con(current.support)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(current.support, poverty150)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(current.support, race_cat)
 ```
 
@@ -169,13 +169,13 @@ wellbeing.con(current.support, outcome = fussy)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(current.support, poverty150, outcome = fussy)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(current.support, race_cat, outcome = fussy)
 ```
 
@@ -189,20 +189,20 @@ wellbeing.con(current.support, outcome = fear)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(current.support, poverty150, outcome = fear)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(current.support, race_cat, outcome = fear)
 ```
 
 
 # Prior social support
 
-```{r}
+```{r, results = 'asis'}
 scored %>%
   ggplot(aes(x = prior.support)) +
   geom_density(fill = "grey") +
@@ -224,13 +224,13 @@ wellbeing.con(prior.support)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(prior.support, poverty150)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(prior.support, race_cat)
 ```
 
@@ -245,13 +245,13 @@ wellbeing.con(prior.support, outcome = fussy)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(prior.support, poverty150, outcome = fussy)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(prior.support, race_cat, outcome = fussy)
 ```
 
@@ -265,20 +265,20 @@ wellbeing.con(prior.support, outcome = fear)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(prior.support, poverty150, outcome = fear)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(prior.support, race_cat, outcome = fear)
 ```
 
 
 # Change in social support
 
-```{r}
+```{r, results = 'asis'}
 scored %>%
   ggplot(aes(x = change.support)) +
   geom_density(fill = "grey") +
@@ -300,13 +300,13 @@ wellbeing.con(change.support)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(change.support, poverty150)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(change.support, race_cat)
 ```
 
@@ -321,13 +321,13 @@ wellbeing.con(change.support, outcome = fussy)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(change.support, poverty150, outcome = fussy)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(change.support, race_cat, outcome = fussy)
 ```
 
@@ -341,13 +341,13 @@ wellbeing.con(change.support, outcome = fear)
 
 ### Income
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(change.support, poverty150, outcome = fear)
 ```
 
 ### Race/ethnicity
 
-```{r}
+```{r, results = 'asis'}
 wellbeing.con.group(change.support, race_cat, outcome = fear)
 ```
 
