@@ -664,6 +664,16 @@ sp_week7$plot
 sp_week7$summary
 ```
 
+```{r}
+sp_week7$pdata %>%
+  mutate(fit = round(fit,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(file = here("figure data/07-24-2020_caregiver-mental-health.csv"))
+```
+
+
 ### Anxiety
 
 ```{r wellbeing-states-67 }
@@ -710,6 +720,14 @@ sp_week7$plot
 
 ```{r wellbeing-states-74, results = 'asis'}
 sp_week7$summary
+```
+```{r}
+sp_week7$pdata %>%
+  mutate(fit = round(fit,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(file = here("figure data/07-24-2020_caregiver-loneliness.csv"))
 ```
 
 ### Child externalizing

@@ -6,7 +6,7 @@ output:
     toc_float: TRUE
 ---
 
-```{r echo = F}
+```{r social-support-1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 #re-run all the machine learning models?
@@ -14,7 +14,7 @@ rerun = FALSE
 dontrerun = !rerun
 ```
 
-```{r  }
+```{r social-support-2  }
 library(conflicted)
 library(here)
 library(ggpubr)
@@ -28,15 +28,15 @@ conflict_prefer("map", "purrr")
 library(plotly)
 ```
 
-```{r }
+```{r social-support-3 }
 source(here("Scripts/score data.R")) 
 ```
 
-```{r }
+```{r social-support-4 }
 source(here("Functions/pomp.R"))
 ```
 
-```{r, results = 'asis'}
+```{r social-support-5, results = 'asis'}
 #score well-being
 scored = scored %>%
   mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
@@ -45,21 +45,23 @@ scored = scored %>%
   ungroup()
 ```
 
-```{r, results = 'asis'}
-scored = filter(scored, Week == 15)
+```{r social-support-6, results = 'asis'}
+scored = filter(scored, Week == 15) 
 ```
 
-```{r, results = 'asis'}
+```{r social-support-7, results = 'asis'}
 scored = scored %>%
   mutate(poverty150 = factor(poverty150, levels = c(0,1), 
                              labels = c("High Income", "Low Income"))) %>%
+  mutate(latinx = factor(latinx, levels = c(0,1), 
+                             labels = c("Not Latinx", "Latinx"))) %>%
   mutate(race_cat = factor(race_cat))
 
 contrasts(scored$race_cat) = contr.treatment(7)
 ```
 
 
-```{r, results = 'asis'}
+```{r social-support-8, results = 'asis'}
 scored = scored %>%
   mutate(current.support = rowMeans(select(., contains("SOCIALSUPP.001")), na.rm=T),
          prior.support = rowMeans(select(., contains("SOCIALSUPP.002")), na.rm=T)) %>%
@@ -228,7 +230,7 @@ support_by_group = function(predictor, timev, data = support, title = NULL){
 
 ## Distribution
 
-```{r, results = 'asis'}
+```{r social-support-9, results = 'asis'}
 scored %>%
   ggplot(aes(x = current.support)) +
   geom_density(fill = "grey") +
@@ -241,25 +243,37 @@ scored %>%
 
 ## By Income
 
-```{r, results = 'asis'}
+```{r social-support-10, results = 'asis'}
 mod = compare.support(current.support, poverty150)
 mod$plot
 ```
 
 
-```{r, results = 'asis'}
+```{r social-support-11, results = 'asis'}
 mod$summary
 ```
 
-## By Race/Ethnicity
+## By Race
 
-```{r, results = 'asis'}
+```{r social-support-12, results = 'asis'}
 mod = compare.support(current.support, race_cat)
 mod$plot
 ```
 
 
-```{r, results = 'asis'}
+```{r social-support-13, results = 'asis'}
+mod$summary
+```
+
+## By Ethnicity
+
+```{r social-support-14, results = 'asis'}
+mod = compare.support(current.support, latinx)
+mod$plot
+```
+
+
+```{r social-support-15, results = 'asis'}
 mod$summary
 ```
 
@@ -268,20 +282,28 @@ mod$summary
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-16, results = 'asis'}
 wellbeing.con(current.support)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
-compare.support(current.support, poverty150)
+```{r social-support-17, results = 'asis'}
+wellbeing.con.group(predictor = current.support, group = poverty150)
 ```
 
-### Race/ethnicity
 
-```{r, results = 'asis'}
-compare.support(current.support, race_cat)
+
+### Race
+
+```{r social-support-18, results = 'asis'}
+wellbeing.con.group(current.support, race_cat)
+```
+
+### Ethnicity
+
+```{r social-support-19, results = 'asis'}
+wellbeing.con.group(current.support, latinx)
 ```
 
 
@@ -289,48 +311,59 @@ compare.support(current.support, race_cat)
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-20, results = 'asis'}
 wellbeing.con(current.support, outcome = fussy)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-21, results = 'asis'}
 wellbeing.con.group(current.support, poverty150, outcome = fussy)
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-22, results = 'asis'}
 wellbeing.con.group(current.support, race_cat, outcome = fussy)
+```
+
+### Ethnicity
+
+```{r social-support-23, results = 'asis'}
+wellbeing.con.group(current.support, latinx, outcome = fussy)
 ```
 
 ## Child Internalizing{.tabset}
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-24, results = 'asis'}
 wellbeing.con(current.support, outcome = fear)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-25, results = 'asis'}
 wellbeing.con.group(current.support, poverty150, outcome = fear)
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-26, results = 'asis'}
 wellbeing.con.group(current.support, race_cat, outcome = fear)
 ```
 
+### Ethnicity
+
+```{r social-support-27, results = 'asis'}
+wellbeing.con.group(current.support, latinx, outcome = fear)
+```
 
 # Prior social support{.tabset}
 
 ## Distribution
 
-```{r, results = 'asis'}
+```{r social-support-28, results = 'asis'}
 scored %>%
   ggplot(aes(x = prior.support)) +
   geom_density(fill = "grey") +
@@ -343,25 +376,37 @@ scored %>%
 
 ## By Income
 
-```{r, results = 'asis'}
+```{r social-support-29, results = 'asis'}
 mod = compare.support(prior.support, poverty150)
 mod$plot
 ```
 
 
-```{r, results = 'asis'}
+```{r social-support-30, results = 'asis'}
 mod$summary
 ```
 
-## By Race/Ethnicity
+## By Race
 
-```{r, results = 'asis'}
+```{r social-support-31, results = 'asis'}
 mod = compare.support(prior.support, race_cat)
 mod$plot
 ```
 
 
-```{r, results = 'asis'}
+```{r social-support-32, results = 'asis'}
+mod$summary
+```
+
+## By Ethnicity
+
+```{r social-support-33, results = 'asis'}
+mod = compare.support(prior.support, latinx)
+mod$plot
+```
+
+
+```{r social-support-34, results = 'asis'}
 mod$summary
 ```
 
@@ -370,77 +415,97 @@ mod$summary
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-35, results = 'asis'}
 wellbeing.con(prior.support)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-36, results = 'asis'}
 wellbeing.con.group(prior.support, poverty150)
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-37, results = 'asis'}
 wellbeing.con.group(prior.support, race_cat)
 ```
 
+### Ethnicity
+
+```{r social-support-38, results = 'asis'}
+wellbeing.con.group(prior.support, latinx)
+```
 
 ## Child Externalizing{.tabset}
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-39, results = 'asis'}
 wellbeing.con(prior.support, outcome = fussy)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-40, results = 'asis'}
 wellbeing.con.group(prior.support, poverty150, outcome = fussy)
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-41, results = 'asis'}
 wellbeing.con.group(prior.support, race_cat, outcome = fussy)
+```
+
+### Ethnicity
+
+```{r social-support-42, results = 'asis'}
+wellbeing.con.group(prior.support, latinx, outcome = fussy)
 ```
 
 ## Child Internalizing{.tabset}
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-43, results = 'asis'}
 wellbeing.con(prior.support, outcome = fear)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-44, results = 'asis'}
 mod = wellbeing.con.group(prior.support, poverty150, outcome = fear)
 mod$plot
 ```
-```{r, results = 'asis'}
+```{r social-support-45, results = 'asis'}
 mod$summary
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-46, results = 'asis'}
 mod = wellbeing.con.group(prior.support, race_cat, outcome = fear)
 mod$plot
 ```
-```{r, results = 'asis'}
+```{r social-support-47, results = 'asis'}
 mod$summary
 ```
 
+### Ethnicity
+
+```{r social-support-48, results = 'asis'}
+mod = wellbeing.con.group(prior.support, latinx, outcome = fear)
+mod$plot
+```
+```{r social-support-49, results = 'asis'}
+mod$summary
+```
 
 # Change in social support{.tabset}
 
 ## Distribution
 
-```{r, results = 'asis'}
+```{r social-support-50, results = 'asis'}
 scored %>%
   ggplot(aes(x = change.support)) +
   geom_density(fill = "grey") +
@@ -454,96 +519,126 @@ scored %>%
 
 ## By Income
 
-```{r, results = 'asis'}
+```{r social-support-51, results = 'asis'}
 mod = compare.support(change.support, poverty150)
 mod$plot
 ```
 
 
-```{r, results = 'asis'}
+```{r social-support-52, results = 'asis'}
 mod$summary
 ```
 
-## By Race/Ethnicity
+## By Race
 
-```{r, results = 'asis'}
+```{r social-support-53, results = 'asis'}
 mod = compare.support(change.support, race_cat)
 mod$plot
 ```
 
 
-```{r, results = 'asis'}
+```{r social-support-54, results = 'asis'}
 mod$summary
 ```
 
+## By Ethnicity
+
+```{r social-support-55, results = 'asis'}
+mod = compare.support(change.support, latinx)
+mod$plot
+```
+
+
+```{r social-support-56, results = 'asis'}
+mod$summary
+```
 
 ## Caregiver Wellbeing{.tabset}
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-57, results = 'asis'}
 wellbeing.con(change.support)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-58, results = 'asis'}
 wellbeing.con.group(change.support, poverty150)
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-59, results = 'asis'}
 wellbeing.con.group(change.support, race_cat)
 ```
 
+### Ethnicity
+
+```{r social-support-60, results = 'asis'}
+wellbeing.con.group(change.support, latinx)
+```
 
 ## Child Externalizing{.tabset}
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-61, results = 'asis'}
 wellbeing.con(change.support, outcome = fussy)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-62, results = 'asis'}
 wellbeing.con.group(change.support, poverty150, outcome = fussy)
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-63, results = 'asis'}
 wellbeing.con.group(change.support, race_cat, outcome = fussy)
+```
+
+### Ethnicity
+
+```{r social-support-64, results = 'asis'}
+wellbeing.con.group(change.support, latinx, outcome = fussy)
 ```
 
 ## Child Internalizing{.tabset}
 
 ### Overall
 
-```{r, results = 'asis'}
+```{r social-support-65, results = 'asis'}
 wellbeing.con(change.support, outcome = fear)
 ```
 
 ### Income
 
-```{r, results = 'asis'}
+```{r social-support-66, results = 'asis'}
 wellbeing.con.group(change.support, poverty150, outcome = fear)
 ```
 
-### Race/ethnicity
+### Race
 
-```{r, results = 'asis'}
+```{r social-support-67, results = 'asis'}
 wellbeing.con.group(change.support, race_cat, outcome = fear)
+```
+
+### Ethnicity
+
+```{r social-support-68, results = 'asis'}
+wellbeing.con.group(change.support, latinx, outcome = fear)
 ```
 
 # Sources of support
 
-```{r}
+_Note that for single caregivers, responses to "partner/spouse" support are removed._
+
+```{r social-support-69}
 #dataset of cleaned social support
 support = scored %>%
-  select(CaregiverID, race_cat, poverty150, contains("SOCIALSUPP.003")) %>%
+  select(CaregiverID, race_cat, poverty150, latinx, single, contains("SOCIALSUPP.003")) %>%
   gather("key", "value", contains("SOCIALSUPP.003")) %>%
   mutate(key = gsub("SOCIALSUPP\\.003\\.", "", key)) %>%
   separate(key, into = c("source", "time")) %>% 
@@ -556,7 +651,11 @@ support = scored %>%
                          labels = c("Partner/Spouse", "Child", "Parent",
                                     "Other relatives", "Friend", "Neighbor",
                                     "Co-worker", "Religious group", "Spritual figure", 
-                                    "Parent support group", "Health professional")))
+                                    "Parent support group", "Health professional"))) %>%
+  mutate(support = case_when(
+    single == 1 & source == "Partner/Spouse" ~ NA_real_,
+    TRUE ~ support
+  ))
 ```
 
 
@@ -564,12 +663,13 @@ support = scored %>%
 
 ### Overall
 
-```{r}
+```{r social-support-70}
 plot = support %>%
   filter(time == 1) %>%
+  filter(!is.na(support)) %>%
   group_by(source) %>%
   summarize(n = n(),
-            support = sum(support)) %>%
+            support = sum(support, na.rm=T)) %>%
   mutate(percent = 100*support/n) %>%
   mutate_at(vars(support, percent), round, 2) %>%
   ggplot(aes(x = reorder(source, percent), y = percent,
@@ -587,13 +687,14 @@ ggplotly(plot, tooltip = "text")
 
 ### Income
 
-```{r}
+```{r social-support-71}
 plot = support %>%
   filter(time == 1) %>%
+  filter(!is.na(support)) %>%
   filter(!is.na(poverty150)) %>%
   group_by(source, poverty150) %>%
   summarize(n = n(),
-            support = sum(support)) %>%
+            support = sum(support, na.rm=T)) %>%
   mutate(percent = 100*support/n) %>%
   mutate_at(vars(support, percent), round, 2) %>%
   ungroup() %>%
@@ -615,7 +716,7 @@ plot = support %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r social-support-72, results = 'asis'}
 support %>%
   filter(time == 1) %>%
   filter(!is.na(poverty150)) %>%
@@ -638,16 +739,17 @@ support %>%
 ```
 
 
-### Race/ethnicity
+### Race
 
 
-```{r}
+```{r social-support-73}
 plot = support %>%
   filter(time == 1) %>%
+  filter(!is.na(support)) %>%
   filter(!is.na(race_cat)) %>%
   group_by(source, race_cat) %>%
   summarize(n = n(),
-            support = sum(support)) %>%
+            support = sum(support, na.rm=T)) %>%
   mutate(percent = 100*support/n) %>%
   mutate_at(vars(support, percent), round, 2) %>%
   filter(n > 30) %>%
@@ -670,7 +772,7 @@ plot = support %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r social-support-74, results = 'asis'}
 support %>%
   filter(time == 1) %>%
   filter(race_cat %in% c(
@@ -698,17 +800,71 @@ support %>%
    
 ```
 
+### Ethnicity
+
+```{r social-support-75}
+plot = support %>%
+  filter(time == 1) %>%
+  filter(!is.na(support)) %>%
+  filter(!is.na(latinx)) %>%
+  group_by(source, latinx) %>%
+  summarize(n = n(),
+            support = sum(support, na.rm=T)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  ungroup() %>%
+  mutate(row = row_number(),
+         group = cut_interval(row, length = 6)) %>%
+  ggplot(aes(x = latinx, y = percent,
+             fill = latinx,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", support))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~source) +
+  scale_fill_brewer(palette = "Set2")+
+  guides(fill = F)+
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r social-support-76, results = 'asis'}
+support %>%
+  filter(time == 1) %>%
+  filter(!is.na(support)) %>%
+  filter(!is.na(latinx)) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(ttest = map(data, .f = function(x) t.test(support~latinx, data = x))) %>%
+  select(source, ttest) %>%
+  mutate(ttest = map(ttest, broom::tidy)) %>%
+  unnest(cols = c(ttest)) %>%
+  select(source, estimate, conf.low, conf.high, statistic, p.value) %>%
+  ungroup() %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"))  %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        booktabs = T,
+        digits = 2,
+        col.names = c("Source", "Est", "Lower CI", "Upper CI", "t", "p")) %>%
+  kable_styling(full_width = T) %>%
+  add_header_above(c(" ", "Difference between groups" = 3, " " = 2))
+```
 
 ## Prior{.tabset}
 
 ### Overall
 
-```{r}
+```{r social-support-77}
 plot = support %>%
   filter(time == 2) %>%
+  filter(!is.na(support)) %>%
   group_by(source) %>%
   summarize(n = n(),
-            support = sum(support)) %>%
+            support = sum(support, na.rm=T)) %>%
   mutate(percent = 100*support/n) %>%
   mutate_at(vars(support, percent), round, 2) %>%
   ggplot(aes(x = reorder(source, percent), y = percent,
@@ -725,13 +881,14 @@ ggplotly(plot, tooltip = "text")
 
 ### Income
 
-```{r}
+```{r social-support-78}
 plot = support %>%
   filter(time == 2) %>%
+  filter(!is.na(support)) %>%
   filter(!is.na(poverty150)) %>%
   group_by(source, poverty150) %>%
   summarize(n = n(),
-            support = sum(support)) %>%
+            support = sum(support, na.rm=T)) %>%
   mutate(percent = 100*support/n) %>%
   mutate_at(vars(support, percent), round, 2) %>%
   ungroup() %>%
@@ -753,9 +910,10 @@ plot = support %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r social-support-79, results = 'asis'}
 support %>%
   filter(time == 2) %>%
+  filter(!is.na(support)) %>%
   filter(!is.na(poverty150)) %>%
   group_by(source) %>%
   nest() %>%
@@ -776,16 +934,17 @@ support %>%
 ```
 
 
-### Race/ethnicity
+### Race
 
 
-```{r}
+```{r social-support-80}
 plot = support %>%
   filter(time == 2) %>%
+  filter(!is.na(support)) %>%
   filter(!is.na(race_cat)) %>%
   group_by(source, race_cat) %>%
   summarize(n = n(),
-            support = sum(support)) %>%
+            support = sum(support, na.rm=T)) %>%
   mutate(percent = 100*support/n) %>%
   mutate_at(vars(support, percent), round, 2) %>%
   filter(n > 30) %>%
@@ -808,7 +967,7 @@ plot = support %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r social-support-81, results = 'asis'}
 support %>%
   filter(time == 2) %>%
   filter(race_cat %in% c(
@@ -834,6 +993,60 @@ support %>%
   kable(caption = "p-values from pair-wise t-tests performed within source. All p-values adjusted with Holm correction") %>%
   kable_styling(full_width = T)
    
+```
+
+### Ethnicity
+
+```{r social-support-82}
+plot = support %>%
+  filter(time == 2) %>%
+  filter(!is.na(support)) %>%
+  filter(!is.na(latinx)) %>%
+  group_by(source, latinx) %>%
+  summarize(n = n(),
+            support = sum(support, na.rm=T)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  ungroup() %>%
+  mutate(row = row_number(),
+         group = cut_interval(row, length = 6)) %>%
+  ggplot(aes(x = latinx, y = percent,
+             fill = latinx,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", support))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~source) +
+  scale_fill_brewer(palette = "Set2")+
+  guides(fill = F)+
+  labs(x = "", y = "Percent", title = "Source of support prior to covid-19") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r social-support-83, results = 'asis'}
+support %>%
+  filter(time == 2) %>%
+  filter(!is.na(support)) %>%
+  filter(!is.na(latinx)) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(ttest = map(data, .f = function(x) t.test(support~latinx, data = x))) %>%
+  select(source, ttest) %>%
+  mutate(ttest = map(ttest, broom::tidy)) %>%
+  unnest(cols = c(ttest)) %>%
+  select(source, estimate, conf.low, conf.high, statistic, p.value) %>%
+  ungroup() %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"))  %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        booktabs = T,
+        digits = 2,
+        col.names = c("Source", "Est", "Lower CI", "Upper CI", "t", "p")) %>%
+  kable_styling(full_width = T) %>%
+  add_header_above(c(" ", "Difference between groups" = 3, " " = 2))
 ```
 
 ## Change{.tabset}
@@ -841,7 +1054,7 @@ support %>%
 ### Overall
 
 
-```{r}
+```{r social-support-84}
 support = support %>%
   spread(time, support) %>%
   mutate(change = case_when(
@@ -853,6 +1066,7 @@ support = support %>%
   ))  
 
 plot = support %>%
+  filter(!is.na(support)) %>%
   group_by(source, change) %>%
   summarize(n = n()) %>%
   group_by(source) %>%
@@ -874,7 +1088,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Income
 
-```{r}
+```{r social-support-85}
 
 plot = support %>%
   filter(!is.na(poverty150)) %>%
@@ -898,7 +1112,7 @@ plot = support %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r social-support-86, results = 'asis'}
 support %>%
   filter(!is.na(poverty150)) %>%
   group_by(source) %>%
@@ -916,9 +1130,9 @@ support %>%
 ```
 
 
-### Race/ethnicity
+### Race
 
-```{r}
+```{r social-support-87}
 
 plot = support %>%
   filter(race_cat %in% c(
@@ -957,7 +1171,7 @@ plot = support %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r social-support-88, results = 'asis'}
 support %>%
   filter(!is.na(poverty150)) %>%
   group_by(source) %>%
@@ -974,3 +1188,45 @@ support %>%
   kable_styling(full_width = T)
 ```
 
+### Ethnicity
+
+```{r social-support-89}
+
+plot = support %>%
+  filter(!is.na(latinx)) %>%
+  group_by(source, change, latinx) %>%
+  summarize(n = n()) %>%
+  group_by(source, latinx) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  mutate_at(vars(percent), round, 2) %>%
+  filter(!is.na(change)) %>%
+  ggplot(aes(x = reorder(source, percent), y = percent,
+             fill = latinx,
+               text = paste("Group:", latinx,
+                            "\nPercent:", percent,
+                            "Count:", n))) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  coord_flip() +
+  facet_wrap(~change)+
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r social-support-90, results = 'asis'}
+support %>%
+  filter(!is.na(latinx)) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) stats::chisq.test(x = x$change, y = x$latinx))) %>%
+  mutate(chisq = map(chisq, broom::tidy)) %>%
+  select(source, chisq) %>%
+  unnest(cols = c(chisq)) %>%
+  ungroup() %>%
+  select(source, statistic, p.value) %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  kable(digits = 2, booktabs = T, caption = "Chi-square test by source") %>%
+  kable_styling(full_width = T)
+```
