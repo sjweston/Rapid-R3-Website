@@ -121,10 +121,18 @@ wellbeing.con = function(predictor, data = scored, outcome = mental_health, titl
   plot = data %>%
     ggplot(aes(x = {{predictor}}, y = {{outcome}})) +
     geom_jitter(alpha = .3, size = .5)  +
-    geom_smooth(method = lm, se = F) +
-    scale_x_continuous("___ of the time", breaks = c(1:5), labels = c("None", "A little", "Some", "A lot", "Most")) +
+    geom_smooth(method = lm, se = F)  +
     labs(y = "Poor Mental Health", title = title) +
     theme_pubclean()
+  
+  if(deparse(substitute(predictor)) %in% c("current.support", "prior.support")){
+    plot = plot +
+    scale_x_continuous("___ of the time", breaks = c(1:5), labels = c("None", "A little", "Some", "A lot", "Most"))
+  } else {
+    plot = plot +
+    scale_x_continuous("", breaks = c(-2,0,2), 
+                       labels = c("Lost support", "No change", "Gained support"))
+  }
   
   formula = as.formula(paste(deparse(substitute(outcome)), "~", deparse(substitute(predictor))))
   
@@ -161,6 +169,54 @@ wellbeing.con.group = function(predictor, group, outcome = mental_health, data =
     broom::tidy() %>%
     mutate(p.value = papaja::printp(p.value)) %>%
     kable(digits = 2) %>%
+    kable_styling(full_width = T)
+  
+  return.list = list(plot = plot, summary = model)
+  return(return.list)
+}
+```
+
+```{r function support by categorical predictor, eval = F}
+support_by_group = function(predictor, timev, data = support, title = NULL){
+  
+  data = data %>%
+    filter(!is.na({{predictor}})) 
+  
+  if(timev == "change"){
+    data = data %>%
+      spread(time, support) %>%
+      mutate(support = `1`-`2`)
+  }
+  
+  plotdata = data %>%
+    group_by({{predictor}}, ) %>%
+    summarize(m = mean({{outcome}}),
+              s = sd({{outcome}}),
+              n = n(),
+              se = s/sqrt(n),
+              moe = se*qt(.975, df = n-1)) 
+  
+  plot = plotdata %>%
+    ggplot(aes(x = {{predictor}}, y = m,
+               group=1,
+               text = paste("\nResponse:", {{predictor}},
+                            "\nMental Health:", round(m,2),
+                            "\nCount:", n))) +
+    geom_bar(stat = "identity", fill = "grey") +
+    geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .3) +
+    coord_flip() +
+    labs(y = "Poor Mental Health", x = NULL, title = title) +
+    theme_pubclean()
+
+  plot = ggplotly(plot, tooltip = "text")
+
+  data = as.data.frame(data)
+  x = data[, deparse(substitute(outcome))]
+  g = data[, deparse(substitute(predictor))]
+  model = pairwise.t.test(x, g, p.adjust.method = "holm")
+  model = broom::tidy(model) %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable() %>%
     kable_styling(full_width = T)
   
   return.list = list(plot = plot, summary = model)
@@ -388,9 +444,10 @@ mod$summary
 scored %>%
   ggplot(aes(x = change.support)) +
   geom_density(fill = "grey") +
+  geom_vline(aes(xintercept = 0), linetype = "dashed") +
   scale_x_continuous(
-    breaks = c(1:5), 
-    labels = c("None", "A little", "Some", "A lot", "Most")) +
+    breaks = c(-2,0,2), 
+    labels = c("Lost support", "No change", "Gained support")) +
   labs(title = "Current levels of support", x = NULL) +
   theme_pubclean()
 ```
@@ -479,5 +536,441 @@ wellbeing.con.group(change.support, poverty150, outcome = fear)
 
 ```{r, results = 'asis'}
 wellbeing.con.group(change.support, race_cat, outcome = fear)
+```
+
+# Sources of support
+
+```{r}
+#dataset of cleaned social support
+support = scored %>%
+  select(CaregiverID, race_cat, poverty150, contains("SOCIALSUPP.003")) %>%
+  gather("key", "value", contains("SOCIALSUPP.003")) %>%
+  mutate(key = gsub("SOCIALSUPP\\.003\\.", "", key)) %>%
+  separate(key, into = c("source", "time")) %>% 
+  spread(source, value) %>%
+  mutate(answered = ceiling(rowMeans(select(., matches("^.{1}$")), na.rm=T))) %>%
+  filter(!is.nan(answered)) %>%
+  mutate_at(vars(matches("^.{1}$")), .funs = function(x) ifelse(is.na(x), 0, 1)) %>%
+  gather("source", "support", matches("^.{1}$")) %>%
+  mutate(source = factor(source, 
+                         labels = c("Partner/Spouse", "Child", "Parent",
+                                    "Other relatives", "Friend", "Neighbor",
+                                    "Co-worker", "Religious group", "Spritual figure", 
+                                    "Parent support group", "Health professional")))
+```
+
+
+## Current{.tabset}
+
+### Overall
+
+```{r}
+plot = support %>%
+  filter(time == 1) %>%
+  group_by(source) %>%
+  summarize(n = n(),
+            support = sum(support)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  ggplot(aes(x = reorder(source, percent), y = percent,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", n))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+
+### Income
+
+```{r}
+plot = support %>%
+  filter(time == 1) %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(source, poverty150) %>%
+  summarize(n = n(),
+            support = sum(support)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  ungroup() %>%
+  mutate(row = row_number(),
+         group = cut_interval(row, length = 6)) %>%
+  ggplot(aes(x = poverty150, y = percent,
+             fill = poverty150,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", support))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~source) +
+  scale_fill_brewer(palette = "Set2")+
+  guides(fill = F)+
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r, results = 'asis'}
+support %>%
+  filter(time == 1) %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(ttest = map(data, .f = function(x) t.test(support~poverty150, data = x))) %>%
+  select(source, ttest) %>%
+  mutate(ttest = map(ttest, broom::tidy)) %>%
+  unnest(cols = c(ttest)) %>%
+  select(source, estimate, conf.low, conf.high, statistic, p.value) %>%
+  ungroup() %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"))  %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        booktabs = T,
+        digits = 2,
+        col.names = c("Source", "Est", "Lower CI", "Upper CI", "t", "p")) %>%
+  kable_styling(full_width = T) %>%
+  add_header_above(c(" ", "Difference between groups" = 3, " " = 2))
+```
+
+
+### Race/ethnicity
+
+
+```{r}
+plot = support %>%
+  filter(time == 1) %>%
+  filter(!is.na(race_cat)) %>%
+  group_by(source, race_cat) %>%
+  summarize(n = n(),
+            support = sum(support)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  filter(n > 30) %>%
+  ungroup() %>%
+  mutate(row = row_number(),
+         group = cut_interval(row, length = 6)) %>%
+  ggplot(aes(x = race_cat, y = percent,
+             fill = race_cat,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", support))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~source) +
+  scale_fill_brewer(palette = "Set2")+
+  guides(fill = F)+
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r, results = 'asis'}
+support %>%
+  filter(time == 1) %>%
+  filter(race_cat %in% c(
+    "Asian",
+    "Black/African American",
+    "Multiple races", 
+    "Other race",
+    "White/Caucasian"
+  )) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(test = map(data, function(x) pairwise.t.test(x$support, x$race_cat, adjust = "none"))) %>%
+  mutate(test = map(test, broom::tidy)) %>%
+  select(source, test) %>%
+  unnest(cols = c(test)) %>%
+  ungroup() %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  mutate(group1 = str_extract(group1, ".{5}"),
+         group2 = str_extract(group2, ".{5}")) %>%
+  unite(group, group1, group2, sep = "-") %>%
+  spread(group, p.value) %>%
+  kable(caption = "p-values from pair-wise t-tests performed within source. All p-values adjusted with Holm correction") %>%
+  kable_styling(full_width = T)
+   
+```
+
+
+## Prior{.tabset}
+
+### Overall
+
+```{r}
+plot = support %>%
+  filter(time == 2) %>%
+  group_by(source) %>%
+  summarize(n = n(),
+            support = sum(support)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  ggplot(aes(x = reorder(source, percent), y = percent,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", n))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "", y = "Percent", title = "Source of support prior to covid-19") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Income
+
+```{r}
+plot = support %>%
+  filter(time == 2) %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(source, poverty150) %>%
+  summarize(n = n(),
+            support = sum(support)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  ungroup() %>%
+  mutate(row = row_number(),
+         group = cut_interval(row, length = 6)) %>%
+  ggplot(aes(x = poverty150, y = percent,
+             fill = poverty150,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", support))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~source) +
+  scale_fill_brewer(palette = "Set2")+
+  guides(fill = F)+
+  labs(x = "", y = "Percent", title = "Source of support prior to covid-19") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r, results = 'asis'}
+support %>%
+  filter(time == 2) %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(ttest = map(data, .f = function(x) t.test(support~poverty150, data = x))) %>%
+  select(source, ttest) %>%
+  mutate(ttest = map(ttest, broom::tidy)) %>%
+  unnest(cols = c(ttest)) %>%
+  select(source, estimate, conf.low, conf.high, statistic, p.value) %>%
+  ungroup() %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"))  %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        booktabs = T,
+        digits = 2,
+        col.names = c("Source", "Est", "Lower CI", "Upper CI", "t", "p")) %>%
+  kable_styling(full_width = T) %>%
+  add_header_above(c(" ", "Difference between groups" = 3, " " = 2))
+```
+
+
+### Race/ethnicity
+
+
+```{r}
+plot = support %>%
+  filter(time == 2) %>%
+  filter(!is.na(race_cat)) %>%
+  group_by(source, race_cat) %>%
+  summarize(n = n(),
+            support = sum(support)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  filter(n > 30) %>%
+  ungroup() %>%
+  mutate(row = row_number(),
+         group = cut_interval(row, length = 6)) %>%
+  ggplot(aes(x = race_cat, y = percent,
+             fill = race_cat,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", support))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~source) +
+  scale_fill_brewer(palette = "Set2")+
+  guides(fill = F)+
+  labs(x = "", y = "Percent", title = "Source of support prior to covid-19") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r, results = 'asis'}
+support %>%
+  filter(time == 2) %>%
+  filter(race_cat %in% c(
+    "Asian",
+    "Black/African American",
+    "Multiple races", 
+    "Other race",
+    "White/Caucasian"
+  )) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(test = map(data, function(x) pairwise.t.test(x$support, x$race_cat, adjust = "none"))) %>%
+  mutate(test = map(test, broom::tidy)) %>%
+  select(source, test) %>%
+  unnest(cols = c(test)) %>%
+  ungroup() %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  mutate(group1 = str_extract(group1, ".{5}"),
+         group2 = str_extract(group2, ".{5}")) %>%
+  unite(group, group1, group2, sep = "-") %>%
+  spread(group, p.value) %>%
+  kable(caption = "p-values from pair-wise t-tests performed within source. All p-values adjusted with Holm correction") %>%
+  kable_styling(full_width = T)
+   
+```
+
+## Change{.tabset}
+
+### Overall
+
+
+```{r}
+support = support %>%
+  spread(time, support) %>%
+  mutate(change = case_when(
+    `2` == 0 & `1` == 0 ~ "No support, stable",
+    `2` == 0 & `1` == 1 ~ "Gained support",
+    `2` == 1 & `1` == 0 ~ "Lost support",
+    `2` == 1 & `1` == 1 ~ "Support, stable",
+    TRUE ~ NA_character_
+  ))  
+
+plot = support %>%
+  group_by(source, change) %>%
+  summarize(n = n()) %>%
+  group_by(source) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  mutate_at(vars(percent), round, 2) %>%
+  filter(!is.na(change)) %>%
+  ggplot(aes(x = reorder(source, percent), y = percent,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", n))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~change)+
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Income
+
+```{r}
+
+plot = support %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(source, change, poverty150) %>%
+  summarize(n = n()) %>%
+  group_by(source, poverty150) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  mutate_at(vars(percent), round, 2) %>%
+  filter(!is.na(change)) %>%
+  ggplot(aes(x = reorder(source, percent), y = percent,
+             fill = poverty150,
+               text = paste("Group:", poverty150,
+                            "\nPercent:", percent,
+                            "Count:", n))) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  coord_flip() +
+  facet_wrap(~change)+
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r, results = 'asis'}
+support %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) stats::chisq.test(x = x$change, y = x$poverty150))) %>%
+  mutate(chisq = map(chisq, broom::tidy)) %>%
+  select(source, chisq) %>%
+  unnest(cols = c(chisq)) %>%
+  ungroup() %>%
+  select(source, statistic, p.value) %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  kable(digits = 2, booktabs = T, caption = "Chi-square test by source") %>%
+  kable_styling(full_width = T)
+```
+
+
+### Race/ethnicity
+
+```{r}
+
+plot = support %>%
+  filter(race_cat %in% c(
+    "Asian",
+    "Black/African American",
+    "Multiple races", 
+    "Other race",
+    "White/Caucasian"
+  )) %>%
+  group_by(source, change, race_cat) %>%
+  summarize(n = n()) %>%
+  group_by(source, race_cat) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  mutate_at(vars(percent), round, 2) %>%
+  filter(!is.na(change)) %>%
+  mutate(totaln = sum(n)) %>%
+  filter(totaln > 30) %>%
+  mutate(source.num = as.numeric(source)) %>%
+  ggplot(aes(x = source.num, y = percent,
+             fill = race_cat,
+             group = race_cat,
+               text = paste("Group:", race_cat,
+                            "\nSupport:", source,
+                            "\nPercent:", percent,
+                            "\nCount:", n))) +
+  geom_point()+
+  geom_line(alpha = .3)+
+  #coord_flip() +
+  facet_wrap(~change, scales = "free_y")+
+  scale_x_continuous(breaks = c(1:11), labels = levels(support$source)) +
+  labs(x = "", y = "Percent", title = "Source of support in the last week",
+       caption = "Summary statistics removed if fewer than 10 responses") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r, results = 'asis'}
+support %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(source) %>%
+  nest() %>%
+  mutate(chisq = map(data, function(x) stats::chisq.test(x = x$change, y = x$poverty150))) %>%
+  mutate(chisq = map(chisq, broom::tidy)) %>%
+  select(source, chisq) %>%
+  unnest(cols = c(chisq)) %>%
+  ungroup() %>%
+  select(source, statistic, p.value) %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  kable(digits = 2, booktabs = T, caption = "Chi-square test by source") %>%
+  kable_styling(full_width = T)
 ```
 

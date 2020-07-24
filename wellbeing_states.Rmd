@@ -110,6 +110,11 @@ scored = scored %>%
 sp_week3 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 3)
 
 sp_week3$plot
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_caregiver_spline3.csv"))
 ```
 
 ```{r wellbeing-states-10, results = 'asis'}
@@ -126,6 +131,12 @@ sp_week3$plot
 
 ```{r wellbeing-states-12, results = 'asis'}
 sp_week3$summary
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_anxiety_spline3.csv"))
+
 ```
 
 ### Depression
@@ -138,6 +149,12 @@ sp_week3$plot
 
 ```{r wellbeing-states-14, results = 'asis'}
 sp_week3$summary
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_depress_spline3.csv"))
+
 ```
 
 ### Stress
@@ -146,6 +163,12 @@ sp_week3$summary
 sp_week3 = splines.groups(scored, outcome = stress, group = states_groups, point = 3)
 
 sp_week3$plot
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_stress_spline3.csv"))
+
 ```
 
 ```{r wellbeing-states-16, results = 'asis'}
@@ -158,6 +181,12 @@ sp_week3$summary
 sp_week3 = splines.groups(scored, outcome = lonely, group = states_groups, point = 3)
 
 sp_week3$plot
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_lonely_spline3.csv"))
+
 ```
 
 ```{r wellbeing-states-18, results = 'asis'}
@@ -293,6 +322,12 @@ sp_week7$plot
 
 ```{r wellbeing-states-38, results = 'asis'}
 sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_caregiver_spline7.csv"))
+
 ```
 
 ### Anxiety
@@ -305,6 +340,11 @@ sp_week7$plot
 
 ```{r wellbeing-states-40, results = 'asis'}
 sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_anxiety_spline7.csv"))
 ```
 
 ### Depression
@@ -317,6 +357,11 @@ sp_week7$plot
 
 ```{r wellbeing-states-42, results = 'asis'}
 sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_depress_spline7.csv"))
 ```
 
 ### Stress
@@ -329,6 +374,11 @@ sp_week7$plot
 
 ```{r wellbeing-states-44, results = 'asis'}
 sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_stress_spline7.csv"))
 ```
 
 ### Loneliness
@@ -341,6 +391,11 @@ sp_week7$plot
 
 ```{r wellbeing-states-46, results = 'asis'}
 sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_lonely_spline7.csv"))
 ```
 
 ### Child externalizing
