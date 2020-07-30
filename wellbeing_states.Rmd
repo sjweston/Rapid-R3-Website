@@ -9,9 +9,6 @@ output:
 ```{r wellbeing-states-1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
-#re-run all the machine learning models?
-rerun = FALSE
-dontrerun = !rerun
 ```
 
 ```{r wellbeing-states-2 }
@@ -41,7 +38,6 @@ source(here("Scripts/score data.R"))
 source(here("Functions/pomp.R"))
 source(here("Functions/spline_state level.R"))
 source(here("Functions/splines.R"))
-
 ```
 
 ```{r wellbeing-states-5 }
@@ -99,6 +95,22 @@ scored = scored %>%
   ungroup() 
   
 ```
+
+# Representativeness disclaimer
+
+```{r policy-state-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
 
 # Splines at Week 3
 
@@ -398,6 +410,16 @@ sp_week7$pdata %>%
   write.csv(., file = here("figure data/07232020_lonely_spline7.csv"))
 ```
 
+```{r}
+sp_week7$plotdata %>%
+  mutate(dot = round(m,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, dot) %>%
+  write.csv(file = here("figure data/07-24-2020_lonely_dots.csv"))
+```
+
+
 ### Child externalizing
 
 ```{r wellbeing-states-47 }
@@ -673,6 +695,14 @@ sp_week7$pdata %>%
   write.csv(file = here("figure data/07-24-2020_caregiver-mental-health.csv"))
 ```
 
+```{r}
+sp_week7$plotdata %>%
+  mutate(dot = round(m,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, dot) %>%
+  write.csv(file = here("figure data/07-24-2020_caregiver-mental-health_dots.csv"))
+```
 
 ### Anxiety
 
