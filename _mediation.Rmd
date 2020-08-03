@@ -38,19 +38,44 @@ scored = scored %>%
   ungroup() 
 ```
 
+```{r}
+# score social support
+scored = scored %>%
+  mutate(current.support = rowMeans(select(., contains("SOCIALSUPP.001")), na.rm=T),
+         prior.support = rowMeans(select(., contains("SOCIALSUPP.002")), na.rm=T)) %>%
+  mutate(change.support = current.support-prior.support)
+
+scored = scored %>%
+  group_by(CaregiverID) %>%
+  mutate(social_support = mean(current.support, na.rm=T)) %>%
+  ungroup() %>%
+  filter(!is.na(social_support)) 
+
+caregiver_demos = scored %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1)
+
+scored = scored %>%
+  mutate(social_support = ifelse(social_support > mean(caregiver_demos$social_support), "high", "low"))
+```
+
+
 
 ```{r}
 library(lavaan)
 scored_long = scored %>%
   rename(income_decreased = income_decreaed) %>%
   select(CaregiverID, Week, wellbeing, child_wellbeing, 
-         income_decreased, material_hardship) %>%
-  gather(key, value, -CaregiverID, -Week) %>%
+         income_decreased, material_hardship, 
+         social_support) %>%
+  gather(key, value, -CaregiverID, -Week, -social_support) %>%
   unite(key, key, Week) %>%
   spread(key, value)
 ```
 
-# Mediation: Income Decreased
+# Mediation (no moderators)
+
+## Income Decreased
 
 ```{r}
 
@@ -122,7 +147,7 @@ summary(test, fit.measures = T, standardized = T)
 ```
 
 
-# Mediation: Material Hardship
+## Material Hardship
 
 ```{r}
 
@@ -183,3 +208,153 @@ summary(test, fit.measures = T, standardized = T)
 
 ```
 
+# Moderated by social support
+## Income Decreased
+
+```{r}
+
+income_wellbeing_model = "
+
+child_wellbeing_2 ~ c(p1a, p1b)*wellbeing_1 + c1*child_wellbeing_1 + i1*income_decreased_1
+child_wellbeing_3 ~ c(p1a, p1b)*wellbeing_2 + c1*child_wellbeing_2 + i1*income_decreased_2
+child_wellbeing_4 ~ c(p1a, p1b)*wellbeing_3 + c1*child_wellbeing_3 + i1*income_decreased_3
+child_wellbeing_5 ~ c(p1a, p1b)*wellbeing_4 + c1*child_wellbeing_4 + i1*income_decreased_4
+child_wellbeing_6 ~ c(p1a, p1b)*wellbeing_5 + c1*child_wellbeing_5 + i1*income_decreased_5
+child_wellbeing_7 ~ c(p1a, p1b)*wellbeing_6 + c1*child_wellbeing_6 + i1*income_decreased_6
+child_wellbeing_8 ~ c(p1a, p1b)*wellbeing_7 + c1*child_wellbeing_7 + i1*income_decreased_7
+child_wellbeing_9 ~ c(p1a, p1b)*wellbeing_8 + c1*child_wellbeing_8 + i1*income_decreased_8
+child_wellbeing_10 ~ c(p1a, p1b)*wellbeing_9 + c1a*child_wellbeing_9 + i1*income_decreased_9
+child_wellbeing_11 ~ c(p1a, p1b)*wellbeing_10 + c1*child_wellbeing_10 + i1*income_decreased_10
+child_wellbeing_12 ~ c(p1a, p1b)*wellbeing_11 + c1*child_wellbeing_11 + i1*income_decreased_11
+child_wellbeing_13 ~ c(p1a, p1b)*wellbeing_12 + c1*child_wellbeing_12 + i1*income_decreased_12
+child_wellbeing_14 ~ c(p1a, p1b)*wellbeing_13 + c1*child_wellbeing_13 + i1*income_decreased_13
+child_wellbeing_15 ~ c(p1a, p1b)*wellbeing_14 + c1*child_wellbeing_14 + i1*income_decreased_14
+child_wellbeing_16 ~ c(p1a, p1b)*wellbeing_15 + c1*child_wellbeing_15 + i1*income_decreased_15
+
+wellbeing_2 ~ p2*wellbeing_1 + c2*child_wellbeing_1 + c(i2a, i2b)*income_decreased_1
+wellbeing_3 ~ p2*wellbeing_2 + c2*child_wellbeing_2 + c(i2a, i2b)*income_decreased_2
+wellbeing_4 ~ p2*wellbeing_3 + c2*child_wellbeing_3 + c(i2a, i2b)*income_decreased_3
+wellbeing_5 ~ p2*wellbeing_4 + c2*child_wellbeing_4 + c(i2a, i2b)*income_decreased_4
+wellbeing_6 ~ p2*wellbeing_5 + c2*child_wellbeing_5 + c(i2a, i2b)*income_decreased_5
+wellbeing_7 ~ p2*wellbeing_6 + c2*child_wellbeing_6 + c(i2a, i2b)*income_decreased_6
+wellbeing_8 ~ p2*wellbeing_7 + c2*child_wellbeing_7 + c(i2a, i2b)*income_decreased_7
+wellbeing_9 ~ p2*wellbeing_8 + c2*child_wellbeing_8 + c(i2a, i2b)*income_decreased_8
+wellbeing_10 ~ p2*wellbeing_9 + c2*child_wellbeing_9 + c(i2a, i2b)*income_decreased_9
+wellbeing_11 ~ p2*wellbeing_10 + c2*child_wellbeing_10 + c(i2a, i2b)*income_decreased_10
+wellbeing_12 ~ p2*wellbeing_11 + c2*child_wellbeing_11 + c(i2a, i2b)*income_decreased_11
+wellbeing_13 ~ p2*wellbeing_12 + c2*child_wellbeing_12 + c(i2a, i2b)*income_decreased_12
+wellbeing_14 ~ p2*wellbeing_13 + c2*child_wellbeing_13 + c(i2a, i2b)*income_decreased_13
+wellbeing_15 ~ p2*wellbeing_14 + c2*child_wellbeing_14 + c(i2a, i2b)*income_decreased_14
+wellbeing_16 ~ p2*wellbeing_15 + c2*child_wellbeing_15 + c(i2a, i2b)*income_decreased_15
+
+income_decreased_2 ~ p3*wellbeing_1 + c3*child_wellbeing_1 + i3*income_decreased_1
+income_decreased_3 ~ p3*wellbeing_2 + c3*child_wellbeing_2 + i3*income_decreased_2
+income_decreased_4 ~ p3*wellbeing_3 + c3*child_wellbeing_3 + i3*income_decreased_3
+income_decreased_5 ~ p3*wellbeing_4 + c3*child_wellbeing_4 + i3*income_decreased_4
+income_decreased_6 ~ p3*wellbeing_5 + c3*child_wellbeing_5 + i3*income_decreased_5
+income_decreased_7 ~ p3*wellbeing_6 + c3*child_wellbeing_6 + i3*income_decreased_6
+income_decreased_8 ~ p3*wellbeing_7 + c3*child_wellbeing_7 + i3*income_decreased_7
+income_decreased_9 ~ p3*wellbeing_8 + c3*child_wellbeing_8 + i3*income_decreased_8
+income_decreased_10 ~ p3*wellbeing_9 + c3*child_wellbeing_9 + i3*income_decreased_9
+income_decreased_11 ~ p3*wellbeing_10 + c3*child_wellbeing_10 + i3*income_decreased_10
+income_decreased_12 ~ p3*wellbeing_11 + c3*child_wellbeing_11 + i3*income_decreased_11
+income_decreased_13 ~ p3*wellbeing_12 + c3*child_wellbeing_12 + i3*income_decreased_12
+income_decreased_14 ~ p3*wellbeing_13 + c3*child_wellbeing_13 + i3*income_decreased_13
+income_decreased_15 ~ p3*wellbeing_14 + c3*child_wellbeing_14 + i3*income_decreased_14
+income_decreased_16 ~ p3*wellbeing_15 + c3*child_wellbeing_15 + i3*income_decreased_15
+
+# mediation
+indirect_a := i2a*p1a
+indirect_b := i2b*p1b
+
+
+# total
+total_a := indirect_a + i3*i1 + i1*c1
+total_b := indirect_b + i3*i1 + i1*c1
+"
+
+income_test = sem(income_wellbeing_model, 
+           data = scored_long, 
+           missing='fiml', 
+           fixed.x=F, 
+           group = "social_support")
+
+summary(income_test, fit.measures = T, standardized = T)
+
+```
+
+
+## Material Hardship
+
+```{r}
+material_hardship_model = "
+
+child_wellbeing_2 ~ c(p1a, p1b)*wellbeing_1 + c1*child_wellbeing_1 + i1*material_hardship_1
+child_wellbeing_3 ~ c(p1a, p1b)*wellbeing_2 + c1*child_wellbeing_2 + i1*material_hardship_2
+child_wellbeing_4 ~ c(p1a, p1b)*wellbeing_3 + c1*child_wellbeing_3 + i1*material_hardship_3
+child_wellbeing_5 ~ c(p1a, p1b)*wellbeing_4 + c1*child_wellbeing_4 + i1*material_hardship_4
+child_wellbeing_6 ~ c(p1a, p1b)*wellbeing_5 + c1*child_wellbeing_5 + i1*material_hardship_5
+child_wellbeing_7 ~ c(p1a, p1b)*wellbeing_6 + c1*child_wellbeing_6 + i1*material_hardship_6
+child_wellbeing_8 ~ c(p1a, p1b)*wellbeing_7 + c1*child_wellbeing_7 + i1*material_hardship_7
+child_wellbeing_9 ~ c(p1a, p1b)*wellbeing_8 + c1*child_wellbeing_8 + i1*material_hardship_8
+child_wellbeing_10 ~ c(p1a, p1b)*wellbeing_9 + c1a*child_wellbeing_9 + i1*material_hardship_9
+child_wellbeing_11 ~ c(p1a, p1b)*wellbeing_10 + c1*child_wellbeing_10 + i1*material_hardship_10
+child_wellbeing_12 ~ c(p1a, p1b)*wellbeing_11 + c1*child_wellbeing_11 + i1*material_hardship_11
+child_wellbeing_13 ~ c(p1a, p1b)*wellbeing_12 + c1*child_wellbeing_12 + i1*material_hardship_12
+child_wellbeing_14 ~ c(p1a, p1b)*wellbeing_13 + c1*child_wellbeing_13 + i1*material_hardship_13
+child_wellbeing_15 ~ c(p1a, p1b)*wellbeing_14 + c1*child_wellbeing_14 + i1*material_hardship_14
+child_wellbeing_16 ~ c(p1a, p1b)*wellbeing_15 + c1*child_wellbeing_15 + i1*material_hardship_15
+
+wellbeing_2 ~ p2*wellbeing_1 + c2*child_wellbeing_1 + c(i2a, i2b)*material_hardship_1
+wellbeing_3 ~ p2*wellbeing_2 + c2*child_wellbeing_2 + c(i2a, i2b)*material_hardship_2
+wellbeing_4 ~ p2*wellbeing_3 + c2*child_wellbeing_3 + c(i2a, i2b)*material_hardship_3
+wellbeing_5 ~ p2*wellbeing_4 + c2*child_wellbeing_4 + c(i2a, i2b)*material_hardship_4
+wellbeing_6 ~ p2*wellbeing_5 + c2*child_wellbeing_5 + c(i2a, i2b)*material_hardship_5
+wellbeing_7 ~ p2*wellbeing_6 + c2*child_wellbeing_6 + c(i2a, i2b)*material_hardship_6
+wellbeing_8 ~ p2*wellbeing_7 + c2*child_wellbeing_7 + c(i2a, i2b)*material_hardship_7
+wellbeing_9 ~ p2*wellbeing_8 + c2*child_wellbeing_8 + c(i2a, i2b)*material_hardship_8
+wellbeing_10 ~ p2*wellbeing_9 + c2*child_wellbeing_9 + c(i2a, i2b)*material_hardship_9
+wellbeing_11 ~ p2*wellbeing_10 + c2*child_wellbeing_10 + c(i2a, i2b)*material_hardship_10
+wellbeing_12 ~ p2*wellbeing_11 + c2*child_wellbeing_11 + c(i2a, i2b)*material_hardship_11
+wellbeing_13 ~ p2*wellbeing_12 + c2*child_wellbeing_12 + c(i2a, i2b)*material_hardship_12
+wellbeing_14 ~ p2*wellbeing_13 + c2*child_wellbeing_13 + c(i2a, i2b)*material_hardship_13
+wellbeing_15 ~ p2*wellbeing_14 + c2*child_wellbeing_14 + c(i2a, i2b)*material_hardship_14
+wellbeing_16 ~ p2*wellbeing_15 + c2*child_wellbeing_15 + c(i2a, i2b)*material_hardship_15
+
+material_hardship_2 ~ p3*wellbeing_1 + c3*child_wellbeing_1 + i3*material_hardship_1
+material_hardship_3 ~ p3*wellbeing_2 + c3*child_wellbeing_2 + i3*material_hardship_2
+material_hardship_4 ~ p3*wellbeing_3 + c3*child_wellbeing_3 + i3*material_hardship_3
+material_hardship_5 ~ p3*wellbeing_4 + c3*child_wellbeing_4 + i3*material_hardship_4
+material_hardship_6 ~ p3*wellbeing_5 + c3*child_wellbeing_5 + i3*material_hardship_5
+material_hardship_7 ~ p3*wellbeing_6 + c3*child_wellbeing_6 + i3*material_hardship_6
+material_hardship_8 ~ p3*wellbeing_7 + c3*child_wellbeing_7 + i3*material_hardship_7
+material_hardship_9 ~ p3*wellbeing_8 + c3*child_wellbeing_8 + i3*material_hardship_8
+material_hardship_10 ~ p3*wellbeing_9 + c3*child_wellbeing_9 + i3*material_hardship_9
+material_hardship_11 ~ p3*wellbeing_10 + c3*child_wellbeing_10 + i3*material_hardship_10
+material_hardship_12 ~ p3*wellbeing_11 + c3*child_wellbeing_11 + i3*material_hardship_11
+material_hardship_13 ~ p3*wellbeing_12 + c3*child_wellbeing_12 + i3*material_hardship_12
+material_hardship_14 ~ p3*wellbeing_13 + c3*child_wellbeing_13 + i3*material_hardship_13
+material_hardship_15 ~ p3*wellbeing_14 + c3*child_wellbeing_14 + i3*material_hardship_14
+material_hardship_16 ~ p3*wellbeing_15 + c3*child_wellbeing_15 + i3*material_hardship_15
+
+# mediation
+indirect_a := i2a*p1a
+indirect_b := i2b*p1b
+
+
+# total
+total_a := indirect_a + i3*i1 + i1*c1
+total_b := indirect_b + i3*i1 + i1*c1
+"
+
+material_hardship_test = sem(material_hardship_model, 
+           data = scored_long, 
+           missing='fiml', 
+           fixed.x=F, 
+           group = "social_support")
+
+summary(material_hardship_test, fit.measures = T, standardized = T)
+
+```
+
+```

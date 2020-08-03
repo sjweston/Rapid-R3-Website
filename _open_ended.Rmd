@@ -1,0 +1,279 @@
+---
+title: "Open-ended responses"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(stm)
+library(tidytext)
+library(furrr)
+```
+
+```{r}
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+```
+
+```{r prep open-ended responses for tokenizing}
+open_ended = scored %>%
+  select(CaregiverID, Week, contains("OPEN")) %>%
+  select(-contains("006")) %>%
+  gather("question", "response", contains("OPEN")) %>%
+  mutate(question = str_extract(question, ".$")) %>%
+  filter(!is.na(response)) %>%
+  filter(!(response %in% c("", "None","None.","NA","NA.",
+                         "none","none.","na","na.","Na", "Na.", 
+                         "N/A","N/A.", "N/a","N/a.", "n/a","n/a.",
+                         "No", "No.", "Nope", "nope","Nope.", "nope.", "no", "no.", "No thank you", "No thank you.",
+                         "no thank you", "no thank you.","No, thank you", "No, thank you.",
+                         "no, thank you", "no, thank you.", "Nothing", "ty", "nothing", "not really", "Not really", "Ni", "ni", 
+                         " No", "Not at this time", "No, thx", "Nope !", "NONE", "Nope!", "not at this time", 
+                         "Not at the moment", "No thanks", "no thanks", "Nothing I can think of.", "Nothing I can think of.",
+                         "^no[.]{0-6}", "^No[.]{0-6}", "Not right now", "not right now", "I do not"))) %>%
+  group_by(question) %>%
+  nest()
+```
+
+# Question 1
+```{r prep q1}
+open1_tidy = open_ended$data[[1]] %>%
+  unnest_tokens(output = word, input = response, token = "words") %>%
+  anti_join(get_stopwords()) %>%
+  filter(!str_detect(word, "[0-9]+")) 
+
+processed1 <- textProcessor(open_ended$data[[1]]$response, metadata = open_ended$data[[1]])
+out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)
+docs1 <- out1$documents
+vocab1 <- out1$vocab
+meta1 <- out1$meta
+
+heldout1 = make.heldout(docs1, vocab1)
+```
+```{r models q1, eval = F}
+set.seed(07312020)
+plan(multiprocess)
+
+many_models1 <- tibble(K = c(2:30)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,
+                                          verbose = FALSE)))
+save(many_models1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))
+```
+
+```{r}
+load(here("../../Data Management R3/R Data/open1_many_models.Rdata"))
+```
+
+
+```{r}
+#extract fit statistics
+k_result <- many_models1 %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),
+         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),
+         residual = map(topic_model, checkResiduals, heldout1$documents),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+```
+
+```{r}
+k_result %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics",
+       subtitle = "These diagnostics indicate that a good number of topics would be around 18")
+```
+
+```{r}
+k_result %>%
+  select(K, exclusivity, semantic_coherence) %>%
+  filter(K %in% c(11,14,18,20)) %>%
+  unnest() %>%
+  mutate(K = as.factor(K)) %>%
+  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
+  stat_ellipse(expand = 0)+
+  geom_point(size = 2, alpha = 0.7) +
+  labs(x = "Semantic coherence",
+       y = "Exclusivity",
+       title = "Comparing exclusivity and semantic coherence",
+       subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
+```
+
+## Fit model
+
+
+```{r}
+topics_rapid1 <- stm(documents = docs, 
+                    vocab = vocab,
+                    K = 18, 
+                    prevalence =~ s(Week), 
+                    data = meta, 
+                    init.type = "Spectral")
+```
+
+```{r}
+labelTopics(topics_rapid1)
+findThoughts(topics_rapid1, 
+             texts = out1$meta$response, 
+             topics = 1, n = 5)
+```
+
+
+# Question 2
+
+```{r prep q2}
+open2_tidy = open_ended$data[[2]] %>%
+  unnest_tokens(output = word, input = response, token = "words") %>%
+  anti_join(get_stopwords()) %>%
+  filter(!str_detect(word, "[0-9]+")) 
+
+processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)
+docs2 <- out2$documents
+vocab2 <- out2$vocab
+meta2 <- out2$meta
+
+heldout2 = make.heldout(docs2, vocab2)
+```
+```{r models q2, eval = F}
+set.seed(07322020)
+plan(multiprocess)
+
+many_models <- tibble(K = c(2:30)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, heldout2$vocab, K = .,
+                                          verbose = FALSE)))
+save(many_models, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))
+```
+
+```{r}
+load(here("../../Data Management R3/R Data/open2_many_models.Rdata"))
+```
+
+# Question 3
+
+```{r prep q3}
+open3_tidy = open_ended$data[[3]] %>%
+  unnest_tokens(output = word, input = response, token = "words") %>%
+  anti_join(get_stopwords()) %>%
+  filter(!str_detect(word, "[0-9]+")) 
+
+processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]])
+out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta)
+docs3 <- out3$documents
+vocab3 <- out3$vocab
+meta3 <- out3$meta
+
+heldout3 = make.heldout(docs3, vocab3)
+```
+```{r models q3, eval = F}
+set.seed(07332020)
+plan(multiprocess)
+
+many_models <- tibble(K = c(2:30)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout3$documents, heldout3$vocab, K = .,
+                                          verbose = FALSE)))
+save(many_models, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))
+```
+
+```{r}
+load(here("../../Data Management R3/R Data/open3_many_models.Rdata"))
+```
+
+# Question 4
+
+```{r prep q4}
+open4_tidy = open_ended$data[[4]] %>%
+  unnest_tokens(output = word, input = response, token = "words") %>%
+  anti_join(get_stopwords()) %>%
+  filter(!str_detect(word, "[0-9]+")) 
+
+processed4 <- textProcessor(open_ended$data[[4]]$response, metadata = open_ended$data[[4]])
+out4 <- prepDocuments(processed4$documents, processed4$vocab, processed4$meta)
+docs4 <- out4$documents
+vocab4 <- out4$vocab
+meta4 <- out4$meta
+
+heldout4 = make.heldout(docs4, vocab4)
+```
+```{r models q4, eval = F}
+set.seed(07342020)
+plan(multiprocess)
+
+many_models <- tibble(K = c(2:30)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout4$documents, heldout4$vocab, K = .,
+                                          verbose = FALSE)))
+save(many_models, file = here("../../Data Management R3/R Data/open4_many_models.Rdata"))
+```
+
+```{r}
+load(here("../../Data Management R3/R Data/open4_many_models.Rdata"))
+```
+
+# Question 5
+
+```{r prep q5}
+open5_tidy = open_ended$data[[5]] %>%
+  unnest_tokens(output = word, input = response, token = "words") %>%
+  anti_join(get_stopwords()) %>%
+  filter(!str_detect(word, "[0-9]+")) 
+
+processed5 <- textProcessor(open_ended$data[[5]]$response, metadata = open_ended$data[[5]])
+out5 <- prepDocuments(processed5$documents, processed5$vocab, processed5$meta)
+docs5 <- out5$documents
+vocab5 <- out5$vocab
+meta5 <- out5$meta
+
+heldout5 = make.heldout(docs5, vocab5)
+```
+```{r models q5, eval = F}
+set.seed(07352020)
+plan(multiprocess)
+
+many_models <- tibble(K = c(2:30)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout5$documents, heldout5$vocab, K = .,
+                                          verbose = FALSE)))
+save(many_models, file = here("../../Data Management R3/R Data/open5_many_models.Rdata"))
+```
+
+```{r}
+load(here("../../Data Management R3/R Data/open5_many_models.Rdata"))
+```
+
+
+```{r}
+topics_rapid <- stm(documents = docs, 
+                    vocab = vocab,
+                    K = 7, 
+                    prevalence =~ question + s(Week), 
+                    data = meta, 
+                    init.type = "Spectral")
+```
+
+```{r}
+labelTopics(topics_rapid)
+plot(topics_rapid, type = "labels")
+```
+
+

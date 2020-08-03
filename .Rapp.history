@@ -1,0 +1,693 @@
+length(x)
+mean(x)
+x-362
+(x-362)^2
+sum((x-362)^2)
+sum((x-362)^2)/9
+sqrt(sum((x-362)^2)/9)
+chavez = c(17,17,19,13,8,20,16,19,18,18,12)
+mean(chavez)
+chavez - 16.09
+dev = chavez - 16.09
+dev[11] = .75
+dev^2
+sum(dev^2)
+25+29.5
+54.5/66
+chavez-16.09
+(chavez-16.09)^2
+sum((chavez-16.09)^2)
+24+27
+scores = c(51, 52.5, 54.5)
+scores/66
+3.5-6
+-2.5/2.24
+exercise = c(5,12,8,12,9)
+happy = c(1,4,3,4,3)
+mean(exercise)
+sd(exercise)
+mean(happy)
+sd(happy)
+plot(exercise, happy)
+happy = c(1,3,4,7,7,8)
+exercise = c(6,21,10,10,19,30)
+cor(happy,exercise)
+scale(exerise)
+scale(exercise)
+scale(exercise)*scale(happy)
+x = scale(exercise)*scale(happy)
+x
+x[[1]]
+dim(x)
+mean(x)
+s1 = 1200
+s2 = 1100
+n1 = 15
+n2 = 15
+((s1^2)*(n1-1))+((s2^2)*(n2-1))
+(((s1^2)*(n1-1))+((s2^2)*(n2-1)))/(n1+n2-2)
+sqrt((((s1^2)*(n1-1))+((s2^2)*(n2-1)))/(n1+n2-2))
+spool = sqrt((((s1^2)*(n1-1))+((s2^2)*(n2-1)))/(n1+n2-2))
+spool^2*(30/(15x15))
+spool^2*(30/(15*15))
+sqrt(spool^2*(30/(15*15)))
+(s1-s2)/spool
+m1 = 3880.60
+m2 = 2900.40
+(m1-m2)/spool
+26.48*(12/36)
+sqrt(8.83)
+8/2.97
+8-(2.97*2.447)
+8+(2.97*2.447)
+8-(2.97*2.228)
+8+(2.97*2.228)
+1200^2
+1200^2+(1100^2)
+(1200^2)+(1100^2)
+((1200^2)+(1100^2))/2
+var = ((1200^2)+(1100^2))/2
+var(30/(15*15))
+var*(30/(15*15))
+sqrt(var*(30/(15*15)))
+3880-2900
+(3880-2900)/420.32
+980/sqrt(1325000)
+122+16+22+2
+13+17+42+12
+29+8+21+1
+3+6+41+25
+162+84+59+75
+m1 = c(15,10,7,18,5,9,12)
+m2 = c(24,23,11,25,14,14,21)
+d = m2-m1
+d
+d^2
+mean(d)
+d-mean(d)
+(d-mean(d))^2
+sum((d-mean(d))^2)
+54/6
+3/sqrt(7)
+mean(m1)
+mean(m2)
+8/1.13
+2.447*1.13
+8-2.77
+sd(m2)
+sd(m1)
+m1-m2
+mean(m1-m2)
+mean(m1)-mean(m2)
+x = c(6,21,10,10,19,30)
+mean(x)
+sd(x)
+(x-mean(x))/8.97
+zx = (x-mean(x))/8.97
+y = c(1,3,4,7,7,8)
+mean(y)
+sd(y)
+zy = (y-mean(y))/2.76
+zy
+zx*zy
+round(zx,2)*round(zy,2)
+mean(round(zx,2)*round(zy,2))
+scale(x)
+round(scale(x),2)
+round(scale(x),2)*round(scale(y),2)
+mean(round(scale(x),2)*round(scale(y),2))
+mean(scale(x)*scale(y))
+cor(x,y)
+(x-mean(x))^2
+sum((x-mean(x))^2)
+sum((x-mean(x))^2)/6
+sqrt(sum((x-mean(x))^2)/6)
+s_x
+s_x=sqrt(sum((x-mean(x))^2)/6)
+s_7=sqrt(sum((y-mean(y))^2)/6)
+s_y=sqrt(sum((y-mean(y))^2)/6)
+zx = (x-mean(x))/s_x
+zy = (y-mean(y))/s_y
+zx*zy
+mean(zx*zy)
+s_x
+sy
+s_y
+z_x
+zx
+round(zx,2)
+round(zx,2)*round(zy,2)
+mean(round(zx,2)*round(zy,2))
+round(zy,2)
+round(round(zx,2)*round(zy,2),2)
+mean(round(round(zx,2)*round(zy,2),2))
+x = c(3,4,1,1)
+ss = x*x
+ss
+ss = sum(x*x)
+ss
+s = ss/3
+s = sqrt(ss/3)
+s
+3/sqrt(3)
+data.frame(x = c(1,1,1,1,2,2,2,2), y = c(8,8,8,6,5,7,9,2))
+t.test(y~x, var.equal=T)
+data =data.frame(x = c(1,1,1,1,2,2,2,2), y = c(8,8,8,6,5,7,9,2))
+t.test(y~x, data=data, var.equal=T)
+mod = t.test(y~x, data=data, var.equal=T)
+str(mod)
+x1 = c(8,8,8,6)
+x2 = c(5,7,9,2)
+sd(x1)
+sd(x2)
+s1 = sd(x1)
+s2 = sd(x2)
+data.frame(x = rep(c(1,2), each = 4), y = c(x1,x2))
+data = data.frame(x = rep(c(1,2), each = 4), y = c(x1,x2))
+library(MVR)
+install.packages("MVR")
+library(lsr)
+lsr::independentSamplesTTest(formula=y~x, data = data)
+lsr::independentSamplesTTest(formula=y~x, data = data, var.equal=TRUE)
+test = lsr::independentSamplesTTest(formula=y~x, data = data, var.equal=TRUE)
+str(test)
+den = s1(3) + s2(3)
+den = s1*3 + s2*3
+num = 6
+den/num
+s = den/num
+s/sqrt(8)
+library(psych)
+describe(bfi, fast = T)
+plot(bfi$N1, bfi$E3)
+plot(bfi$N1, bfi$E3, jitter = T)
+library(lavaan)
+lavaan:::lav_fit_measures
+filepathdata <- "~/Downloads/"
+load(paste0(filepathdata, "fullSample.Rdata"))
+load("/Volumes/NO NAME/fullsample.Rdata")
+suppressPackageStartupMessages(library(zipcode))#
+suppressPackageStartupMessages(library(mgcv))#
+suppressPackageStartupMessages(library(maps))
+gridsize = 1000 # default is 300 # 1000 is the best value (lots of testing)#
+#
+sapaZip <- #
+function (data = data, gridsize = gridsize, DV = DV, database = database, #
+    average = average, regions = ".", size = size, miss = miss, #
+    w = NULL, ncols = NULL, main = "", mapdatabase = mapdatabase) #
+{#
+    zipData <- sapaZipPrep(data)#
+    grid <- sapaGrid(data = zipData, gridsize = gridsize)#
+    smooth <- sapaSmooth(data = grid)#
+    inside <- sapaInside(data = smooth)#
+    sapaImage(data = inside, main = main)#
+    invisible(inside)#
+}#
+#
+sapaZipPrep <-#
+function (data) #
+{#
+    zipData <- subset(data, select = c(zip, ZCTA))#
+    zip <- zipData[, 1]#
+    ZCTA <- zipData[, 2]#
+    ZCTAn <- 1 - is.na(ZCTA)#
+    zipn <- 1 - is.na(zip)#
+    zipframe <- data.frame(zip, ZCTA, ZCTAn, zipn)#
+    valid <- function(x) {#
+        sum(!is.na(x))#
+    }#
+    if (!require(zipcode)) {#
+        stop("The package zipcode must be installed:")#
+    }#
+    data(zipcode)#
+    zips <- zipcode#
+    zips$zip <- as.numeric(zips$zip)#
+    z <- zipframe[, "zip"]#
+    cnames <- colnames(zipframe)#
+    for (i in 1:ncol(zipframe)) {#
+        if (is.factor(zipframe[, i]) || is.logical(zipframe[, #
+            i])) {#
+            zipframe[, i] <- as.numeric(zipframe[, i])#
+        }#
+    }#
+    xvals <- list()#
+    xvals$mean <- t(matrix(unlist(by(zipframe, z, colMeans, na.rm = TRUE)), #
+        nrow = ncol(zipframe)))#
+    xvals$n <- t(matrix(unlist(by(zipframe, z, function(x) sapply(x, #
+        valid))), nrow = ncol(zipframe)))#
+    colnames(xvals$mean) <- colnames(zipframe)#
+    colnames(xvals$n) <- paste(colnames(xvals$mean), ".n", sep = "")#
+    rownames(xvals$mean) <- rownames(xvals$n) <- xvals$mean[, #
+        "zip"]#
+    sapa.values <- cbind(xvals$mean, xvals$n)#
+    sapa.zip <- merge(sapa.values, zips, by = "zip")#
+    return(sapa.zip)#
+}#
+#
+sapaGrid <- #
+function (data = data, gridsize = 600, DV = "ZCTAn", database = "usa", #
+    average = FALSE, regions = ".") #
+{#
+    map <- map(database = database, plot = FALSE, regions = regions)#
+    if (average) {#
+        aver = mean(data[, DV], na.rm = TRUE)#
+    }#
+    else {#
+        aver = 0#
+    }#
+    data[, DV] <- data[, DV] - aver#
+    mat <- matrix(0, gridsize, gridsize)#
+    count <- matrix(0, gridsize, gridsize)#
+    nsubs <- nrow(data)#
+    rangex <- map$range[2] - map$range[1]#
+    rangey <- map$range[4] - map$range[3]#
+    data["longitude"] <- round((data["longitude"] - map$range[1]) * #
+        gridsize/rangex)#
+    data["latitude"] <- round((data["latitude"] - map$range[3]) * #
+        gridsize/rangey)#
+    clean <- subset(data, (data[, "longitude"] > 0))#
+    clean <- subset(clean, (clean[, "longitude"] < (gridsize + #
+        1)))#
+    clean <- subset(clean, (clean[, "latitude"] < (gridsize + #
+        1)))#
+    clean <- subset(clean, (clean[, "latitude"] > 0))#
+    nsubs <- nrow(clean)#
+    DVn <- paste(DV, ".n", sep = "")#
+    for (observation in (1:nsubs)) {#
+        long <- clean[observation, "longitude"]#
+        lat <- clean[observation, "latitude"]#
+        if (!is.na(clean[observation, DV])) {#
+            mat[long, lat] <- mat[long, lat] + clean[observation, #
+                DV] * clean[observation, DVn]#
+            count[long, lat] <- count[long, lat] + clean[observation, #
+                DVn]#
+        }#
+    }#
+    av <- mat/count#
+    if (average) {#
+        av[!is.finite(av)] <- 0#
+    }#
+    else {#
+        av[!is.finite(av)] <- aver#
+    }#
+    return(list(average = av, total = mat, count = count))#
+}#
+#
+sapaSmooth <- #
+function (data = data, size = 11, miss = 0.05, w = NULL) #
+{#
+    n <- data$count#
+    n[n == 0] <- miss#
+    tot <- data$tot#
+    nvar <- ncol(tot)#
+    if (is.null(w)) {#
+        w <- matrix(1, size, size)#
+        center <- median(1:size)#
+        for (i in 1:size) {#
+            for (j in 1:size) {#
+                w[i, j] <- (sqrt((i - center)^2 + (j - center)^2))/2#
+                w[i, j] <- dnorm(w[i, j])#
+            }#
+        }#
+    }#
+    pad <- center - 1#
+    padding <- matrix(0, nvar, pad)#
+    tot1 <- cbind(padding, tot, padding)#
+    n1 <- cbind(padding, n, padding)#
+    padding <- matrix(0, pad, ncol(tot1))#
+    tot1 <- rbind(padding, tot1, padding)#
+    n1 <- rbind(padding, n1, padding)#
+    for (i in (pad + 1):(nvar + pad)) {#
+        for (j in (pad + 1):(nvar + pad)) {#
+            tot[(i - pad), (j - pad)] <- sum(tot1[(i - pad):(i + #
+                pad), (j - pad):(j + pad)] * w)/sum(n1[(i - pad):(i + #
+                pad), (j - pad):(j + pad)] * w)#
+        }#
+    }#
+    return(tot)#
+}#
+#
+sapaInside <- #
+function (data, database = "usa", regions = ".") #
+{#
+    if (!require(maps)) {#
+        stop("The package maps must be installed:")#
+    }#
+    if (!require(mgcv)) {#
+        stop("The package mgcv must be installed")#
+    }#
+    nlat = nrow(data)#
+    nlong = ncol(data)#
+    us <- map(database = database, plot = FALSE, regions = regions)#
+    bnd <- data.frame(x = us$x, y = us$y)#
+    sapa <- matrix(0, nlat * nlong, 3)#
+    x <- (rep(1:nlat, each = nlong)/nlong) * (us$range[2] - us$range[1]) + #
+        us$range[1]#
+    y <- (rep(1:nlong, nlat)/nlat) * (us$range[4] - us$range[3]) + #
+        us$range[3]#
+    z <- as.vector(t(data))#
+    is.in <- inSide(bnd, x, y)#
+    x <- x[is.in]#
+    y <- y[is.in]#
+    z <- z[is.in]#
+    n.in <- length(x)#
+    zgrid <- matrix(NA, nlat, nlong)#
+    for (location in 1:n.in) {#
+        lat <- round((y[location] - us$range[3]) * nlat/(us$range[4] - #
+            us$range[3]))#
+        long <- round((x[location] - us$range[1]) * nlong/(us$range[2] - #
+            us$range[1]))#
+        zgrid[long, lat] <- z[location]#
+    }#
+    newgrid <- list(x = (1:nlong) * (us$range[2] - us$range[1])/nlong + #
+        us$range[1], y = (1:nlat) * (us$range[4] - us$range[3])/nlat + #
+        us$range[3], z = zgrid)#
+    return(list(x = x, y = y, z = z, grid = newgrid))#
+}#
+#
+sapaImage <-#
+function (data = data, ncols = NULL, main = main, mapdatabase = "state", #
+    regions = ".") #
+{#
+    if (is.list(data)) #
+        grid <- data$grid#
+    map <- map(database = mapdatabase, plot = FALSE)#
+    rangex <- map$range[2] - map$range[1]#
+    rangey <- map$range[4] - map$range[3]#
+    if (is.null(ncols)) #
+        ncols <- ncol(data$z)#
+    gr <- colorRampPalette(c("white", "white", "blue"))#
+    colramp <- gr(ncols)#
+    image(grid, col = colramp, axes = FALSE, main = main)#
+    map <- map(mapdatabase, add = TRUE, regions = regions)#
+}#
+#
+png(file=paste(filepathdata, "USmap.png", sep = ""), width=800, height=580)#
+sapaZip(data = fullSample, gridsize = gridsize, DV = DV, database = database, average = average, regions = ".", size = 8, miss = 0.03, w = NULL, ncols = NULL, main = "", mapdatabase = mapdatabase)#
+dev.off()
+sapaZip(data = fullSample, gridsize = gridsize, DV = DV, database = database, average = average, regions = ".", size = 8, miss = 0.03, w = NULL, ncols = NULL, main = "", mapdatabase = mapdatabase)
+setwd("/Users/sweston2/Dropbox (University of Oregon)/Rapid Response Research (R3)/Data Analysis R3/R code Rapid-R3-Website")#
+library(here)#
+library(stm)#
+library(tidyverse)#
+library(tidytext)#
+library(furrr)#
+load("../../Data Management R3/R Data/scored.Rdata")#
+#
+open_ended = scored %>%#
+  select(CaregiverID, Week, contains("OPEN")) %>%#
+  select(-contains("006")) %>%#
+  gather("question", "response", contains("OPEN")) %>%#
+  mutate(question = str_extract(question, ".$")) %>%#
+  filter(!is.na(response)) %>%#
+  filter(!(response %in% c("", "None","None.","NA","NA.",#
+                           "none","none.","na","na.","Na", "Na.", #
+                           "N/A","N/A.", "N/a","N/a.", "n/a","n/a.",#
+                           "No", "No.", "Nope", "nope","Nope.", "nope.", "no", "no.", "No thank you", "No thank you.",#
+                           "no thank you", "no thank you.","No, thank you", "No, thank you.",#
+                           "no, thank you", "no, thank you.", "Nothing", "ty", "nothing", "not really", "Not really", "Ni", "ni", #
+                           " No", "Not at this time", "No, thx", "Nope !", "NONE", "Nope!", "not at this time", #
+                           "Not at the moment", "No thanks", "no thanks", "Nothing I can think of.", "Nothing I can think of.",#
+                           "^no[.]{0-6}", "^No[.]{0-6}", "Not right now", "not right now", "I do not"))) %>%#
+  group_by(question) %>%#
+  nest()
+open1_tidy = open_ended$data[[1]] %>%#
+  unnest_tokens(output = word, input = response, token = "words") %>%#
+  anti_join(get_stopwords()) %>%#
+  filter(!str_detect(word, "[0-9]+")) #
+#
+processed1 <- textProcessor(open_ended$data[[1]]$response, metadata = open_ended$data[[1]])#
+out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)#
+docs1 <- out1$documents#
+vocab1 <- out1$vocab#
+meta1 <- out1$meta#
+#
+heldout1 = make.heldout(docs1, vocab1)#
+#
+set.seed(07312020)#
+plan(multiprocess)#
+#
+many_models1 <- tibble(K = c(2:30)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
+                                          verbose = FALSE)))#
+save(many_models1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))#
+#
+rm(many_models1)#
+#
+open2_tidy = open_ended$data[[2]] %>%#
+  unnest_tokens(output = word, input = response, token = "words") %>%#
+  anti_join(get_stopwords()) %>%#
+  filter(!str_detect(word, "[0-9]+")) #
+#
+processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])#
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
+docs2 <- out2$documents#
+vocab2 <- out2$vocab#
+meta2 <- out2$meta#
+#
+heldout2 = make.heldout(docs2, vocab2)#
+#
+set.seed(07322020)#
+plan(multiprocess)#
+#
+many_models2 <- tibble(K = c(2:30)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, heldout2$vocab, K = .,#
+                                          verbose = FALSE)))#
+save(many_models2, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))#
+#
+rm(many_models2)#
+#
+open3_tidy = open_ended$data[[3]] %>%#
+  unnest_tokens(output = word, input = response, token = "words") %>%#
+  anti_join(get_stopwords()) %>%#
+  filter(!str_detect(word, "[0-9]+")) #
+#
+processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]])#
+out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta)#
+docs3 <- out3$documents#
+vocab3 <- out3$vocab#
+meta3 <- out3$meta#
+#
+heldout3 = make.heldout(docs3, vocab3)#
+#
+set.seed(07332020)#
+plan(multiprocess)#
+#
+many_models3 <- tibble(K = c(2:30)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout3$documents, heldout3$vocab, K = .,#
+                                          verbose = FALSE)))#
+save(many_models3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))#
+#
+rm(many_models3)#
+#
+open4_tidy = open_ended$data[[4]] %>%#
+  unnest_tokens(output = word, input = response, token = "words") %>%#
+  anti_join(get_stopwords()) %>%#
+  filter(!str_detect(word, "[0-9]+")) #
+#
+processed4 <- textProcessor(open_ended$data[[4]]$response, metadata = open_ended$data[[4]])#
+out4 <- prepDocuments(processed4$documents, processed4$vocab, processed4$meta)#
+docs4 <- out4$documents#
+vocab4 <- out4$vocab#
+meta4 <- out4$meta#
+#
+heldout4 = make.heldout(docs4, vocab4)#
+#
+set.seed(07342020)#
+plan(multiprocess)#
+#
+many_models4 <- tibble(K = c(2:30)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout4$documents, heldout4$vocab, K = .,#
+                                          verbose = FALSE)))#
+save(many_models4, file = here("../../Data Management R3/R Data/open4_many_models.Rdata"))#
+#
+rm(many_models4)#
+#
+open5_tidy = open_ended$data[[5]] %>%#
+  unnest_tokens(output = word, input = response, token = "words") %>%#
+  anti_join(get_stopwords()) %>%#
+  filter(!str_detect(word, "[0-9]+")) #
+#
+processed5 <- textProcessor(open_ended$data[[5]]$response, metadata = open_ended$data[[5]])#
+out5 <- prepDocuments(processed5$documents, processed5$vocab, processed5$meta)#
+docs5 <- out5$documents#
+vocab5 <- out5$vocab#
+meta5 <- out5$meta#
+#
+heldout5 = make.heldout(docs5, vocab5)#
+#
+set.seed(07352020)#
+plan(multiprocess)#
+#
+many_models5 <- tibble(K = c(2:30)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout5$documents, heldout5$vocab, K = .,#
+                                          verbose = FALSE)))#
+save(many_models5, file = here("../../Data Management R3/R Data/open5_many_models.Rdata"))#
+#
+rm(many_models5)
+load(here("../../Data Management R3/R Data/open1_many_models.Rdata"))
+ls()
+k_result <- many_models1 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity))
+k_result <- many_models1 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents))
+k_result <- many_models1 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
+         residual = map(topic_model, checkResiduals, heldout1$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+k_result %>%#
+  transmute(K,#
+            `Lower bound` = lbound,#
+            Residuals = map_dbl(residual, "dispersion"),#
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
+  gather(Metric, Value, -K) %>%#
+  ggplot(aes(K, Value, color = Metric)) +#
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
+  facet_wrap(~Metric, scales = "free_y") +#
+  labs(x = "K (number of topics)",#
+       y = NULL,#
+       title = "Model diagnostics by number of topics",#
+       subtitle = "These diagnostics indicate that a good number of topics would be around 18")
+k_result %>%#
+  select(K, exclusivity, semantic_coherence) %>%#
+  filter(K %in% c(11,14,18,20)) %>%#
+  unnest() %>%#
+  mutate(K = as.factor(K)) %>%#
+  ggplot(aes(semantic_coherence, exclusivity, color = K)) +#
+  stat_ellipse(expand = 0)+#
+  geom_point(size = 2, alpha = 0.7) +#
+  labs(x = "Semantic coherence",#
+       y = "Exclusivity",#
+       title = "Comparing exclusivity and semantic coherence",#
+       subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
+k_result %>%#
+  select(K, exclusivity, semantic_coherence) %>%#
+  filter(K %in% c(14,18,20)) %>%#
+  unnest() %>%#
+  mutate(K = as.factor(K)) %>%#
+  ggplot(aes(semantic_coherence, exclusivity, color = K)) +#
+  stat_ellipse(expand = 0)+#
+  geom_point(size = 2, alpha = 0.7) +#
+  labs(x = "Semantic coherence",#
+       y = "Exclusivity",#
+       title = "Comparing exclusivity and semantic coherence",#
+       subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
+topics_rapid <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 18, #
+                    prevalence =~ s(Week), #
+                    data = meta, #
+                    init.type = "Spectral")
+topics_rapid <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 18, #
+                    prevalence =~ s(Week), #
+                    data = meta1, #
+                    init.type = "Spectral")
+labelTopics(topics_rapid)
+findThoughts(topics_rapid, texts = docs1, topics = 11, n = 2)
+findThoughts(topics_rapid, texts = out1$documents, topics = 11, n = 2)
+findThoughts(topics_rapid, texts = open_ended$data[[1]]$response, topics = 11, n = 2)
+str(heldout)
+str(heldout1)
+length(open_ended$data[[1]]$response)
+str(processed1)
+findThoughts(topics_rapid, texts = processed1$meta$response, topics = 11, n = 2)
+str(topic_rapid)
+str(topics_rapid)
+dim(processed1$documents)
+str(processed1$documents)
+str(docs1)
+str(processed1$meta)
+length(docs1)
+str(out1)
+findThoughts(topics_rapid, texts = out1$meta$response, topics = 11, n = 2)
+findThoughts(topics_rapid, texts = out1$meta$response, topics = 1, n = 5)
+labelTopics(topics_rapid)
+findThoughts(topics_rapid, texts = out1$meta$response, topics = 2, n = 5)
+plot(topics_rapid, type = "summary")
+plot(topics_rapid, covariate = "Week")
+plot(topics_rapid, covariate = "Week", topics = c(1, 2, 3))
+prep <- estimateEffect(1:18 ~ s(Week), topics_rapid,#
++ meta = out1$meta, uncertainty = "Global")
+prep <- estimateEffect(1:18 ~ s(Week), topics_rapid, meta = out1$meta, uncertainty = "Global")
+plot(prep, "Week", method = "continuous")
+plot(prep, "Week", method = "continuous", topic = 15)
+labelTopics(topics_rapid)
+findThoughts(topics_rapid, #
+             texts = out1$meta$response, #
+             topics = 15, n = 5)
+plot(prep, "Week", method = "continuous", topic = 1)
+plot(prep, "Week", method = "continuous", topic = c(1:5))
+plot(prep, "Week", method = "continuous", topic = 5)
+findThoughts(topics_rapid, #
+             texts = out1$meta$response, #
+             topics = 5, n = 5)
+k_result1 = k_result
+save(many_models1, k_result1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))
+k_result2 <- many_models2 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+ls()
+load(here("../../Data Management R3/R Data/open2_many_models.Rdata"))
+k_result2 <- many_models2 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+save(many_models2, k_result2, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))
+load(here("../../Data Management R3/R Data/open3_many_models.Rdata"))
+k_result3 <- many_models3 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout3$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout3$missing),#
+         residual = map(topic_model, checkResiduals, heldout3$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models3, k_results3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))
+save(many_models3, k_result3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))
+load(here("../../Data Management R3/R Data/open4_many_models.Rdata"))
+load(here("../../Data Management R3/R Data/open5_many_models.Rdata"))
+k_result4 <- many_models4 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout4$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout4$missing),#
+         residual = map(topic_model, checkResiduals, heldout4$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models4, k_result4, file = here("../../Data Management R3/R Data/open4_many_models.Rdata"))#
+#
+k_result5 <- many_models5 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout5$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout5$missing),#
+         residual = map(topic_model, checkResiduals, heldout5$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models5, k_result5, file = here("../../Data Management R3/R Data/open5_many_models.Rdata"))

@@ -215,6 +215,9 @@ zipincome$zip = as.character(zipincome$zip)
 zipincome = filter(zipincome, !is.na(zip))
 
 scored = left_join(scored, zipincome)
+
+rm(list = setdiff(ls(), "scored"))
+
 save(scored, file = paste0(here("../../Data Management R3/R Data/"), "scored.Rdata"))
 } else{
   rm(scored)
