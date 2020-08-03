@@ -1130,6 +1130,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     select(contains("SOCIALSUPP")) 
   newdata = cbind(newdata, ss)
   
+  open_ended = data %>% select(CaregiverID, Week, contains("Open"))
+  newdata = newdata %>% full_join(open_ended)
   
   
   return(newdata)

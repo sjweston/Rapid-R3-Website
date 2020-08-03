@@ -153,12 +153,14 @@ nyt_data = nyt_data %>%
   group_by(fips) %>%
   arrange(date) %>%
   mutate(
-    total_cases = cumsum(cases),
-    total_deaths = cumsum(deaths),
-    new_cases_twoweeks = rollapplyr(cases, FUN = sum, partial = T, width = 14),
-    new_deaths_twoweeks = rollapplyr(deaths, FUN = sum, partial = T, width = 14),
-    growth_cases_oneweek = 100*(rollapplyr(cases, FUN = sum, partial = T, width = 7))/lag(total_cases, 7),
-    growth_deaths_oneweek = 100*(rollapplyr(deaths, FUN = sum, partial = T, width = 7))/lag(total_deaths, 7),
+    new_cases = ifelse(row_number() == 1, 1, cases - lag(cases, default = cases[1])),
+    new_deaths = deaths - lag(deaths, default = deaths[1]),
+    total_cases = cumsum(new_cases),
+    total_deaths = cumsum(new_deaths),
+    new_cases_twoweeks = rollapplyr(new_cases, FUN = sum, partial = T, width = 14),
+    new_deaths_twoweeks = rollapplyr(new_deaths, FUN = sum, partial = T, width = 14),
+    growth_cases_oneweek = 100*(rollapplyr(new_cases, FUN = sum, partial = T, width = 7))/lag(total_cases, 7),
+    growth_deaths_oneweek = 100*(rollapplyr(new_deaths, FUN = sum, partial = T, width = 7))/lag(total_deaths, 7),
     doubling_time_cases = 7*(70/growth_cases_oneweek),
     total_cases_per1000 = (total_cases/population)*1000,
     total_deaths_per1000 = (total_deaths/population)*1000,
@@ -215,6 +217,9 @@ zipincome$zip = as.character(zipincome$zip)
 zipincome = filter(zipincome, !is.na(zip))
 
 scored = left_join(scored, zipincome)
+
+rm(list = setdiff(ls(), "scored"))
+
 save(scored, file = paste0(here("../../Data Management R3/R Data/"), "scored.Rdata"))
 } else{
   rm(scored)
