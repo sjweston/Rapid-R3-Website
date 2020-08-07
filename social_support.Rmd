@@ -517,6 +517,30 @@ scored %>%
   theme_pubclean()
 ```
 
+```{r}
+percent.plot = scored %>%
+  mutate(change.support = case_when(
+    change.support < 0 ~ "Lost",
+    change.support > 0 ~ "Gained",
+    change.support == 0 ~ "Stayed the same"
+  )) %>%
+  filter(!is.na(change.support)) %>%
+  group_by(change.support) %>%
+  summarize(C = n()) %>%
+  mutate(Percent = round(C/sum(C)*100,2)) %>%
+  ggplot(aes(x = change.support, y = Percent, 
+             fill = change.support)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(x = NULL, fill = NULL) +
+  guides(fill = F) +
+  theme_pubr() 
+
+ggplotly(percent.plot)
+  
+```
+
+
 ## By Income
 
 ```{r social-support-51, results = 'asis'}
@@ -650,7 +674,7 @@ support = scored %>%
   mutate(source = factor(source, 
                          labels = c("Partner/Spouse", "Child", "Parent",
                                     "Other relatives", "Friend", "Neighbor",
-                                    "Co-worker", "Religious group", "Spritual figure", 
+                                    "Co-worker", "Religious group", "Spiritual figure", 
                                     "Parent support group", "Health professional"))) %>%
   mutate(support = case_when(
     single == 1 & source == "Partner/Spouse" ~ NA_real_,
@@ -1085,6 +1109,47 @@ plot = support %>%
 
 ggplotly(plot, tooltip = "text")
 ```
+
+```{r}
+gainsLosses = support %>%
+  filter(!is.na(support)) %>%
+  group_by(source, change) %>%
+  summarize(n = n()) %>%
+  group_by(source) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  mutate_at(vars(percent), round, 2) %>%
+  filter(!is.na(change)) %>%
+  filter(change %in% c("Gained support", "Lost support")) %>%
+  mutate(percent = case_when(
+    grepl("Lost", change) ~ -1*percent,
+    TRUE ~ percent
+  )) %>%
+  mutate(loss = case_when(
+    percent < 0 ~ percent, 
+    percent >- 0 ~ 0
+  )) %>%
+  ggplot(aes(x = reorder(source, -loss),
+             y = percent, fill = change)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  scale_y_continuous(breaks = seq(-30,10,10), labels  = abs(seq(-30,10,10))) +
+  labs(x = "", y = "Percent") +
+  theme_pubr()
+
+ggplotly(gainsLosses)
+
+gainsLosses = support %>%
+  filter(!is.na(support)) %>%
+  group_by(source, change) %>%
+  summarize(n = n()) %>%
+  group_by(source) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  mutate_at(vars(percent), round, 2) %>%
+  filter(!is.na(change)) %>%
+  filter(change %in% c("Gained support", "Lost support")) %>%
+  write.csv(file = here("figure data/08072020_changeSocialSupport.csv"))
+```
+
 
 ### Income
 
