@@ -467,6 +467,21 @@ topics_only_wide = gamma_terms_wide %>%
 iclust(topics_only_wide)
 ```
 
+### Topic structure (Black respondants only)
+
+```{r}
+gamma_terms_wide <- td_gamma1 %>%
+  full_join(meta1) %>%
+  mutate(topic = paste0("Topic", topic)) %>%
+  spread(topic, gamma) 
+
+topics_only_wide = gamma_terms_wide %>%
+  filter(black == 1) %>%
+  select(starts_with("Topic"))
+
+iclust(topics_only_wide)
+```
+
 ### Cluster 1
 
 ```{r}
@@ -961,6 +976,21 @@ topics_only_wide = gamma_terms_wide %>%
 iclust(topics_only_wide)
 ```
 
+### Topic structure (Black respondants only)
+
+```{r}
+gamma_terms_wide <- td_gamma2 %>%
+  full_join(meta2) %>%
+  mutate(topic = paste0("Topic", topic)) %>%
+  spread(topic, gamma) 
+
+topics_only_wide = gamma_terms_wide %>%
+  filter(black == 1) %>%
+  select(starts_with("Topic"))
+
+iclust(topics_only_wide)
+```
+
 ### Cluster 1
 
 ```{r}
@@ -1339,6 +1369,21 @@ gamma_terms_wide <- td_gamma3 %>%
   spread(topic, gamma) 
 
 topics_only_wide = gamma_terms_wide %>%
+  select(starts_with("Topic"))
+
+iclust(topics_only_wide)
+```
+
+### Topic structure (Black respondants only)
+
+```{r}
+gamma_terms_wide <- td_gamma3 %>%
+  full_join(meta3) %>%
+  mutate(topic = paste0("Topic", topic)) %>%
+  spread(topic, gamma) 
+
+topics_only_wide = gamma_terms_wide %>%
+  filter(black == 1) %>%
   select(starts_with("Topic"))
 
 iclust(topics_only_wide)
@@ -1771,6 +1816,21 @@ topics_only_wide = gamma_terms_wide %>%
 iclust(topics_only_wide)
 ```
 
+### Topic structure (Black respondants only)
+
+```{r}
+gamma_terms_wide <- td_gamma4 %>%
+  full_join(meta4) %>%
+  mutate(topic = paste0("Topic", topic)) %>%
+  spread(topic, gamma) 
+
+topics_only_wide = gamma_terms_wide %>%
+  filter(black == 1) %>%
+  select(starts_with("Topic"))
+
+iclust(topics_only_wide)
+```
+
 # Question 5
 
 **Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?**
@@ -2186,6 +2246,21 @@ gamma_terms_wide <- td_gamma5 %>%
   spread(topic, gamma) 
 
 topics_only_wide = gamma_terms_wide %>%
+  select(starts_with("Topic"))
+
+iclust(topics_only_wide)
+```
+
+### Topic structure (Black respondants only)
+
+```{r}
+gamma_terms_wide <- td_gamma5 %>%
+  full_join(meta5) %>%
+  mutate(topic = paste0("Topic", topic)) %>%
+  spread(topic, gamma) 
+
+topics_only_wide = gamma_terms_wide %>%
+  filter(black == 1) %>%
   select(starts_with("Topic"))
 
 iclust(topics_only_wide)
