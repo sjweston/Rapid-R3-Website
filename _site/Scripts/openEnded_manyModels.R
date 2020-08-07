@@ -7,7 +7,7 @@ library(furrr)
 load("../../Data Management R3/R Data/scored.Rdata")
 
 open_ended = scored %>%
-  select(CaregiverID, Week, contains("OPEN")) %>%
+  select(CaregiverID, Week, contains("OPEN"), black, poverty150) %>%
   select(-contains("006")) %>%
   gather("question", "response", contains("OPEN")) %>%
   mutate(question = str_extract(question, ".$")) %>%
@@ -40,7 +40,7 @@ heldout1 = make.heldout(docs1, vocab1)
 set.seed(07312020)
 plan(multiprocess)
 
-many_models1 <- tibble(K = c(2:30)) %>%
+many_models1 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%
   mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,
                                           verbose = FALSE)))
 k_result1 <- many_models1 %>%
@@ -53,7 +53,7 @@ k_result1 <- many_models1 %>%
          lbound = bound + lfact,
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
 
-save(many_models1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))
+save(many_models1, k_result1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))
 
 rm(many_models1)
 
@@ -73,7 +73,7 @@ heldout2 = make.heldout(docs2, vocab2)
 set.seed(07322020)
 plan(multiprocess)
 
-many_models2 <- tibble(K = c(2:30)) %>%
+many_models2 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%
   mutate(topic_model = future_map(K, ~stm(heldout2$documents, heldout2$vocab, K = .,
                                           verbose = FALSE)))
 
@@ -107,7 +107,7 @@ heldout3 = make.heldout(docs3, vocab3)
 set.seed(07332020)
 plan(multiprocess)
 
-many_models3 <- tibble(K = c(2:30)) %>%
+many_models3 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%
   mutate(topic_model = future_map(K, ~stm(heldout3$documents, heldout3$vocab, K = .,
                                           verbose = FALSE)))
 
@@ -141,7 +141,7 @@ heldout4 = make.heldout(docs4, vocab4)
 set.seed(07342020)
 plan(multiprocess)
 
-many_models4 <- tibble(K = c(2:30)) %>%
+many_models4 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%
   mutate(topic_model = future_map(K, ~stm(heldout4$documents, heldout4$vocab, K = .,
                                           verbose = FALSE)))
 
@@ -175,7 +175,7 @@ heldout5 = make.heldout(docs5, vocab5)
 set.seed(07352020)
 plan(multiprocess)
 
-many_models5 <- tibble(K = c(2:30)) %>%
+many_models5 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%
   mutate(topic_model = future_map(K, ~stm(heldout5$documents, heldout5$vocab, K = .,
                                           verbose = FALSE)))
 k_result5 <- many_models5 %>%

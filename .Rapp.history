@@ -1,3 +1,40 @@
+var(x)
+x-mean(x)
+sum(x-mean(x))
+x = c(10, 14, 17, 4, 20, 15)
+sum(x-mean(x))
+x = c(10, 14, 17, 4, 20, 16)
+sum(x-mean(x))
+mean(x)
+var(x)
+sum((x-mean(x))^2)
+163.5/5
+x = c(10, 14, 17, 4, 20, 16)
+mean(x)
+y = c(5,8,10,8,3)
+sum(y)
+mnm = c(rep(0,2), rep(1,16), rep(2,18), rep(3,18), rep(4,19), rep(5,8), rep(6,3), rep(7,4),rep(8,1))
+length(mnm)
+mnm
+table(mnm)
+mean(mnm)
+mnm-mean(mnm)
+(mnm-mean(mnm))^2
+sum((mnm-mean(mnm))^2)
+sum((mnm-mean(mnm))^2)/length(mnm)
+sqrt(sum((mnm-mean(mnm))^2)/length(mnm))
+x = c(1,1,2,2,2,3,4,5,6,6)
+sum(x)
+sum(x^2)
+32^2
+1024/10
+x = c(5,8,9,12,3,5)
+2/sqrt(6)
+mean(x)
+-1/.8165
+7-(1.96*0.8165)
+7+(1.96*0.8165)
+x = c(400, 410, 370, 410, 380, 420, 410, 390, 390, 430)
 length(x)
 mean(x)
 x-362
@@ -395,7 +432,7 @@ library(furrr)#
 load("../../Data Management R3/R Data/scored.Rdata")#
 #
 open_ended = scored %>%#
-  select(CaregiverID, Week, contains("OPEN")) %>%#
+  select(CaregiverID, Week, contains("OPEN"), black, poverty150) %>%#
   select(-contains("006")) %>%#
   gather("question", "response", contains("OPEN")) %>%#
   mutate(question = str_extract(question, ".$")) %>%#
@@ -410,7 +447,8 @@ open_ended = scored %>%#
                            "Not at the moment", "No thanks", "no thanks", "Nothing I can think of.", "Nothing I can think of.",#
                            "^no[.]{0-6}", "^No[.]{0-6}", "Not right now", "not right now", "I do not"))) %>%#
   group_by(question) %>%#
-  nest()
+  nest()#
+#
 open1_tidy = open_ended$data[[1]] %>%#
   unnest_tokens(output = word, input = response, token = "words") %>%#
   anti_join(get_stopwords()) %>%#
@@ -422,272 +460,44 @@ docs1 <- out1$documents#
 vocab1 <- out1$vocab#
 meta1 <- out1$meta#
 #
-heldout1 = make.heldout(docs1, vocab1)#
+heldout1 = make.heldout(docs1, vocab1)
+load(here("../../Data Management R3/R Data/open1_fit.Rdata"))
+library(psych)
+td_gamma1 <- tidy(topics_rapid1, matrix = "gamma")
+gamma_terms_wide <- td_gamma1 %>%#
+  full_join(meta1) %>%#
+  mutate(topic = paste0("Topic", topic)) %>%#
+  spread(topic, gamma) #
 #
-set.seed(07312020)#
-plan(multiprocess)#
+topics_only_wide = gamma_terms_wide %>%#
+  select(starts_with("Topic"))
+meta1 = meta1 %>%#
+  mutate(document = row_number())
+gamma_terms_wide <- td_gamma1 %>%#
+  full_join(meta1) %>%#
+  mutate(topic = paste0("Topic", topic)) %>%#
+  spread(topic, gamma) #
 #
-many_models1 <- tibble(K = c(2:30)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
-                                          verbose = FALSE)))#
-save(many_models1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))#
-#
-rm(many_models1)#
-#
-open2_tidy = open_ended$data[[2]] %>%#
-  unnest_tokens(output = word, input = response, token = "words") %>%#
-  anti_join(get_stopwords()) %>%#
-  filter(!str_detect(word, "[0-9]+")) #
-#
-processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])#
-out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
-docs2 <- out2$documents#
-vocab2 <- out2$vocab#
-meta2 <- out2$meta#
-#
-heldout2 = make.heldout(docs2, vocab2)#
-#
-set.seed(07322020)#
-plan(multiprocess)#
-#
-many_models2 <- tibble(K = c(2:30)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout2$documents, heldout2$vocab, K = .,#
-                                          verbose = FALSE)))#
-save(many_models2, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))#
-#
-rm(many_models2)#
-#
-open3_tidy = open_ended$data[[3]] %>%#
-  unnest_tokens(output = word, input = response, token = "words") %>%#
-  anti_join(get_stopwords()) %>%#
-  filter(!str_detect(word, "[0-9]+")) #
-#
-processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]])#
-out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta)#
-docs3 <- out3$documents#
-vocab3 <- out3$vocab#
-meta3 <- out3$meta#
-#
-heldout3 = make.heldout(docs3, vocab3)#
-#
-set.seed(07332020)#
-plan(multiprocess)#
-#
-many_models3 <- tibble(K = c(2:30)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout3$documents, heldout3$vocab, K = .,#
-                                          verbose = FALSE)))#
-save(many_models3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))#
-#
-rm(many_models3)#
-#
-open4_tidy = open_ended$data[[4]] %>%#
-  unnest_tokens(output = word, input = response, token = "words") %>%#
-  anti_join(get_stopwords()) %>%#
-  filter(!str_detect(word, "[0-9]+")) #
-#
-processed4 <- textProcessor(open_ended$data[[4]]$response, metadata = open_ended$data[[4]])#
-out4 <- prepDocuments(processed4$documents, processed4$vocab, processed4$meta)#
-docs4 <- out4$documents#
-vocab4 <- out4$vocab#
-meta4 <- out4$meta#
-#
-heldout4 = make.heldout(docs4, vocab4)#
-#
-set.seed(07342020)#
-plan(multiprocess)#
-#
-many_models4 <- tibble(K = c(2:30)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout4$documents, heldout4$vocab, K = .,#
-                                          verbose = FALSE)))#
-save(many_models4, file = here("../../Data Management R3/R Data/open4_many_models.Rdata"))#
-#
-rm(many_models4)#
-#
-open5_tidy = open_ended$data[[5]] %>%#
-  unnest_tokens(output = word, input = response, token = "words") %>%#
-  anti_join(get_stopwords()) %>%#
-  filter(!str_detect(word, "[0-9]+")) #
-#
-processed5 <- textProcessor(open_ended$data[[5]]$response, metadata = open_ended$data[[5]])#
-out5 <- prepDocuments(processed5$documents, processed5$vocab, processed5$meta)#
-docs5 <- out5$documents#
-vocab5 <- out5$vocab#
-meta5 <- out5$meta#
-#
-heldout5 = make.heldout(docs5, vocab5)#
-#
-set.seed(07352020)#
-plan(multiprocess)#
-#
-many_models5 <- tibble(K = c(2:30)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout5$documents, heldout5$vocab, K = .,#
-                                          verbose = FALSE)))#
-save(many_models5, file = here("../../Data Management R3/R Data/open5_many_models.Rdata"))#
-#
-rm(many_models5)
-load(here("../../Data Management R3/R Data/open1_many_models.Rdata"))
-ls()
-k_result <- many_models1 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity))
-k_result <- many_models1 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents))
-k_result <- many_models1 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-k_result %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
-  facet_wrap(~Metric, scales = "free_y") +#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics",#
-       subtitle = "These diagnostics indicate that a good number of topics would be around 18")
-k_result %>%#
-  select(K, exclusivity, semantic_coherence) %>%#
-  filter(K %in% c(11,14,18,20)) %>%#
-  unnest() %>%#
-  mutate(K = as.factor(K)) %>%#
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +#
-  stat_ellipse(expand = 0)+#
-  geom_point(size = 2, alpha = 0.7) +#
-  labs(x = "Semantic coherence",#
-       y = "Exclusivity",#
-       title = "Comparing exclusivity and semantic coherence",#
-       subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
-k_result %>%#
-  select(K, exclusivity, semantic_coherence) %>%#
-  filter(K %in% c(14,18,20)) %>%#
-  unnest() %>%#
-  mutate(K = as.factor(K)) %>%#
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +#
-  stat_ellipse(expand = 0)+#
-  geom_point(size = 2, alpha = 0.7) +#
-  labs(x = "Semantic coherence",#
-       y = "Exclusivity",#
-       title = "Comparing exclusivity and semantic coherence",#
-       subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity")
-topics_rapid <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 18, #
-                    prevalence =~ s(Week), #
-                    data = meta, #
-                    init.type = "Spectral")
-topics_rapid <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 18, #
-                    prevalence =~ s(Week), #
-                    data = meta1, #
-                    init.type = "Spectral")
-labelTopics(topics_rapid)
-findThoughts(topics_rapid, texts = docs1, topics = 11, n = 2)
-findThoughts(topics_rapid, texts = out1$documents, topics = 11, n = 2)
-findThoughts(topics_rapid, texts = open_ended$data[[1]]$response, topics = 11, n = 2)
-str(heldout)
-str(heldout1)
-length(open_ended$data[[1]]$response)
-str(processed1)
-findThoughts(topics_rapid, texts = processed1$meta$response, topics = 11, n = 2)
-str(topic_rapid)
-str(topics_rapid)
-dim(processed1$documents)
-str(processed1$documents)
-str(docs1)
-str(processed1$meta)
-length(docs1)
-str(out1)
-findThoughts(topics_rapid, texts = out1$meta$response, topics = 11, n = 2)
-findThoughts(topics_rapid, texts = out1$meta$response, topics = 1, n = 5)
-labelTopics(topics_rapid)
-findThoughts(topics_rapid, texts = out1$meta$response, topics = 2, n = 5)
-plot(topics_rapid, type = "summary")
-plot(topics_rapid, covariate = "Week")
-plot(topics_rapid, covariate = "Week", topics = c(1, 2, 3))
-prep <- estimateEffect(1:18 ~ s(Week), topics_rapid,#
-+ meta = out1$meta, uncertainty = "Global")
-prep <- estimateEffect(1:18 ~ s(Week), topics_rapid, meta = out1$meta, uncertainty = "Global")
-plot(prep, "Week", method = "continuous")
-plot(prep, "Week", method = "continuous", topic = 15)
-labelTopics(topics_rapid)
-findThoughts(topics_rapid, #
-             texts = out1$meta$response, #
-             topics = 15, n = 5)
-plot(prep, "Week", method = "continuous", topic = 1)
-plot(prep, "Week", method = "continuous", topic = c(1:5))
-plot(prep, "Week", method = "continuous", topic = 5)
-findThoughts(topics_rapid, #
-             texts = out1$meta$response, #
-             topics = 5, n = 5)
-k_result1 = k_result
-save(many_models1, k_result1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))
-k_result2 <- many_models2 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
-         residual = map(topic_model, checkResiduals, heldout2$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-ls()
-load(here("../../Data Management R3/R Data/open2_many_models.Rdata"))
-k_result2 <- many_models2 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
-         residual = map(topic_model, checkResiduals, heldout2$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-save(many_models2, k_result2, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))
-load(here("../../Data Management R3/R Data/open3_many_models.Rdata"))
-k_result3 <- many_models3 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout3$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout3$missing),#
-         residual = map(topic_model, checkResiduals, heldout3$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models3, k_results3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))
-save(many_models3, k_result3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))
-load(here("../../Data Management R3/R Data/open4_many_models.Rdata"))
-load(here("../../Data Management R3/R Data/open5_many_models.Rdata"))
-k_result4 <- many_models4 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout4$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout4$missing),#
-         residual = map(topic_model, checkResiduals, heldout4$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models4, k_result4, file = here("../../Data Management R3/R Data/open4_many_models.Rdata"))#
-#
-k_result5 <- many_models5 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout5$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout5$missing),#
-         residual = map(topic_model, checkResiduals, heldout5$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models5, k_result5, file = here("../../Data Management R3/R Data/open5_many_models.Rdata"))
+topics_only_wide = gamma_terms_wide %>%#
+  select(starts_with("Topic"))
+nfactors(topics_only_wide)
+fa.out = fa(topics_only_wide, nfactors = 19)
+summary(fa.out)
+print(fa.sort(fa.out))
+omega(topics_only_wide, nfactors=19)
+nfactors(topics_only_wide)
+omega(topics_only_wide, nfactors=6)
+omega(topics_only_wide, nfactors=10, plot= F)
+cor1 = cor(topics_only_wide, use = "pairwise") %>%#
+  as.data.frame() %>%#
+  mutate(var1 = row.names(.)) %>%#
+  gather("var2", r, -var1) %>%#
+  filter(!is.na(r)) %>%#
+  filter(abs(r) > .4) %>%#
+  filter(var1 != var2)
+cor1
+cor1 %>% arrange(var1)
+nfactors(topics_only_wide)
+dim(topics_only_wide)
+iclust(topics_only_wide)
+cluster.fit = iclust(topics_only_wide)
