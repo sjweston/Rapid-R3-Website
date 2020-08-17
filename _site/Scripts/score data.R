@@ -18,7 +18,7 @@ if(!scored_in_environ){
 
 data(zipcode)
 #master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 13 MasterFile/MasterFile_groupings.sav"))
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
 
 master = filter(master, CaregiverID != "") 
 master = master %>%
@@ -51,6 +51,27 @@ save(master.data, file = "allvariables.Rdata")
 
 scored = score_report(data = master, master = T)
 
+# poverty threshold --------------------------------------------------------------
+
+census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
+
+scored = scored %>%
+  select(CaregiverID, Week, BaselineWeek, income,
+         household_size, num_children_raw) %>%
+  left_join(census) %>%
+  mutate(poverty150s = ifelse(income < poverty_threshold*1.5,1,0),
+         poverty200s = ifelse(income < poverty_threshold*2,1,0)) %>%
+  select(CaregiverID, Week, BaselineWeek, income, household_size, 
+         num_children_raw, poverty150s, poverty200s) %>%
+  full_join(scored)
+
+if(!(contains_items("FPL\\.", scored))){
+  scored$poverty100 = scored$poverty150s
+  scored$poverty125 = scored$poverty150s
+  scored$poverty150 = scored$poverty150s
+  scored$poverty200 = scored$poverty200s
+}
+
 # repeat ------------------------------------------------
 
 scored = scored %>%
@@ -73,19 +94,6 @@ scored = scored %>%
             na.locf0) %>% # carry these variables down through NA's
   ungroup()
   
-# poverty threshold --------------------------------------------------------------
-
-census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
-
-scored = scored %>%
-  select(CaregiverID, Week, BaselineWeek, income,
-         household_size, num_children_raw) %>%
-  left_join(census) %>%
-  mutate(poverty150s = ifelse(income < poverty_threshold*1.5,1,0),
-         poverty200s = ifelse(income < poverty_threshold*2,1,0)) %>%
-  select(CaregiverID, Week, BaselineWeek, income, household_size, 
-         num_children_raw, poverty150s, poverty200s) %>%
-  full_join(scored)
 
 # baseline week -----------------------------------------------------------
 

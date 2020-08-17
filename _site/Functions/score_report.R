@@ -1120,11 +1120,13 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                    "HI") ~ "West")
   }
   
+  if(contains_items("FPL\\.", data)){
   newdata$poverty = data$FPL.150
   newdata$poverty100 = data$FPL.100
   newdata$poverty125 = data$FPL.125
   newdata$poverty150 = data$FPL.150
   newdata$poverty200 = data$FPL.200
+  }
   
   ss = data %>%
     select(contains("SOCIALSUPP")) 
