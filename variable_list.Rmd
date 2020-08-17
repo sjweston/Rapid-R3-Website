@@ -1,0 +1,23 @@
+---
+title: "All variables"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+library(here)
+library(DT)
+library(stringr)
+load(here("allvariables.Rdata"))
+```
+
+```{r, results = 'asis'}
+master.data$Responses = str_trunc(master.data$Responses, width= 100, side = "right")
+datatable(master.data, 
+          rownames = F)
+```
+

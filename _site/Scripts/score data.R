@@ -31,6 +31,22 @@ master = master %>%
 source(here("Functions/score_report.R"))
 source(here("Scripts/demo groups.R"))
 
+
+# get variable names and levels -------------------------------------------
+
+master.names = names(master)
+master.labels = sjlabelled::get_label(master)
+master.levels = sjlabelled::get_labels(master)
+
+master.levels = lapply(master.levels, paste, collapse = "; ")
+
+master.data = data.frame(Variable = master.names,
+           Item = master.labels,
+           Responses = unlist(master.levels), stringsAsFactors = F)
+
+save(master.data, file = "allvariables.Rdata")
+
+
 # score data --------------------------------------------------------------
 
 scored = score_report(data = master, master = T)
