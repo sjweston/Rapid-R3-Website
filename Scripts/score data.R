@@ -17,8 +17,8 @@ scored_in_environ = length(which(grepl("scored", ls()))) > 0
 if(!scored_in_environ){
 
 data(zipcode)
-#master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 13 MasterFile/MasterFile_groupings.sav"))
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 13 MasterFile/MasterFile_groupings.sav"))
+#master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
 
 master = filter(master, CaregiverID != "") 
 master = master %>%

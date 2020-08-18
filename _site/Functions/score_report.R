@@ -905,6 +905,14 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       grepl("8", data$FSTR.002_cat) ~ 1,
       TRUE ~ NA_real_)
   }
+  if(contains_items("MH\\.", data)){
+    newdata$mh_food = data$MH.001
+    newdata$mh_eviction = data$MH.002
+    newdata$mh_foreclose = data$MH.003
+    newdata$mh_utilities = data$MH.004
+  }
+  
+    
   if(contains_items("CBCL.002.a", data)){
     newdata$fussy_current_some = ifelse(data$CBCL.002.a > 0, 1, 0)
     newdata$fussy_current_lots = ifelse(data$CBCL.002.a > 1, 1, 0)

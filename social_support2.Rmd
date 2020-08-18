@@ -1,0 +1,358 @@
+---
+title: "Social Support II"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r wellbeing-states-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r wellbeing-states-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+library(lme4)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+conflict_prefer("View", "gganimate")
+library(plotly)
+library(emmeans)
+library(gganimate)
+library(stm)
+library(splines)
+```
+
+```{r wellbeing-states-3 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r wellbeing-states-4 }
+source(here("Functions/pomp.R"))
+```
+
+<!-- Prep data -->
+
+
+```{r}
+scored = scored %>%
+  select(CaregiverID, Week, single, contains("diff_pay"), 
+         starts_with("mh"), contains("SOCIALSUPP"))
+
+scored = scored %>%
+  mutate(current.support = rowMeans(select(., contains("SOCIALSUPP.001")), na.rm=T),
+         prior.support = rowMeans(select(., contains("SOCIALSUPP.002")), na.rm=T)) %>%
+  gather("key", "value", contains("SOCIALSUPP.003")) %>%
+  mutate(key = gsub("SOCIALSUPP\\.003\\.", "", key)) %>%
+  separate(key, into = c("source", "time")) %>% 
+  spread(source, value) %>%
+  mutate(answered = ceiling(rowMeans(select(., matches("^.{1}$")), na.rm=T))) %>%
+  mutate_at(vars(matches("^.{1}$")), .funs = function(x) ifelse(is.na(x), 0, 1)) %>%
+  gather("source", "support", matches("^.{1}$")) %>%
+  mutate(source = case_when(
+    source == "a" ~ "Partner/Spouse",
+    source == "b" ~ "Child(ren)",
+    source == "c" ~ "Parent(s)",
+    source == "d" ~ "Other relative(s)",
+    source == "e" ~ "Friend(s)",
+    source == "f" ~ "Neighbor(s)",
+    source == "g" ~ "Co-worker(s)",
+    source == "h" ~ "Religious group",
+    source == "i" ~ "Spiritual figure",
+    source == "j" ~ "Parent group",
+    source == "k" ~ "Health professional",
+    source == "l" ~ "Childcare provider",
+    source == "m" ~ "Babysitter"
+  )) %>%
+  mutate(support = case_when(
+    single == 1 & source == "Partner/Spouse" ~ NA_real_,
+    TRUE ~ support
+  )) %>%
+  rowwise() %>%
+  mutate(material_hardship = sum(c_across(starts_with("diff_pay")), na.rm=T)) %>%
+  ungroup()
+```
+
+# Material hardship
+
+## New questions{.tabset}
+
+### Food
+
+How worried are you about having enough money to pay for food to feed your household for the next month?
+
+```{r}
+
+plot = scored %>%
+  filter(!is.na(mh_food)) %>%
+  group_by(mh_food) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+  mutate(mh_food = factor(mh_food, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
+  ggplot(aes(x = mh_food, y = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(title = "Worried about food", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+### Eviction
+
+If you rent the place where you currently live, how worried are you about being evicted in the next month?
+
+```{r}
+plot = scored %>%
+  filter(!is.na(mh_eviction)) %>%
+  filter(mh_eviction != 6) %>%
+  group_by(mh_eviction) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+  mutate(mh_eviction = factor(mh_eviction, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
+  ggplot(aes(x = mh_eviction, y = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(title = "Worried about being evicted", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+### Foreclosure
+
+If you own the house you currently live in, how worried are you that the mortgage will be foreclosed in the next month?
+
+```{r}
+plot = scored %>%
+  filter(!is.na(mh_foreclose)) %>%
+  filter(mh_foreclose != 6) %>%
+  group_by(mh_foreclose) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+  mutate(mh_foreclose = factor(mh_foreclose, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
+  ggplot(aes(x = mh_foreclose, y = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(title = "Worried about foreclosure", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+### Utilities
+
+How worried are you that your utilities (water, electricity, gas) will turn off in the next month?
+
+```{r}
+plot = scored %>%
+  filter(!is.na(mh_utilities)) %>%
+  group_by(mh_utilities) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+  mutate(mh_utilities = factor(mh_utilities, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
+  ggplot(aes(x = mh_utilities, y = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(title = "Worried about losing utilities", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+### All
+
+```{r}
+plot = scored %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  filter(!is.na(mh_food)) %>%
+  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  group_by(mh_all) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+  ggplot(aes(x = mh_all, y = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+# Social support{.tabset}
+
+_Note that for single caregivers, responses to "partner/spouse" support are removed._
+
+## Source of support
+
+```{r social-support-70}
+plot = scored %>%
+  filter(time == 1) %>%
+  filter(Week %in% c(15,19)) %>%
+  filter(!is.na(support)) %>%
+  mutate(Week = paste("Week", Week)) %>%
+  group_by(source, Week) %>%
+  summarize(n = n(),
+            support = sum(support, na.rm=T)) %>%
+  mutate(percent = 100*support/n) %>%
+  mutate_at(vars(support, percent), round, 2) %>%
+  ggplot(aes(x = reorder(source, percent), y = percent,
+             group=1,
+               text = paste("\nPercent:", percent,
+                            "Count:", n))) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "", y = "Percent", title = "Source of support in the last week") +
+  facet_wrap(~Week)+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Children as support{.tabset}
+
+### Ages
+
+```{r}
+plot = scored %>%
+  filter(time == 1) %>%
+  filter(Week == 19) %>%
+  filter(source == "Child(ren)") %>%
+  filter(support == 1) %>%
+  gather("variable", "response", contains("SOCIALSUPP")) %>%
+  filter(str_detect(variable, "SOCIALSUPP.00[4-9]\\.a")) %>% 
+  group_by(response) %>%
+  summarize(count = n()) %>%
+  filter(!is.na(response)) %>%
+  ggplot(aes(x = as.factor(response), y = count))+
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "", y = "Count", title = "Age of child providing support") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Number per household
+
+```{r}
+plot = scored %>%
+  filter(time == 1) %>%
+  filter(Week == 19) %>%
+  filter(source == "Child(ren)") %>%
+  gather("variable", "response", contains("SOCIALSUPP")) %>%
+  filter(str_detect(variable, "SOCIALSUPP.00[4-9]\\.a")) %>% 
+    filter(!is.na(response)) %>%
+group_by(CaregiverID) %>%
+  summarize(num_child = n()) %>%
+  group_by(num_child) %>%
+  summarize(count = n()) %>%
+  ggplot(aes(x = num_child, y = count))+
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "", y = "Count", title = "Number of children providing support") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+  
+```
+
+### Type of support
+
+```{r}
+plot = scored %>%
+  filter(time == 1) %>%
+  filter(Week == 19) %>%
+  filter(source == "Child(ren)") %>%
+  filter(support == 1) %>%
+  gather("variable", "response", contains("SOCIALSUPP")) %>%
+  mutate(response =ifelse(is.na(response), 0, 1)) %>%
+  filter(str_detect(variable, "SOCIALSUPP.00[4-9]\\.[a,b]")) %>%
+  mutate(support_type = case_when(
+    str_detect(variable, "a$") ~ "Age",
+    str_detect(variable, "_1$") ~ "Emotional",
+    str_detect(variable, "_2$") ~ "OtherChildren",
+    str_detect(variable, "_3$") ~ "Household"
+  ),
+    variable = str_remove(variable, "\\.a$"),
+  variable = str_remove(variable, "\\.b_[1-3]$")) %>%
+  spread(support_type, response) %>%
+  summarize_at(vars(Emotional, OtherChildren, Household), sum, na.rm=T) %>%
+  gather("support_type", count) %>%
+  mutate(support_type = factor(support_type, labels = c("Emotional", "Other household chores", "Watching other children"))) %>%
+  ggplot(aes(x = support_type, y = count)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = "", y = "Count", title = "Number of children providing support") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Type of support by age
+
+```{r}
+plot = scored %>%
+  filter(time == 1) %>%
+  filter(Week == 19) %>%
+  filter(source == "Child(ren)") %>%
+  filter(support == 1) %>%
+  gather("variable", "response", contains("SOCIALSUPP")) %>%
+  mutate(response =ifelse(is.na(response), 0, response)) %>%
+  filter(str_detect(variable, "SOCIALSUPP.00[4-9]\\.[a,b]")) %>%
+  mutate(support_type = case_when(
+    str_detect(variable, "a$") ~ "Age",
+    str_detect(variable, "_1$") ~ "Emotional",
+    str_detect(variable, "_2$") ~ "OtherChildren",
+    str_detect(variable, "_3$") ~ "Household"
+  ),
+    variable = str_remove(variable, "\\.a$"),
+  variable = str_remove(variable, "\\.b_[1-3]$")) %>%
+  spread(support_type, response) %>%
+  group_by(Age) %>%
+  summarize_at(vars(Emotional, OtherChildren, Household), sum, na.rm=T) %>%
+  gather("support_type", count, -Age) %>%
+  mutate(support_type = factor(support_type, labels = c("Emotional", "Other household chores", "Watching other children"))) %>%
+  group_by(Age) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent,1)) %>%
+  ggplot(aes(x = Age, y = count, fill = support_type)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  facet_wrap(~support_type)+
+  labs(x = "", y = "Percent", title = "Number of children providing support") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+# Hardship and social support
+
+```{r}
+plot = scored %>%
+  filter(Week == 19) %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  filter(!is.na(mh_food)) %>%
+  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  filter(support == 1) %>%
+  group_by(source) %>%
+  summarize(mh = mean(mh_all, na.rm=T)) %>%
+  ggplot(aes(x = reorder(source, mh), y = mh)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(x = NULL, y = "Material Hardship", title = "Average material hardship by source of support") +
+  theme_pubr()
+
+ggplotly(plot)
+```
+
