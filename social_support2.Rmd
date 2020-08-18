@@ -41,6 +41,13 @@ source(here("Functions/pomp.R"))
 
 <!-- Prep data -->
 
+```{r}
+dates = master %>%
+  group_by(Week) %>%
+  summarize(start = min(StartDate),
+            end = max(StartDate)) 
+```
+
 
 ```{r}
 scored = scored %>%
@@ -83,6 +90,45 @@ scored = scored %>%
 
 # Material hardship
 
+## Old questions{.tabset}
+
+### Number of hardships
+
+```{r}
+scored %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == 1) %>%
+  ungroup() %>%
+  filter(Week > 0) %>%
+  filter(!is.na(material_hardship)) %>%
+  group_by(Week) %>%
+  summarize(count = n(),
+            hardship = mean(material_hardship)) %>%
+  ggplot(aes(x = Week, y = hardship)) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = 17.5), color = "red")
+```
+
+### At least one hardship
+
+```{r}
+scored %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == 1) %>%
+  ungroup() %>%
+  filter(Week > 0) %>%
+  filter(!is.na(material_hardship)) %>%
+  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
+  group_by(Week) %>%
+  summarize(count = n(),
+            hardship = 100*sum(material_hardship)/count) %>%
+  ggplot(aes(x = Week, y = hardship)) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = 17.5), color = "red") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship")
+```
 ## New questions{.tabset}
 
 ### Food

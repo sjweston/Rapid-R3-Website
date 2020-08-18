@@ -17,8 +17,8 @@ scored_in_environ = length(which(grepl("scored", ls()))) > 0
 if(!scored_in_environ){
 
 data(zipcode)
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 13 MasterFile/MasterFile_groupings.sav"))
-#master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
+#master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Week 13 MasterFile/MasterFile_groupings.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
 master = filter(master, CaregiverID != "") 
 master = master %>%
@@ -34,6 +34,8 @@ source(here("Scripts/demo groups.R"))
 
 # get variable names and levels -------------------------------------------
 
+max.week = max(master$Week)
+
 master.names = names(master)
 master.labels = sjlabelled::get_label(master)
 master.levels = sjlabelled::get_labels(master)
@@ -43,6 +45,17 @@ master.levels = lapply(master.levels, paste, collapse = "; ")
 master.data = data.frame(Variable = master.names,
            Item = master.labels,
            Responses = unlist(master.levels), stringsAsFactors = F)
+
+num_responses = function(x){length(which(!is.na(x)))}
+master.num = master %>%
+  group_by(Week) %>%
+  summarize_all(num_responses) %>%
+  gather("Variable", "num_responses",-Week) %>%
+  mutate(Week = paste0("Week", Week),
+         Week = factor(Week, levels = paste0("Week", c(1:max.week)))) %>%
+  spread(Week, num_responses)
+
+master.data = full_join(master.data, master.num)
 
 save(master.data, file = "allvariables.Rdata")
 
@@ -242,7 +255,9 @@ zipincome = filter(zipincome, !is.na(zip))
 
 scored = left_join(scored, zipincome)
 
-rm(list = setdiff(ls(), "scored"))
+rm(list = setdiff(ls(), c("scored", "master", "combine.cat", 
+                          "find_items", "contains_items", "identify_state",
+                          "select_first")))
 
 save(scored, file = paste0(here("../../Data Management R3/R Data/"), "scored.Rdata"))
 } else{
