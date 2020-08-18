@@ -10,10 +10,46 @@ options(knitr.kable.NA = '')
 
 ```{r}
 library(here)
+library(tidyverse)
 library(DT)
 library(stringr)
 load(here("allvariables.Rdata"))
 ```
+
+```{r, eval = F}
+
+# this code is in the script that scores the dataset -- the code printed here is not evaluated, but just copied over so others can see how I made the table.
+
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+
+# get variable names and levels -------------------------------------------
+
+max.week = max(master$Week)
+
+master.names = names(master)
+master.labels = sjlabelled::get_label(master)
+master.levels = sjlabelled::get_labels(master)
+
+master.levels = lapply(master.levels, paste, collapse = "; ")
+
+master.data = data.frame(Variable = master.names,
+           Item = master.labels,
+           Responses = unlist(master.levels), stringsAsFactors = F)
+
+num_responses = function(x){length(which(!is.na(x)))}
+master.num = master %>%
+  group_by(Week) %>%
+  summarize_all(num_responses) %>%
+  gather("Variable", "num_responses",-Week) %>%
+  mutate(Week = paste0("Week", Week),
+         Week = factor(Week, levels = paste0("Week", c(1:max.week)))) %>%
+  spread(Week, num_responses)
+
+master.data = full_join(master.data, master.num)
+
+save(master.data, file = "allvariables.Rdata")
+```
+
 
 ```{r, results = 'asis'}
 master.data$Responses = str_trunc(master.data$Responses, width= 100, side = "right")

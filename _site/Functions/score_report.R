@@ -600,14 +600,10 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   }
   
   
-  if(contains_items("JOB.001_[1,2,3]_TEXT", data)){
-    income_weeklybased = suppressWarnings(as.numeric(data$JOB.001_1_TEXT)*52)
-    income_monthlybased = suppressWarnings(as.numeric(data$JOB.001_2_TEXT)*12)
-    income_yearlybased = suppressWarnings(as.numeric(data$JOB.001_3_TEXT))
-    income.mat = cbind(income_weeklybased, income_monthlybased, income_yearlybased)
-    inc.missing = apply(income.mat, 1, function(x) length(which(is.na(x))))
-    income = rowSums(income.mat, na.rm=T)
-    income[which(inc.missing == 3)] = NA
+  if(contains_items("incomeM2", data)){
+    data$JOB.001_3_TEXT = as.numeric(data$JOB.001_3_TEXT)
+    data$JOB.001_16 = as.numeric(data$JOB.001_16)
+    income = rowMeans(data[,c("incomeM2Y", "incomeW2Y", "incomeM2Y2", "incomeW2Y2", "JOB.001_3_TEXT", "JOB.001_16")], na.rm=T)
     newdata$income = income
     income = income/1000
     newdata$income.cat = cut(income, breaks =  quantile(income, probs = c(0, .25, .5, .75, 1), na.rm=T))
@@ -1139,6 +1135,71 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   ss = data %>%
     select(contains("SOCIALSUPP")) 
   newdata = cbind(newdata, ss)
+  
+  data = data %>%
+    mutate(
+      food1_pre = case_when(
+        is.na(FI.001.a) ~ NA_real_,
+        FI.001.a %in% c(1,2) ~ 1, 
+        TRUE ~ 0),
+      food2_pre = case_when(
+        is.na(FI.002.a) ~ NA_real_,
+        FI.002.a %in% c(1,2) ~ 1, 
+        TRUE ~ 0),
+      food3_pre = case_when(
+        is.na(FI.003.a) ~ NA_real_,
+        FI.003.a == 1 ~ 1, 
+        TRUE ~ 0),
+      food4_pre = case_when(
+        is.na(FI.004.a) ~ NA_real_,
+        FI.004.a %in% c(1,2) ~ 1, 
+        TRUE ~ 0),
+      food5_pre = case_when(
+        is.na(FI.005.a) ~ NA_real_,
+        FI.005.a  == 1 ~ 1,  
+        TRUE ~ 0),
+      food6_pre = case_when(
+        is.na(FI.006.a) ~ NA_real_,
+        FI.006.a  == 1 ~ 1, 
+        TRUE ~ 0),
+      food1 = case_when(
+        is.na(FI.001.b) ~ NA_real_,
+        FI.001.b %in% c(1,2) ~ 1, 
+        TRUE ~ 0),
+      food2 = case_when(
+        is.na(FI.002.b) ~ NA_real_,
+        FI.002.b %in% c(1,2) ~ 1,
+        TRUE ~ 0),
+      food3 = case_when(
+        is.na(FI.003.b) ~ NA_real_,
+        FI.003.b == 1 ~ 1, 
+        TRUE ~ 0),
+      food4 = case_when(
+        is.na(FI.004.b) ~ NA_real_,
+        FI.004.b %in% c(1,2) ~ 1, 
+        TRUE ~ 0),
+      food5 = case_when(
+        is.na(FI.005.b) ~ NA_real_,
+        FI.005.b == 1 ~ 1, 
+        TRUE ~ 0),
+      food6 = case_when(
+        is.na(FI.006.b) ~ NA_real_,
+        FI.006.b == 1 ~ 1, 
+        TRUE ~ 0)) %>%
+    rowwise() %>%
+    mutate(food_pre = sum(c(food1_pre, food2_pre, food3_pre, food4_pre, food5_pre, food6_pre), na.rm = T),
+           food = sum(c(food1, food2, food3, food4, food5, food6), na.rm = T),
+           missing_pre = mean(c(food1_pre, food2_pre, food3_pre, food4_pre, food5_pre, food6_pre), na.rm = T),
+           missing = mean(c(food1, food2, food3, food4, food5, food6), na.rm = T),
+           food_pre = case_when(
+             is.na(missing_pre) ~ NA_real_,
+             TRUE ~ food_pre),
+           food = case_when(
+             is.na(missing) ~ NA_real_,
+             TRUE ~ food))
+  
+  newdata$food = data$food
+  newdata$food_pre = data$food_pre
   
   open_ended = data %>% select(CaregiverID, Week, contains("Open"))
   newdata = newdata %>% full_join(open_ended)
