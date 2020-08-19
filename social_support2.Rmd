@@ -43,7 +43,7 @@ dates = master %>%
 
 ```{r}
 scored = scored %>%
-  select(CaregiverID, Week, single, poverty150, unemployed, black,
+  select(CaregiverID, Week, single, poverty150, work_status, black,
          contains("diff_pay"), 
          starts_with("mh"), contains("SOCIALSUPP"), contains("food"))
 
@@ -260,25 +260,22 @@ ggplotly(plot, tooltip = "text")
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(unemployed)) %>%
+  filter(!is.na(work_status)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
   filter(Week > 0) %>%
   filter(!is.na(material_hardship)) %>%
   mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
-  group_by(Week, unemployed) %>%
+  group_by(Week, work_status) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
-  mutate(unemployed = factor(unemployed, 
-                             levels = c(0,1), 
-                             labels = c("Employed", "Unemployed"))) %>%
   ggplot(aes(x = Week, 
              y = hardship, 
-             color = unemployed,
+             color = work_status,
              group = 1,
              text = paste0(
-               "Group:", unemployed,
+               "Group:", work_status,
                "\n Week:", Week,
                "\n Count:", count,
                "\n Hardship:", round(hardship,2)
@@ -368,18 +365,14 @@ ggplotly(plot)
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(mh_food) & !is.na(unemployed)) %>%
-  group_by(mh_food, unemployed) %>%
+  filter(!is.na(mh_food) & !is.na(work_status)) %>%
+  group_by(mh_food, work_status) %>%
   summarize(count = n()) %>%
-  group_by(unemployed)  %>%
+  group_by(work_status)  %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(percent = round(percent, 1)) %>%
   mutate(mh_food = factor(mh_food, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
-  mutate(unemployed = factor(unemployed, 
-                             levels = c(0,1), 
-                             labels = c("Employed",
-                                        "Unemployed"))) %>%
-  ggplot(aes(x = mh_food, y = percent, fill = unemployed)) +
+  ggplot(aes(x = mh_food, y = percent, fill = work_status)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Worried about food", y = "Percent", x = NULL) +
@@ -465,18 +458,14 @@ ggplotly(plot)
 ```{r}
 plot = scored %>%
     filter(mh_eviction != 6) %>%
-filter(!is.na(mh_eviction) & !is.na(unemployed)) %>%
-  group_by(mh_eviction, unemployed) %>%
+filter(!is.na(mh_eviction) & !is.na(work_status)) %>%
+  group_by(mh_eviction, work_status) %>%
   summarize(count = n()) %>%
-  group_by(unemployed)  %>%
+  group_by(work_status)  %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(percent = round(percent, 1)) %>%
   mutate(mh_eviction = factor(mh_eviction, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
-  mutate(unemployed = factor(unemployed, 
-                             levels = c(0,1), 
-                             labels = c("Employed",
-                                        "Unemployed"))) %>%
-  ggplot(aes(x = mh_eviction, y = percent, fill = unemployed)) +
+  ggplot(aes(x = mh_eviction, y = percent, fill = work_status)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Worried about eviction", y = "Percent", x = NULL) +
@@ -565,18 +554,14 @@ ggplotly(plot)
 ```{r}
 plot = scored %>%
    filter(mh_foreclose != 6) %>%
-  filter(!is.na(mh_foreclose) & !is.na(unemployed)) %>%
-  group_by(mh_foreclose, unemployed) %>%
+  filter(!is.na(mh_foreclose) & !is.na(work_status)) %>%
+  group_by(mh_foreclose, work_status) %>%
   summarize(count = n()) %>%
-  group_by(unemployed)  %>%
+  group_by(work_status)  %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(percent = round(percent, 1)) %>%
   mutate(mh_foreclose = factor(mh_foreclose, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
-  mutate(unemployed = factor(unemployed, 
-                             levels = c(0,1), 
-                             labels = c("Employed",
-                                        "Unemployed"))) %>%
-  ggplot(aes(x = mh_foreclose, y = percent, fill = unemployed)) +
+  ggplot(aes(x = mh_foreclose, y = percent, fill = work_status)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Worried about foreclose", y = "Percent", x = NULL) +
@@ -658,18 +643,14 @@ ggplotly(plot)
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(mh_food) & !is.na(unemployed)) %>%
-  group_by(mh_food, unemployed) %>%
+  filter(!is.na(mh_food) & !is.na(work_status)) %>%
+  group_by(mh_food, work_status) %>%
   summarize(count = n()) %>%
-  group_by(unemployed)  %>%
+  group_by(work_status)  %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(percent = round(percent, 1)) %>%
   mutate(mh_food = factor(mh_food, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
-  mutate(unemployed = factor(unemployed, 
-                             levels = c(0,1), 
-                             labels = c("Employed",
-                                        "Unemployed"))) %>%
-  ggplot(aes(x = mh_food, y = percent, fill = unemployed)) +
+  ggplot(aes(x = mh_food, y = percent, fill = work_status)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Worried about food", y = "Percent", x = NULL) +
@@ -758,18 +739,14 @@ ggplotly(plot)
 plot = scored %>%
   mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
   mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(unemployed)) %>%
+  filter(!is.na(mh_food) & !is.na(work_status)) %>%
   mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
-  group_by(mh_all, unemployed) %>%
+  group_by(mh_all, work_status) %>%
   summarize(count = n()) %>%
-  group_by(unemployed) %>%
+  group_by(work_status) %>%
   mutate(percent = 100*count/sum(count),
          percent = round(percent, 1)) %>%
-   mutate(unemployed = factor(unemployed, 
-                             levels = c(0,1), 
-                             labels = c("Employed", 
-                                        "Unemployed"))) %>%
-  ggplot(aes(x = mh_all, y = percent, fill = unemployed)) +
+  ggplot(aes(x = mh_all, y = percent, fill = work_status)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
@@ -882,7 +859,7 @@ ggplotly(plot)
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(unemployed)) %>%
+  filter(!is.na(work_status)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
@@ -892,20 +869,19 @@ plot = scored %>%
     food >=2 & food <=4 ~ "Some",
     food > 4 ~ "A lot"
   )) %>%
-  group_by(Week, unemployed, food) %>%
+  group_by(Week, work_status, food) %>%
   summarize(count = n()) %>%
-  group_by(Week, unemployed) %>%
+  group_by(Week, work_status) %>%
   mutate(percent = 100*count/sum(count),
          percent = round(percent,1)) %>%
   filter(food != "No") %>%
-  mutate(unemployed = factor(unemployed, levels = c(0,1), labels = c("Employed", "Unemployed"))) %>%
   ggplot(aes(x = Week, y = percent, 
              color = food)) +
   geom_point() +
   geom_line()+
   labs(title = "Percent of caregivers experiencing ___ food insecurity", 
        x = NULL)+
-  facet_grid(. ~ unemployed, scales = "free")+
+  facet_grid(. ~ work_status, scales = "free")+
   theme_pubclean()
 
 ggplotly(plot)
