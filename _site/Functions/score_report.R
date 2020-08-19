@@ -1064,31 +1064,50 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       )
   }
   
-  if(contains_items("DEMO.007_.{1}$", data)){
-    data = data %>%
-      mutate_at(vars(contains("DEMO.007")), 
-                .funs = function(x) ifelse(x == 99, NA, x))
-    data = combine.cat(x = data, 
-                       cols = find_items("DEMO.007_.{1}$", data), 
-                       id = "CaregiverID",
-                       newvar.name = "DEMO.007_cat")
-    newdata$minority = ifelse(grepl("[^5]", data$DEMO.007_cat), 1, 0)
-    newdata$black = ifelse(grepl("3", data$DEMO.007_cat), 1, 0)
-    newdata$native = ifelse(grepl("1", data$DEMO.007_cat), 1, 0)
-    newdata$asian = ifelse(grepl("2", data$DEMO.007_cat), 1, 0)
-    newdata$hawaii = ifelse(grepl("4", data$DEMO.007_cat), 1, 0)
-    newdata$white = ifelse(grepl("5", data$DEMO.007_cat), 1, 0)
-    newdata$other_race = ifelse(grepl("6", data$DEMO.007_cat), 1, 0)
-    newdata$race_cat = case_when(
-      data$DEMO.007_cat == "1" ~ "American Indian/Alaska Native",
-      data$DEMO.007_cat == "2" ~ "Asian",
-      data$DEMO.007_cat == "3" ~ "Black/African American",
-      data$DEMO.007_cat == "4" ~ "Native Hawaiian/Pacific Islander",
-      data$DEMO.007_cat == "5" ~ "White/Caucasian",
-      data$DEMO.007_cat == "6" ~ "Other race",
-      !is.na(data$DEMO.007_cat) ~ "Multiple races",
-      TRUE ~ NA_character_)
-    }
+  # if(contains_items("DEMO.007_.{1}$", data)){
+  #   data = data %>%
+  #     mutate_at(vars(contains("DEMO.007")), 
+  #               .funs = function(x) ifelse(x == 99, NA, x))
+  #   data = combine.cat(x = data, 
+  #                      cols = find_items("DEMO.007_.{1}$", data), 
+  #                      id = "CaregiverID",
+  #                      newvar.name = "DEMO.007_cat")
+  #   newdata$minority = ifelse(grepl("[^5]", data$DEMO.007_cat), 1, 0)
+  #   newdata$black = ifelse(grepl("3", data$DEMO.007_cat), 1, 0)
+  #   newdata$native = ifelse(grepl("1", data$DEMO.007_cat), 1, 0)
+  #   newdata$asian = ifelse(grepl("2", data$DEMO.007_cat), 1, 0)
+  #   newdata$hawaii = ifelse(grepl("4", data$DEMO.007_cat), 1, 0)
+  #   newdata$white = ifelse(grepl("5", data$DEMO.007_cat), 1, 0)
+  #   newdata$other_race = ifelse(grepl("6", data$DEMO.007_cat), 1, 0)
+  #   newdata$race_cat = case_when(
+  #     data$DEMO.007_cat == "1" ~ "American Indian/Alaska Native",
+  #     data$DEMO.007_cat == "2" ~ "Asian",
+  #     data$DEMO.007_cat == "3" ~ "Black/African American",
+  #     data$DEMO.007_cat == "4" ~ "Native Hawaiian/Pacific Islander",
+  #     data$DEMO.007_cat == "5" ~ "White/Caucasian",
+  #     data$DEMO.007_cat == "6" ~ "Other race",
+  #     !is.na(data$DEMO.007_cat) ~ "Multiple races",
+  #     TRUE ~ NA_character_)
+  #   }
+  
+  newdata$race_cat = case_when(
+          data$RaceGroup == "1" ~ "American Indian/Alaska Native",
+          data$RaceGroup == "2" ~ "Asian",
+          data$RaceGroup == "3" ~ "Black/African American",
+          data$RaceGroup == "4" ~ "Native Hawaiian/Pacific Islander",
+          data$RaceGroup == "5" ~ "White/Caucasian",
+          data$RaceGroup == "6" ~ "Other race",
+          data$RaceGroup == "7" ~ "Multiple races",
+          TRUE ~ NA_character_)
+  newdata = newdata %>%
+    mutate(
+      minority = ifelse(race_cat != "White/Caucasian", 1, 0),
+      black = ifelse(race_cat == "Black/African American", 1, 0),
+      native = ifelse(race_cat == "American Indian/Alaska Native", 1, 0),
+      asian = ifelse(race_cat == "Asian", 1, 0),
+      hawaii = ifelse(race_cat == "Native Hawaiian/Pacific Islander", 1, 0),
+      white = ifelse(race_cat == "White/Caucasian", 1, 0),
+      other_race = ifelse(race_cat %in% c("Other race", "Multiple races"), 1, 0))
   
   if(contains_items("DEMO.008", data)){
     data = data %>%

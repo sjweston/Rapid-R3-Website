@@ -20,14 +20,20 @@ library(tidytext)
 library(furrr)
 library(ggpubr)
 library(psych)
+library(conflicted)
 ```
 
 ```{r}
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
 source(here("Scripts/score data.R")) 
 source(here("Functions/pomp.R"))
+conflict_prefer("map", "purrr")
+
 ```
 
 ```{r prep open-ended responses for tokenizing}
+scored = scored %>% filter(Week < 17)
 open_ended = scored %>%
   select(CaregiverID, Week, contains("OPEN"), black, poverty150) %>%
   select(-contains("006")) %>%
