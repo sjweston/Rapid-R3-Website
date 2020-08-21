@@ -33,7 +33,7 @@ source(here("Functions/pomp.R"))
 
 <!-- Prep data -->
 
-```{r}
+```{r social-support2-1}
 dates = master %>%
   group_by(Week) %>%
   summarize(start = min(StartDate),
@@ -41,11 +41,14 @@ dates = master %>%
 ```
 
 
-```{r}
+```{r social-support2-2}
 scored = scored %>%
-  select(CaregiverID, Week, single, poverty150, work_status, black,
+  select(CaregiverID, Week, single, income,
+         contains("poverty"), work_status, black,
+         white, latinx, disability,
          contains("diff_pay"), 
-         starts_with("mh"), contains("SOCIALSUPP"), contains("food"))
+         starts_with("mh"), contains("SOCIALSUPP"),
+         contains("food"), state)
 
 scored = scored %>%
   mutate(current.support = rowMeans(select(., contains("SOCIALSUPP.001")), na.rm=T),
@@ -88,7 +91,7 @@ scored = scored %>%
 
 ### Number (overall)
 
-```{r}
+```{r social-support2-3}
 scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
@@ -106,7 +109,7 @@ scored %>%
 
 ### Number (Black/African American)
 
-```{r}
+```{r social-support2-4}
 plot = scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
@@ -136,7 +139,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Number (by income)
 
-```{r}
+```{r social-support2-5}
 plot = scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
@@ -166,7 +169,7 @@ ggplotly(plot, tooltip = "text")
 
 ### At least one hardship (overall)
 
-```{r}
+```{r social-support2-6}
 scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
@@ -186,7 +189,7 @@ scored %>%
 
 ### At least one hardship (Black/African American)
 
-```{r}
+```{r social-support2-7}
 plot = scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
@@ -220,9 +223,81 @@ ggplotly(plot, tooltip = "text")
 
 ```
 
+### At least one hardship (LatinX)
+
+```{r social-support2-8}
+plot = scored %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == 1) %>%
+  ungroup() %>%
+  filter(Week > 0) %>%
+  filter(!is.na(material_hardship)) %>%
+  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
+  group_by(Week, latinx) %>%
+  summarize(count = n(),
+            hardship = 100*sum(material_hardship)/count) %>%
+  mutate(latinx = factor(latinx, 
+                             levels = c(0,1), 
+                             labels = c("Not LatinX", "LatinX"))) %>%
+  ggplot(aes(x = Week, 
+             y = hardship, 
+             color = latinx,
+             group = 1,
+             text = paste0(
+               "Group:", latinx,
+               "\n Week:", Week,
+               "\n Count:", count,
+               "\n Hardship:", round(hardship,2)
+             ))) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = 17.5), color = "red") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+
+```
+
+### At least one hardship (White/BIPOC)
+
+```{r social-support2-9}
+plot = scored %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == 1) %>%
+  ungroup() %>%
+  filter(Week > 0) %>%
+  filter(!is.na(material_hardship)) %>%
+  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
+  group_by(Week, white) %>%
+  summarize(count = n(),
+            hardship = 100*sum(material_hardship)/count) %>%
+  mutate(white = factor(white, 
+                             levels = c(0,1), 
+                             labels = c("BIPOC", "White"))) %>%
+  ggplot(aes(x = Week, 
+             y = hardship, 
+             color = white,
+             group = 1,
+             text = paste0(
+               "Group:", white,
+               "\n Week:", Week,
+               "\n Count:", count,
+               "\n Hardship:", round(hardship,2)
+             ))) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = 17.5), color = "red") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+
+```
+
 ### At least one hardship (by income)
 
-```{r}
+```{r social-support2-10}
 plot = scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
@@ -258,7 +333,7 @@ ggplotly(plot, tooltip = "text")
 
 ### At least one hardship (by employment)
 
-```{r}
+```{r social-support2-11}
 plot = scored %>%
   filter(!is.na(work_status)) %>%
   group_by(CaregiverID, Week) %>%
@@ -298,9 +373,11 @@ How worried are you about having enough money to pay for food to feed your house
 
 #### Overall
 
-```{r}
+```{r social-support2-12}
 plot = scored %>%
   filter(!is.na(mh_food)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_food) %>%
   summarize(count = n()) %>%
   mutate(percent = 100*count/sum(count),
@@ -316,9 +393,11 @@ ggplotly(plot)
 
 #### Income
 
-```{r}
+```{r social-support2-13}
 plot = scored %>%
   filter(!is.na(mh_food) & !is.na(poverty150)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_food, poverty150) %>%
   summarize(count = n()) %>%
   group_by(poverty150)  %>%
@@ -339,9 +418,11 @@ ggplotly(plot)
 
 #### Black/African American
 
-```{r}
+```{r social-support2-14}
 plot = scored %>%
   filter(!is.na(mh_food) & !is.na(black)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_food, black) %>%
   summarize(count = n()) %>%
   group_by(black)  %>%
@@ -363,9 +444,11 @@ ggplotly(plot)
 
 #### Employment
 
-```{r}
+```{r social-support2-15}
 plot = scored %>%
   filter(!is.na(mh_food) & !is.na(work_status)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_food, work_status) %>%
   summarize(count = n()) %>%
   group_by(work_status)  %>%
@@ -386,9 +469,11 @@ If you rent the place where you currently live, how worried are you about being 
 
 #### Overall
 
-```{r}
+```{r social-support2-16}
 plot = scored %>%
   filter(!is.na(mh_eviction)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   filter(mh_eviction != 6) %>%
   group_by(mh_eviction) %>%
   summarize(count = n()) %>%
@@ -406,9 +491,11 @@ ggplotly(plot)
 
 #### Income
 
-```{r}
+```{r social-support2-17}
 plot = scored %>%
   filter(!is.na(mh_eviction) & !is.na(poverty150)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
     filter(mh_eviction != 6) %>%
   group_by(mh_eviction, poverty150) %>%
   summarize(count = n()) %>%
@@ -430,9 +517,11 @@ ggplotly(plot)
 
 #### Black/African American
 
-```{r}
+```{r social-support2-18}
 plot = scored %>%
     filter(mh_eviction != 6) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
 filter(!is.na(mh_eviction) & !is.na(black)) %>%
   group_by(mh_eviction, black) %>%
   summarize(count = n()) %>%
@@ -455,9 +544,11 @@ ggplotly(plot)
 
 #### Employment
 
-```{r}
+```{r social-support2-19}
 plot = scored %>%
     filter(mh_eviction != 6) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
 filter(!is.na(mh_eviction) & !is.na(work_status)) %>%
   group_by(mh_eviction, work_status) %>%
   summarize(count = n()) %>%
@@ -479,9 +570,11 @@ If you own the house you currently live in, how worried are you that the mortgag
 
 #### Overall
 
-```{r}
+```{r social-support2-20}
 plot = scored %>%
   filter(!is.na(mh_foreclose)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   filter(mh_foreclose != 6) %>%
   group_by(mh_foreclose) %>%
   summarize(count = n()) %>%
@@ -499,9 +592,11 @@ ggplotly(plot)
 
 #### Income
 
-```{r}
+```{r social-support2-21}
 plot = scored %>%
     filter(mh_foreclose != 6) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   filter(!is.na(mh_foreclose) & !is.na(poverty150)) %>%
   group_by(mh_foreclose, poverty150) %>%
   summarize(count = n()) %>%
@@ -523,9 +618,11 @@ ggplotly(plot)
 
 #### Black/African American
 
-```{r}
+```{r social-support2-22}
 plot = scored %>%
    filter(mh_foreclose != 6) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   filter(!is.na(mh_foreclose) & !is.na(black)) %>%
   group_by(mh_foreclose, black) %>%
   summarize(count = n()) %>%
@@ -551,9 +648,11 @@ ggplotly(plot)
 
 #### Employment
 
-```{r}
+```{r social-support2-23}
 plot = scored %>%
    filter(mh_foreclose != 6) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   filter(!is.na(mh_foreclose) & !is.na(work_status)) %>%
   group_by(mh_foreclose, work_status) %>%
   summarize(count = n()) %>%
@@ -575,9 +674,11 @@ How worried are you that your utilities (water, electricity, gas) will turn off 
 
 #### Overall
 
-```{r}
+```{r social-support2-24}
 plot = scored %>%
   filter(!is.na(mh_utilities)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_utilities) %>%
   summarize(count = n()) %>%
   mutate(percent = 100*count/sum(count),
@@ -594,19 +695,21 @@ ggplotly(plot)
 
 #### Income
 
-```{r}
+```{r social-support2-25}
 plot = scored %>%
-  filter(!is.na(mh_food) & !is.na(poverty150)) %>%
-  group_by(mh_food, poverty150) %>%
+  filter(!is.na(mh_utilities) & !is.na(poverty150)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
+  group_by(mh_utilities, poverty150) %>%
   summarize(count = n()) %>%
   group_by(poverty150)  %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(percent = round(percent, 1)) %>%
-  mutate(mh_food = factor(mh_food, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
+  mutate(mh_utilities = factor(mh_utilities, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
   mutate(poverty150 = factor(poverty150, 
                              levels = c(0,1), 
                              labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(x = mh_food, y = percent, fill = poverty150)) +
+  ggplot(aes(x = mh_utilities, y = percent, fill = poverty150)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Worried about food", y = "Percent", x = NULL) +
@@ -617,23 +720,25 @@ ggplotly(plot)
 
 #### Black/African American
 
-```{r}
+```{r social-support2-26}
 plot = scored %>%
-  filter(!is.na(mh_food) & !is.na(black)) %>%
-  group_by(mh_food, black) %>%
+  filter(!is.na(mh_utilities) & !is.na(black)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
+  group_by(mh_utilities, black) %>%
   summarize(count = n()) %>%
   group_by(black)  %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(percent = round(percent, 1)) %>%
-  mutate(mh_food = factor(mh_food, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
+  mutate(mh_utilities = factor(mh_utilities, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
   mutate(black = factor(black, 
                              levels = c(0,1), 
                              labels = c("Not Black",
                                         "Black"))) %>%
-  ggplot(aes(x = mh_food, y = percent, fill = black)) +
+  ggplot(aes(x = mh_utilities, y = percent, fill = black)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
-  labs(title = "Worried about food", y = "Percent", x = NULL) +
+  labs(title = "Worried about utilities", y = "Percent", x = NULL) +
   theme_pubr()
 ggplotly(plot)
 ```
@@ -641,19 +746,21 @@ ggplotly(plot)
 
 #### Employment
 
-```{r}
+```{r social-support2-27}
 plot = scored %>%
-  filter(!is.na(mh_food) & !is.na(work_status)) %>%
-  group_by(mh_food, work_status) %>%
+  filter(!is.na(mh_utilities) & !is.na(work_status)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
+  group_by(mh_utilities, work_status) %>%
   summarize(count = n()) %>%
   group_by(work_status)  %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(percent = round(percent, 1)) %>%
-  mutate(mh_food = factor(mh_food, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
-  ggplot(aes(x = mh_food, y = percent, fill = work_status)) +
+  mutate(mh_utilities = factor(mh_utilities, labels = c("Not at all","Slightly", "Somewhat","Very","Extremely"))) %>%
+  ggplot(aes(x = mh_utilities, y = percent, fill = work_status)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
-  labs(title = "Worried about food", y = "Percent", x = NULL) +
+  labs(title = "Worried about utilities", y = "Percent", x = NULL) +
   theme_pubr()
 ggplotly(plot)
 ```
@@ -662,12 +769,15 @@ ggplotly(plot)
 
 #### Overall
 
-```{r}
+```{r social-support2-28}
 plot = scored %>%
   mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
   mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
   filter(!is.na(mh_food)) %>%
   mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_all) %>%
   summarize(count = n()) %>%
   mutate(percent = 100*count/sum(count),
@@ -683,12 +793,15 @@ ggplotly(plot)
 #### Income
 
 
-```{r}
+```{r social-support2-29}
 plot = scored %>%
   mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
   mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
   filter(!is.na(mh_food) & !is.na(poverty150)) %>%
   mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_all, poverty150) %>%
   summarize(count = n()) %>%
   group_by(poverty150) %>%
@@ -708,12 +821,15 @@ ggplotly(plot)
 #### Black/African American
 
 
-```{r}
+```{r social-support2-30}
 plot = scored %>%
   mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
   mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
   filter(!is.na(mh_food) & !is.na(black)) %>%
   mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+    filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_all, black) %>%
   summarize(count = n()) %>%
   group_by(black) %>%
@@ -731,16 +847,134 @@ plot = scored %>%
 ggplotly(plot)
 ```
 
+#### LatinX
+
+
+```{r social-support2-31}
+plot = scored %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  filter(!is.na(mh_food) & !is.na(latinx)) %>%
+  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
+  group_by(mh_all, latinx) %>%
+  summarize(count = n()) %>%
+  group_by(latinx) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(latinx = factor(latinx, 
+                             levels = c(0,1), 
+                             labels = c("Not LatinX", 
+                                        "LatinX"))) %>%
+  ggplot(aes(x = mh_all, y = percent, fill = latinx)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+#### White/BIPOC
+
+
+```{r social-support2-32}
+plot = scored %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  filter(!is.na(mh_food) & !is.na(white)) %>%
+  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+    filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
+  group_by(mh_all, white) %>%
+  summarize(count = n()) %>%
+  group_by(white) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(white = factor(white, 
+                             levels = c(0,1), 
+                             labels = c("BIPOC", 
+                                        "White"))) %>%
+  ggplot(aes(x = mh_all, y = percent, fill = white)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+#### Single 
+
+
+```{r social-support2-33}
+plot = scored %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  filter(!is.na(mh_food) & !is.na(single)) %>%
+  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+    filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
+  group_by(mh_all, single) %>%
+  summarize(count = n()) %>%
+  group_by(single) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(single = factor(single, 
+                             levels = c(0,1), 
+                             labels = c("Two-parent", 
+                                        "Single parent"))) %>%
+  ggplot(aes(x = mh_all, y = percent, fill = single)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
+
+#### Disability 
+
+
+```{r social-support2-34}
+plot = scored %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  filter(!is.na(mh_food) & !is.na(disability)) %>%
+  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+    filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
+  group_by(mh_all, disability) %>%
+  summarize(count = n()) %>%
+  group_by(disability) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(disability = factor(disability, 
+                             levels = c(0,1), 
+                             labels = c("No disability", 
+                                        "Child with disability"))) %>%
+  ggplot(aes(x = mh_all, y = percent, fill = disability)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  theme_pubr()
+ggplotly(plot)
+```
 
 #### Unemployed
 
 
-```{r}
+```{r social-support2-35}
 plot = scored %>%
   mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
   mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
   filter(!is.na(mh_food) & !is.na(work_status)) %>%
   mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+    filter(!is.na(mh_all)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(mh_all, work_status) %>%
   summarize(count = n()) %>%
   group_by(work_status) %>%
@@ -758,7 +992,7 @@ ggplotly(plot)
 
 ## All
 
-```{r}
+```{r social-support2-36}
 plot = scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
@@ -791,7 +1025,7 @@ ggplotly(plot)
 
 ## Low Income
 
-```{r}
+```{r social-support2-37}
 plot = scored %>%
   filter(!is.na(poverty150)) %>%
   group_by(CaregiverID, Week) %>%
@@ -824,7 +1058,7 @@ ggplotly(plot)
 
 ## Black/African American
 
-```{r}
+```{r social-support2-38}
 plot = scored %>%
   filter(!is.na(black)) %>%
   group_by(CaregiverID, Week) %>%
@@ -857,7 +1091,7 @@ ggplotly(plot)
 
 ## Unemployed
 
-```{r}
+```{r social-support2-39}
 plot = scored %>%
   filter(!is.na(work_status)) %>%
   group_by(CaregiverID, Week) %>%
@@ -921,7 +1155,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Ages
 
-```{r}
+```{r social-support2-40}
 plot = scored %>%
   filter(time == 1) %>%
   filter(Week == 19) %>%
@@ -943,7 +1177,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Number per household
 
-```{r}
+```{r social-support2-41}
 plot = scored %>%
   filter(time == 1) %>%
   filter(Week == 19) %>%
@@ -967,7 +1201,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Type of support
 
-```{r}
+```{r social-support2-42}
 plot = scored %>%
   filter(time == 1) %>%
   filter(Week == 19) %>%
@@ -999,7 +1233,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Type of support by age
 
-```{r}
+```{r social-support2-43}
 plot = scored %>%
   filter(time == 1) %>%
   filter(Week == 19) %>%
@@ -1038,7 +1272,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Has material hardship (old questions)
 
-```{r}
+```{r social-support2-44}
 plot = scored %>%
   filter(Week == 19) %>%
   filter(!is.na(material_hardship)) %>%
@@ -1062,7 +1296,7 @@ ggplotly(plot)
 
 ## Has material hardship (new questions)
 
-```{r}
+```{r social-support2-45}
 plot = scored %>%
   filter(Week == 19) %>%
   filter(!is.na(support)) %>%
@@ -1090,7 +1324,7 @@ ggplotly(plot)
 
 ## Number of material hardship (new questions)
 
-```{r}
+```{r social-support2-46}
 plot = scored %>%
   filter(Week == 19) %>%
   mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%

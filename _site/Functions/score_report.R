@@ -1219,6 +1219,19 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   newdata$food = data$food
   newdata$food_pre = data$food_pre
+  newdata$food1 = data$food1
+  newdata$food2 = data$food2
+  newdata$food3 = data$food3
+  newdata$food4 = data$food4
+  newdata$food5 = data$food5
+  newdata$food6 = data$food6
+  newdata$food1_pre = data$food1_pre
+  newdata$food2_pre = data$food2_pre
+  newdata$food3_pre = data$food3_pre
+  newdata$food4_pre = data$food4_pre
+  newdata$food5_pre = data$food5_pre
+  newdata$food6_pre = data$food6_pre
+  
   
   open_ended = data %>% select(CaregiverID, Week, contains("Open"))
   newdata = newdata %>% full_join(open_ended)
