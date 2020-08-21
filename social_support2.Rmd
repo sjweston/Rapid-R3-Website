@@ -170,7 +170,7 @@ ggplotly(plot, tooltip = "text")
 ### At least one hardship (overall)
 
 ```{r social-support2-6}
-scored %>%
+plot = scored %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
@@ -180,17 +180,26 @@ scored %>%
   group_by(Week) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
-  ggplot(aes(x = Week, y = hardship)) +
+  ggplot(aes(x = Week, y = hardship, group = 1, 
+             text = paste0(
+               "Week: ", Week, 
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)
+             ))) +
   geom_point() + 
   geom_line() +
   geom_vline(aes(xintercept = 17.5), color = "red") +
-  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship")
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
 ```
 
 ### At least one hardship (Black/African American)
 
 ```{r social-support2-7}
 plot = scored %>%
+  filter(!is.na(black)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
@@ -227,6 +236,7 @@ ggplotly(plot, tooltip = "text")
 
 ```{r social-support2-8}
 plot = scored %>%
+  filter(!is.na(latinx)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
@@ -259,10 +269,11 @@ ggplotly(plot, tooltip = "text")
 
 ```
 
-### At least one hardship (White/BIPOC)
+### At least one hardship (White)
 
 ```{r social-support2-9}
 plot = scored %>%
+  filter(!is.na(white)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
@@ -274,7 +285,7 @@ plot = scored %>%
             hardship = 100*sum(material_hardship)/count) %>%
   mutate(white = factor(white, 
                              levels = c(0,1), 
-                             labels = c("BIPOC", "White"))) %>%
+                             labels = c("Not White", "White"))) %>%
   ggplot(aes(x = Week, 
              y = hardship, 
              color = white,
@@ -299,6 +310,7 @@ ggplotly(plot, tooltip = "text")
 
 ```{r social-support2-10}
 plot = scored %>%
+  filter(!is.na(poverty150)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
   ungroup() %>%
@@ -876,7 +888,7 @@ plot = scored %>%
 ggplotly(plot)
 ```
 
-#### White/BIPOC
+#### White
 
 
 ```{r social-support2-32}
@@ -895,7 +907,7 @@ plot = scored %>%
          percent = round(percent, 1)) %>%
    mutate(white = factor(white, 
                              levels = c(0,1), 
-                             labels = c("BIPOC", 
+                             labels = c("Not White", 
                                         "White"))) %>%
   ggplot(aes(x = mh_all, y = percent, fill = white)) +
   geom_bar(stat = "identity", position = "dodge") +
@@ -987,6 +999,7 @@ plot = scored %>%
   theme_pubr()
 ggplotly(plot)
 ```
+
 
 # Food insecurity{.tabset}
 

@@ -1,0 +1,111 @@
+---
+title: "Material hardship by region"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r wellbeing-states-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r wellbeing-states-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r wellbeing-states-3 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r wellbeing-states-4 }
+source(here("Functions/pomp.R"))
+```
+
+<!-- Prep data -->
+
+```{r social-support2-1}
+dates = master %>%
+  group_by(Week) %>%
+  summarize(start = min(StartDate),
+            end = max(StartDate)) 
+```
+
+
+```{r social-support2-2}
+scored = scored %>%
+  select(CaregiverID, Week, single, income,
+         contains("poverty"), work_status, black,
+         white, latinx, disability,
+         contains("diff_pay"), 
+         starts_with("mh"), contains("SOCIALSUPP"),
+         contains("food"), state) %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  filter(!is.na(mh_food)) %>%
+  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  mutate(census_region = case_when(
+    state %in% c("WA","OR","CA", "AK", "HI") ~ "West - Pacific",
+    state %in% c("NV", "ID", "AZ", "UT", "NM", "CO", "WY", "MT") ~ "West - Mountain",
+    state %in% c("ND", "SD", "NE", "KS", "MN", "IA", "MO") ~ "MidWest - West North Central",
+    state %in% c("WI", "MI", "IL", "IN", "OH") ~ "MidWest - East North Central",
+    state %in% c("TX","OK", "AR", "LA") ~ "South - West South Central",
+    state %in% c("KY", "TN", "MS", "AL") ~ "South - East South Central",
+    state %in% c("DE", "MD", "DC", "WV", "VA", "NC", "SC", "GA", "FL") ~ "South - South Atlantic",
+    state %in% c("NY", "PA","NJ") ~ "Northeast - Middle Atantic",
+    state %in% c("VT", "CT", "RI", "NH", "MA", "ME") ~ "Northeast - New England"
+  ))
+```
+
+```{r}
+mh_state = scored %>%
+  filter(!is.na(census_region)) %>%
+  mutate(mh_all = ifelse(mh_all > 0, 1, 0)) %>%
+  group_by(census_region) %>%
+  summarize(n = n(),
+            mh = sum(mh_all)) %>%
+  filter(n >=30) %>%
+  mutate(percent = 100*mh/n)
+mh_state  = scored %>%
+  select(state, census_region) %>%
+  group_by(state) %>%
+  filter(row_number() == 1) %>%
+  ungroup() %>%
+  full_join(mh_state)
+
+us_map <- usmap::us_map()
+
+plot_state_counts = mh_state %>%
+  usmap::plot_usmap(data = ., values = "percent") +
+  labs(fill = 'Percent experiencing material hardship') + 
+  scale_fill_gradientn(colours=c("yellow", "orange", "red"),
+                       limits = c(10,100),
+                       na.value="grey90",
+                       guide = guide_colourbar(barwidth = 25, 
+                                               barheight = 0.4,
+                                               #put legend title on top of legend
+                                               
+                                               title.position = "top")) 
+  # map scale
+plot_scale = plot_state_counts + 
+  ggsn::scalebar(data = mh_state, dist = 500, dist_unit = "km",
+           border.size = 0.4, st.size = 4,
+           box.fill = c('black','white'),
+           transform = FALSE, model = "WGS84") + 
+  # put legend at the bottom, adjust legend title and text font sizes
+  theme(legend.position = "bottom",
+        legend.title=element_text(size=12), 
+        legend.text=element_text(size=10))
+
+plot_scale
+```
+

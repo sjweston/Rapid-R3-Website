@@ -102,7 +102,7 @@ scored = scored %>%
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", 
                       "zip", "state", "region",
-                      "single",
+                      "single", "disability",
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   ungroup()
