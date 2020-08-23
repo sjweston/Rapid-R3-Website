@@ -43,6 +43,10 @@ dates = master %>%
 
 ```{r social-support2-2}
 scored = scored %>%
+  filter(Week < 20) %>%
+  group_by(Week) %>%
+  mutate(Week = min(Date, na.rm=T)) %>%
+  ungroup() %>%
   select(CaregiverID, Week, single, income,
          contains("poverty"), work_status, black,
          white, latinx, disability,
@@ -104,7 +108,7 @@ scored %>%
   ggplot(aes(x = Week, y = hardship)) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red")
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red")
 ```
 
 ### Number (Black/African American)
@@ -132,7 +136,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   theme_pubr()
 ggplotly(plot, tooltip = "text")
 ```
@@ -162,7 +166,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   theme_pubr()
 ggplotly(plot, tooltip = "text")
 ```
@@ -188,7 +192,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -224,7 +228,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -261,7 +265,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -298,7 +302,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -335,7 +339,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -369,7 +373,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = 17.5), color = "red") +
+  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -602,6 +606,8 @@ ggplotly(plot)
 ```
 
 
+
+
 #### Income
 
 ```{r social-support2-21}
@@ -679,6 +685,7 @@ plot = scored %>%
   theme_pubr()
 ggplotly(plot)
 ```
+
 
 ### Utilities{.tabset}
 
@@ -779,38 +786,61 @@ ggplotly(plot)
 
 ### All{.tabset}
 
+Note that foreclosure and housing were combined into a single variable.
+
 #### Overall
 
 ```{r social-support2-28}
-plot = scored %>%
+scored = scored %>%
   mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
   mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  mutate(mh_housing = case_when(
+    mh_eviction == 1 ~ 1, 
+    mh_foreclose == 1 ~ 1,
+    mh_eviction == 0 ~ 0,
+    mh_foreclose == 0 ~ 0,
+    !is.na(mh_food) ~ 0,
+    !is.na(mh_utilities) ~ 0,
+    TRUE ~ NA_real_
+  ),
+  mh_food = case_when(
+    !is.na(mh_food) ~ mh_food,
+    !is.na(mh_housing) ~ 0
+  ),
+  mh_utilities = case_when(
+    !is.na(mh_utilities) ~ mh_utilities,
+    !is.na(mh_housing) ~ 0
+  )) %>%
+  select(-mh_eviction, -mh_foreclose) %>%
+  mutate(mh_all = rowMeans(select(., contains("mh_")), na.rm=T)*3) 
+
+plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all) %>%
   summarize(count = n()) %>%
   mutate(percent = 100*count/sum(count),
-         percent = round(percent, 1)) %>%
+         percent = round(percent, 1)) 
+
+plot_data %>%
   ggplot(aes(x = mh_all, y = percent)) +
   geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
   theme_pubr()
 ggplotly(plot)
+
+plot_data %>%
+  select(-count) %>%
+  write.csv(here("figure data/0822_figure1.csv"))
 ```
 
 #### Income
 
 
 ```{r social-support2-29}
-plot = scored %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(poverty150)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
@@ -821,25 +851,27 @@ plot = scored %>%
          percent = round(percent, 1)) %>%
    mutate(poverty150 = factor(poverty150, 
                              levels = c(0,1), 
-                             labels = c("High Income", "Low Income"))) %>%
+                             labels = c("High Income", "Low Income"))) 
+
+plot_data %>%
   ggplot(aes(x = mh_all, y = percent, fill = poverty150)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
   theme_pubr()
 ggplotly(plot)
+
+plot_data %>%
+  select(-count) %>%
+  write.csv(here("figure data/0822_figure2.csv"))
 ```
 
 #### Black/African American
 
 
 ```{r social-support2-30}
-plot = scored %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(black)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
-    filter(!is.na(mh_all)) %>%
+plot_data = scored %>%
+  filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, black) %>%
@@ -850,24 +882,26 @@ plot = scored %>%
    mutate(black = factor(black, 
                              levels = c(0,1), 
                              labels = c("Not Black", 
-                                        "Black"))) %>%
+                                        "Black"))) 
+
+plot_data %>%
   ggplot(aes(x = mh_all, y = percent, fill = black)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
   theme_pubr()
 ggplotly(plot)
+
+plot_data %>%
+  select(-count) %>%
+  write.csv(here("figure data/0822_figure3a.csv"))
 ```
 
 #### LatinX
 
 
 ```{r social-support2-31}
-plot = scored %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(latinx)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
@@ -879,13 +913,19 @@ plot = scored %>%
    mutate(latinx = factor(latinx, 
                              levels = c(0,1), 
                              labels = c("Not LatinX", 
-                                        "LatinX"))) %>%
+                                        "LatinX"))) 
+
+plot_data %>%
   ggplot(aes(x = mh_all, y = percent, fill = latinx)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
   theme_pubr()
 ggplotly(plot)
+
+plot_data %>%
+  select(-count) %>%
+  write.csv(here("figure data/0822_figure3b.csv"))
 ```
 
 #### White
@@ -893,11 +933,7 @@ ggplotly(plot)
 
 ```{r social-support2-32}
 plot = scored %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(white)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
-    filter(!is.na(mh_all)) %>%
+ filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, white) %>%
@@ -921,12 +957,8 @@ ggplotly(plot)
 
 
 ```{r social-support2-33}
-plot = scored %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(single)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
-    filter(!is.na(mh_all)) %>%
+plot_data = scored %>%
+  filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, single) %>%
@@ -937,13 +969,19 @@ plot = scored %>%
    mutate(single = factor(single, 
                              levels = c(0,1), 
                              labels = c("Two-parent", 
-                                        "Single parent"))) %>%
+                                        "Single parent"))) 
+
+plot_data %>%
   ggplot(aes(x = mh_all, y = percent, fill = single)) +
   geom_bar(stat = "identity", position = "dodge") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
   theme_pubr()
 ggplotly(plot)
+
+plot_data %>%
+  select(-count) %>%
+  write.csv(here("figure data/0822_figure3c.csv"))
 ```
 
 #### Disability 
@@ -951,11 +989,7 @@ ggplotly(plot)
 
 ```{r social-support2-34}
 plot = scored %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(disability)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
-    filter(!is.na(mh_all)) %>%
+  filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, disability) %>%
@@ -980,11 +1014,7 @@ ggplotly(plot)
 
 ```{r social-support2-35}
 plot = scored %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food) & !is.na(work_status)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
-    filter(!is.na(mh_all)) %>%
+  filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, work_status) %>%
@@ -1142,10 +1172,9 @@ _Note that for single caregivers, responses to "partner/spouse" support are remo
 
 ```{r social-support-70}
 plot = scored %>%
-  filter(time == 1) %>%
-  filter(Week %in% c(15,19)) %>%
+  #filter(time == 1) %>%
   filter(!is.na(support)) %>%
-  mutate(Week = paste("Week", Week)) %>%
+  #mutate(Week = paste("Week", Week)) %>%
   group_by(source, Week) %>%
   summarize(n = n(),
             support = sum(support, na.rm=T)) %>%
@@ -1171,7 +1200,7 @@ ggplotly(plot, tooltip = "text")
 ```{r social-support2-40}
 plot = scored %>%
   filter(time == 1) %>%
-  filter(Week == 19) %>%
+  filter(Week == "2020-08-11") %>%
   filter(source == "Child(ren)") %>%
   filter(support == 1) %>%
   gather("variable", "response", contains("SOCIALSUPP")) %>%
@@ -1193,7 +1222,7 @@ ggplotly(plot, tooltip = "text")
 ```{r social-support2-41}
 plot = scored %>%
   filter(time == 1) %>%
-  filter(Week == 19) %>%
+  filter(Week == "2020-08-11") %>%
   filter(source == "Child(ren)") %>%
   gather("variable", "response", contains("SOCIALSUPP")) %>%
   filter(str_detect(variable, "SOCIALSUPP.00[4-9]\\.a")) %>% 
@@ -1217,7 +1246,7 @@ ggplotly(plot, tooltip = "text")
 ```{r social-support2-42}
 plot = scored %>%
   filter(time == 1) %>%
-  filter(Week == 19) %>%
+  filter(Week == "2020-08-11") %>%
   filter(source == "Child(ren)") %>%
   filter(support == 1) %>%
   gather("variable", "response", contains("SOCIALSUPP")) %>%
@@ -1249,7 +1278,7 @@ ggplotly(plot, tooltip = "text")
 ```{r social-support2-43}
 plot = scored %>%
   filter(time == 1) %>%
-  filter(Week == 19) %>%
+  filter(Week == "2020-08-11") %>%
   filter(source == "Child(ren)") %>%
   filter(support == 1) %>%
   gather("variable", "response", contains("SOCIALSUPP")) %>%
@@ -1287,7 +1316,7 @@ ggplotly(plot, tooltip = "text")
 
 ```{r social-support2-44}
 plot = scored %>%
-  filter(Week == 19) %>%
+  filter(Week == "2020-08-11") %>%
   filter(!is.na(material_hardship)) %>%
   filter(!is.na(support)) %>%
   mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
@@ -1311,13 +1340,9 @@ ggplotly(plot)
 
 ```{r social-support2-45}
 plot = scored %>%
-  filter(Week == 19) %>%
+  filter(Week == "2020-08-11") %>%
   filter(!is.na(support)) %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T),
-         material_hardship = ifelse(mh_all > 0, "Hardship", "No hardship")) %>%
+  mutate(material_hardship = ifelse(mh_all > 0, "Hardship", "No hardship")) %>%
   group_by(material_hardship, source) %>% 
   summarize(count = sum(support),
             percent = round(100*count/n(),1)) %>%
@@ -1339,11 +1364,7 @@ ggplotly(plot)
 
 ```{r social-support2-46}
 plot = scored %>%
-  filter(Week == 19) %>%
-  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
-  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
-  filter(!is.na(mh_food)) %>%
-  mutate(mh_all = rowSums(select(., contains("mh_")), na.rm=T)) %>%
+  filter(Week == "2020-08-11") %>%
   filter(support == 1) %>%
   group_by(source) %>%
   summarize(mh = mean(mh_all, na.rm=T)) %>%
