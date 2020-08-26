@@ -1,0 +1,112 @@
+---
+title: "Open-ended responses"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    theme: paper
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+library(here)
+library(haven)
+library(tidyverse)
+library(zoo)
+library(DT)
+library(zipcode)
+```
+
+```{r}
+identify_state = function(ZC, zipcode.dataset = zipcode){
+  if(!is.na(ZC)) {
+    loc = which(zipcode.dataset$zip == ZC)
+    state = zipcode.dataset$state[loc]
+    if(length(loc) == 0) state = NA
+  }
+  if(is.na(ZC)) state = NA
+  return(state)
+}
+```
+
+
+```{r}
+
+master = read_sav(
+  here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+```
+
+```{r}
+data(zipcode)
+
+master = master %>%
+  mutate(State = map(DEMO.001, identify_state)) %>%
+  select(CaregiverID, Week, starts_with("OPEN"), DEMO.001, State, RaceGroup, CaregiverAge) %>%
+  arrange(Week) %>%
+  group_by(CaregiverID) %>%
+  mutate_if(is.labelled, as_factor, levels = "labels") %>%
+  mutate_at(vars(DEMO.001, State, RaceGroup, CaregiverAge), na.locf0) %>%
+  ungroup() %>%
+  rename(canuse = OPEN.006,
+         zipcode = DEMO.001) %>%
+  gather("Question", "Response", starts_with("OPEN")) %>%
+  filter(Response != "")
+
+```
+# Q1: What are the biggest challenges and concerns for you and your family right now?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("1", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q2: What is helping you and your family the most right now?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("2", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+
+# Q3: What is on your mind the most when you think about your community re-opening?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("3", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+
+# Q4: What concerns do you have about your place of employment and/or your child’s child care setting re-opening?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("4", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+
+# Q5: Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("5", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+

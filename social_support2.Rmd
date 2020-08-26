@@ -47,7 +47,7 @@ scored = scored %>%
   group_by(Week) %>%
   mutate(Week = min(Date, na.rm=T)) %>%
   ungroup() %>%
-  select(CaregiverID, Week, single, income,
+  select(CaregiverID, Week, Date, single, income,
          contains("poverty"), work_status, black,
          white, latinx, disability,
          contains("diff_pay"), 
@@ -87,6 +87,23 @@ scored = scored %>%
   mutate(material_hardship = sum(c_across(starts_with("diff_pay")), na.rm=T)) %>%
   ungroup()
 ```
+
+# Representativeness disclaimer
+
+```{r spline-final-10 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(row_number() == 1)
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
 
 
 # Material hardship
@@ -842,6 +859,7 @@ plot_data %>%
 ```{r social-support2-29}
 plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
+  filter(!is.na(poverty150)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, poverty150) %>%
@@ -872,6 +890,7 @@ plot_data %>%
 ```{r social-support2-30}
 plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
+  filter(!is.na(black)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, black) %>%
@@ -903,6 +922,7 @@ plot_data %>%
 ```{r social-support2-31}
 plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
+  filter(!is.na(latinx)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, latinx) %>%
@@ -959,6 +979,7 @@ ggplotly(plot)
 ```{r social-support2-33}
 plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
+  filter(!is.na(single)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, single) %>%
