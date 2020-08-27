@@ -838,15 +838,16 @@ plot_data = scored %>%
   group_by(mh_all) %>%
   summarize(count = n()) %>%
   mutate(percent = 100*count/sum(count),
-         percent = round(percent, 1)) 
+         percent = round(percent, 1)) %>%
+  mutate(number = as.factor(mh_all),
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
 
 plot_data %>%
-  ggplot(aes(x = mh_all, y = percent)) +
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
   geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
   theme_pubr()
-ggplotly(plot)
 
 plot_data %>%
   select(-count) %>%
@@ -869,15 +870,17 @@ plot_data = scored %>%
          percent = round(percent, 1)) %>%
    mutate(poverty150 = factor(poverty150, 
                              levels = c(0,1), 
-                             labels = c("High Income", "Low Income"))) 
+                             labels = c("High Income", "Low Income"))) %>%
+  mutate(number = as.factor(mh_all),
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
 
 plot_data %>%
-  ggplot(aes(x = mh_all, y = percent, fill = poverty150)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~poverty150)+
   theme_pubr()
-ggplotly(plot)
 
 plot_data %>%
   select(-count) %>%
@@ -901,15 +904,17 @@ plot_data = scored %>%
    mutate(black = factor(black, 
                              levels = c(0,1), 
                              labels = c("Not Black", 
-                                        "Black"))) 
+                                        "Black"))) %>%
+  mutate(number = as.factor(mh_all),
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
 
 plot_data %>%
-  ggplot(aes(x = mh_all, y = percent, fill = black)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~black)+
   theme_pubr()
-ggplotly(plot)
 
 plot_data %>%
   select(-count) %>%
@@ -933,15 +938,17 @@ plot_data = scored %>%
    mutate(latinx = factor(latinx, 
                              levels = c(0,1), 
                              labels = c("Not LatinX", 
-                                        "LatinX"))) 
+                                        "LatinX"))) %>%
+  mutate(number = as.factor(mh_all),
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
 
 plot_data %>%
-  ggplot(aes(x = mh_all, y = percent, fill = latinx)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~latinx)+
   theme_pubr()
-ggplotly(plot)
 
 plot_data %>%
   select(-count) %>%
@@ -952,7 +959,7 @@ plot_data %>%
 
 
 ```{r social-support2-32}
-plot = scored %>%
+plot_data = scored %>%
  filter(!is.na(mh_all)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
@@ -965,12 +972,16 @@ plot = scored %>%
                              levels = c(0,1), 
                              labels = c("Not White", 
                                         "White"))) %>%
-  ggplot(aes(x = mh_all, y = percent, fill = white)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  mutate(number = as.factor(mh_all),
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data %>%
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~white)+
   theme_pubr()
-ggplotly(plot)
 ```
 
 #### Single 
@@ -990,52 +1001,59 @@ plot_data = scored %>%
    mutate(single = factor(single, 
                              levels = c(0,1), 
                              labels = c("Two-parent", 
-                                        "Single parent"))) 
+                                        "Single parent"))) %>%
+  mutate(number = as.factor(mh_all),
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
 
 plot_data %>%
-  ggplot(aes(x = mh_all, y = percent, fill = single)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~single)+
   theme_pubr()
-ggplotly(plot)
 
 plot_data %>%
   select(-count) %>%
   write.csv(here("figure data/0822_figure3c.csv"))
 ```
 
-#### Disability 
+<!-- #### Disability  -->
 
 
-```{r social-support2-34}
-plot = scored %>%
-  filter(!is.na(mh_all)) %>%
-  group_by(CaregiverID) %>%
-  filter(row_number() == 1) %>%
-  group_by(mh_all, disability) %>%
-  summarize(count = n()) %>%
-  group_by(disability) %>%
-  mutate(percent = 100*count/sum(count),
-         percent = round(percent, 1)) %>%
-   mutate(disability = factor(disability, 
-                             levels = c(0,1), 
-                             labels = c("No disability", 
-                                        "Child with disability"))) %>%
-  ggplot(aes(x = mh_all, y = percent, fill = disability)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  coord_flip()+
-  labs(title = "Material hardship", y = "Percent", x = NULL) +
-  theme_pubr()
-ggplotly(plot)
-```
+<!-- ```{r social-support2-34} -->
+<!-- plot)data = scored %>% -->
+<!--   filter(!is.na(mh_all)) %>% -->
+<!--   group_by(CaregiverID) %>% -->
+<!--   filter(row_number() == 1) %>% -->
+<!--   group_by(mh_all, disability) %>% -->
+<!--   summarize(count = n()) %>% -->
+<!--   group_by(disability) %>% -->
+<!--   mutate(percent = 100*count/sum(count), -->
+<!--          percent = round(percent, 1)) %>% -->
+<!--    mutate(disability = factor(disability,  -->
+<!--                              levels = c(0,1),  -->
+<!--                              labels = c("No disability",  -->
+<!--                                         "Child with disability"))) %>% -->
+<!--   mutate(number = as.factor(mh_all), -->
+<!--          mh_all = ifelse(mh_all == 0, "0", "1+")) -->
+
+<!-- plot_data %>% -->
+<!--   ggplot(aes(x = mh_all, y = percent, fill = number)) + -->
+<!--   geom_bar(stat = "identity") + -->
+<!--   coord_flip()+ -->
+<!--   labs(title = "Material hardship", y = "Percent", x = NULL) + -->
+<!--   facet_wrap(~disablity)+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
 
 #### Unemployed
 
 
 ```{r social-support2-35}
-plot = scored %>%
+plot_data = scored %>%
   filter(!is.na(mh_all)) %>%
+  filter(!is.na(work_status)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(mh_all, work_status) %>%
@@ -1043,12 +1061,16 @@ plot = scored %>%
   group_by(work_status) %>%
   mutate(percent = 100*count/sum(count),
          percent = round(percent, 1)) %>%
-  ggplot(aes(x = mh_all, y = percent, fill = work_status)) +
-  geom_bar(stat = "identity", position = "dodge") +
+  mutate(number = as.factor(mh_all),
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data %>%
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~work_status)+
   theme_pubr()
-ggplotly(plot)
 ```
 
 
