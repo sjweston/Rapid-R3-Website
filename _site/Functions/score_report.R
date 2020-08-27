@@ -65,6 +65,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
 
   }
   
+  newdata$language = data$UserLanguage
   
   
   if(contains_items("POLICY.001_[1-7]$", data)){

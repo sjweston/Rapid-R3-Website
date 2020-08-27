@@ -98,7 +98,7 @@ scored = scored %>%
 
 scored = scored %>%
   group_by(CaregiverID) %>%
-  mutate_at(.vars = c("income", "household_size", "num_children_raw", "gender", 
+  mutate_at(.vars = c("language","income", "household_size", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", 
                       "zip", "state", "region",

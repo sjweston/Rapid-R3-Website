@@ -87,6 +87,7 @@ plot = scored %>%
   group_by(Week) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
+  filter(hardship > 0) %>%
   ggplot(aes(x = Week, y = hardship, group = 1, 
              text = paste0(
                "Week: ", Week, 
@@ -113,6 +114,7 @@ plot = scored %>%
   group_by(Week, black) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
+  filter(count > 50) %>%
   mutate(black = factor(black, 
                              levels = c(0,1), 
                              labels = c("Not Black", "Black"))) %>%
@@ -147,6 +149,7 @@ plot = scored %>%
   group_by(Week, latinx) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
+  filter(count > 50) %>%
   mutate(latinx = factor(latinx, 
                              levels = c(0,1), 
                              labels = c("Not LatinX", "LatinX"))) %>%
@@ -181,6 +184,7 @@ plot = scored %>%
   group_by(Week, white) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
+  filter(count > 50) %>%
   mutate(white = factor(white, 
                              levels = c(0,1), 
                              labels = c("Not White", "White"))) %>%

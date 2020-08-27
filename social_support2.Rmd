@@ -839,12 +839,13 @@ plot_data = scored %>%
   summarize(count = n()) %>%
   mutate(percent = 100*count/sum(count),
          percent = round(percent, 1)) %>%
-  mutate(number = as.factor(mh_all),
+  mutate(number = mh_all,
          mh_all = ifelse(mh_all == 0, "0", "1+"))
 
 plot_data %>%
   ggplot(aes(x = mh_all, y = percent, fill = number)) +
   geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue")+
   coord_flip()+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
   theme_pubr()
@@ -871,15 +872,17 @@ plot_data = scored %>%
    mutate(poverty150 = factor(poverty150, 
                              levels = c(0,1), 
                              labels = c("High Income", "Low Income"))) %>%
-  mutate(number = as.factor(mh_all),
+  mutate(number = mh_all,
          mh_all = ifelse(mh_all == 0, "0", "1+"))
 
 plot_data %>%
-  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  ggplot(aes(x = poverty150, y = percent, fill = number)) +
   geom_bar(stat = "identity") +
   coord_flip()+
+    scale_fill_gradient(low = "lightblue", high = "darkblue")+
+
   labs(title = "Material hardship", y = "Percent", x = NULL) +
-  facet_wrap(~poverty150)+
+  facet_wrap(~mh_all)+
   theme_pubr()
 
 plot_data %>%
