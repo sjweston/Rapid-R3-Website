@@ -78,90 +78,10 @@ These analyses are based on responses collected from `r papaja::printnum(n_care,
 
 # Material hardship
 
-## Old questions{.tabset}
-
-### Number (overall)
-
-```{r social-support2-3}
-plot = scored %>%
-  filter(Week > 0) %>%
-  filter(!is.na(material_hardship)) %>%
-  group_by(Week) %>%
-  summarize(count = n(),
-            hardship = mean(material_hardship)) %>%
-  ggplot(aes(x = Week, y = hardship,
-             group = 1,
-             text = paste0(
-               "\n Week:", Week,
-               "\n Count:", count,
-               "\n Hardship:", round(hardship,2)))) +
-  geom_point() + 
-  geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
-  theme_pubr()
-  
-ggplotly(plot, tooltip = "text")
-```
-
-### Number (Black/African American)
-
-```{r social-support2-4}
-plot = scored %>%
-  filter(Week > 0) %>%
-  filter(!is.na(material_hardship)) %>%
-  group_by(Week, black) %>%
-  summarize(count = n(),
-            hardship = mean(material_hardship)) %>%
-  mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>%
-  ggplot(aes(x = Week, 
-             y = hardship, 
-             color = black,
-             group = 1,
-             text = paste0(
-               "Group:", black,
-               "\n Week:", Week,
-               "\n Count:", count,
-               "\n Hardship:", round(hardship,2)
-             ))) +
-  geom_point() + 
-  geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
-  theme_pubr()
-ggplotly(plot, tooltip = "text")
-```
-
-### Number (by income)
-
-```{r social-support2-5}
-plot = scored %>%
- filter(Week > 0) %>%
-  filter(!is.na(material_hardship)) %>%
-  group_by(Week, poverty150) %>%
-  summarize(count = n(),
-            hardship = mean(material_hardship)) %>%
-  mutate(poverty150 = factor(poverty150, levels = c(0,1), labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(x = Week, 
-             y = hardship, 
-             color = poverty150,
-             group = 1,
-             text = paste0(
-               "Group:", poverty150,
-               "\n Week:", Week,
-               "\n Count:", count,
-               "\n Hardship:", round(hardship,2)
-             ))) +
-  geom_point() + 
-  geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
-  theme_pubr()
-ggplotly(plot, tooltip = "text")
-```
-
-### At least one hardship (overall)
+## Overall
 
 ```{r social-support2-6}
 plot = scored %>%
-  filter(Week > 0) %>%
   filter(!is.na(material_hardship)) %>%
   mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
   group_by(Week) %>%
@@ -175,14 +95,14 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
 ggplotly(plot, tooltip = "text")
 ```
 
-### At least one hardship (Black/African American)
+### Black/African American
 
 ```{r social-support2-7}
 plot = scored %>%
@@ -208,7 +128,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -216,7 +136,7 @@ ggplotly(plot, tooltip = "text")
 
 ```
 
-### At least one hardship (LatinX)
+### LatinX
 
 ```{r social-support2-8}
 plot = scored %>%
@@ -242,7 +162,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -250,7 +170,7 @@ ggplotly(plot, tooltip = "text")
 
 ```
 
-### At least one hardship (White)
+### White
 
 ```{r social-support2-9}
 plot = scored %>%
@@ -276,7 +196,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -284,7 +204,7 @@ ggplotly(plot, tooltip = "text")
 
 ```
 
-### At least one hardship (by income)
+### by income
 
 ```{r social-support2-10}
 plot = scored %>%
@@ -310,7 +230,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
@@ -318,7 +238,7 @@ ggplotly(plot, tooltip = "text")
 
 ```
 
-### At least one hardship (by employment)
+### by employment
 
 ```{r social-support2-11}
 plot = scored %>%
@@ -341,7 +261,7 @@ plot = scored %>%
              ))) +
   geom_point() + 
   geom_line() +
-  geom_vline(aes(xintercept = as.Date("2020-07-31")), color = "red") +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
   labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 
