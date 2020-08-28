@@ -34,10 +34,10 @@ source(here("Functions/pomp.R"))
 <!-- Prep data -->
 
 ```{r social-support2-1}
-dates = master %>%
+dates = scored %>%
   group_by(Week) %>%
-  summarize(start = min(StartDate),
-            end = max(StartDate)) 
+  summarize(start = min(Date),
+            end = max(Date)) 
 ```
 
 

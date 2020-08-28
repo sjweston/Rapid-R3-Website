@@ -29,7 +29,7 @@ source(here("Scripts/score data.R"))
 ```
 
 ```{r}
-master %>%
+scored %>%
   filter(!is.na(SCHOOL.001.a)) %>%
   mutate(SCHOOL.001.a = factor(SCHOOL.001.a, 
                                levels = c(1:7),

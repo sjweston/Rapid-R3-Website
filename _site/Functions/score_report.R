@@ -1407,6 +1407,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
         !is.na(data$SCHOOL003_cat) ~ 0,
         TRUE ~ NA_real_))
   
+  newdata$SCHOOL.001.a = data$SCHOOL.001.a
+  
   
   open_ended = data %>% select(CaregiverID, Week, contains("Open"))
   newdata = newdata %>% full_join(open_ended)

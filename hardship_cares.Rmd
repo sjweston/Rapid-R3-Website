@@ -48,6 +48,8 @@ scored = scored %>%
     (Week %% 2) == 0,
     Week - 1,
     Week)) %>%
+  group_by(Week, CaregiverID) %>%
+  filter(row_number() == 1) %>%
   group_by(Week) %>%
   mutate(Week = min(Date, na.rm=T)) %>%
   ungroup() %>%

@@ -39,6 +39,7 @@ source(here("Functions/pomp.R"))
 ```{r social-support-5, results = 'asis'}
 #score well-being
 scored = scored %>%
+  filter(Week < 18) %>%
   mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
   rowwise() %>%
   mutate(mental_health = mean(c(anxiety, depress, stress, lonely), na.rm=T)) %>%
@@ -671,6 +672,7 @@ support = scored %>%
   filter(!is.nan(answered)) %>%
   mutate_at(vars(matches("^.{1}$")), .funs = function(x) ifelse(is.na(x), 0, 1)) %>%
   gather("source", "support", matches("^.{1}$")) %>%
+  filter(source != "l" & source != "m") %>%
   mutate(source = factor(source, 
                          labels = c("Partner/Spouse", "Child", "Parent",
                                     "Other relatives", "Friend", "Neighbor",
