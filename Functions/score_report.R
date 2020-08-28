@@ -1233,6 +1233,180 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   newdata$food5_pre = data$food5_pre
   newdata$food6_pre = data$food6_pre
   
+  data = combine.cat(x = data, 
+                     cols = find_items("JOB.022_.{1}$", data),
+                     id = "CaregiverID",
+                     newvar.name = "JOB.022_cat")
+  
+  newdata = newdata %>%
+    mutate(
+      concern_cuthours = case_when(
+        grepl("1", data$JOB.022_cat) ~ 1,
+        !is.na(data$JOB.022_cat) ~ 0,
+        TRUE ~ NA_real_),
+      concern_demotion = case_when(
+        grepl("2", data$JOB.022_cat) ~ 1,
+        !is.na(data$JOB.022_cat) ~ 0,
+        TRUE ~ NA_real_),
+      concern_fired = case_when(
+        grepl("3", data$JOB.022_cat) ~ 1,
+        !is.na(data$JOB.022_cat) ~ 0,
+        TRUE ~ NA_real_),
+      concern_pcuthours = case_when(
+        grepl("4", data$JOB.022_cat) ~ 1,
+        !is.na(data$JOB.022_cat) ~ 0,
+        TRUE ~ NA_real_),
+      concern_pdemotion = case_when(
+        grepl("5", data$JOB.022_cat) ~ 1,
+        !is.na(data$JOB.022_cat) ~ 0,
+        TRUE ~ NA_real_),
+      concern_pfired = case_when(
+        grepl("6", data$JOB.022_cat) ~ 1,
+        !is.na(data$JOB.022_cat) ~ 0,
+        TRUE ~ NA_real_),
+      concern_none = case_when(
+        grepl("7", data$JOB.022_cat) ~ 1,
+        !is.na(data$JOB.022_cat) ~ 0,
+        TRUE ~ NA_real_))
+  
+  data = combine.cat(x = data, 
+                     cols = find_items("SCHOOL.001.b_.{1,2}$", data),
+                     id = "CaregiverID",
+                     newvar.name = "SCHOOL001b_cat")
+  
+  newdata = newdata %>%
+    mutate(
+      school_parent = case_when(
+        grepl("1\\,", data$SCHOOL001b_cat) ~ 1,
+        grepl("^1$", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_sibling = case_when(
+        grepl("2", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_grandparent = case_when(
+        grepl("3", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_relative = case_when(
+        grepl("4", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_friend = case_when(
+        grepl("5", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_neighbor = case_when(
+        grepl("6", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_pod = case_when(
+        grepl("7", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_babysitter = case_when(
+        grepl("8", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_other = case_when(
+        grepl("9", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_none = case_when(
+        grepl("10", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      school_na = case_when(
+        grepl("11", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_))
+  
+  data = combine.cat(x = data, 
+                     cols = find_items("SCHOOL.002_.{1}$", data),
+                     id = "CaregiverID",
+                     newvar.name = "SCHOOL002_cat")
+  
+  newdata = newdata %>%
+    mutate(
+      learning_games = case_when(
+        grepl("1", data$SCHOOL002_cat) ~ 1,
+        !is.na(data$SCHOOL002_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learning_inperson = case_when(
+        grepl("2", data$SCHOOL002_cat) ~ 1,
+        !is.na(data$SCHOOL002_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learning_apps = case_when(
+        grepl("3", data$SCHOOL002_cat) ~ 1,
+        !is.na(data$SCHOOL002_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learning_online = case_when(
+        grepl("4", data$SCHOOL002_cat) ~ 1,
+        !is.na(data$SCHOOL002_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learning_other = case_when(
+        grepl("6", data$SCHOOL002_cat) ~ 1,
+        !is.na(data$SCHOOL002_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learning_none = case_when(
+        grepl("7", data$SCHOOL002_cat) ~ 1,
+        !is.na(data$SCHOOL002_cat) ~ 0,
+        TRUE ~ NA_real_))
+  
+  data = combine.cat(x = data, 
+                     cols = find_items("SCHOOL.003_.{1,2}$", data),
+                     id = "CaregiverID",
+                     newvar.name = "SCHOOL003_cat")
+  
+  newdata = newdata %>%
+    mutate(
+      learningp_parent = case_when(
+        grepl("1\\,", data$SCHOOL003_cat) ~ 1,
+        grepl("^1$", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_sibling = case_when(
+        grepl("2", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_grandparent = case_when(
+        grepl("3", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_relative = case_when(
+        grepl("4", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_friend = case_when(
+        grepl("5", data$SCHOOL001b_cat) ~ 1,
+        !is.na(data$SCHOOL001b_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_neighbor = case_when(
+        grepl("6", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_pod = case_when(
+        grepl("7", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_babysitter = case_when(
+        grepl("8", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_other = case_when(
+        grepl("9", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_none = case_when(
+        grepl("10", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_),
+      learningp_na = case_when(
+        grepl("11", data$SCHOOL003_cat) ~ 1,
+        !is.na(data$SCHOOL003_cat) ~ 0,
+        TRUE ~ NA_real_))
+  
   
   open_ended = data %>% select(CaregiverID, Week, contains("Open"))
   newdata = newdata %>% full_join(open_ended)

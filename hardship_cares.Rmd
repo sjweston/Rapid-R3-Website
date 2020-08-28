@@ -6,12 +6,12 @@ output:
     toc_float: TRUE
 ---
 
-```{r wellbeing-states-1, echo = F}
+```{r hardship-cares-1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 ```
 
-```{r wellbeing-states-2 }
+```{r hardship-cares-2 }
 library(conflicted)
 library(here)
 library(ggpubr)
@@ -23,17 +23,17 @@ conflict_prefer("map", "purrr")
 library(plotly)
 ```
 
-```{r wellbeing-states-3 }
+```{r hardship-cares-3 }
 source(here("Scripts/score data.R")) 
 ```
 
-```{r wellbeing-states-4 }
+```{r hardship-cares-4 }
 source(here("Functions/pomp.R"))
 ```
 
 <!-- Prep data -->
 
-```{r social-support2-1}
+```{r hardship-cares-5 }
 dates = master %>%
   group_by(Week) %>%
   summarize(start = min(StartDate),
@@ -41,8 +41,13 @@ dates = master %>%
 ```
 
 
-```{r social-support2-2}
+```{r hardship-cares-6 }
 scored = scored %>%
+  filter(Week > 0) %>%
+  mutate(Week = ifelse(
+    (Week %% 2) == 0,
+    Week - 1,
+    Week)) %>%
   group_by(Week) %>%
   mutate(Week = min(Date, na.rm=T)) %>%
   ungroup() %>%
@@ -61,7 +66,7 @@ scored = scored %>%
 
 # Representativeness disclaimer
 
-```{r spline-final-10 }
+```{r hardship-cares-7 }
 n_care = length(unique(scored$CaregiverID))
 date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
 date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
@@ -80,14 +85,16 @@ These analyses are based on responses collected from `r papaja::printnum(n_care,
 
 ## Overall
 
-```{r social-support2-6}
-plot = scored %>%
+```{r hardship-cares-8 }
+plot_data = scored %>%
   filter(!is.na(material_hardship)) %>%
   mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
   group_by(Week) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
-  filter(hardship > 0) %>%
+  filter(hardship > 0)
+
+plot = plot_data %>%
   ggplot(aes(x = Week, y = hardship, group = 1, 
              text = paste0(
                "Week: ", Week, 
@@ -103,9 +110,9 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-### Black/African American
+## Black/African American
 
-```{r social-support2-7}
+```{r hardship-cares-9 }
 plot = scored %>%
   filter(!is.na(black)) %>%
   filter(Week > 0) %>%
@@ -131,16 +138,16 @@ plot = scored %>%
   geom_point() + 
   geom_line() +
   geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship", color = NULL) +
   theme_pubr()
 
 ggplotly(plot, tooltip = "text")
 
 ```
 
-### LatinX
+## LatinX
 
-```{r social-support2-8}
+```{r hardship-cares-10 }
 plot = scored %>%
   filter(!is.na(latinx)) %>%
   filter(Week > 0) %>%
@@ -166,34 +173,32 @@ plot = scored %>%
   geom_point() + 
   geom_line() +
   geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship", color = NULL) +
   theme_pubr()
 
 ggplotly(plot, tooltip = "text")
 
 ```
+## Single
 
-### White
-
-```{r social-support2-9}
+```{r hardship-cares-11 }
 plot = scored %>%
-  filter(!is.na(white)) %>%
+  filter(!is.na(single)) %>%
   filter(Week > 0) %>%
   filter(!is.na(material_hardship)) %>%
   mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
-  group_by(Week, white) %>%
+  group_by(Week, single) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
-  filter(count > 50) %>%
-  mutate(white = factor(white, 
+  mutate(single = factor(single, 
                              levels = c(0,1), 
-                             labels = c("Not White", "White"))) %>%
+                             labels = c("Dual-parent", "Single parent"))) %>%
   ggplot(aes(x = Week, 
              y = hardship, 
-             color = white,
+             color = single,
              group = 1,
              text = paste0(
-               "Group:", white,
+               "Group:", single,
                "\n Week:", Week,
                "\n Count:", count,
                "\n Hardship:", round(hardship,2)
@@ -201,16 +206,16 @@ plot = scored %>%
   geom_point() + 
   geom_line() +
   geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship", color = NULL) +
   theme_pubr()
 
 ggplotly(plot, tooltip = "text")
 
 ```
 
-### by income
+## Low Income
 
-```{r social-support2-10}
+```{r hardship-cares-12 }
 plot = scored %>%
   filter(!is.na(poverty150)) %>%
   filter(Week > 0) %>%
@@ -235,41 +240,241 @@ plot = scored %>%
   geom_point() + 
   geom_line() +
   geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship", color = NULL) +
   theme_pubr()
 
 ggplotly(plot, tooltip = "text")
 
 ```
 
-### by employment
 
-```{r social-support2-11}
+## All groups
+
+```{r hardship-cares-13}
 plot = scored %>%
-  filter(!is.na(work_status)) %>%
   filter(Week > 0) %>%
   filter(!is.na(material_hardship)) %>%
   mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
-  group_by(Week, work_status) %>%
+  gather("Group", value, black, latinx, single, poverty150) %>%
+  filter(value == 1) %>%
+  group_by(Week, Group) %>%
   summarize(count = n(),
             hardship = 100*sum(material_hardship)/count) %>%
+  mutate(Group = factor(Group, 
+                             levels = c("black", "latinx", "single", "poverty150"), 
+                             labels = c("Black", "LatinX", "Single parents", "Low income"))) %>%
   ggplot(aes(x = Week, 
              y = hardship, 
-             color = work_status,
+             color = Group,
              group = 1,
              text = paste0(
-               "Group:", work_status,
+               "Group:", Group,
                "\n Week:", Week,
                "\n Count:", count,
                "\n Hardship:", round(hardship,2)
              ))) +
+  geom_point(aes(x = Week, y=hardship, color = "Average"), data = plot_data, inherit.aes = F) + 
+  geom_line(aes(x = Week, y=hardship, color = "Average"), data = plot_data, inherit.aes = F) +
   geom_point() + 
   geom_line() +
   geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  labs(x = "Week", y = NULL, title = "Percent of households experiencing at least one material hardship", color = NULL) +
+  scale_color_manual(values = c("black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   theme_pubr()
 
 ggplotly(plot, tooltip = "text")
-
 ```
 
+
+# Number of hardships {.tabset}
+
+Note that foreclosure and housing were combined into a single variable.
+
+## Overall
+
+```{r hardship-cares-14 }
+scored = scored %>%
+  mutate_at(vars(mh_eviction, mh_foreclose), .funs = function(x) ifelse(x == 6, NA, x)) %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > 1, 1, 0)) %>%
+  mutate(mh_housing = case_when(
+    mh_eviction == 1 ~ 1, 
+    mh_foreclose == 1 ~ 1,
+    mh_eviction == 0 ~ 0,
+    mh_foreclose == 0 ~ 0,
+    !is.na(mh_food) ~ 0,
+    !is.na(mh_utilities) ~ 0,
+    TRUE ~ NA_real_
+  ),
+  mh_food = case_when(
+    !is.na(mh_food) ~ mh_food,
+    !is.na(mh_housing) ~ 0
+  ),
+  mh_utilities = case_when(
+    !is.na(mh_utilities) ~ mh_utilities,
+    !is.na(mh_housing) ~ 0
+  )) %>%
+  select(-mh_eviction, -mh_foreclose) %>%
+  mutate(mh_all = rowMeans(select(., contains("mh_")), na.rm=T)*3) %>%
+  filter(!is.na(mh_all))
+
+
+plot_data_avg = scored %>%
+  group_by(mh_all) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+  mutate(number = mh_all,
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data_avg %>%
+  ggplot(aes(x = mh_all, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue")+
+  coord_flip()+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  theme_pubr()
+```
+
+## Black African American
+
+
+```{r hardship-cares-15 }
+plot_data = scored %>%
+  filter(!is.na(black)) %>%
+  group_by(mh_all, black) %>%
+  summarize(count = n()) %>%
+  group_by(black) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(black = factor(black, 
+                             levels = c(0,1), 
+                             labels = c("Not Black", "Black"))) %>%
+  mutate(number = mh_all,
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data %>%
+  ggplot(aes(x = black, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+    scale_fill_gradient(low = "lightblue", high = "darkblue")+
+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~mh_all)+
+  theme_pubr()
+```
+
+
+## LatinX
+
+
+```{r hardship-cares-16 }
+plot_data = scored %>%
+  filter(!is.na(latinx)) %>%
+  group_by(mh_all, latinx) %>%
+  summarize(count = n()) %>%
+  group_by(latinx) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(latinx = factor(latinx, 
+                             levels = c(0,1), 
+                             labels = c("Not LatinX", "LatinX"))) %>%
+  mutate(number = mh_all,
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data %>%
+  ggplot(aes(x = latinx, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+    scale_fill_gradient(low = "lightblue", high = "darkblue")+
+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~mh_all)+
+  theme_pubr()
+```
+
+
+## Single
+
+
+```{r hardship-cares-17 }
+plot_data = scored %>%
+  filter(!is.na(single)) %>%
+  group_by(mh_all, single) %>%
+  summarize(count = n()) %>%
+  group_by(single) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(single = factor(single, 
+                             levels = c(0,1), 
+                             labels = c("Dual Parent", "Single Parent"))) %>%
+  mutate(number = mh_all,
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data %>%
+  ggplot(aes(x = single, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+    scale_fill_gradient(low = "lightblue", high = "darkblue")+
+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~mh_all)+
+  theme_pubr()
+```
+
+## Low Income
+
+
+```{r hardship-cares-18 }
+plot_data = scored %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(mh_all, poverty150) %>%
+  summarize(count = n()) %>%
+  group_by(poverty150) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+   mutate(poverty150 = factor(poverty150, 
+                             levels = c(0,1), 
+                             labels = c("High Income", "Low Income"))) %>%
+  mutate(number = mh_all,
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data %>%
+  ggplot(aes(x = poverty150, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+    scale_fill_gradient(low = "lightblue", high = "darkblue")+
+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~mh_all)+
+  theme_pubr()
+```
+
+## All Groups
+
+
+```{r hardship-cares-19 }
+plot_data = scored %>%
+  gather("Group", value, black, latinx, single, poverty150) %>%
+  filter(value == 1) %>%
+  group_by(mh_all, Group) %>%
+  summarize(count = n()) %>%
+  group_by(Group) %>%
+  mutate(percent = 100*count/sum(count),
+         percent = round(percent, 1)) %>%
+     mutate(Group = factor(Group, 
+                             levels = c("black", "latinx", "single", "poverty150"), 
+                             labels = c("Black", "LatinX", "Single parents", "Low income"))) %>%
+  mutate(number = mh_all,
+         mh_all = ifelse(mh_all == 0, "0", "1+"))
+
+plot_data %>%
+  ggplot(aes(x = Group, y = percent, fill = number)) +
+  geom_bar(stat = "identity") +
+  geom_bar(aes(x = "Average"), data = plot_data_avg, stat = "identity") +
+  coord_flip()+
+    scale_fill_gradient(low = "lightblue", high = "darkblue")+
+
+  labs(title = "Material hardship", y = "Percent", x = NULL) +
+  facet_wrap(~mh_all)+
+  theme_pubr()
+```

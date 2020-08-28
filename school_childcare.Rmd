@@ -1,0 +1,111 @@
+---
+title: "School Reopening Q"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+```{r wellbeing-states-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r wellbeing-states-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r wellbeing-states-3 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r}
+master %>%
+  filter(!is.na(SCHOOL.001.a)) %>%
+  mutate(SCHOOL.001.a = factor(SCHOOL.001.a, 
+                               levels = c(1:7),
+                               labels = c(
+                                 "Open completely",
+                                 "Move to online only",
+                                 "Hybrid",
+                                 "Choice between in-person and online",
+                                 "Other",
+                                 "NA",
+                                 "I don't know"))) %>%
+  ggplot(aes(x = SCHOOL.001.a)) +
+  geom_bar(stat = "count") +
+  coord_flip() +
+  labs(x = NULL, title = "What has the school/school district your child(ren) plans to attend/currently attending decided regarding the school-year?")+
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+```{r}
+scored %>%
+  select(starts_with("school_")) %>%
+  gather("person", response) %>%
+  filter(!is.na(response)) %>%
+  group_by(person) %>%
+  summarize(count = n(),
+            percent = 100*sum(response)/count) %>%
+  mutate(person = str_remove(person, "school_")) %>%
+  ggplot(aes(x = reorder(person, percent), y = percent)) +
+  geom_bar(stat = "identity")+
+  coord_flip() +
+  labs(x = NULL, title = "For the time your child will be learning remotely, who will be assisting with your child’s online learning?")+
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+
+```{r}
+scored %>%
+  select(starts_with("learning_")) %>%
+  gather("learning", response) %>%
+  filter(!is.na(response)) %>%
+  group_by(learning) %>%
+  summarize(count = n(),
+            percent = 100*sum(response)/count) %>%
+  mutate(learning = str_remove(learning, "learning_"),
+         learning = factor(learning, 
+                           levels = c("games", "inperson", "apps", "online", "other", "none"),
+                           labels = c(
+                             "Using in-person games and activities at your home", 
+                             "Attending in-person learning outside of your home (daycare, childcare, etc.)", 
+                             "Using online resources (e.g., educational apps, educational TV shows, etc.)", 
+                             "Attending online classes/activities", 
+                             "Other", 
+                             "None of the above"))) %>%
+  ggplot(aes(x = reorder(learning, percent), y = percent)) +
+  geom_bar(stat = "identity")+
+  coord_flip() +
+  labs(x = NULL, title = "For your child(ren) between the ages of 0-5, which of the following are you doing to support their learning?")+
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+```{r}
+scored %>%
+  select(starts_with("learningp_")) %>%
+  gather("person", response) %>%
+  filter(!is.na(response)) %>%
+  group_by(person) %>%
+  summarize(count = n(),
+            percent = 100*sum(response)/count) %>%
+  mutate(person = str_remove(person, "learningp_")) %>%
+  ggplot(aes(x = reorder(person, percent), y = percent)) +
+  geom_bar(stat = "identity")+
+  coord_flip() +
+  labs(x = NULL, title = "Who will be assisting with you child(s) 0-5 learning?")+
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
