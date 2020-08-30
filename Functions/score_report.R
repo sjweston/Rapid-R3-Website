@@ -1407,6 +1407,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
         !is.na(data$SCHOOL003_cat) ~ 0,
         TRUE ~ NA_real_))
   
+  newdata$has_schoolage_child = data$SCHOOL.001
   newdata$SCHOOL.001.a = data$SCHOOL.001.a
   
   
