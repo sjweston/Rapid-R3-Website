@@ -7,12 +7,12 @@ output:
 ---
 
 
-```{r wellbeing-states-1, echo = F}
+```{r, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 ```
 
-```{r wellbeing-states-2 }
+```{r }
 library(conflicted)
 library(here)
 library(ggpubr)
@@ -24,7 +24,7 @@ conflict_prefer("map", "purrr")
 library(plotly)
 ```
 
-```{r wellbeing-states-3 }
+```{r }
 source(here("Scripts/score data.R")) 
 source(here("Functions/pomp.R"))
 ```
@@ -45,13 +45,21 @@ scored = scored %>%
     black = ifelse(black == 1, "Black", "Not Black"),
     latinx = ifelse(latinx == 1, "LatinX", "Not LatinX"),
     single = ifelse(single == 1, "Single parent", "Dual parent"),
-    poverty150 = ifelse(poverty150 == 1, "Low income", "High income")) %>%
+    poverty150 = ifelse(poverty150 == 1, "Low income", "High income"),
+    employment = ifelse(unemployed == 1, "Unemployed", "Employed")
+    ) %>%
   mutate(Week = case_when(
     Week > 17 & (Week %% 2) == 0 ~ Week - 1,
     TRUE ~ Week)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == 1) %>%
-  ungroup()
+  ungroup() %>%
+  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
+  rowwise() %>%
+  mutate(m_health = mean(c(anxiety, depress, stress, lonely), na.rm = T)) %>%
+  mutate(cm_health = mean(c(fussy,fear), na.rm = T)) %>%
+  ungroup() %>%
+  mutate_at(vars(m_health, cm_health), ~100-.x) 
 ```
 
 
@@ -70,12 +78,6 @@ families_with_school = scored %>%
   left_join(scored)
 
 fam_school_mh = families_with_school %>%
-  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
-  rowwise() %>%
-  mutate(m_health = mean(c(anxiety, depress, stress, lonely), na.rm = T)) %>%
-  mutate(cm_health = mean(c(fussy,fear), na.rm = T)) %>%
-  ungroup() %>%
-  mutate_at(vars(m_health, cm_health), ~100-.x) %>%
   group_by(Week, schoolage_child) %>%
   mutate(Week = case_when(
     Week == 0 ~ as.Date("2020-03-27"),
@@ -167,7 +169,21 @@ schoolplan_group = function(group = black, data = scored){
   theme_pubclean() +
   theme(plot.title.position = "plot")
   
-  ggplotly(plot, tooltip = "text")
+  plot = ggplotly(plot, tooltip = "text")
+  
+  group = deparse(substitute(group))
+
+  test = stats::chisq.test(data[,"SCHOOL.001.a"][1],
+                           data[,group][[1]])
+  test = broom::tidy(test) 
+  sig = ifelse(test$p.value[1] < .05, "is significant", "is not significant")
+  test = test %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2) %>% kable_styling()
+  
+  return(list(plot = plot,
+              sig = sig,
+              test = test))
   }
 
 ```
@@ -190,25 +206,66 @@ scored %>%
 ### Black
 
 ```{r}
-schoolplan_group(black)
+schoolplan_group(black)$plot
 ```
+
+The difference between groups `r schoolplan_group(black)$sig`.
+
+```{r, results = 'asis'}
+schoolplan_group(black)$test
+```
+
+
 
 ### LatinX
 
 ```{r}
-schoolplan_group(latinx)
+schoolplan_group(latinx)$plot
+```
+
+
+The difference between groups `r schoolplan_group(latinx)$sig`.
+
+```{r, results = 'asis'}
+schoolplan_group(latinx)$test
 ```
 
 ### Single
 
 ```{r}
-schoolplan_group(single)
+schoolplan_group(single)$plot
+```
+
+
+The difference between groups `r schoolplan_group(single)$sig`.
+
+```{r, results = 'asis'}
+schoolplan_group(single)$test
 ```
 
 ### Low Income
 
 ```{r}
-schoolplan_group(poverty150)
+schoolplan_group(poverty150)$plot
+```
+
+
+The difference between groups `r schoolplan_group(poverty150)$sig`.
+
+```{r, results = 'asis'}
+schoolplan_group(poverty150)$test
+```
+
+### Employment{.tabset}
+
+```{r}
+schoolplan_group(employment)$plot
+```
+
+The difference between groups `r schoolplan_group(employment)$sig`.
+
+```{r, results = 'asis'}
+schoolplan_group(employment)$test
 ```
 
 ### All groups
@@ -221,10 +278,10 @@ overall = scored %>%
   mutate(percent = 100*count/sum(count)) %>%
   mutate(response = "Average")
 
-scored %>%
+plot = scored %>%
   gather(category, response, black, latinx, single, poverty150) %>%
   filter(response %in% c("Black","LatinX","Single parent","Low income")) %>%
-  filter(!is.na(SCHOOL.001.a))%>%
+  filter(!is.na(SCHOOL.001.a)) %>%
   group_by(SCHOOL.001.a, response) %>%
   summarize(count = n()) %>%
   ungroup() %>%
@@ -232,13 +289,37 @@ scored %>%
   mutate(percent = 100*count/sum(count)) %>%
   ungroup() %>%
   full_join(overall) %>%
-  ggplot(aes(x = SCHOOL.001.a, y = percent, fill = response)) +
+  ggplot(aes(x = SCHOOL.001.a, 
+             y = percent, 
+             fill = response,
+             text = paste0(
+               "Group: ", response,
+               "\nCount:", count,
+               "\nPercent:", round(percent)
+             ))) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_fill_manual(values =  c("Black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   coord_flip() +
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+ggplotly(plot, tooltip = "text")
+```
+
+
+```{r, results='asis'}
+test.prop = scored %>%
+  gather(category, response, black, latinx, single, poverty150) %>%
+  filter(response %in% c("Black","LatinX","Single parent","Low income")) %>%
+  filter(!is.na(SCHOOL.001.a)) 
+
+stats::chisq.test(test.prop$SCHOOL.001.a, test.prop$response) %>%
+  broom::tidy() %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(booktabs = T, digits = 2, 
+        caption = "A comparison of groups (excluding the average)") %>% 
+  kable_styling()
 ```
 
 
@@ -271,7 +352,64 @@ school_managing = function(group, data = scored){
   theme_pubclean() +
   theme(plot.title.position = "plot")
   
-  ggplotly(plot, tooltip = "text")
+  plot = ggplotly(plot, tooltip = "text")
+  
+  test.formula = deparse(substitute(group))
+  test.formula = paste0("response ~ ", test.formula)
+  test.formula = as.formula(test.formula)
+  
+  if(deparse(substitute(group)) != "employment") {
+    employ.formula = deparse(substitute(group))
+    employ.formula = paste0("response ~ ", employ.formula, " + employment")
+    employ.formula = as.formula(employ.formula)}
+  
+  test = data %>%
+    filter(!is.na({{group}})) %>%
+    select({{group}}, starts_with("school_"), employment) %>%
+    gather("person", response, starts_with("school_")) %>%
+    filter(!is.na(response)) %>%
+    mutate(person = str_remove(person, "school_")) 
+  
+  groups = unique(test[, deparse(substitute(group))])
+  
+  if(deparse(substitute(group)) != "employment") {
+    employ = test %>%
+    group_by(person) %>%
+    nest() %>%
+    mutate(test = map(data, ~lm(employ.formula, data = .x,
+                                    var.equal = T))) %>%
+    mutate(test = map(test, broom::tidy)) %>%
+    select(-data) %>%
+    unnest(cols = test) %>%
+    filter(!(term %in% c(
+      "(Intercept)", "employmentUnemployed"))) %>%
+    select(-term) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+      p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within person category after accounting for employment status. p-values have been adjusted using a Holm correction.") %>%
+    kable_styling()
+  
+  test = test %>%
+    group_by(person) %>%
+    nest() %>%
+    mutate(test = map(data, ~t.test(test.formula, data = .x,
+                                    var.equal = T))) %>%
+    mutate(test = map(test, broom::tidy)) %>%
+    select(-data) %>%
+    unnest(cols = test) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+      p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within person category. p-values have been adjusted using a Holm correction.") %>%
+    kable_styling()} else{employ = NULL}
+
+
+  return(list(
+    plot = plot,
+    test = test,
+    employ = employ
+  ))
 }
 ```
 
@@ -300,26 +438,71 @@ scored %>%
 ### Black
 
 ```{r}
-school_managing(black)
+school_managing(black)$plot
+```
+
+```{r, results='asis'}
+school_managing(black)$test
+```
+
+```{r, results='asis'}
+school_managing(black)$employ
 ```
 
 ### LatinX
 
 ```{r}
-school_managing(latinx)
+school_managing(latinx)$plot
 ```
+```{r, results='asis'}
+school_managing(latinx)$test
+```
+
+```{r, results='asis'}
+school_managing(latinx)$employ
+```
+
+
 
 ### Single
 
 ```{r}
-school_managing(single)
+school_managing(single)$plot
 ```
+```{r, results='asis'}
+school_managing(single)$test
+```
+
+```{r, results='asis'}
+school_managing(single)$employ
+```
+
+
 
 ### Low Income
 
 ```{r}
-school_managing(poverty150)
+school_managing(poverty150)$plot
 ```
+```{r, results='asis'}
+school_managing(poverty150)$test
+```
+
+```{r, results='asis'}
+school_managing(poverty150)$employ
+```
+
+
+### Employment
+
+```{r}
+school_managing(employment)$plot
+```
+
+```{r, results='asis'}
+school_managing(employment)$test
+```
+
 ### All groups
 
 ```{r}
@@ -334,7 +517,7 @@ overall = scored %>%
   mutate(person = str_remove(person, "school_")) %>%
   mutate(group = "Average")
 
-scored %>%
+plot = scored %>%
   gather(category, group, black, latinx, single, poverty150) %>%
   filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
   gather("person", response, starts_with("school_")) %>%
@@ -345,13 +528,45 @@ scored %>%
             percent = 100*sum(response)/count) %>%
     mutate(person = str_remove(person, "school_")) %>%
   full_join(overall) %>%
-  ggplot(aes(x = person, y = percent, fill = group)) +
+  ggplot(aes(x = person, 
+             y = percent, 
+             fill = group,
+             text = paste0(
+               "Response:", person,
+               "\nGroup: ", group,
+               "\nCount:", count,
+               "\nPercent:", round(percent)
+             ))) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_fill_manual(values =  c("Black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   coord_flip() +
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+ggplotly(plot, tooltip = "text")
+```
+
+
+```{r, results='asis'}
+scored %>%
+  gather(category, group, black, latinx, single, poverty150) %>%
+  filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
+  gather("person", response, starts_with("school_")) %>%
+  filter(!is.na(response)) %>%
+  mutate(person = str_remove(person, "school_")) %>%
+  group_by(person) %>%
+  nest() %>%
+  mutate(test = map(data, ~anova(lm(response~group, data = .x))),
+         test = map(test, broom::tidy)) %>%
+  select(-data) %>%
+  unnest(cols = test) %>%
+  filter(!is.na(p.value)) %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  kable(booktabs = T, digits = 2, 
+        caption = "A comparison of groups using ANOVA (excluding the average)") %>% 
+  kable_styling()
 ```
 
 # Pre-K Learning
@@ -394,7 +609,66 @@ prek_how = function(group, data = scored){
   theme_pubclean() +
   theme(plot.title.position = "plot")
 
-  ggplotly(plot, tooltip = "text")
+  plot = ggplotly(plot, tooltip = "text")
+  
+   test.formula = deparse(substitute(group))
+  test.formula = paste0("response ~ ", test.formula)
+  test.formula = as.formula(test.formula)
+  
+  if(deparse(substitute(group)) != "employment") {
+    employ.formula = deparse(substitute(group))
+    employ.formula = paste0("response ~ ", employ.formula, "+ employment")
+    employ.formula = as.formula(employ.formula)
+  }
+  
+  test = data %>%
+    filter(!is.na({{group}})) %>%
+    select({{group}}, starts_with("learning_"), employment) %>%
+    gather("learning", response, starts_with("learning_")) %>%
+    filter(!is.na(response)) %>%
+    mutate(learning = str_remove(learning, "learning_")) 
+  
+  groups = unique(test[, deparse(substitute(group))])
+  
+  if(deparse(substitute(group)) != "employment") {
+    employ = test %>%
+      group_by(learning) %>%
+      nest() %>%
+      mutate(test = map(data, ~lm(employ.formula, data = .x,
+                                    var.equal = T))) %>%
+      mutate(test = map(test, broom::tidy)) %>%
+      select(-data) %>%
+      unnest(cols = test) %>%
+      filter(!(term %in% c(
+        "(Intercept)", "employmentUnemployed"))) %>%
+      select(-term)  %>%
+      filter(!is.na(p.value)) %>%
+      mutate(p.value = p.adjust(p.value, method = "holm"),
+        p.value = papaja::printp(p.value)) %>%
+      kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within learning category after controlling for employment status. p-values have been adjusted using a Holm correction.") %>%
+     kable_styling()} else{employ = NULL}
+  
+  test = test %>%
+    group_by(learning) %>%
+    nest() %>%
+    mutate(test = map(data, ~t.test(test.formula, data = .x,
+                                    var.equal = T))) %>%
+    mutate(test = map(test, broom::tidy)) %>%
+    select(-data) %>%
+    unnest(cols = test) %>%  
+    filter(!is.na(statistic)) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+      p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within learning category. p-values have been adjusted using a Holm correction.") %>%
+    kable_styling()
+
+  return(list(
+    plot = plot,
+    test = test,
+    employ = employ
+  ))
 }
 ```
 
@@ -432,26 +706,80 @@ scored %>%
 ### Black
 
 ```{r}
-prek_how(black)
+prek_how(black)$plot
+```
+
+```{r, results = 'asis'}
+prek_how(black)$test
+```
+
+```{r, results = 'asis'}
+prek_how(black)$employ
 ```
 
 ### LatinX
 
 ```{r}
-prek_how(latinx)
+prek_how(latinx)$plot
 ```
+
+
+```{r, results = 'asis'}
+prek_how(latinx)$test
+```
+
+```{r, results = 'asis'}
+prek_how(latinx)$employ
+```
+
 
 ### Single
 
 ```{r}
-prek_how(single)
+prek_how(single)$plot
 ```
+
+
+```{r, results = 'asis'}
+prek_how(single)$test
+```
+
+```{r, results = 'asis'}
+prek_how(single)$employ
+```
+
 
 ### Low Income
 
 ```{r}
-prek_how(poverty150)
+prek_how(poverty150)$plot
 ```
+
+
+```{r, results = 'asis'}
+prek_how(poverty150)$test
+```
+
+```{r, results = 'asis'}
+prek_how(poverty150)$employ
+```
+
+
+### Employment
+
+```{r}
+prek_how(employment)$plot
+```
+
+
+```{r, results = 'asis'}
+prek_how(employment)$test
+```
+
+```{r, results = 'asis'}
+prek_how(employment)$employ
+```
+
 
 ### All groups
 
@@ -475,7 +803,7 @@ overall = scored %>%
                              "None of the above"))) %>%
   mutate(group = "Average")
 
-scored %>%
+plot = scored %>%
   gather(category, group, black, latinx, single, poverty150) %>%
   filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
   gather("learning", response, starts_with("learning_")) %>%
@@ -494,7 +822,15 @@ scored %>%
                              "Other", 
                              "None of the above")))  %>%
   full_join(overall) %>%
-  ggplot(aes(x = learning, y = percent, fill = group)) +
+  ggplot(aes(x = learning, 
+             y = percent, 
+             fill = group,
+             text = paste0(
+               "Response:", learning,
+               "\nGroup: ", group,
+               "\nCount:", count,
+               "\nPercent:", round(percent)
+             ))) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_fill_manual(values =  c("Black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   coord_flip() +
@@ -502,7 +838,26 @@ scored %>%
   theme_pubclean() +
   theme(plot.title.position = "plot")
 ```
-
+```{r, results='asis'}
+scored %>%
+  gather(category, group, black, latinx, single, poverty150) %>%
+  filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
+  gather("person", response, starts_with("learning_")) %>%
+  filter(!is.na(response)) %>%
+  mutate(person = str_remove(person, "learning_")) %>%
+  group_by(person) %>%
+  nest() %>%
+  mutate(test = map(data, ~anova(lm(response~group, data = .x))),
+         test = map(test, broom::tidy)) %>%
+  select(-data) %>%
+  unnest(cols = test) %>%
+  filter(!is.na(p.value)) %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  kable(booktabs = T, digits = 2, 
+        caption = "A comparison of groups using ANOVA (excluding the average)") %>% 
+  kable_styling()
+```
 
 ## Who{.tabset}
 
@@ -533,7 +888,64 @@ prek_who = function(group, data = scored){
   theme_pubclean() +
   theme(plot.title.position = "plot")
   
-  ggplotly(plot,tooltip = "text")
+  plot = ggplotly(plot,tooltip = "text")
+  
+  test.formula = deparse(substitute(group))
+  test.formula = paste0("response ~ ", test.formula)
+  test.formula = as.formula(test.formula)
+  
+  if(deparse(substitute(group)) != "employment") {
+    employ.formula = deparse(substitute(group))
+    employ.formula = paste0("response ~ ", test.formula)
+    employ.formula = as.formula(test.formula)
+  }
+  
+  test = data %>%
+    filter(!is.na({{group}})) %>%
+    select({{group}}, starts_with("learningp_"), employment) %>%
+    gather("learning", response, starts_with("learningp_")) %>%
+    filter(!is.na(response)) %>%
+    mutate(learning = str_remove(learning, "learningp_")) 
+  
+  groups = unique(test[, deparse(substitute(group))])
+  
+  if(deparse(substitute(group)) != "employment") {
+      employ = test %>%
+    group_by(learning) %>%
+    nest() %>%
+    mutate(test = map(data, ~lm(test.formula, data = .x))) %>%
+    mutate(test = map(test, broom::tidy)) %>%
+    select(-data) %>%
+    unnest(cols = test) %>%  
+    filter(!is.na(statistic)) %>%
+    filter(!(term %in% c("(Intercept)", "employmentUnemployed"))) %>%
+    select(-term) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+      p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within learning category after accounting for employment status. p-values have been adjusted using a Holm correction.") %>%
+    kable_styling()} else{employ = NULL}
+  
+  test = test %>%
+    group_by(learning) %>%
+    nest() %>%
+    mutate(test = map(data, ~t.test(test.formula, data = .x,
+                                    var.equal = T))) %>%
+    mutate(test = map(test, broom::tidy)) %>%
+    select(-data) %>%
+    unnest(cols = test) %>%  
+    filter(!is.na(statistic)) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+      p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within learning category. p-values have been adjusted using a Holm correction.") %>%
+    kable_styling()
+
+  return(list(
+    plot = plot,
+    test = test, 
+    employ = employ
+  ))
 }
 ```
 
@@ -562,26 +974,75 @@ scored %>%
 ### Black
 
 ```{r}
-prek_who(black)
+prek_who(black)$plot
+```
+
+
+```{r, results = 'asis'}
+prek_who(black)$test
+```
+
+```{r, results = 'asis'}
+prek_who(black)$employ
 ```
 
 ### LatinX
 
 ```{r}
-prek_who(latinx)
+prek_who(latinx)$plot
 ```
+
+```{r, results = 'asis'}
+prek_who(latinx)$test
+```
+
+```{r, results = 'asis'}
+prek_who(latinx)$employ
+```
+
+
 
 ### Single
 
 ```{r}
-prek_who(single)
+prek_who(single)$plot
 ```
+
+```{r, results = 'asis'}
+prek_who(single)$test
+```
+
+```{r, results = 'asis'}
+prek_who(single)$employ
+```
+
+
 
 ### Low Income
 
 ```{r}
-prek_who(poverty150)
+prek_who(poverty150)$plot
 ```
+
+```{r, results = 'asis'}
+prek_who(poverty150)$test
+```
+
+```{r, results = 'asis'}
+prek_who(poverty150)$employ
+```
+
+
+### Employment
+
+```{r}
+prek_who(employment)$plot
+```
+
+```{r, results = 'asis'}
+prek_who(employment)$test
+```
+
 
 ### All groups
 
@@ -597,7 +1058,7 @@ overall = scored %>%
   mutate(person = str_remove(person, "learningp_")) %>%
   mutate(group = "Average")
 
-scored %>%
+plot = scored %>%
   gather(category, group, black, latinx, single, poverty150) %>%
   filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
   gather("person", response, starts_with("learningp_")) %>%
@@ -608,11 +1069,215 @@ scored %>%
             percent = 100*sum(response)/count) %>%
     mutate(person = str_remove(person, "learningp_")) %>%
   full_join(overall) %>%
-  ggplot(aes(x = person, y = percent, fill = group)) +
+  ggplot(aes(x = person, 
+             y = percent, 
+             fill = group,
+             text = paste0(
+               "Response:", person,
+               "\nGroup: ", group,
+               "\nCount:", count,
+               "\nPercent:", round(percent)
+             ))) +
   geom_bar(stat = "identity", position = "dodge") +
   scale_fill_manual(values =  c("Black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   coord_flip() +
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r, results='asis'}
+scored %>%
+  gather(category, group, black, latinx, single, poverty150) %>%
+  filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
+  gather("person", response, starts_with("learningp_")) %>%
+  filter(!is.na(response)) %>%
+  mutate(person = str_remove(person, "learningp_")) %>%
+  group_by(person) %>%
+  nest() %>%
+  mutate(test = map(data, ~anova(lm(response~group, data = .x))),
+         test = map(test, broom::tidy)) %>%
+  select(-data) %>%
+  unnest(cols = test) %>%
+  filter(!is.na(p.value)) %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  kable(booktabs = T, digits = 2, 
+        caption = "A comparison of groups using ANOVA (excluding the average)") %>% 
+  kable_styling()
+```
+
+# Caregiver Mental Health
+
+```{r}
+mhealth_data = scored %>%
+  filter(Week == 21) %>%
+  #dichotomize variables
+  mutate(
+    online_only = ifelse(SCHOOL.001.a == "Move to online only", 1, 0)
+  )
+```
+
+
+## Mental health composite{.tabset}
+
+Caregiver mental health is a composite variable indexing anxiety, depression, stress, and loneliness. The scale ranges from 0 (worse possible mental health) to 100 (best possible mental health).
+
+### Overall
+
+```{r, results = 'asis'}
+model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+              data =  mhealth_data)
+```
+
+This model is based on the data from `r nrow(model.mh$model)` caregivers. 
+
+```{r, results = 'asis'}
+broom::tidy(model.mh) %>%
+  mutate(
+    term = str_replace(term, "(Intercept)","Intercept"),
+     term = str_replace(term, "online_only","Older child: Remote learning"),
+     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+    term = str_replace(term, "learning_inperson","Younger child: In-person care"),
+    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+  ) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        digits = 2, 
+        booktabs = T, 
+        caption = "Relationship between mental health and child school plans") %>%
+  kable_styling()
+```
+
+### Black
+
+```{r, results = 'asis'}
+model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+              data =  filter(mhealth_data, black == "Black"))
+```
+
+This model is based on the data from `r nrow(model.mh$model)` caregivers. 
+
+```{r, results = 'asis'}
+broom::tidy(model.mh) %>%
+  mutate(
+    term = str_replace(term, "(Intercept)","Intercept"),
+     term = str_replace(term, "online_only","Older child: Remote learning"),
+     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+    term = str_replace(term, "learning_inperson","Younger child: In-person care"),
+    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+  ) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        digits = 2, 
+        booktabs = T, 
+        caption = "Relationship between mental health and child school plans") %>%
+  kable_styling()
+```
+
+### LatinX
+
+```{r, results = 'asis'}
+model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+              data =  filter(mhealth_data, latinx == "LatinX"))
+```
+
+This model is based on the data from `r nrow(model.mh$model)` caregivers. 
+
+```{r, results = 'asis'}
+broom::tidy(model.mh) %>%
+  mutate(
+    term = str_replace(term, "(Intercept)","Intercept"),
+     term = str_replace(term, "online_only","Older child: Remote learning"),
+     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+    term = str_replace(term, "learning_inperson","Younger child: In-person care"),
+    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+  ) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        digits = 2, 
+        booktabs = T, 
+        caption = "Relationship between mental health and child school plans") %>%
+  kable_styling()
+```
+
+
+### Single
+
+```{r, results = 'asis'}
+model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+              data =  filter(mhealth_data, single == "Single parent"))
+```
+
+This model is based on the data from `r nrow(model.mh$model)` caregivers. 
+
+```{r, results = 'asis'}
+broom::tidy(model.mh) %>%
+  mutate(
+    term = str_replace(term, "(Intercept)","Intercept"),
+     term = str_replace(term, "online_only","Older child: Remote learning"),
+     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+    term = str_replace(term, "learning_inperson","Younger child: In-person care"),
+    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+  ) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        digits = 2, 
+        booktabs = T, 
+        caption = "Relationship between mental health and child school plans") %>%
+  kable_styling()
+```
+
+### Low income
+
+```{r, results = 'asis'}
+model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+              data =  filter(mhealth_data, poverty150 == "Low income"))
+```
+
+This model is based on the data from `r nrow(model.mh$model)` caregivers. 
+
+```{r, results = 'asis'}
+broom::tidy(model.mh) %>%
+  mutate(
+    term = str_replace(term, "(Intercept)","Intercept"),
+     term = str_replace(term, "online_only","Older child: Remote learning"),
+     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+    term = str_replace(term, "learning_inperson","Younger child: In-person care"),
+    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+  ) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        digits = 2, 
+        booktabs = T, 
+        caption = "Relationship between mental health and child school plans") %>%
+  kable_styling()
+```
+
+### Unemployed
+
+```{r, results = 'asis'}
+model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+              data =  filter(mhealth_data, employment == "Unemployed"))
+```
+
+This model is based on the data from `r nrow(model.mh$model)` caregivers. 
+
+```{r, results = 'asis'}
+broom::tidy(model.mh) %>%
+  mutate(
+    term = str_replace(term, "(Intercept)","Intercept"),
+     term = str_replace(term, "online_only","Older child: Remote learning"),
+     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+    term = str_replace(term, "learning_inperson","Younger child: In-person care"),
+    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+  ) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  kable(., 
+        digits = 2, 
+        booktabs = T, 
+        caption = "Relationship between mental health and child school plans") %>%
+  kable_styling()
 ```
