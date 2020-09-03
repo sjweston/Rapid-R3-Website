@@ -59,7 +59,37 @@ scored = scored %>%
   mutate(m_health = mean(c(anxiety, depress, stress, lonely), na.rm = T)) %>%
   mutate(cm_health = mean(c(fussy,fear), na.rm = T)) %>%
   ungroup() %>%
-  mutate_at(vars(m_health, cm_health), ~100-.x) 
+  mutate_at(vars(m_health, cm_health), ~100-.x)
+
+num_sources = scored %>%
+  select(starts_with("school_"))
+scored$numsources_older = apply(num_sources, 1, sum, na.rm=T)
+
+num_sources = scored %>%
+  select(starts_with("learningp_"))
+scored$numsources_younger = apply(num_sources, 1, sum, na.rm=T)
+
+scored = scored %>%
+  mutate(
+    parentonly_older = case_when(
+    numsources_older == 1 & school_parent == 1 ~ 1,
+    !is.na(SCHOOL.001.a) ~ 0, 
+    TRUE ~ NA_real_),
+    parentonly_younger = case_when(
+    numsources_younger == 1 & learningp_parent == 1 ~ 1,
+    !is.na(learning_games) ~ 0, 
+    TRUE ~ NA_real_)) %>%
+  mutate(
+    parentonly_olderf = case_when(
+    numsources_older == 1 & school_parent == 1 ~ "Parent only",
+    numsources_older > 1 & school_parent == 1 ~ "Parents + others",
+    !is.na(SCHOOL.001.a) ~ "Not parents", 
+    TRUE ~ NA_character_),
+    parentonly_youngerf = case_when(
+    numsources_younger == 1 & learningp_parent == 1 ~ "Parent only",
+    numsources_younger > 1 & learningp_parent == 1 ~ "Parents + others",
+    !is.na(learning_games) ~ "Not parents", 
+    TRUE ~ NA_character_))
 ```
 
 
@@ -200,6 +230,31 @@ scored %>%
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+scored %>%
+  filter(!is.na(SCHOOL.001.a)) %>%
+  group_by(SCHOOL.001.a) %>%
+  summarize(count = n()) %>%
+  mutate(percent = round(100*count/sum(count),1)) %>%
+  select(-count) %>%
+  rename(plans = SCHOOL.001.a) %>%
+  arrange(desc(percent)) %>%
+  mutate(plans = factor(plans, 
+                        levels = c("Open completely",
+                                   "Move to online only",
+                                   "Hybrid",
+                                   "Choice between in-person and online",
+                                   "Other", 
+                                   "NA", 
+                                   "I don't know"),
+                        labels = c("Open completely",
+                                   "Move to online only",
+                                   "A combination of in-person on some days and online on other days",
+                                   "Ability for parent to choose between online or in-person instruction",
+                                   "Other",
+                                   "Not applicable (e.g., homeschooled)",
+                                   "Don't know yet"))) %>%
+  write.csv(file = here("figure data/0901_older_plans_overall.csv"), row.names = F)
 ```
 
 
@@ -305,6 +360,28 @@ plot = scored %>%
   theme(plot.title.position = "plot")
 
 ggplotly(plot, tooltip = "text")
+
+overall %>%
+    mutate(percent = round(percent, 1)) %>%
+  select(-count) %>%
+  rename(plans = SCHOOL.001.a,
+         group = response) %>%
+  mutate(plans = factor(plans, 
+                        levels = c("Open completely",
+                                   "Move to online only",
+                                   "Hybrid",
+                                   "Choice between in-person and online",
+                                   "Other", 
+                                   "NA", 
+                                   "I don't know"),
+                        labels = c("Open completely",
+                                   "Move to online only",
+                                   "A combination of in-person on some days and online on other days",
+                                   "Ability for parent to choose between online or in-person instruction",
+                                   "Other",
+                                   "Not applicable (e.g., homeschooled)",
+                                   "Don't know yet"))) %>%
+  write.csv(file = here("figure data/0901_older_plans_groups.csv"), row.names = F)
 ```
 
 
@@ -433,6 +510,38 @@ scored %>%
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+scored %>%
+  select(starts_with("school_")) %>%
+  gather("person", response) %>%
+  filter(!is.na(response)) %>%
+  group_by(person) %>%
+  summarize(count = n(),
+            percent = 100*sum(response)/count,
+            percent = round(percent, 1)) %>%
+  mutate(person = str_remove(person, "school_")) %>%
+  select(-count) %>%
+  arrange(desc(percent)) %>%
+  mutate(person  = factor(person,
+                          levels = c("babysitter","friend",
+"grandparent","na",
+"neighbor","none",
+"other","parent",
+"pod","relative",
+"sibling"),
+                          labels = c("Babysitter/nanny/au pair",
+                                     "Friend of parent",
+                                     "Grandparent",
+                                     "Not applicable",
+                                     "Other neighbor",
+                                     "No one is able to do this",
+                                     "Other",
+                                     "You/other parent/step-parent ",
+                                     "Adult responsible for a group (e.g., pod, bubble) ",
+                                     "Other relative",
+                                     "Sibling 15 years or older"))) %>%
+  write.csv(file = here("figure data/0901_older_person_overall.csv"),
+            row.names = F)
 ```
 
 ### Black
@@ -525,7 +634,8 @@ plot = scored %>%
   group_by(group, person) %>%
   summarize(count = n(),
             num_respond = sum(response),
-            percent = 100*sum(response)/count) %>%
+            percent = 100*sum(response)/count,
+            percent = round(percent, 1)) %>%
     mutate(person = str_remove(person, "school_")) %>%
   full_join(overall) %>%
   ggplot(aes(x = person, 
@@ -545,6 +655,42 @@ plot = scored %>%
   theme(plot.title.position = "plot")
 
 ggplotly(plot, tooltip = "text")
+
+
+ scored %>%
+  gather(category, group, black, latinx, single, poverty150) %>%
+  filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
+  gather("person", response, starts_with("school_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(group, person) %>%
+  summarize(count = n(),
+            num_respond = sum(response),
+            percent = 100*sum(response)/count,
+            percent = round(percent, 1)) %>%
+    mutate(person = str_remove(person, "school_")) %>%
+  full_join(overall) %>% 
+     mutate(percent = round(percent, 1)) %>%
+   mutate(person  = factor(person,
+                          levels = c("babysitter","friend",
+"grandparent","na",
+"neighbor","none",
+"other","parent",
+"pod","relative",
+"sibling"),
+                          labels = c("Babysitter/nanny/au pair",
+                                     "Friend of parent",
+                                     "Grandparent",
+                                     "Not applicable",
+                                     "Other neighbor",
+                                     "No one is able to do this",
+                                     "Other",
+                                     "You/other parent/step-parent ",
+                                     "Adult responsible for a group (e.g., pod, bubble) ",
+                                     "Other relative",
+                                     "Sibling 15 years or older"))) %>%
+   select(group, person, percent) %>%
+   write.csv(file = here("figure data/0901_older_person_groups.csv"), 
+             row.names = F)
 ```
 
 
@@ -568,6 +714,200 @@ scored %>%
         caption = "A comparison of groups using ANOVA (excluding the average)") %>% 
   kable_styling()
 ```
+
+## Parents only managing school{.tabset}
+
+```{r, eval = F}
+school_managing = function(group, data = scored){
+  plot = data %>%
+  filter(!is.na({{group}})) %>%
+  select({{group}}, parentonly_older) %>%
+  filter(!is.na(parentonly_older)) %>%
+  group_by(parentonly_older, {{group}}) %>%
+  summarize(count = n(),
+            num_respond = sum(response),
+            percent = 100*sum(response)/count) %>%
+    mutate(parentonly_older = factor(parentonly_older, 
+                                     labels = "Not just parents", "Only parents")) %>%
+  ggplot(aes(x = parentonly_older,
+             y = percent,
+             fill = {{group}},
+             text = paste0(
+               "Person: ", parentonly_older,
+               "\nGroup:", {{group}},
+               "\nCount: ", num_respond,
+               "\nPercent: ", round(percent)
+             ))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  coord_flip() +
+  labs(x = NULL)+
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+  
+  plot = ggplotly(plot, tooltip = "text")
+  
+  test.formula = deparse(substitute(group))
+  test.formula = paste0("response ~ ", test.formula)
+  test.formula = as.formula(test.formula)
+  
+  if(deparse(substitute(group)) != "employment") {
+    employ.formula = deparse(substitute(group))
+    employ.formula = paste0("response ~ ", employ.formula, " + employment")
+    employ.formula = as.formula(employ.formula)}
+  
+  test = data %>%
+    filter(!is.na({{group}})) %>%
+    select({{group}}, starts_with("school_"), employment) %>%
+    gather("person", response, starts_with("school_")) %>%
+    filter(!is.na(response)) %>%
+    mutate(person = str_remove(person, "school_")) 
+  
+  groups = unique(test[, deparse(substitute(group))])
+  
+  if(deparse(substitute(group)) != "employment") {
+    employ = test %>%
+    group_by(person) %>%
+    nest() %>%
+    mutate(test = map(data, ~lm(employ.formula, data = .x,
+                                    var.equal = T))) %>%
+    mutate(test = map(test, broom::tidy)) %>%
+    select(-data) %>%
+    unnest(cols = test) %>%
+    filter(!(term %in% c(
+      "(Intercept)", "employmentUnemployed"))) %>%
+    select(-term) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+      p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within person category after accounting for employment status. p-values have been adjusted using a Holm correction.") %>%
+    kable_styling()
+  
+  test = test %>%
+    group_by(person) %>%
+    nest() %>%
+    mutate(test = map(data, ~t.test(test.formula, data = .x,
+                                    var.equal = T))) %>%
+    mutate(test = map(test, broom::tidy)) %>%
+    select(-data) %>%
+    unnest(cols = test) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+      p.value = papaja::printp(p.value)) %>%
+    kable(., booktabs = T, digits = 2,
+          caption = "Comparison of responses within person category. p-values have been adjusted using a Holm correction.") %>%
+    kable_styling()} else{employ = NULL}
+
+
+  return(list(
+    plot = plot,
+    test = test,
+    employ = employ
+  ))
+}
+```
+
+
+### Overall
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_olderf)) %>%
+  group_by(parentonly_olderf) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_olderf, y = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+  
+```
+
+### Black
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_olderf)) %>%
+  filter(!is.na(black)) %>%
+  group_by(parentonly_olderf,black) %>%
+  summarize(count = n()) %>%
+  group_by(black) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_olderf, y = percent, fill = black)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+### LatinX
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_olderf)) %>%
+  filter(!is.na(latinx)) %>%
+  group_by(parentonly_olderf,latinx) %>%
+  summarize(count = n()) %>%
+  group_by(latinx) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_olderf, y = percent, fill = latinx)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+### Single
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_olderf)) %>%
+  filter(!is.na(single)) %>%
+  group_by(parentonly_olderf,single) %>%
+  summarize(count = n()) %>%
+  group_by(single) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_olderf, y = percent, fill = single)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+
+### Low Income
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_olderf)) %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(parentonly_olderf,poverty150) %>%
+  summarize(count = n()) %>%
+  group_by(poverty150) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_olderf, y = percent, fill = poverty150)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+### Employment
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_olderf)) %>%
+  filter(!is.na(employment)) %>%
+  group_by(parentonly_olderf,employment) %>%
+  summarize(count = n()) %>%
+  group_by(employment) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_olderf, y = percent, fill = employment)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
 
 # Pre-K Learning
 
@@ -701,6 +1041,28 @@ scored %>%
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+scored %>%
+  select(starts_with("learning_")) %>%
+  gather("learning", response) %>%
+  filter(!is.na(response)) %>%
+  group_by(learning) %>%
+  summarize(count = n(),
+            percent = 100*sum(response)/count,
+            percent = round(percent, 1)) %>%
+  mutate(learning = str_remove(learning, "learning_"),
+         learning = factor(learning, 
+                           levels = c("games", "inperson", "apps", "online", "other", "none"),
+                           labels = c(
+                             "Using in-person games and activities at your home", 
+                             "Attending in-person learning outside of your home (daycare, childcare, etc.)", 
+                             "Using online resources (e.g., educational apps, educational TV shows, etc.)", 
+                             "Attending online classes/activities", 
+                             "Other", 
+                             "None of the above"))) %>%
+  select(learning, percent) %>%
+  write.csv(file = here("figure data/0901_younger_learning_overall.csv"), 
+            row.names = F)
 ```
 
 ### Black
@@ -837,6 +1199,30 @@ plot = scored %>%
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+scored %>%
+  gather(category, group, black, latinx, single, poverty150) %>%
+  filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
+  gather("learning", response, starts_with("learning_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(learning, group) %>%
+  summarize(count = n(),
+            percent = 100*sum(response)/count) %>%
+  mutate(learning = str_remove(learning, "learning_"),
+         learning = factor(learning, 
+                           levels = c("games", "inperson", "apps", "online", "other", "none"),
+                           labels = c(
+                             "Using in-person games and activities at your home", 
+                             "Attending in-person learning outside of your home (daycare, childcare, etc.)", 
+                             "Using online resources (e.g., educational apps, educational TV shows, etc.)", 
+                             "Attending online classes/activities", 
+                             "Other", 
+                             "None of the above")))  %>%
+  full_join(overall) %>%
+  mutate(percent = round(percent, 1)) %>%
+  select(learning, group, percent) %>%
+  write.csv(file = here("figure data/0901_younger_learning_groups.csv"),
+            row.names = F)
 ```
 ```{r, results='asis'}
 scored %>%
@@ -969,6 +1355,36 @@ scored %>%
   labs(x = NULL, title = "Who will be assisting with you child(s) 0-5 learning?")+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+scored %>%
+  select(starts_with("learningp_")) %>%
+  gather("person", response) %>%
+  filter(!is.na(response)) %>%
+  group_by(person) %>%
+  summarize(count = n(),
+            percent = 100*sum(response)/count,
+            percent = round(percent,1)) %>%
+  mutate(person = str_remove(person, "learningp_")) %>%
+   mutate(person  = factor(person,
+                          levels = c("babysitter","friend",
+"grandparent","na",
+"neighbor","none",
+"other","parent",
+"pod","relative",
+"sibling"),
+                          labels = c("Babysitter/nanny/au pair",
+                                     "Friend of parent",
+                                     "Grandparent",
+                                     "Not applicable",
+                                     "Other neighbor",
+                                     "No one is able to do this",
+                                     "Other",
+                                     "You/other parent/step-parent ",
+                                     "Adult responsible for a group (e.g., pod, bubble) ",
+                                     "Other relative",
+                                     "Sibling 15 years or older"))) %>%
+  select(-count) %>%
+  write.csv(file = here("figure data/0901_younger_person_overall.csv"), row.names = F)
 ```
 
 ### Black
@@ -1086,6 +1502,40 @@ plot = scored %>%
   theme(plot.title.position = "plot")
 
 ggplotly(plot, tooltip = "text")
+
+scored %>%
+  gather(category, group, black, latinx, single, poverty150) %>%
+  filter(group %in% c("Black","LatinX","Single parent","Low income")) %>%
+  gather("person", response, starts_with("learningp_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(group, person) %>%
+  summarize(count = n(),
+            num_respond = sum(response),
+            percent = 100*sum(response)/count) %>%
+    mutate(person = str_remove(person, "learningp_")) %>%
+  full_join(overall) %>%
+  mutate(percent = round(percent,1)) %>%
+  mutate(person  = factor(person,
+                          levels = c("babysitter","friend",
+"grandparent","na",
+"neighbor","none",
+"other","parent",
+"pod","relative",
+"sibling"),
+                          labels = c("Babysitter/nanny/au pair",
+                                     "Friend of parent",
+                                     "Grandparent",
+                                     "Not applicable",
+                                     "Other neighbor",
+                                     "No one is able to do this",
+                                     "Other",
+                                     "You/other parent/step-parent ",
+                                     "Adult responsible for a group (e.g., pod, bubble) ",
+                                     "Other relative",
+                                     "Sibling 15 years or older"))) %>%
+  select(group, person, percent) %>%
+  write.csv(file = here("figure data/0901_younger_person_groups.csv"),
+            row.names = F)
 ```
 
 ```{r, results='asis'}
@@ -1109,6 +1559,110 @@ scored %>%
   kable_styling()
 ```
 
+## Parents only
+
+### Overall
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_youngerf)) %>%
+  group_by(parentonly_youngerf) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_youngerf, y = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+  
+```
+
+### Black
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_youngerf)) %>%
+  filter(!is.na(black)) %>%
+  group_by(parentonly_youngerf,black) %>%
+  summarize(count = n()) %>%
+  group_by(black) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_youngerf, y = percent, fill = black)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+### LatinX
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_youngerf)) %>%
+  filter(!is.na(latinx)) %>%
+  group_by(parentonly_youngerf,latinx) %>%
+  summarize(count = n()) %>%
+  group_by(latinx) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_youngerf, y = percent, fill = latinx)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+### Single
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_youngerf)) %>%
+  filter(!is.na(single)) %>%
+  group_by(parentonly_youngerf,single) %>%
+  summarize(count = n()) %>%
+  group_by(single) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_youngerf, y = percent, fill = single)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+
+### Low Income
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_youngerf)) %>%
+  filter(!is.na(poverty150)) %>%
+  group_by(parentonly_youngerf,poverty150) %>%
+  summarize(count = n()) %>%
+  group_by(poverty150) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_youngerf, y = percent, fill = poverty150)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
+### Employment
+
+```{r}
+scored %>%
+  filter(!is.na(parentonly_youngerf)) %>%
+  filter(!is.na(employment)) %>%
+  group_by(parentonly_youngerf,employment) %>%
+  summarize(count = n()) %>%
+  group_by(employment) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = parentonly_youngerf, y = percent, fill = employment)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  coord_flip()+
+  labs(x = NULL)+
+  theme_pubclean()
+```
+
 # Caregiver Mental Health
 
 ```{r}
@@ -1128,7 +1682,7 @@ Caregiver mental health is a composite variable indexing anxiety, depression, st
 ### Overall
 
 ```{r, results = 'asis'}
-model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+model.mh = lm(m_health ~ online_only + parentonly_older + learning_inperson + parentonly_younger, 
               data =  mhealth_data)
 ```
 
@@ -1154,7 +1708,7 @@ broom::tidy(model.mh) %>%
 ### Black
 
 ```{r, results = 'asis'}
-model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+model.mh = lm(m_health ~ online_only + parentonly_older + learning_inperson + parentonly_younger, 
               data =  filter(mhealth_data, black == "Black"))
 ```
 
@@ -1180,7 +1734,7 @@ broom::tidy(model.mh) %>%
 ### LatinX
 
 ```{r, results = 'asis'}
-model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+model.mh = lm(m_health ~ online_only + parentonly_older + learning_inperson + parentonly_younger, 
               data =  filter(mhealth_data, latinx == "LatinX"))
 ```
 
@@ -1207,7 +1761,7 @@ broom::tidy(model.mh) %>%
 ### Single
 
 ```{r, results = 'asis'}
-model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+model.mh = lm(m_health ~ online_only + parentonly_older + learning_inperson + parentonly_younger, 
               data =  filter(mhealth_data, single == "Single parent"))
 ```
 
@@ -1233,7 +1787,7 @@ broom::tidy(model.mh) %>%
 ### Low income
 
 ```{r, results = 'asis'}
-model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+model.mh = lm(m_health ~ online_only + parentonly_older + learning_inperson + parentonly_younger, 
               data =  filter(mhealth_data, poverty150 == "Low income"))
 ```
 
@@ -1259,7 +1813,7 @@ broom::tidy(model.mh) %>%
 ### Unemployed
 
 ```{r, results = 'asis'}
-model.mh = lm(m_health ~ online_only + school_parent + learning_inperson + learningp_parent, 
+model.mh = lm(m_health ~ online_only + parentonly_older + learning_inperson + parentonly_younger, 
               data =  filter(mhealth_data, employment == "Unemployed"))
 ```
 
