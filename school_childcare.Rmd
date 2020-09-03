@@ -608,10 +608,6 @@ school_managing(poverty150)$employ
 school_managing(employment)$plot
 ```
 
-```{r, results='asis'}
-school_managing(employment)$test
-```
-
 ### All groups
 
 ```{r}
@@ -1693,9 +1689,9 @@ broom::tidy(model.mh) %>%
   mutate(
     term = str_replace(term, "(Intercept)","Intercept"),
      term = str_replace(term, "online_only","Older child: Remote learning"),
-     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+     term = str_replace(term, "parentonly_older","Older child: Parent responsible"),
     term = str_replace(term, "learning_inperson","Younger child: In-person care"),
-    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+    term = str_replace(term, "parentonly_younger","Younger child: Parent responsible"),
   ) %>%
   mutate(p.value = papaja::printp(p.value)) %>%
   kable(., 
@@ -1719,9 +1715,9 @@ broom::tidy(model.mh) %>%
   mutate(
     term = str_replace(term, "(Intercept)","Intercept"),
      term = str_replace(term, "online_only","Older child: Remote learning"),
-     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+     term = str_replace(term, "parentonly_older","Older child: Parent responsible"),
     term = str_replace(term, "learning_inperson","Younger child: In-person care"),
-    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+    term = str_replace(term, "parentonly_younger","Younger child: Parent responsible")
   ) %>%
   mutate(p.value = papaja::printp(p.value)) %>%
   kable(., 
@@ -1745,9 +1741,9 @@ broom::tidy(model.mh) %>%
   mutate(
     term = str_replace(term, "(Intercept)","Intercept"),
      term = str_replace(term, "online_only","Older child: Remote learning"),
-     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+     term = str_replace(term, "parentonly_older","Older child: Parent responsible"),
     term = str_replace(term, "learning_inperson","Younger child: In-person care"),
-    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+    term = str_replace(term, "parentonly_younger","Younger child: Parent responsible")
   ) %>%
   mutate(p.value = papaja::printp(p.value)) %>%
   kable(., 
@@ -1772,9 +1768,9 @@ broom::tidy(model.mh) %>%
   mutate(
     term = str_replace(term, "(Intercept)","Intercept"),
      term = str_replace(term, "online_only","Older child: Remote learning"),
-     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+     term = str_replace(term, "parentonly_older","Older child: Parent responsible"),
     term = str_replace(term, "learning_inperson","Younger child: In-person care"),
-    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+    term = str_replace(term, "parentonly_younger","Younger child: Parent responsible")
   ) %>%
   mutate(p.value = papaja::printp(p.value)) %>%
   kable(., 
@@ -1798,9 +1794,9 @@ broom::tidy(model.mh) %>%
   mutate(
     term = str_replace(term, "(Intercept)","Intercept"),
      term = str_replace(term, "online_only","Older child: Remote learning"),
-     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+     term = str_replace(term, "parentonly_older","Older child: Parent responsible"),
     term = str_replace(term, "learning_inperson","Younger child: In-person care"),
-    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+    term = str_replace(term, "parentonly_younger","Younger child: Parent responsible")
   ) %>%
   mutate(p.value = papaja::printp(p.value)) %>%
   kable(., 
@@ -1822,11 +1818,11 @@ This model is based on the data from `r nrow(model.mh$model)` caregivers.
 ```{r, results = 'asis'}
 broom::tidy(model.mh) %>%
   mutate(
-    term = str_replace(term, "(Intercept)","Intercept"),
+   term = str_replace(term, "(Intercept)","Intercept"),
      term = str_replace(term, "online_only","Older child: Remote learning"),
-     term = str_replace(term, "school_parent","Older child: Parent responsible"),
+     term = str_replace(term, "parentonly_older","Older child: Parent responsible"),
     term = str_replace(term, "learning_inperson","Younger child: In-person care"),
-    term = str_replace(term, "learningp_parent","Younger child: Parent responsible"),
+    term = str_replace(term, "parentonly_younger","Younger child: Parent responsible")
   ) %>%
   mutate(p.value = papaja::printp(p.value)) %>%
   kable(., 
