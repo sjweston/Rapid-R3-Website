@@ -1,0 +1,908 @@
+---
+title: "Discrimination and concerns for children"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+```{r riser1-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r riser1-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+library(brolgar)
+```
+
+```{r riser1-3 }
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+```
+
+```{r riser1-4 }
+concernvars = names(scored)[grepl("^riserconcern", names(scored))]
+scored$composite_concern = rowMeans(scored[,concernvars], na.rm=T)
+
+discrimvars = names(scored)[grepl("^discrim", names(scored))]
+scored$discrimination = rowMeans(scored[,discrimvars], na.rm=T)
+
+scored = scored %>%
+  filter(!is.na(discrimination)) %>%
+  mutate_at(vars(starts_with("riserconcern")), 
+            factor,
+            levels = c(0:3),
+            labels = c("Never", "Rarely", "Some of the time", "Most of the time")) %>%
+  mutate_at(vars(starts_with("discrim_"), talkchallenge, talkadvantage), 
+            factor,
+            levels = c(0,1),
+            labels = c("No", "Yes")) %>%
+  mutate(black_latinx = case_when(
+    black == 1 & latinx == 1 ~ 1,
+    black == 0 ~ 0, 
+    latinx == 0 ~ 0,
+    TRUE ~ NA_real_
+  )) %>%
+  filter(!is.na(Week)) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    Week == 0 ~ as.Date("2020-03-01"), 
+    Week > 0 ~ min(Date, na.rm=T))) 
+```
+
+
+# Representativeness disclaimer
+
+```{r riser1-5 }
+scored_full = scored
+
+scored = scored %>%
+  filter(Week > 0)
+
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.bl = 100*sum(perc$black_latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+
+scored = scored_full %>%
+  mutate(
+    blackIncome = case_when(
+      black == 1 & poverty150 == 1 ~ "Black, Low income",
+      black == 1 & poverty150 == 0 ~ "Black, High income",
+      black == 0 & poverty150 == 1 ~ "Non-Black, Low income",
+      black == 0 & poverty150 == 0 ~ "Non-Black, High income",
+      TRUE ~ NA_character_),
+    black = factor(black, labels = c("Non-Black", "Black"))
+    )
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, (`r papaja::printnum(perc.bl)`\% report being both Black/African American and LatinX,) and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+# Concerns for children
+
+```{r riser1-6 }
+composite_grps = function(variable, groups, data = scored){
+  
+  plot = data %>%
+    filter(!is.na({{variable}})) %>%
+    dplyr::filter(!is.na({{groups}})) %>%
+  group_by(Date, {{groups}}) %>%
+  summarize(m = mean({{variable}}),
+            sd = sd({{variable}}),
+            n=n()) %>%
+  mutate(se = sqrt(sd/n),
+         moe = se*qt(p = .975, df = n-1)) %>%
+  ggplot(aes(x = Date, 
+             y = m,
+             group = 1,
+             color = {{groups}},
+             text = paste0(
+               "Date: ", Date,
+               "\nGroup: ", {{groups}},
+               "\nCount: ", n,
+               "\nMean: ", round(m,2),
+               "\nLower 95% CI: ", round(m-moe,2),
+               "\nLower 95% CI: ", round(m+moe,2)))) +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), 
+                width = 3,
+                position = position_dodge(1)) +
+  geom_point(position = position_dodge(1)) +
+  geom_line() +
+  labs(x = "Date", title = "Average concern for children", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+}
+```
+
+
+```{r riser1-7 }
+concerns_grps = function(variable, groups, data = scored){
+  
+  plot = data %>%
+    filter(!is.na({{variable}})) %>%
+    filter(!is.na({{groups}})) %>%
+  group_by(Date, {{variable}},{{groups}}) %>%
+  summarize(n=n()) %>%
+    group_by(Date, {{groups}}) %>%
+  mutate(percent = 100*n/sum(n),
+         Date = format.Date(Date, "%B %d")) %>%
+  ggplot(aes(x = {{variable}}, 
+             y = percent,
+             #group = 1,
+             fill = {{groups}},
+             text = paste0(
+               "Date: ", Date,
+               "\nGroup: ", {{groups}},
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2)))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, title = "I am____ concerned for my child(ren)", y = "Percent", fill = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+    facet_wrap(~Date) +
+    coord_flip()+
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+}
+```
+
+```{r riser1-8}
+change_grps = function(variable, groups, data = scored){
+  
+  plot = data %>%
+    filter(Week %in% c(0,21)) %>%
+    filter(!is.na({{groups}})) %>%
+    select(CaregiverID, {{groups}}, Week, {{variable}}) %>%
+    mutate(Week = ifelse(Week == 0, "Pre", "Current")) %>%
+    spread(Week, {{variable}}) %>%
+    group_by({{groups}}, Pre, Current) %>%
+    summarize(n = n()) %>%
+    filter(!is.na(Pre) & !is.na(Current)) %>%
+    ungroup() %>%
+    mutate(group = row_number()) %>%
+    group_by({{groups}}) %>%
+    mutate(percent = 100*n/sum(n)) %>%
+    ungroup() %>%
+    gather("Week", "Response", Pre, Current) %>%
+    mutate(Week = ifelse(Week == "Pre", "2020-03-01", "2020-08-25"),
+           Week = as.Date(Week),
+           Response = factor(Response,
+                             levels = c("Never","Rarely", "Some of the time", "Most of the time")))  %>%
+  ggplot(aes(x = Week,
+             y = Response,
+             group = group,
+             color = percent)) +
+  geom_point(alpha = .2) +
+  geom_line(alpha = .3) +
+    scale_color_gradient(low = "blue", high = "black")+
+  labs(x = "Date", title = "I am____ concerned for my child(ren)", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+    facet_wrap(facets = vars({{groups}})) +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+
+}
+```
+
+
+```{r riser1-9}
+change_grps_simple = function(variable, groups, data = scored){
+  
+  data %>%
+    filter(!is.na({{variable}})) %>%
+    filter(!is.na({{groups}})) %>%
+    ggplot(aes(x = Date,
+               y= {{variable}},
+               group = CaregiverID,
+               color = {{groups}})) +
+    geom_line(alpha = .1) +
+    labs(x = "Date", y = NULL, color = NULL,
+         title = "Change in concern",
+         caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+    facet_wrap(facets = vars({{groups}})) +
+    theme_pubr()
+}
+  
+```
+
+
+
+## Composite{.tabset}
+
+This composite was created by treating the 9 "concerns for children" variables as continuous and averageing responses across those items. The resulting index is a measure that ranges from 0 (Never concerned) to 3 (Concerned most of the time).
+
+### All
+
+```{r riser1-10 }
+plot = scored %>%
+  filter(!is.na(composite_concern)) %>%
+  group_by(Date) %>%
+  summarize(m = mean(composite_concern),
+            sd = sd(composite_concern),
+            n=n()) %>%
+  mutate(se = sqrt(sd/n),
+         moe = se*qt(p = .975, df = n-1)) %>%
+  ggplot(aes(x = Date, 
+             y = m,
+             text = paste0(
+               "Date: ", Date,
+               "\nCount: ", n,
+               "\nMean: ", round(m,2),
+               "\nLower 95% CI: ", round(m-moe,2),
+               "\nLower 95% CI: ", round(m+moe,2)),
+             group = 1)) +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = 3) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Date", title = "Average Concern for children", y = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-11 }
+composite_grps(composite_concern, black)
+```
+
+
+### Black + Income
+
+```{r riser1-12 }
+composite_grps(composite_concern, blackIncome)
+```
+
+## Getting poor care and education{.tabset}
+
+### All
+
+```{r riser1-13}
+plot = scored %>%
+  filter(!is.na(riserconcern_1)) %>%
+  group_by(Date, riserconcern_1) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_1),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_1,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-14}
+concerns_grps(riserconcern_1, black)
+```
+
+```{r riser1-15}
+change_grps_simple(riserconcern_1, black)
+```
+
+### Black + Income
+
+```{r riser1-16}
+concerns_grps(riserconcern_1, blackIncome)
+```
+
+```{r riser1-17}
+change_grps_simple(riserconcern_1, blackIncome)
+```
+
+
+## Being mistreated by adults{.tabset}
+
+### All
+
+```{r riser1-18}
+plot = scored %>%
+  filter(!is.na(riserconcern_2)) %>%
+  group_by(Date, riserconcern_2) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_2),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_2,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-19}
+concerns_grps(riserconcern_2, black)
+```
+
+```{r riser1-20}
+change_grps_simple(riserconcern_2, black)
+```
+
+### Black + Income
+
+```{r riser1-21}
+concerns_grps(riserconcern_2, blackIncome)
+```
+
+```{r riser1-22}
+change_grps_simple(riserconcern_2, blackIncome)
+```
+
+
+## Getting stopped in a white neighborhood{.tabset}
+
+### All
+
+```{r riser1-23}
+plot = scored %>%
+  filter(!is.na(riserconcern_3)) %>%
+  group_by(Date, riserconcern_3) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_3),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_3,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-24}
+concerns_grps(riserconcern_3, black)
+```
+
+```{r riser1-25}
+change_grps_simple(riserconcern_3, black)
+```
+
+### Black + Income
+
+```{r riser1-26}
+concerns_grps(riserconcern_3, blackIncome)
+```
+
+```{r riser1-27}
+change_grps_simple(riserconcern_3, blackIncome)
+```
+
+
+## Being punished more harshly than others{.tabset}
+
+### All
+
+```{r riser1-28}
+plot = scored %>%
+  filter(!is.na(riserconcern_4)) %>%
+  group_by(Date, riserconcern_4) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_4),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_4,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-29}
+concerns_grps(riserconcern_4, black)
+```
+
+```{r riser1-30}
+change_grps_simple(riserconcern_4, black)
+```
+
+### Black + Income
+
+```{r riser1-31}
+concerns_grps(riserconcern_4, blackIncome)
+```
+
+```{r riser1-32}
+change_grps_simple(riserconcern_4, blackIncome)
+```
+
+
+
+## Being discourage from trying new things{.tabset}
+
+### All
+
+```{r riser1-33}
+plot = scored %>%
+  filter(!is.na(riserconcern_5)) %>%
+  group_by(Date, riserconcern_5) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_5),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_5,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-34}
+concerns_grps(riserconcern_5, black)
+```
+
+```{r riser1-35}
+change_grps_simple(riserconcern_5, black)
+```
+
+### Black + Income
+
+```{r riser1-36}
+concerns_grps(riserconcern_5, blackIncome)
+```
+
+```{r riser1-37}
+change_grps_simple(riserconcern_5, blackIncome)
+```
+
+
+
+## Being considered less attractive{.tabset}
+
+### All
+
+```{r riser1-38}
+plot = scored %>%
+  filter(!is.na(riserconcern_6)) %>%
+  group_by(Date, riserconcern_6) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_6),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_6,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-39}
+concerns_grps(riserconcern_6, black)
+```
+
+```{r riser1-40}
+change_grps_simple(riserconcern_6, black)
+```
+
+### Black + Income
+
+```{r riser1-41}
+concerns_grps(riserconcern_6, blackIncome)
+```
+
+```{r riser1-42}
+change_grps_simple(riserconcern_6, blackIncome)
+```
+
+
+
+## Having fewer choices in life{.tabset}
+
+### All
+
+```{r riser1-43}
+plot = scored %>%
+  filter(!is.na(riserconcern_7)) %>%
+  group_by(Date, riserconcern_7) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_7),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_7,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-44}
+concerns_grps(riserconcern_7, black)
+```
+
+```{r riser1-45}
+change_grps_simple(riserconcern_7, black)
+```
+
+### Black + Income
+
+```{r riser1-46}
+concerns_grps(riserconcern_7, blackIncome)
+```
+
+```{r riser1-47}
+change_grps_simple(riserconcern_7, blackIncome)
+```
+
+
+
+## Being excluded from events or groups{.tabset}
+
+### All
+
+```{r riser1-48}
+plot = scored %>%
+  filter(!is.na(riserconcern_8)) %>%
+  group_by(Date, riserconcern_8) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_8),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_8,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-49}
+concerns_grps(riserconcern_8, black)
+```
+
+```{r riser1-50}
+change_grps_simple(riserconcern_8, black)
+```
+
+### Black + Income
+
+```{r riser1-51}
+concerns_grps(riserconcern_8, blackIncome)
+```
+
+```{r riser1-52}
+change_grps_simple(riserconcern_8, blackIncome)
+```
+
+
+
+## Being treated unfairly by other children{.tabset}
+
+### All
+
+```{r riser1-53}
+plot = scored %>%
+  filter(!is.na(riserconcern_9)) %>%
+  group_by(Date, riserconcern_9) %>%
+  summarize(n=n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*n/sum(n)) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = riserconcern_9),
+             text = paste0(
+               "Date: ", Date,
+               "\nResponse: ", riserconcern_9,
+               "\nCount: ", n,
+               "\nPercent: ", round(percent,2))) +
+  geom_line() +
+  labs(x = "Date", title = "Percent choosing response____", y = NULL, color = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-54}
+concerns_grps(riserconcern_9, black)
+```
+
+```{r riser1-55}
+change_grps_simple(riserconcern_9, black)
+```
+
+### Black + Income
+
+```{r riser1-56}
+concerns_grps(riserconcern_9, blackIncome)
+```
+
+```{r riser1-57}
+change_grps_simple(riserconcern_9, blackIncome)
+```
+
+# Discrimination
+
+## Composite{.tabset}
+
+This composite was created by treating the 12 discrimination variables as continuous and averageing responses across those items. The resulting index is a measure that ranges from 0 (Endorsed no discrimination items) to 1 (Endorsed all discrimination items).
+
+### All
+
+```{r riser1-58 }
+plot = scored %>%
+  filter(!is.na(discrimination)) %>%
+  group_by(Date) %>%
+  summarize(m = mean(discrimination),
+            sd = sd(discrimination),
+            n=n()) %>%
+  mutate(se = sqrt(sd/n),
+         moe = se*qt(p = .975, df = n-1)) %>%
+  ggplot(aes(x = Date, 
+             y = m,
+             text = paste0(
+               "Date: ", Date,
+               "\nCount: ", n,
+               "\nMean: ", round(m,2),
+               "\nLower 95% CI: ", round(m-moe,2),
+               "\nLower 95% CI: ", round(m+moe,2)),
+             group = 1)) +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = 3) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Date", title = "Average discrimination", y = NULL,
+       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-59 }
+composite_grps(discrimination, black)
+```
+
+
+### Black + Income
+
+```{r riser1-60 }
+composite_grps(discrimination, blackIncome)
+```
+
+## Individual items{.tabset}
+
+### All
+
+```{r riser1-61}
+plot = scored %>%
+  ungroup() %>%
+  select(Week, starts_with("discrim_")) %>%
+  gather(type, response, -Week) %>%
+  mutate(type = str_remove(type, "discrim_"),
+         type = as.numeric(type),
+         type = factor(type, 
+                       labels = c(
+                         "Worse service",
+                         "Denied service",
+                         "Police mistreatment",
+                         "Fired",
+                         "Not hired",
+                         "Denied promotion",
+                         "Discouraged from education",
+                         "Redlining",
+                         "Hostile neighbors",
+                         "Denied credit",
+                         "Denied healthcare",
+                         "Called slur")),
+         response = ifelse(response == "Yes", 1, 0)) %>%
+  group_by(Week, type) %>%
+  summarize(n = n(),
+    percent = 100*mean(response, na.rm=T)) %>%
+  ungroup() %>%
+  mutate(Week = factor(Week,
+                       labels = c("Pre-pandemic", "Current")))
+
+plot = plot %>%
+  ggplot(aes(x = type, 
+             y = percent, 
+             fill = Week,
+             text = paste0(
+               "Week: ", Week,
+               "\nPercent: ", round(percent, 1),
+               "\nNumber of responses:", n
+             ))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers experiencing discrimiation through due to their race/ethnicity", fill = NULL) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Black
+
+```{r riser1-62, fig.height=8}
+plot = scored %>%
+  filter(!is.na(black)) %>%
+  ungroup() %>%
+  select(Week, black, starts_with("discrim_")) %>%
+  gather(type, response, starts_with("discrim_")) %>%
+  mutate(type = str_remove(type, "discrim_"),
+         type = as.numeric(type),
+         type = factor(type, 
+                       labels = c(
+                         "Worse service",
+                         "Denied service",
+                         "Police mistreatment",
+                         "Fired",
+                         "Not hired",
+                         "Denied promotion",
+                         "Discouraged from education",
+                         "Redlining",
+                         "Hostile neighbors",
+                         "Denied credit",
+                         "Denied healthcare",
+                         "Called slur")),
+         response = ifelse(response == "Yes", 1, 0)) %>%
+  group_by(Week, type, black) %>%
+  summarize(n = n(),
+    percent = 100*mean(response, na.rm=T)) %>%
+  ungroup() %>%
+  mutate(Week = factor(Week,
+                       labels = c("Pre-pandemic", "Current")))
+
+plot = plot %>%
+  ggplot(aes(x = type, 
+             y = percent, 
+             fill = black,
+             text = paste0(
+               "Group: ", black,
+               "\nPercent: ", round(percent, 1),
+               "\nNumber of responses:", n
+             ))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers experiencing discrimiation through due to their race/ethnicity", fill = NULL) +
+  facet_wrap(~Week, nrow = 2) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot, tooltip = "text")
+```
+### Black + Income
+
+```{r riser1-63, fig.height=8}
+plot = scored %>%
+  filter(!is.na(blackIncome)) %>%
+  ungroup() %>%
+  select(Week, blackIncome, starts_with("discrim_")) %>%
+  gather(type, response, starts_with("discrim_")) %>%
+  mutate(type = str_remove(type, "discrim_"),
+         type = as.numeric(type),
+         type = factor(type, 
+                       labels = c(
+                         "Worse service",
+                         "Denied service",
+                         "Police mistreatment",
+                         "Fired",
+                         "Not hired",
+                         "Denied promotion",
+                         "Discouraged from education",
+                         "Redlining",
+                         "Hostile neighbors",
+                         "Denied credit",
+                         "Denied healthcare",
+                         "Called slur")),
+         response = ifelse(response == "Yes", 1, 0)) %>%
+  group_by(Week, type, blackIncome) %>%
+  summarize(n = n(),
+    percent = 100*mean(response, na.rm=T)) %>%
+  ungroup() %>%
+  mutate(Week = factor(Week,
+                       labels = c("Pre-pandemic", "Current")))
+
+plot = plot %>%
+  ggplot(aes(x = type, 
+             y = percent, 
+             fill = blackIncome,
+             text = paste0(
+               "Group: ", blackIncome,
+               "\nPercent: ", round(percent, 1),
+               "\nNumber of responses:", n
+             ))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers experiencing discrimiation through due to their race/ethnicity", fill = NULL) +
+  facet_wrap(~Week, nrow = 2) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot, tooltip = "text")
+```

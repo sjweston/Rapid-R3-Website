@@ -1414,6 +1414,22 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   open_ended = data %>% select(CaregiverID, Week, contains("Open"))
   newdata = newdata %>% full_join(open_ended)
   
+  riser = data %>%
+    select(CaregiverID, Week, contains("RISER")) %>%
+    filter(Week >= 21) %>%
+    gather(variable, response, -CaregiverID, -Week) %>%
+    mutate(
+      variable = str_replace(variable, "RISER\\.00", "riserconcern_"),
+      variable = str_replace(variable, "RISER\\.01", "discrim_0"),
+      variable = str_replace(variable, "RISER.022", "talkchallenge"),
+      variable = str_replace(variable, "RISER.023", "talkadvantage"),
+      variable = str_replace(variable, "(RISER\\.02)", "discrim_1"),
+      variable = str_replace(variable, "\\.a", "_pre"),
+      variable = str_remove(variable, "\\.b"),
+      ) %>%
+    spread(variable, response)
+  
+  newdata = full_join(newdata, riser)
   
   return(newdata)
 }

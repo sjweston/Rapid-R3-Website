@@ -1,0 +1,28 @@
+---
+title: "Create weekly scripts"
+output: html_document
+---
+
+```{r}
+library(here)
+
+source(here("Scripts/score data.R"))
+
+all_weeks = scored %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  summarize(start = min(Date),
+            stop = max(Date),
+            start = format(start, "%B %d"),
+            stop = format(stop, "%B %d")) %>%
+  rowwise() %>%
+  mutate(title  = paste0("Week ", Week, " (", start, " - ", stop, ") Summary"))
+
+for (week_sub in 1) {
+  rmarkdown::render("weekly_report.Rmd", 
+                    params = list(subset = all_weeks$Week[week_sub],
+                                  title = all_weeks$title[week_sub]),
+                    output_file=paste0("week",week_sub, "_report.html"))
+}
+```
+

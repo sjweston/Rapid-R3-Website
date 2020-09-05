@@ -29,6 +29,28 @@ source(here("Scripts/score data.R"))
 source(here("Functions/pomp.R"))
 ```
 
+# Representativeness disclaimer
+
+```{r hardship-cares-7 }
+scored_full = scored
+scored = scored %>%
+  filter(!is.na(learning_games))
+
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+
+scored = scored_full
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
 ```{r}
 scored = scored %>%
   mutate(SCHOOL.001.a = factor(SCHOOL.001.a, 
@@ -95,77 +117,76 @@ scored = scored %>%
 
 # Older children
 
-## Mental health of families{.tabset}
+<!-- ## Mental health of families{.tabset} -->
 
-```{r}
-families_with_school = scored %>%
-  filter(!is.na(has_schoolage_child)) %>%
-  group_by(CaregiverID) %>%
-  filter(row_number() == 1) %>%
-  ungroup() %>%
-  select(CaregiverID, has_schoolage_child) %>%
-  rename(schoolage_child = has_schoolage_child) %>%
-  left_join(scored)
+<!-- ```{r} -->
+<!-- families_with_school = scored %>% -->
+<!--   filter(!is.na(has_schoolage_child)) %>% -->
+<!--   group_by(CaregiverID) %>% -->
+<!--   filter(row_number() == 1) %>% -->
+<!--   ungroup() %>% -->
+<!--   select(CaregiverID, has_schoolage_child) %>% -->
+<!--   rename(schoolage_child = has_schoolage_child) %>% -->
+<!--   left_join(scored) -->
 
-fam_school_mh = families_with_school %>%
-  group_by(Week, schoolage_child) %>%
-  mutate(Week = case_when(
-    Week == 0 ~ as.Date("2020-03-27"),
-    TRUE ~ min(Date, na.rm=T)
-  )) %>%
-  summarize(n = n(),
-            m_health = mean(m_health, na.rm=T),
-            cm_health = mean(cm_health, na.rm=T)) %>%
-  mutate(schoolage_child = factor(schoolage_child, 
-                                  levels = c(0,1),
-                                  labels = c("No older children",
-                                             "1+ school-age children")))
-```
+<!-- fam_school_mh = families_with_school %>% -->
+<!--   group_by(Week, schoolage_child) %>% -->
+<!--   mutate(Week = case_when( -->
+<!--     Week == 0 ~ 0, -->
+<!--     TRUE ~ min(Date, na.rm=T), -->
+<!--   )) %>% -->
+<!--   summarize(n = n(), -->
+<!--             m_health = mean(m_health, na.rm=T), -->
+<!--             cm_health = mean(cm_health, na.rm=T)) %>% -->
+<!--   mutate(schoolage_child = factor(schoolage_child,  -->
+<!--                                   levels = c(0,1), -->
+<!--                                   labels = c("No older children", -->
+<!--                                              "1+ school-age children"))) -->
+<!-- ``` -->
 
-### Caregiver Mental Health
+<!-- ### Caregiver Mental Health -->
 
-```{r}
-plot = fam_school_mh %>%
-  ggplot(aes(x = Week, 
-             y = m_health, 
-             color = schoolage_child,
-             group = 1,
-             text = paste0(
-               "Date: ", Week,
-               "\nCount: ", n,
-               "\nGroup: ", schoolage_child,
-               "\nAvgerage Mental Health: ", round(m_health))
-             )) +
-  geom_point()+
-  geom_line() +
-  labs(x = "Date", y = NULL, color = NULL, title = "Average Caregiver Mental Health") +
-  theme_pubr()
+<!-- ```{r} -->
+<!-- plot = fam_school_mh %>% -->
+<!--   ggplot(aes(x = Week,  -->
+<!--              y = m_health,  -->
+<!--              color = schoolage_child, -->
+<!--              group = 1, -->
+<!--              text = paste0( -->
+<!--                "Date: ", Week, -->
+<!--                "\nCount: ", n, -->
+<!--                "\nGroup: ", schoolage_child, -->
+<!--                "\nAvgerage Mental Health: ", round(m_health)) -->
+<!--              )) + -->
+<!--   geom_point()+ -->
+<!--   geom_line() + -->
+<!--   labs(x = "Date", y = NULL, color = NULL, title = "Average Caregiver Mental Health") + -->
+<!--   theme_pubr() -->
 
-ggplotly(plot, tooltip = "text")
-```
+<!-- ggplotly(plot, tooltip = "text") -->
+<!-- ``` -->
 
-### Child Mental Health
+<!-- ### Child Mental Health -->
 
-```{r}
-plot = fam_school_mh %>%
-  ggplot(aes(x = Week, 
-             y = cm_health, 
-             color = schoolage_child,
-             group = 1,
-             text = paste0(
-               "Date: ", Week,
-               "\nCount: ", n,
-               "\nGroup: ", schoolage_child,
-               "\nAvgerage Mental Health: ", round(cm_health))
-             )) +
-  geom_point()+
-  geom_line() +
-  labs(x = "Date", y = NULL, color = NULL, title = "Average Young Child Mental Health") +
-  theme_pubr()
+<!-- ```{r} -->
+<!-- plot = fam_school_mh %>% -->
+<!--   ggplot(aes(x = Week,  -->
+<!--              y = cm_health,  -->
+<!--              color = schoolage_child, -->
+<!--              group = 1, -->
+<!--              text = paste0( -->
+<!--                "Date: ", Week, -->
+<!--                "\nCount: ", n, -->
+<!--                "\nGroup: ", schoolage_child, -->
+<!--                "\nAvgerage Mental Health: ", round(cm_health)) -->
+<!--              )) + -->
+<!--   geom_point()+ -->
+<!--   geom_line() + -->
+<!--   labs(x = "Date", y = NULL, color = NULL, title = "Average Young Child Mental Health") + -->
+<!--   theme_pubr() -->
 
-ggplotly(plot, tooltip = "text")
-```
-
+<!-- ggplotly(plot, tooltip = "text") -->
+<!-- ``` -->
 
 
 ## School's plans{.tabset}
@@ -355,13 +376,23 @@ plot = scored %>%
   geom_bar(stat = "identity", position = "dodge") +
   scale_fill_manual(values =  c("Black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   coord_flip() +
-  labs(x = NULL)+
+  labs(x = NULL, fill = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
 
 ggplotly(plot, tooltip = "text")
 
-overall %>%
+scored %>%
+  gather(category, response, black, latinx, single, poverty150) %>%
+  filter(response %in% c("Black","LatinX","Single parent","Low income")) %>%
+  filter(!is.na(SCHOOL.001.a)) %>%
+  group_by(SCHOOL.001.a, response) %>%
+  summarize(count = n()) %>%
+  ungroup() %>%
+  group_by(response) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ungroup() %>%
+  full_join(overall) %>%
     mutate(percent = round(percent, 1)) %>%
   select(-count) %>%
   rename(plans = SCHOOL.001.a,
@@ -504,10 +535,11 @@ scored %>%
   summarize(count = n(),
             percent = 100*sum(response)/count) %>%
   mutate(person = str_remove(person, "school_")) %>%
-  ggplot(aes(x = reorder(person, percent), y = percent)) +
+  ggplot(aes(x = reorder(person, percent), y = percent, fill = person)) +
   geom_bar(stat = "identity")+
   coord_flip() +
   labs(x = NULL)+
+  guides(fill = F) +
   theme_pubclean() +
   theme(plot.title.position = "plot")
 
@@ -646,7 +678,7 @@ plot = scored %>%
   geom_bar(stat = "identity", position = "dodge") +
   scale_fill_manual(values =  c("Black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   coord_flip() +
-  labs(x = NULL)+
+  labs(x = NULL, fill = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
 
@@ -1345,10 +1377,11 @@ scored %>%
   summarize(count = n(),
             percent = 100*sum(response)/count) %>%
   mutate(person = str_remove(person, "learningp_")) %>%
-  ggplot(aes(x = reorder(person, percent), y = percent)) +
+  ggplot(aes(x = reorder(person, percent), y = percent, fill = person)) +
   geom_bar(stat = "identity")+
   coord_flip() +
   labs(x = NULL, title = "Who will be assisting with you child(s) 0-5 learning?")+
+  guides(fill = F)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
 
@@ -1493,7 +1526,7 @@ plot = scored %>%
   geom_bar(stat = "identity", position = "dodge") +
   scale_fill_manual(values =  c("Black", "#66C2A5","#FC8D62","#8DA0CB","#E78AC3")) +
   coord_flip() +
-  labs(x = NULL)+
+  labs(x = NULL, fill = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
 
