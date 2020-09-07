@@ -71,14 +71,15 @@ census = readxl::read_xls(here("data/thresh19.xls"), sheet = 2)
 scored = scored %>%
   select(CaregiverID, Week, BaselineWeek, income,
          household_size, num_children_raw) %>%
+  mutate(household_size = ifelse(household_size > 9, 9, household_size),
+         num_children_raw = ifelse(num_children_raw > 8, 8, num_children_raw)) %>%
   left_join(census) %>%
   mutate(poverty150s = ifelse(income < poverty_threshold*1.5,1,0),
          poverty200s = ifelse(income < poverty_threshold*2,1,0)) %>%
-  select(CaregiverID, Week, BaselineWeek, income, household_size, 
-         num_children_raw, poverty150s, poverty200s) %>%
+  select(CaregiverID, Week, poverty150s, poverty200s) %>%
   full_join(scored)
 
-if(!(contains_items("FPL\\.", scored))){
+if(!(contains_items("FPL\\.", master))){
   scored$poverty100 = scored$poverty150s
   scored$poverty125 = scored$poverty150s
   scored$poverty150 = scored$poverty150s
@@ -98,11 +99,20 @@ scored = scored %>%
 
 scored = scored %>%
   group_by(CaregiverID) %>%
-  mutate_at(.vars = c("language","income", "household_size", "num_children_raw", "gender", 
+  arrange(Week) %>%
+  mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", 
                       "zip", "state", "region",
-                      "single", "disability",
+                      "single", "disability", "employment_change",
+                      "poverty100", "poverty125", "poverty150", "poverty200"), 
+            na.locf0) %>% # carry these variables down through NA's
+  arrange(desc(Week)) %>%
+  mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
+                      "race_cat", "black", "white", "minority", "native", "asian",
+                      "hawaii", "other_race", "latinx", 
+                      "zip", "state", "region", 
+                      "single", "disability",  "employment_change",
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   ungroup()

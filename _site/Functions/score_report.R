@@ -78,21 +78,65 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        id = "CaregiverID",
                        newvar.name = "POLICY.012_cat")
     newdata$POLICY.001_cat = data$POLICY.001_cat
-    newdata$access_telehealth = ifelse(grepl("1", data$POLICY.001_cat) | 
-                                         grepl("2", data$POLICY.001_cat) | 
-                                         grepl("1", data$POLICY.012_cat) | 
-                                         grepl("2", data$POLICY.012_cat), 
-                                       1, 0)
-    newdata$access_telehealth_self = ifelse(grepl("1", data$POLICY.001_cat) | 
-                                         grepl("1", data$POLICY.012_cat), 
-                                       1, 0)
-    newdata$access_telehealth_child = ifelse(grepl("2", data$POLICY.001_cat) | 
-                                              grepl("2", data$POLICY.012_cat), 
-                                            1, 0)
-    newdata$access_mentalhealth = ifelse(grepl("3", data$POLICY.001_cat) | grepl("3", data$POLICY.012_cat), 1, 0)
-    newdata$access_parenting = ifelse(grepl("4", data$POLICY.001_cat) | grepl("4", data$POLICY.012_cat), 1, 0)
-    newdata$access_fitness = ifelse(grepl("5", data$POLICY.001_cat) | grepl("5", data$POLICY.012_cat), 1, 0)
-    newdata$access_education = ifelse(grepl("6", data$POLICY.001_cat) | grepl("6", data$POLICY.012_cat), 1, 0)
+    
+    newdata$access_telehealth = case_when(
+      grepl("1", data$POLICY.001_cat) ~ 1, 
+      grepl("2", data$POLICY.001_cat) ~ 1, 
+      grepl("1", data$POLICY.012_cat) ~ 1, 
+      grepl("2", data$POLICY.012_cat) ~ 1,
+      !is.na(data$POLICY.001_cat) ~ 0,
+      !is.na(data$POLICY.012_cat) ~ 0,
+      TRUE ~ NA_real_
+    )
+    
+    newdata$access_telehealth_self = case_when(
+      grepl("1", data$POLICY.001_cat) ~ 1, 
+      grepl("1", data$POLICY.012_cat) ~ 1, 
+      !is.na(data$POLICY.001_cat) ~ 0,
+      !is.na(data$POLICY.012_cat) ~ 0,
+      TRUE ~ NA_real_
+    )
+    
+    newdata$access_telehealth_child = case_when(
+      grepl("2", data$POLICY.001_cat) ~ 1, 
+      grepl("2", data$POLICY.012_cat) ~ 1, 
+      !is.na(data$POLICY.001_cat) ~ 0,
+      !is.na(data$POLICY.012_cat) ~ 0,
+      TRUE ~ NA_real_
+    )
+    
+    newdata$access_mentalhealth = case_when(
+      grepl("3", data$POLICY.001_cat) ~ 1, 
+      grepl("3", data$POLICY.012_cat) ~ 1, 
+      !is.na(data$POLICY.001_cat) ~ 0,
+      !is.na(data$POLICY.012_cat) ~ 0,
+      TRUE ~ NA_real_
+    )
+    
+    newdata$access_parenting = case_when(
+      grepl("4", data$POLICY.001_cat) ~ 1, 
+      grepl("4", data$POLICY.012_cat) ~ 1, 
+      !is.na(data$POLICY.001_cat) ~ 0,
+      !is.na(data$POLICY.012_cat) ~ 0,
+      TRUE ~ NA_real_
+    )
+    
+    newdata$access_fitness = case_when(
+      grepl("5", data$POLICY.001_cat) ~ 1, 
+      grepl("5", data$POLICY.012_cat) ~ 1, 
+      !is.na(data$POLICY.001_cat) ~ 0,
+      !is.na(data$POLICY.012_cat) ~ 0,
+      TRUE ~ NA_real_
+    )
+    
+    newdata$access_education = case_when(
+      grepl("6", data$POLICY.001_cat) ~ 1, 
+      grepl("6", data$POLICY.012_cat) ~ 1, 
+      !is.na(data$POLICY.001_cat) ~ 0,
+      !is.na(data$POLICY.012_cat) ~ 0,
+      TRUE ~ NA_real_
+    )
+      
     newdata$access_social = ifelse(rowSums(data[,find_items("POLICY.001_[3-4]", data)], na.rm=T) > 0, 1, 0)
     newdata$access_online = ifelse(rowSums(data[,find_items("POLICY.001_[1-7]$", data)], na.rm=T) > 0, 1, 0)  
   }
@@ -1051,6 +1095,13 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       newdata$num_children_raw = data$DEMO.003
       newdata$household_size = data$DEMO.005
   }
+  
+  newdata$num_parents = case_when(
+    data$DEMO.011.a == 1 ~ 2,
+    data$DEMO.011.a == 2 ~ 1,
+    data$DEMO.011.a == 3 ~ 0,
+    TRUE ~ NA_real_
+  )
   
   if(contains_items("DEMO.011", data)){
     newdata$living_arrange = data$DEMO.011
