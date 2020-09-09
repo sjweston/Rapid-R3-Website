@@ -44,10 +44,10 @@ dates = master %>%
 ```{r hardship-cares-6 }
 scored = scored %>%
   filter(Week > 0) %>%
-  mutate(Week = ifelse(
-    (Week %% 2) == 0,
-    Week - 1,
-    Week)) %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week, 
+    (Week %% 2) == 0 ~ Week - 1,
+    TRUE ~ Week)) %>%
   group_by(Week, CaregiverID) %>%
   filter(row_number() == 1) %>%
   group_by(Week) %>%

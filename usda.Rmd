@@ -1,0 +1,181 @@
+---
+title: "USDA Food Insecurity"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+```{r, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r }
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+```
+
+# Representativeness disclaimer
+
+```{r hardship-cares-7 }
+scored = scored %>%
+  filter(!is.na(food))
+
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+```{r}
+scored = scored  %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date),
+    TRUE ~ as.Date("2020-08-01"))) %>%
+  ungroup() %>%
+  mutate(food_cat = case_when(
+    food < 2 ~ "No",
+    food >=2 & food <=4 ~ "Some",
+    food > 4 ~ "A lot"
+  )) %>%
+  mutate(black_cat = factor(black, labels = c("non-Black", "Black")),
+         poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
+         race_ethnic = case_when(
+           black == 1 ~ "Black",
+           latinx == 1 ~ "LatinX",
+           !is.na(black) ~ "White",
+           !is.na(latinx) ~ "White",
+           TRUE ~ NA_character_
+         ),
+         black_poverty = case_when(
+           black == 1 & poverty150 == 1 ~ "Low income, Black",
+           black == 1 & poverty150 == 0 ~ "High income, Black",
+           black == 0 & poverty150 == 1 ~ "Low income, non-Black",
+           black == 0 & poverty150 == 0 ~ "High income, non-Black",
+           TRUE ~ NA_character_))
+
+date_labels = scored %>%
+  group_by(Date) %>%
+  summarize(N = n()) %>%
+  ungroup() %>%
+  mutate(label = case_when(
+    Date == "2020-08-01" ~ "Pre-pandemic",
+    TRUE ~ format(Date, "%b %d")))
+```
+
+
+# Food insecurity{.tabset}
+
+```{r}
+usda_group = function(group, data = scored){
+  plot = data %>%
+    filter(!is.na({{group}})) %>%
+  group_by(Date, food_cat, {{group}}) %>%
+  summarize(count = n()) %>%
+  group_by(Date, {{group}}) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  filter(food_cat != "No") %>%
+  ggplot(aes(x = Date, 
+             y = percent, 
+             color = {{group}},
+             group = 1, 
+             text = paste0(
+               "Group: ", {{group}}, 
+               "\nPercent: ", round(percent, 1)
+             ))) +
+  geom_point() +
+  geom_line()+  
+  scale_x_time(breaks = date_labels$Date, labels = date_labels$label) +
+  labs(title = "Percent of caregivers experiencing ___ food insecurity", 
+       x = NULL,
+       color = NULL, 
+       y = NULL)+
+    facet_wrap(~food_cat) +
+  theme_pubclean() +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1, vjust = 1))
+
+ggplotly(plot, tooltip = "text")
+
+}
+```
+
+
+## All
+
+```{r social-support2-36}
+plot = scored %>%
+  group_by(Date, food_cat) %>%
+  summarize(count = n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  #mutate(Week = paste("Week", Week)) %>%
+  filter(food_cat != "No") %>%
+  ggplot(aes(x = Date, 
+             y = percent, 
+             color = food_cat,
+             group = 1, 
+             text = paste0(
+               "Response: ", food_cat, 
+               "\nPercent: ", round(percent, 1)
+             ))) +
+  geom_point() +
+  geom_line()+  
+  scale_x_time(breaks = date_labels$Date, labels = date_labels$label) +
+  labs(title = "Percent of caregivers experiencing ___ food insecurity", 
+       x = NULL,
+       color = NULL, 
+       y = NULL)+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+
+```
+
+## Race/ethnicity
+
+```{r}
+usda_group(race_ethnic)
+```
+
+
+## Black
+
+```{r}
+usda_group(black_cat)
+```
+
+## Income
+
+```{r}
+usda_group(poverty_cat)
+```
+
+## Black + Income
+
+```{r}
+usda_group(black_poverty)
+```
+
+
