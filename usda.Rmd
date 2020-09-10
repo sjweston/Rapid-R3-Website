@@ -103,6 +103,7 @@ usda_group = function(group, data = scored){
              group = 1, 
              text = paste0(
                "Group: ", {{group}}, 
+               "\nCount:", count,
                "\nPercent: ", round(percent, 1)
              ))) +
   geom_point() +
@@ -176,6 +177,13 @@ usda_group(poverty_cat)
 
 ```{r}
 usda_group(black_poverty)
+```
+
+
+## Medicaid expansion
+
+```{r}
+usda_group(medicaid_expansion)
 ```
 
 

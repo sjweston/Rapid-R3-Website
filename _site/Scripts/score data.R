@@ -265,6 +265,24 @@ zipincome = filter(zipincome, !is.na(zip))
 
 scored = left_join(scored, zipincome)
 
+
+# state medicaid ----------------------------------------------------------
+
+scored = scored %>%
+  mutate(medicaid_expansion = case_when(
+    state %in% c("WA", "OR", "CA", "AK", "HI",
+                 "ID", "NV", "MT", "UT", "AZ",
+                 "CO", "NM", "ND", "MN", "IA",
+                 "IL", "AR", "LA", "MI", "IN",
+                 "KY", "OH", "WV", "VA", "PA",
+                 "NY", "ME", "VT", "NH", "MA",
+                 "RI", "CT", "NJ", "DE", "MD", 
+                 "DC") ~ "Medicaid Expansion",
+    state %in% c("NE", "MO", "OK") ~ "Not expanded",
+    state %in% c("WY", "SD", "WI", "KS", "TX",
+                 "TN", "NC", "SC", "MS", "AL",
+                 "GA", "FL") ~ "Not expanded"))
+
 rm(list = setdiff(ls(), c("scored", "master", "combine.cat", 
                           "find_items", "contains_items", "identify_state",
                           "select_first")))
