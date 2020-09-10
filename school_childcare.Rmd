@@ -8,7 +8,10 @@ output:
 
 
 ```{r, echo = F}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=12)
 options(knitr.kable.NA = '')
 ```
 
@@ -1045,7 +1048,7 @@ prek_how = function(group, data = scored){
 
 ### Overall
 
-```{r, fig.width = 10}
+```{r}
 scored %>%
   select(starts_with("learning_")) %>%
   gather("learning", response) %>%
@@ -1095,7 +1098,7 @@ scored %>%
 
 ### Black
 
-```{r, fig.width = 10}
+```{r}
 prek_how(black)$plot
 ```
 
@@ -1109,7 +1112,7 @@ prek_how(black)$employ
 
 ### LatinX
 
-```{r, fig.width = 10}
+```{r}
 prek_how(latinx)$plot
 ```
 
@@ -1125,7 +1128,7 @@ prek_how(latinx)$employ
 
 ### Single
 
-```{r, fig.width = 10}
+```{r}
 prek_how(single)$plot
 ```
 
@@ -1141,7 +1144,7 @@ prek_how(single)$employ
 
 ### Low Income
 
-```{r, fig.width = 10}
+```{r}
 prek_how(poverty150)$plot
 ```
 
@@ -1157,7 +1160,7 @@ prek_how(poverty150)$employ
 
 ### Employment
 
-```{r, fig.width = 10}
+```{r}
 prek_how(employment)$plot
 ```
 
@@ -1173,7 +1176,7 @@ prek_how(employment)$employ
 
 ### All groups
 
-```{r, fig.width = 10}
+```{r}
 overall = scored %>%
   select(starts_with("learning_")) %>%
   gather("learning", response) %>%
@@ -1227,6 +1230,8 @@ plot = scored %>%
   labs(x = NULL)+
   theme_pubclean() +
   theme(plot.title.position = "plot")
+
+ggplotly(plot, tooltip = "text")
 
 scored %>%
   gather(category, group, black, latinx, single, poverty150) %>%
