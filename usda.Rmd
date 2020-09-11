@@ -49,8 +49,10 @@ scored = scored %>%
          black_poverty = case_when(
            black == 1 & poverty150 == 1 ~ "Low income, Black",
            black == 1 & poverty150 == 0 ~ "High income, Black",
-           black == 0 & poverty150 == 1 ~ "Low income, non-Black",
-           black == 0 & poverty150 == 0 ~ "High income, non-Black",
+           latinx == 1 & poverty150 == 1 ~ "Low income, LatinX",
+           latinx == 1 & poverty150 == 0 ~ "High income, LatinX",
+           white == 1 & poverty150 == 1 ~ "Low income, White",
+           white == 1 & poverty150 == 0 ~ "High income, White",
            TRUE ~ NA_character_))
 ```
 
@@ -184,7 +186,7 @@ usda_group(black_cat)
 usda_group(poverty_cat)
 ```
 
-## Black + Income
+## Race + Income
 
 ```{r usda-12 }
 usda_group(black_poverty)
@@ -226,8 +228,9 @@ hardship_scored = scored %>%
   mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
   mutate(Week = case_when(
     Week < 17 ~ Week, 
-    (Week %% 2) == 0 ~ Week - 1,
+    (Week %% 2) == 0 ~ NA_real_,
     TRUE ~ Week)) %>%
+  filter(!is.na(Week)) %>%
   group_by(Week) %>%
   mutate(Date = case_when(
     !is.na(Date) ~ min(Date))) %>%
@@ -313,7 +316,7 @@ hardship_group(black_cat)
 hardship_group(poverty_cat)
 ```
 
-## Black + Income
+## Race + Income
 
 ```{r usda-19 }
 hardship_group(black_poverty)
@@ -455,7 +458,7 @@ financial_group(black_cat)
 financial_group(poverty_cat)
 ```
 
-## Black + Income
+## Race + Income
 
 ```{r usda-28 }
 financial_group(black_poverty)
@@ -605,7 +608,7 @@ mh_group(mh_food, black_cat)
 mh_group(mh_food, poverty_cat)
 ```
 
-### Black + Income
+### Race + Income
 
 ```{r usda-37 }
 mh_group(mh_food, black_poverty)
@@ -649,7 +652,7 @@ mh_group(mh_eviction, black_cat)
 mh_group(mh_eviction, poverty_cat)
 ```
 
-### Black + Income
+### Race + Income
 
 ```{r usda-44 }
 mh_group(mh_eviction, black_poverty)
@@ -693,7 +696,7 @@ mh_group(mh_foreclose, black_cat)
 mh_group(mh_eviction, poverty_cat)
 ```
 
-### Black + Income
+### Race + Income
 
 ```{r usda-51 }
 mh_group(mh_foreclose, black_poverty)
@@ -737,7 +740,7 @@ mh_group(mh_utilities, black_cat)
 mh_group(mh_utilities, poverty_cat)
 ```
 
-### Black + Income
+### Race + Income
 
 ```{r usda-58 }
 mh_group(mh_utilities, black_poverty)
@@ -872,7 +875,7 @@ mh_group(mh_all, black_cat)
 mh_group(mh_all, poverty_cat)
 ```
 
-### Black + Income
+### Race + Income
 
 ```{r usda-67 }
 mh_group(mh_all, black_poverty)
