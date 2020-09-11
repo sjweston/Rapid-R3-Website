@@ -84,7 +84,7 @@ scored = scored %>%
     TRUE ~ support
   )) %>%
   rowwise() %>%
-  mutate(material_hardship = sum(c_across(starts_with("diff_pay")), na.rm=T)) %>%
+  mutate(material_hardship = sum(c_across(starts_with("diff_pay_")), na.rm=T)) %>%
   ungroup()
 ```
 
