@@ -34,6 +34,8 @@ cutoffv = 1
 scored = scored %>%
   mutate(black_cat = factor(black, labels = c("non-Black", "Black")),
          poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
+         single_cat = factor(single, labels = c("Dual parent", "Single parent")),
+         disability_cat = factor(disability, labels = c("No disability", "Child with disability")),
          race_ethnic = case_when(
            black == 1 ~ "Black",
            latinx == 1 ~ "LatinX",
@@ -320,6 +322,20 @@ hardship_group(black_poverty)
 hardship_group(medicaid_expansion)
 ```
 
+## Single 
+
+```{r usda-21 }
+hardship_group(single_cat)
+```
+
+
+## Disability
+
+```{r usda-22 }
+hardship_group(disability_cat)
+```
+
+
 # Family financial status{.tabset}
 
 
@@ -335,7 +351,7 @@ For these analyses, data collected in even numbered weeks starting in August wer
 
 ## Representativeness disclaimer
 
-```{r usda-21 }
+```{r usda-23 }
 hardship_scored = scored %>%
   rowwise() %>%
   mutate(material_hardship = sum(c_across(starts_with("diff_pay_")), na.rm=T)) %>%
@@ -365,7 +381,7 @@ perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
 These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
 
 
-```{r usda-22 }
+```{r usda-24 }
 financial_group = function(group, data = hardship_scored){
   
   plot = data %>%
@@ -398,7 +414,7 @@ financial_group = function(group, data = hardship_scored){
 
 ## All
 
-```{r usda-23 }
+```{r usda-25 }
 plot = hardship_scored %>%
   filter(!is.na(financial_status)) %>%
   group_by(Week, Date, financial_status) %>%
@@ -426,26 +442,38 @@ ggplotly(plot, tooltip = "text")
 
 ## Black
 
-```{r usda-24 }
+```{r usda-26 }
 financial_group(black_cat)
 ```
 
 ## Income
 
-```{r usda-25 }
+```{r usda-27 }
 financial_group(poverty_cat)
 ```
 
 ## Black + Income
 
-```{r usda-26 }
+```{r usda-28 }
 financial_group(black_poverty)
 ```
 
 ## Medicaid expansion
 
-```{r usda-27 }
+```{r usda-29 }
 financial_group(medicaid_expansion)
+```
+
+## Single
+
+```{r usda-30 }
+financial_group(single_cat)
+```
+
+## Disability
+
+```{r usda-31 }
+financial_group(disability_cat)
 ```
 
 # Looking ahead{.tabset}
@@ -471,7 +499,7 @@ For these analyses, data collected in even numbered weeks starting in August wer
 
 ## Representativeness disclaimer
 
-```{r usda-28 }
+```{r usda-32 }
 hardship_scored = scored %>%
   filter(!is.na(mh_food) | !is.na(mh_eviction) | !is.na(mh_foreclose) | !is.na(mh_utilities)) %>%
   mutate_at(vars(starts_with("mh_")), ~ifelse(.x == 6, NA, .x)) %>%
@@ -494,7 +522,7 @@ perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
 These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
 
 
-```{r usda-29 }
+```{r usda-33 }
 
 mh_all = function(variable, cutoff = cutoffv, data = hardship_scored){
     
@@ -558,133 +586,182 @@ mh_group = function(variable, group, cutoff = cutoffv, data = hardship_scored){
 
 ### All
 
-```{r usda-30 }
+```{r usda-34 }
 mh_all(mh_food)
 ```
 
 ### Black
 
-```{r usda-31 }
+```{r usda-35 }
 mh_group(mh_food, black_cat)
 ```
 
 ### Income
 
-```{r usda-32 }
+```{r usda-36 }
 mh_group(mh_food, poverty_cat)
 ```
 
 ### Black + Income
 
-```{r usda-33 }
+```{r usda-37 }
 mh_group(mh_food, black_poverty)
 ```
 
 ### Medicaid expansion
 
-```{r usda-34 }
+```{r usda-38 }
 mh_group(mh_food, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-39 }
+mh_group(mh_food, single_cat)
+```
+
+### Disability
+
+```{r usda-40 }
+mh_group(mh_food, disability_cat)
 ```
 
 ## Eviction{.tabset}
 
 ### All
 
-```{r usda-35 }
+```{r usda-41 }
 mh_all(mh_eviction)
 ```
 
 ### Black
 
-```{r usda-36 }
+```{r usda-42 }
 mh_group(mh_eviction, black_cat)
 ```
 
 ### Income
 
-```{r usda-37 }
+```{r usda-43 }
 mh_group(mh_eviction, poverty_cat)
 ```
 
 ### Black + Income
 
-```{r usda-38 }
+```{r usda-44 }
 mh_group(mh_eviction, black_poverty)
 ```
 
 ### Medicaid expansion
 
-```{r usda-39 }
+```{r usda-45 }
 mh_group(mh_eviction, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-46 }
+mh_group(mh_eviction, single_cat)
+```
+
+### Disability
+
+```{r usda-47 }
+mh_group(mh_eviction, disability_cat)
 ```
 
 ## Foreclosure{.tabset}
 
 ### All
 
-```{r usda-40 }
+```{r usda-48 }
 mh_all(mh_foreclose)
 ```
 
 ### Black
 
-```{r usda-41 }
+```{r usda-49 }
 mh_group(mh_foreclose, black_cat)
 ```
 
 ### Income
 
-```{r usda-42 }
+```{r usda-50 }
 mh_group(mh_eviction, poverty_cat)
 ```
 
 ### Black + Income
 
-```{r usda-43 }
+```{r usda-51 }
 mh_group(mh_foreclose, black_poverty)
 ```
 
 ### Medicaid expansion
 
-```{r usda-44 }
+```{r usda-52 }
 mh_group(mh_foreclose, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-53 }
+mh_group(mh_foreclose, single_cat)
+```
+
+### Disability
+
+```{r usda-54 }
+mh_group(mh_foreclose, disability_cat)
 ```
 
 ## Utilities{.tabset}
 
 ### All
 
-```{r usda-45 }
+```{r usda-55 }
 mh_all(mh_utilities)
 ```
 
 ### Black
 
-```{r usda-46 }
+```{r usda-56 }
 mh_group(mh_utilities, black_cat)
 ```
 
 ### Income
 
-```{r usda-47 }
+```{r usda-57 }
 mh_group(mh_utilities, poverty_cat)
 ```
 
 ### Black + Income
 
-```{r usda-48 }
+```{r usda-58 }
 mh_group(mh_utilities, black_poverty)
 ```
 
 ### Medicaid expansion
 
-```{r usda-49 }
+```{r usda-59 }
 mh_group(mh_utilities, medicaid_expansion)
+```
+
+
+### Single
+
+```{r usda-60 }
+mh_group(mh_utilities, single_cat)
+```
+
+### Disability
+
+```{r usda-61 }
+mh_group(mh_utilities, disability_cat)
 ```
 
 ## All{.tabset}
 
-```{r usda-50}
+```{r usda-62 }
 hardship_scored = hardship_scored %>%
   mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > cutoffv, 1, 0)) %>%
   mutate(mh_housing = case_when(
@@ -708,7 +785,7 @@ hardship_scored = hardship_scored %>%
   mutate(mh_all = rowMeans(select(., contains("mh_")), na.rm=T)*3) 
 ```
 
-```{r usda-51}
+```{r usda-63 }
 
 mh_all = function(variable, cutoff = cutoffv, data = hardship_scored){
     
@@ -776,30 +853,42 @@ mh_group = function(variable, group, cutoff = cutoffv, data = hardship_scored){
 
 ### All
 
-```{r usda-52 }
+```{r usda-64 }
 mh_all(mh_all)
 ```
 
 ### Black
 
-```{r usda-53 }
+```{r usda-65 }
 mh_group(mh_all, black_cat)
 ```
 
 ### Income
 
-```{r usda-54 }
+```{r usda-66 }
 mh_group(mh_all, poverty_cat)
 ```
 
 ### Black + Income
 
-```{r usda-55 }
+```{r usda-67 }
 mh_group(mh_all, black_poverty)
 ```
 
 ### Medicaid expansion
 
-```{r usda-56 }
+```{r usda-68 }
 mh_group(mh_all, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-69 }
+mh_group(mh_all, single_cat)
+```
+
+### Disability
+
+```{r usda-70 }
+mh_group(mh_all, disability_cat)
 ```
