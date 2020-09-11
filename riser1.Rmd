@@ -8,7 +8,10 @@ output:
 
 
 ```{r riser1-1, echo = F}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=12)
 options(knitr.kable.NA = '')
 ```
 
@@ -52,12 +55,7 @@ scored = scored %>%
     black == 0 ~ 0, 
     latinx == 0 ~ 0,
     TRUE ~ NA_real_
-  )) %>%
-  filter(!is.na(Week)) %>%
-  group_by(Week) %>%
-  mutate(Date = case_when(
-    Week == 0 ~ as.Date("2020-03-01"), 
-    Week > 0 ~ min(Date, na.rm=T))) 
+  )) 
 ```
 
 
@@ -89,7 +87,19 @@ scored = scored_full %>%
       black == 0 & poverty150 == 0 ~ "Non-Black, High income",
       TRUE ~ NA_character_),
     black = factor(black, labels = c("Non-Black", "Black"))
-    )
+    ) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date),
+    TRUE ~ as.Date("2020-08-01")))
+
+date_labels = scored %>%
+  group_by(Date) %>%
+  summarize(N = n()) %>%
+  ungroup() %>%
+  mutate(label = case_when(
+    Date == "2020-08-01" ~ "Pre-pandemic",
+    TRUE ~ format(Date, "%b %d")))
 ```
 
 These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, (`r papaja::printnum(perc.bl)`\% report being both Black/African American and LatinX,) and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
@@ -121,9 +131,11 @@ composite_grps = function(variable, groups, data = scored){
                "\nLower 95% CI: ", round(m+moe,2)))) +
   geom_errorbar(aes(ymin = m-moe, ymax = m+moe), 
                 width = 3,
-                position = position_dodge(1)) +
-  geom_point(position = position_dodge(1)) +
+                position = position_dodge(3)) +
+  geom_point(position = position_dodge(3)) +
   geom_line() +
+    scale_x_time(breaks = date_labels$Date, 
+                 labels = date_labels$label)+
   labs(x = "Date", title = "Average concern for children", y = NULL, color = NULL,
        caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
   theme_pubr()
@@ -142,8 +154,7 @@ concerns_grps = function(variable, groups, data = scored){
   group_by(Date, {{variable}},{{groups}}) %>%
   summarize(n=n()) %>%
     group_by(Date, {{groups}}) %>%
-  mutate(percent = 100*n/sum(n),
-         Date = format.Date(Date, "%B %d")) %>%
+  mutate(percent = 100*n/sum(n)) %>%
   ggplot(aes(x = {{variable}}, 
              y = percent,
              #group = 1,
@@ -154,6 +165,8 @@ concerns_grps = function(variable, groups, data = scored){
                "\nCount: ", n,
                "\nPercent: ", round(percent,2)))) +
   geom_bar(stat = "identity", position = "dodge") +
+    scale_x_time(breaks = date_labels$Date, 
+                 labels = date_labels$label)+
   labs(x = NULL, title = "I am____ concerned for my child(ren)", y = "Percent", fill = NULL,
        caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
     facet_wrap(~Date) +
@@ -182,9 +195,7 @@ change_grps = function(variable, groups, data = scored){
     mutate(percent = 100*n/sum(n)) %>%
     ungroup() %>%
     gather("Week", "Response", Pre, Current) %>%
-    mutate(Week = ifelse(Week == "Pre", "2020-03-01", "2020-08-25"),
-           Week = as.Date(Week),
-           Response = factor(Response,
+    mutate(Response = factor(Response,
                              levels = c("Never","Rarely", "Some of the time", "Most of the time")))  %>%
   ggplot(aes(x = Week,
              y = Response,
@@ -253,8 +264,10 @@ plot = scored %>%
   geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = 3) +
   geom_point() +
   geom_line() +
+  scale_x_time(breaks = date_labels$Date, 
+                     labels = date_labels$label) +
   labs(x = "Date", title = "Average Concern for children", y = NULL,
-       caption = "Dates represent first date of data collection per wave,except for March 1, which is an arbitrary\ndate representing responses to questions about life prior to the pandemic.") +
+       caption = "Dates represent first date of data collection per wave.") +
   theme_pubr()
 
 ggplotly(plot, tooltip = "text")
@@ -765,8 +778,8 @@ composite_grps(discrimination, blackIncome)
 ```{r riser1-61}
 plot = scored %>%
   ungroup() %>%
-  select(Week, starts_with("discrim_")) %>%
-  gather(type, response, -Week) %>%
+  select(Date, starts_with("discrim_")) %>%
+  gather(type, response, -Date) %>%
   mutate(type = str_remove(type, "discrim_"),
          type = as.numeric(type),
          type = factor(type, 
@@ -784,19 +797,19 @@ plot = scored %>%
                          "Denied healthcare",
                          "Called slur")),
          response = ifelse(response == "Yes", 1, 0)) %>%
-  group_by(Week, type) %>%
+  group_by(Date, type) %>%
   summarize(n = n(),
     percent = 100*mean(response, na.rm=T)) %>%
   ungroup() %>%
-  mutate(Week = factor(Week,
-                       labels = c("Pre-pandemic", "Current")))
+  mutate(Date = factor(Date,
+                       levels = as.character(date_labels$Date),
+                       labels = date_labels$label))
 
 plot = plot %>%
   ggplot(aes(x = type, 
              y = percent, 
-             fill = Week,
+             fill = Date,
              text = paste0(
-               "Week: ", Week,
                "\nPercent: ", round(percent, 1),
                "\nNumber of responses:", n
              ))) +
@@ -814,7 +827,7 @@ ggplotly(plot, tooltip = "text")
 plot = scored %>%
   filter(!is.na(black)) %>%
   ungroup() %>%
-  select(Week, black, starts_with("discrim_")) %>%
+  select(Date, black, starts_with("discrim_")) %>%
   gather(type, response, starts_with("discrim_")) %>%
   mutate(type = str_remove(type, "discrim_"),
          type = as.numeric(type),
@@ -833,12 +846,13 @@ plot = scored %>%
                          "Denied healthcare",
                          "Called slur")),
          response = ifelse(response == "Yes", 1, 0)) %>%
-  group_by(Week, type, black) %>%
+  group_by(Date, type, black) %>%
   summarize(n = n(),
     percent = 100*mean(response, na.rm=T)) %>%
   ungroup() %>%
-  mutate(Week = factor(Week,
-                       labels = c("Pre-pandemic", "Current")))
+  mutate(Date = factor(Date,
+                       levels = as.character(date_labels$Date),
+                       labels = date_labels$label))
 
 plot = plot %>%
   ggplot(aes(x = type, 
@@ -851,7 +865,7 @@ plot = plot %>%
              ))) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = NULL, y = NULL, title = "Percent of caregivers experiencing discrimiation through due to their race/ethnicity", fill = NULL) +
-  facet_wrap(~Week, nrow = 2) +
+  facet_wrap(~Date, nrow = 2) +
   theme_pubclean() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -863,7 +877,7 @@ ggplotly(plot, tooltip = "text")
 plot = scored %>%
   filter(!is.na(blackIncome)) %>%
   ungroup() %>%
-  select(Week, blackIncome, starts_with("discrim_")) %>%
+  select(Date, blackIncome, starts_with("discrim_")) %>%
   gather(type, response, starts_with("discrim_")) %>%
   mutate(type = str_remove(type, "discrim_"),
          type = as.numeric(type),
@@ -882,12 +896,13 @@ plot = scored %>%
                          "Denied healthcare",
                          "Called slur")),
          response = ifelse(response == "Yes", 1, 0)) %>%
-  group_by(Week, type, blackIncome) %>%
+  group_by(Date, type, blackIncome) %>%
   summarize(n = n(),
     percent = 100*mean(response, na.rm=T)) %>%
   ungroup() %>%
-  mutate(Week = factor(Week,
-                       labels = c("Pre-pandemic", "Current")))
+  mutate(Date = factor(Date,
+                       levels = as.character(date_labels$Date),
+                       labels = date_labels$label))
 
 plot = plot %>%
   ggplot(aes(x = type, 
@@ -900,7 +915,7 @@ plot = plot %>%
              ))) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = NULL, y = NULL, title = "Percent of caregivers experiencing discrimiation through due to their race/ethnicity", fill = NULL) +
-  facet_wrap(~Week, nrow = 2) +
+  facet_wrap(~Date, nrow = 2) +
   theme_pubclean() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 

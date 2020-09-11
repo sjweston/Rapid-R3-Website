@@ -1482,5 +1482,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   newdata = full_join(newdata, riser)
   
+  #newdata$kinder_delay = 
+  
   return(newdata)
 }
