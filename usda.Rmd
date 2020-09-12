@@ -322,6 +322,35 @@ hardship_group(poverty_cat)
 hardship_group(black_poverty)
 ```
 
+```{r, eval = F}
+plot1 = hardship_scored %>%
+    filter(!is.na(black_poverty)) %>%
+    group_by(Week, Date, black_poverty) %>%
+    summarize(count = n(),
+              hardship = 100*sum(material_hardship)/count)  %>%
+       ungroup()  %>%
+  separate(black_poverty, into = c("income", "race"), sep = ", ")
+
+plot_both = plot1 %>%
+    ggplot(aes(x = Date,
+             y = hardship,
+             group = 1,
+             color = race,
+             text = paste0(
+               "Date: ", Date,
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)))) +
+  geom_point() +
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  facet_wrap(~income) +
+  labs(x = NULL, y = NULL, color = NULL,
+       title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+ggplotly(plot_both, tooltip = "text")
+```
+
+
 ## Medicaid expansion
 
 ```{r usda-20 }

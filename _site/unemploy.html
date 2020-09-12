@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Unemployment benefits</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Weekly Summaries
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Preliminary analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="0prelim_april27.html">April 27</a>
+    </li>
+    <li>
+      <a href="disability.html">Children with disabilities</a>
+    </li>
+    <li>
+      <a href="single.html">Single parents</a>
+    </li>
+    <li>
+      <a href="poverty.html">Low-income households</a>
+    </li>
+    <li>
+      <a href="childcare.html">Childcare</a>
+    </li>
+    <li>
+      <a href="access_by_race.html">Race/Ethnicity</a>
+    </li>
+    <li>
+      <a href="0prelim_may22.html">May 22</a>
+    </li>
+    <li>
+      <a href="0prelim_may29.html">May 29</a>
+    </li>
+    <li>
+      <a href="inequality.html">racial_inequality</a>
+    </li>
+    <li>
+      <a href="canary.html">Canary</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="social_support2.html">Additional hardship and support</a>
+    </li>
+    <li>
+      <a href="hardship_cares.html">Hardship trends post CARES</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li>
+      <a href="usda.html">Food insecurity</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Riser
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Unemployment benefits</h1>
+
+</div>
+
+
+<div id="representativeness-disclaimer" class="section level2">
+<h2>Representativeness disclaimer</h2>
+<p>These analyses are based on responses collected from 8051 caregivers between the dates of April 06, 2020 and September 08, 2020. These caregivers represent a range of voices: 10.38% are Black/African American, 20.08% are LatinX, and 27.26% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are <em>not</em> weighted.</p>
+</div>
+<div id="lose-job-if-take-sick-leave" class="section level1 tabset">
+<h1>Lose job if take sick leave</h1>
+<p><em>If you were unable to work because you lost your child care provider or your child’s school shut down, were you approved to receive unemployment benefits?</em></p>
+<div id="all" class="section level2">
+<h2>All</h2>
+<div id="htmlwidget-b6ac104d740288e70e3a" style="width:1056px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b6ac104d740288e70e3a">{"x":{"data":[{"orientation":"v","width":[0.9,0.9,0.9,0.9],"base":[0,0,0,0],"x":[1,2,3,4],"y":[76.4856230031949,18.6581469648562,1.08626198083067,3.76996805111821],"text":["Count: 1197<br />Percent: 76.5","Count: 292<br />Percent: 18.7","Count: 17<br />Percent: 1.1","Count: 59<br />Percent: 3.8"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(89,89,89,1)","line":{"width":1.88976377952756,"color":"transparent"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.5342465753425,"r":7.97011207970112,"b":37.4595267745953,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,4.6],"tickmode":"array","ticktext":["N/A","No","Yes, not received","Yes, Received"],"tickvals":[1,2,3,4],"categoryorder":"array","categoryarray":["N/A","No","Yes, not received","Yes, Received"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.82428115015974,80.3099041533546],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[4.44089209850063e-16,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1016c6f4fa9c8":{"x":{},"y":{},"text":{},"type":"bar"}},"cur_data":"1016c6f4fa9c8","visdat":{"1016c6f4fa9c8":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="over-time" class="section level2">
+<h2>Over time</h2>
+<div id="htmlwidget-62a75d53e0f2391e6d7e" style="width:1056px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-62a75d53e0f2391e6d7e">{"x":{"data":[{"x":[18499,18513],"y":[78.0341023069208,75.9131293188549],"text":["Date: August 25<br />Count: 778<br />Percent: 78","Date: September 08<br />Count: 769<br />Percent: 75.9"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"N/A","legendgroup":"N/A","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18499,18513],"y":[17.6529588766299,19.3484698914116],"text":["Date: August 25<br />Count: 176<br />Percent: 17.7","Date: September 08<br />Count: 196<br />Percent: 19.3"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(124,174,0,1)","dash":"solid"},"hoveron":"points","name":"No","legendgroup":"No","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18499,18513],"y":[1.00300902708124,0.987166831194472],"text":["Date: August 25<br />Count: 10<br />Percent: 1","Date: September 08<br />Count: 10<br />Percent: 1"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"Yes, not received","legendgroup":"Yes, not received","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18499,18513],"y":[3.3099297893681,3.75123395853899],"text":["Date: August 25<br />Count: 33<br />Percent: 3.3","Date: September 08<br />Count: 38<br />Percent: 3.8"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(199,124,255,1)","dash":"solid"},"hoveron":"points","name":"Yes, Received","legendgroup":"Yes, Received","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.5342465753425,"r":7.97011207970112,"b":37.4595267745953,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18498.3,18513.7],"tickmode":"array","ticktext":["Aug 31","Sep 07"],"tickvals":[18505,18512],"categoryorder":"array","categoryarray":["Aug 31","Sep 07"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-2.86517994259184,81.8864490807071],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[-4.44089209850063e-16,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":0.905511811023622},"annotations":[{"text":"collectUI","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1016cc7cc4f9":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"}},"cur_data":"1016cc7cc4f9","visdat":{"1016cc7cc4f9":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="by-raceethnicity" class="section level2">
+<h2>By race/ethnicity</h2>
+<div id="htmlwidget-07ba47d9b9ef79a01a31" style="width:1056px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-07ba47d9b9ef79a01a31">{"x":{"data":[{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[0.6625,1.6625,2.6625],"y":[70.0892857142857,68.5810810810811,80.8743169398907],"text":["race: Black<br />Count: 157<br />Percent: 70.1","race: Latinx<br />Count: 203<br />Percent: 68.6","race: White<br />Count: 1036<br />Percent: 80.9"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"N/A","legendgroup":"N/A","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[0.8875,1.8875,2.8875],"y":[20.5357142857143,22.2972972972973,16.5495706479313],"text":["race: Black<br />Count: 46<br />Percent: 20.5","race: Latinx<br />Count: 66<br />Percent: 22.3","race: White<br />Count: 212<br />Percent: 16.5"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"No","legendgroup":"No","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[1.1125,2.1125,3.1125],"y":[2.23214285714286,1.35135135135135,0.546448087431694],"text":["race: Black<br />Count: 5<br />Percent: 2.2","race: Latinx<br />Count: 4<br />Percent: 1.4","race: White<br />Count: 7<br />Percent: 0.5"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes, not received","legendgroup":"Yes, not received","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[1.3375,2.3375,3.3375],"y":[7.14285714285714,7.77027027027027,2.02966432474629],"text":["race: Black<br />Count: 16<br />Percent: 7.1","race: Latinx<br />Count: 23<br />Percent: 7.8","race: White<br />Count: 26<br />Percent: 2"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes, Received","legendgroup":"Yes, Received","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.5342465753425,"r":7.97011207970112,"b":37.4595267745953,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.04371584699454,84.9180327868852],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1016c197b2fb9":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"1016c197b2fb9","visdat":{"1016c197b2fb9":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="by-income" class="section level2">
+<h2>By income</h2>
+<div id="htmlwidget-ae040dde43ddae5550e1" style="width:1056px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ae040dde43ddae5550e1">{"x":{"data":[{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[0.6625,1.6625],"y":[77.2638436482085,76.0869565217391],"text":["Middle- to High-Income<br />Count: 1186<br />Percent: 77.3","Low-Income<br />Count: 350<br />Percent: 76.1"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"N/A","legendgroup":"N/A","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[0.8875,1.8875],"y":[19.1530944625407,16.0869565217391],"text":["Middle- to High-Income<br />Count: 294<br />Percent: 19.2","Low-Income<br />Count: 74<br />Percent: 16.1"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"No","legendgroup":"No","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[1.1125,2.1125],"y":[0.651465798045603,2.17391304347826],"text":["Middle- to High-Income<br />Count: 10<br />Percent: 0.7","Low-Income<br />Count: 10<br />Percent: 2.2"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes, not received","legendgroup":"Yes, not received","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[1.3375,2.3375],"y":[2.93159609120521,5.65217391304348],"text":["Middle- to High-Income<br />Count: 45<br />Percent: 2.9","Low-Income<br />Count: 26<br />Percent: 5.7"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes, Received","legendgroup":"Yes, Received","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.5342465753425,"r":7.97011207970112,"b":37.4595267745953,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,2.6],"tickmode":"array","ticktext":["Middle- to High-Income","Low-Income"],"tickvals":[1,2],"categoryorder":"array","categoryarray":["Middle- to High-Income","Low-Income"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.86319218241042,81.1270358306189],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1016c27ef5c97":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"1016c27ef5c97","visdat":{"1016c27ef5c97":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="by-race-by-income" class="section level2">
+<h2>By race by income</h2>
+<div id="htmlwidget-cfb51d310c0927e58bf3" style="width:1056px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-cfb51d310c0927e58bf3">{"x":{"data":[{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[0.775,1.775,2.775],"y":[71.523178807947,66.6666666666667,80.9386973180077],"text":["Middle- to High-Income<br />Count: 108<br />Percent: 71.5","Middle- to High-Income<br />Count: 120<br />Percent: 66.7","Middle- to High-Income<br />Count: 845<br />Percent: 80.9"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Middle- to High-Income","legendgroup":"Middle- to High-Income","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[0.775,1.775,2.775],"y":[21.8543046357616,24.4444444444444,16.8582375478927],"text":["Middle- to High-Income<br />Count: 33<br />Percent: 21.9","Middle- to High-Income<br />Count: 44<br />Percent: 24.4","Middle- to High-Income<br />Count: 176<br />Percent: 16.9"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Middle- to High-Income","legendgroup":"Middle- to High-Income","showlegend":false,"xaxis":"x2","yaxis":"y2","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[0.775,1.775,2.775],"y":[0.662251655629139,1.11111111111111,0.478927203065134],"text":["Middle- to High-Income<br />Count: 1<br />Percent: 0.7","Middle- to High-Income<br />Count: 2<br />Percent: 1.1","Middle- to High-Income<br />Count: 5<br />Percent: 0.5"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Middle- to High-Income","legendgroup":"Middle- to High-Income","showlegend":false,"xaxis":"x3","yaxis":"y3","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[0.775,1.775,2.775],"y":[5.96026490066225,7.77777777777778,1.72413793103448],"text":["Middle- to High-Income<br />Count: 9<br />Percent: 6","Middle- to High-Income<br />Count: 14<br />Percent: 7.8","Middle- to High-Income<br />Count: 18<br />Percent: 1.7"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Middle- to High-Income","legendgroup":"Middle- to High-Income","showlegend":false,"xaxis":"x4","yaxis":"y4","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[1.225,2.225,3.225],"y":[67.1232876712329,71.4285714285714,80.5907172995781],"text":["Low-Income<br />Count: 49<br />Percent: 67.1","Low-Income<br />Count: 75<br />Percent: 71.4","Low-Income<br />Count: 191<br />Percent: 80.6"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Low-Income","legendgroup":"Low-Income","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[1.225,2.225,3.225],"y":[17.8082191780822,18.0952380952381,15.1898734177215],"text":["Low-Income<br />Count: 13<br />Percent: 17.8","Low-Income<br />Count: 19<br />Percent: 18.1","Low-Income<br />Count: 36<br />Percent: 15.2"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Low-Income","legendgroup":"Low-Income","showlegend":false,"xaxis":"x2","yaxis":"y2","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[1.225,2.225,3.225],"y":[5.47945205479452,1.9047619047619,0.843881856540084],"text":["Low-Income<br />Count: 4<br />Percent: 5.5","Low-Income<br />Count: 2<br />Percent: 1.9","Low-Income<br />Count: 2<br />Percent: 0.8"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Low-Income","legendgroup":"Low-Income","showlegend":false,"xaxis":"x3","yaxis":"y3","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.45,0.45,0.45],"base":[0,0,0],"x":[1.225,2.225,3.225],"y":[9.58904109589041,8.57142857142857,3.37552742616034],"text":["Low-Income<br />Count: 7<br />Percent: 9.6","Low-Income<br />Count: 9<br />Percent: 8.6","Low-Income<br />Count: 8<br />Percent: 3.4"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Low-Income","legendgroup":"Low-Income","showlegend":false,"xaxis":"x4","yaxis":"y4","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":37.4595267745953,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,0.461576594657088],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"yaxis":{"domain":[0.577889731687988,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.04693486590038,84.9856321839081],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"annotations":[{"text":"percent","x":-0.0264160911732518,"y":0.5,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-90,"xanchor":"right","yanchor":"center","annotationType":"axis"},{"text":"N/A","x":0.230788297328544,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"No","x":0.769211702671456,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Yes, not received","x":0.230788297328544,"y":0.422110268312012,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Yes, Received","x":0.769211702671456,"y":0.422110268312012,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.461576594657088,"y0":0.577889731687988,"y1":1},{"type":"rect","fillcolor":"rgba(242,242,242,1)","line":{"color":"rgba(0,0,0,1)","width":0.929846409298464,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":0.461576594657088,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.538423405342912,"x1":1,"y0":0.577889731687988,"y1":1},{"type":"rect","fillcolor":"rgba(242,242,242,1)","line":{"color":"rgba(0,0,0,1)","width":0.929846409298464,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0.538423405342912,"x1":1,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.461576594657088,"y0":0,"y1":0.422110268312012},{"type":"rect","fillcolor":"rgba(242,242,242,1)","line":{"color":"rgba(0,0,0,1)","width":0.929846409298464,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":0.461576594657088,"y0":0,"y1":25.5043586550436,"yanchor":0.422110268312012,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.538423405342912,"x1":1,"y0":0,"y1":0.422110268312012},{"type":"rect","fillcolor":"rgba(242,242,242,1)","line":{"color":"rgba(0,0,0,1)","width":0.929846409298464,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0.538423405342912,"x1":1,"y0":0,"y1":25.5043586550436,"yanchor":0.422110268312012,"ysizemode":"pixel"}],"xaxis2":{"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"domain":[0.538423405342912,1],"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y2","title":"","hoverformat":".2f"},"yaxis2":{"type":"linear","autorange":false,"range":[-1.22222222222222,25.6666666666667],"tickmode":"array","ticktext":["0","5","10","15","20","25"],"tickvals":[0,5,10,15,20,25],"categoryorder":"array","categoryarray":["0","5","10","15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"domain":[0.577889731687988,1],"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x2","title":"","hoverformat":".2f"},"xaxis3":{"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"domain":[0,0.461576594657088],"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y3","title":"","hoverformat":".2f"},"yaxis3":{"type":"linear","autorange":false,"range":[-0.273972602739726,5.75342465753425],"tickmode":"array","ticktext":["0","2","4"],"tickvals":[0,2,4],"categoryorder":"array","categoryarray":["0","2","4"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"domain":[0,0.422110268312012],"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x3","title":"","hoverformat":".2f"},"xaxis4":{"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"domain":[0.538423405342912,1],"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y4","title":"","hoverformat":".2f"},"yaxis4":{"type":"linear","autorange":false,"range":[-0.479452054794521,10.0684931506849],"tickmode":"array","ticktext":["0.0","2.5","5.0","7.5","10.0"],"tickvals":[0,2.5,5,7.5,10],"categoryorder":"array","categoryarray":["0.0","2.5","5.0","7.5","10.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"domain":[0,0.422110268312012],"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x4","title":"","hoverformat":".2f"},"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1016c4b036ff":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"1016c4b036ff","visdat":{"1016c4b036ff":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="navigating-unemployment-benefits" class="section level1">
+<h1>Navigating unemployment benefits</h1>
+<p><em>How difficult was it to navigate the application process?</em></p>
+<p>Note there are not enough responses to this question to examine change over time or sub group analyses.</p>
+<div id="all-1" class="section level2">
+<h2>All</h2>
+<div id="htmlwidget-9e76ceb7f5d1e57f98d7" style="width:1056px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9e76ceb7f5d1e57f98d7">{"x":{"data":[{"orientation":"v","width":[0.9,0.9,0.9],"base":[98.9139515455305,76.4705882352941,86.4406779661017],"x":[1,3,4],"y":[1.08604845446951,23.5294117647059,13.5593220338983],"text":["Very difficult<br />Count: 13<br />Percent: 1.1","Very difficult<br />Count: 4<br />Percent: 23.5","Very difficult<br />Count: 8<br />Percent: 13.6"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Very difficult","legendgroup":"Very difficult","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9],"base":[96.8253968253968,64.7058823529412,66.1016949152542],"x":[1,3,4],"y":[2.08855472013367,11.7647058823529,20.3389830508475],"text":["Difficult<br />Count: 25<br />Percent: 2.1","Difficult<br />Count: 2<br />Percent: 11.8","Difficult<br />Count: 12<br />Percent: 20.3"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(163,165,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Difficult","legendgroup":"Difficult","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9],"base":[74.6031746031746,29.4117647058824,42.3728813559322],"x":[1,3,4],"y":[22.2222222222222,35.2941176470588,23.728813559322],"text":["Neutral<br />Count: 266<br />Percent: 22.2","Neutral<br />Count: 6<br />Percent: 35.3","Neutral<br />Count: 14<br />Percent: 23.7"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,125,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Neutral","legendgroup":"Neutral","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9],"base":[71.3450292397661,11.7647058823529,10.1694915254237],"x":[1,3,4],"y":[3.25814536340853,17.6470588235294,32.2033898305085],"text":["Easy<br />Count: 39<br />Percent: 3.3","Easy<br />Count: 3<br />Percent: 17.6","Easy<br />Count: 19<br />Percent: 32.2"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,176,246,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Easy","legendgroup":"Easy","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9],"base":[68.0868838763576,0,0],"x":[1,3,4],"y":[3.25814536340852,11.7647058823529,10.1694915254237],"text":["Very easy<br />Count: 39<br />Percent: 3.3","Very easy<br />Count: 2<br />Percent: 11.8","Very easy<br />Count: 6<br />Percent: 10.2"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(231,107,243,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Very easy","legendgroup":"Very easy","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9],"base":[0,0],"x":[1,2],"y":[68.0868838763576,100],"text":["NA<br />Count: 815<br />Percent: 68.1","NA<br />Count: 292<br />Percent: 100"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(127,127,127,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"NA","legendgroup":"NA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.5342465753425,"r":7.97011207970112,"b":37.4595267745953,"l":51.8057285180573},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,4.6],"tickmode":"array","ticktext":["N/A","No","Yes, not received","Yes, Received"],"tickvals":[1,2,3,4],"categoryorder":"array","categoryarray":["N/A","No","Yes, not received","Yes, Received"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-5,105],"tickmode":"array","ticktext":["0","25","50","75","100"],"tickvals":[0,25,50,75,100],"categoryorder":"array","categoryarray":["0","25","50","75","100"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1016c31ee7461":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"1016c31ee7461","visdat":{"1016c31ee7461":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="directed-to-specific-programs" class="section level1">
+<h1>Directed to specific programs</h1>
+<p><em>Were you directed to file for Pandemic Unemployment Assistance (PUA) or Families First Coronavirus Response Act (FFCRA) benefits?</em></p>
+<p>Note there are not enough responses to this question to examine change over time or sub group analyses.</p>
+<div id="all-2" class="section level2">
+<h2>All</h2>
+<div id="htmlwidget-b3d57db99372a777790b" style="width:1056px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b3d57db99372a777790b">{"x":{"data":[{"orientation":"v","width":0.9,"base":48.972602739726,"x":[2],"y":[51.027397260274],"text":"No<br />Count: 149<br />Percent: 51","type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"No","legendgroup":"No","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":41.7808219178082,"x":[2],"y":[7.19178082191781],"text":"Yes<br />Count: 21<br />Percent: 7.2","type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Yes","legendgroup":"Yes","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":39.7260273972603,"x":[2],"y":[2.05479452054794],"text":"Don't Know<br />Count: 6<br />Percent: 2.1","type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Don't Know","legendgroup":"Don't Know","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.9,0.9,0.9,0.9],"base":[0,0,0,0],"x":[1,2,3,4],"y":[100,39.7260273972603,100,100],"text":["NA<br />Count: 1197<br />Percent: 100","NA<br />Count: 116<br />Percent: 39.7","NA<br />Count: 17<br />Percent: 100","NA<br />Count: 59<br />Percent: 100"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(127,127,127,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"NA","legendgroup":"NA","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":33.5342465753425,"r":7.97011207970112,"b":37.4595267745953,"l":51.8057285180573},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,4.6],"tickmode":"array","ticktext":["N/A","No","Yes, not received","Yes, Received"],"tickvals":[1,2,3,4],"categoryorder":"array","categoryarray":["N/A","No","Yes, not received","Yes, Received"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-5,105],"tickmode":"array","ticktext":["0","25","50","75","100"],"tickvals":[0,25,50,75,100],"categoryorder":"array","categoryarray":["0","25","50","75","100"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1016c380f5095":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"1016c380f5095","visdat":{"1016c380f5095":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

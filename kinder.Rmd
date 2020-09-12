@@ -1,0 +1,81 @@
+---
+title: "Kindergarten"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+
+```{r usda-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=11)
+options(knitr.kable.NA = '')
+```
+
+```{r usda-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r usda-3 }
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+```
+
+# Delay start
+
+```{r}
+plot = scored %>%
+  filter(!is.na(kinderDelay)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  mutate(kinderDelay = factor(kinderDelay, labels = c("Didn't delay", "Delayed"))) %>%
+  ggplot(aes(x = kinderDelay)) +
+  geom_bar(stat = "count") +
+  labs(x = NULL,
+       title = "Number of caregivers by kindergarten delay choice") +
+  theme_pubr()
+
+ggplotly(plot)
+```
+
+# Why delay
+
+```{r, fig.height=8}
+plot = scored %>%
+  filter(kinderDelay == 1) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  gather("reason", "endorsed", starts_with("kinderDelay_")) %>%
+  mutate(
+    reason = str_remove(reason, "kinderDelay_"),
+    reason = factor(reason,
+                    levels = c("safety", "time", "uncertain"),
+                    labels = c("Safety",
+                               "Uncertain about the plan for school",
+                               "Not able to manage along with other responsibilities"))) %>%
+  group_by(reason) %>%
+  summarize(percent = 100*mean(endorsed)) %>%
+  ggplot(aes(x = reason, y = percent)) +
+  geom_bar(stat = "identity") +
+  labs(x = NULL,
+       title = "Reason caregivers are delaying kindergarten") +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1))
+
+ggplotly(plot)
+```
+

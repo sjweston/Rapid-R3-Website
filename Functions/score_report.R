@@ -731,6 +731,14 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   if(contains_items("JOB.014", data)){
     losejob_sickleave = ifelse(data$JOB.014 == 5, NA, data$JOB.014)
     newdata$losejob_sickleave = ifelse(losejob_sickleave > 2, 1, 0)
+    newdata$losejob_sickleave_cat = case_when(
+      losejob_sickleave == 1 ~ "Very Unlikely",
+      losejob_sickleave == 2 ~ "Unlikely",
+      losejob_sickleave == 3 ~ "Neutral / Unsure",
+      losejob_sickleave == 4 ~ "Likely",
+      losejob_sickleave == 5 ~ "Very Likely",
+    )
+    
   } 
   
   
@@ -1284,6 +1292,23 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   newdata$food5_pre = data$food5_pre
   newdata$food6_pre = data$food6_pre
   
+  newdata$collectUI = case_when(
+    data$JOB.021 == 0 ~ "No",
+    data$JOB.021 == 1 ~ "Yes, not received",
+    data$JOB.021 == 2 ~ "Yes, Received",
+    data$JOB.021 == 3 ~ "N/A"
+  )
+  
+  newdata$difficultyUI = factor(
+    data$JOB.021.a,
+    labels = c("Very difficult", "Difficult", "Neutral","Easy", "Very easy"))
+  
+  newdata$UIdirectedPUA = factor(
+    data$JOB.021.b,
+    labels = c("No", "Yes", "Don't Know")
+  )
+  
+  
   data = combine.cat(x = data, 
                      cols = find_items("JOB.022_.{1}$", data),
                      id = "CaregiverID",
@@ -1482,7 +1507,29 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   newdata = full_join(newdata, riser)
   
-  #newdata$kinder_delay = 
+  newdata$kinderDelay = case_when(
+    data$SCHOOL.07 == 1 ~ 1,
+    data$SCHOOL.07 == 2 ~ 0,
+    TRUE ~ NA_real_
+  )
+  
+  newdata$kinderDelay_safety = case_when(
+    data$SCHOOL.08_1 == 1 ~ 1,
+    data$SCHOOL.07 == 1 ~ 0,
+    TRUE ~ NA_real_
+  )
+  
+  newdata$kinderDelay_uncertain = case_when(
+    data$SCHOOL.08_2 == 1 ~ 1,
+    data$SCHOOL.07 == 1 ~ 0,
+    TRUE ~ NA_real_
+  )
+  
+  newdata$kinderDelay_time = case_when(
+    data$SCHOOL.08_3 == 1 ~ 1,
+    data$SCHOOL.07 == 1 ~ 0,
+    TRUE ~ NA_real_
+  )
   
   return(newdata)
 }
