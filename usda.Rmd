@@ -35,6 +35,7 @@ cutoffv = 1
 
 ```{r usda-4 }
 scored = scored %>%
+  filter(Week != BaselineWeek) %>%
   mutate(black_cat = factor(black, labels = c("non-Black", "Black")),
          poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
          single_cat = factor(single, labels = c("Dual parent", "Single parent")),
