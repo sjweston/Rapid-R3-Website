@@ -37,9 +37,10 @@ source(here("Functions/state_policy_fun.R"))
 
 ```{r state-policy-5 }
 scored = scored %>%
-  mutate_at(vars(anxiety, depress, lonely, stress), pomp) %>%
+  mutate_at(vars(anxiety, depress, lonely, stress, fussy, fear), pomp) %>%
   rowwise() %>%
-  mutate(mental_health = mean(c(anxiety, depress, lonely, stress), na.rm=T)) %>%
+  mutate(mental_health = mean(c(anxiety, depress, lonely, stress), na.rm=T),
+         child_mental = mean(c(fussy, fear), na.rm=T)) %>%
   mutate(material_hardship = case_when(
     Week == 0 ~ NA_real_,
     TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
@@ -124,7 +125,7 @@ For these analyses, data collected in even numbered weeks starting in August wer
 
 ## Sources of material hardship
 
-```{r}
+```{r state-policy-8}
 sources = scored %>%
   select(Week, CaregiverID, race_poverty, starts_with("diff_pay")) %>%
   filter(Week > 0) %>%
@@ -165,31 +166,31 @@ sources %>%
 
 ### All
 
-```{r state-policy-8 }
+```{r state-policy-9 }
 policy_binary(childcare_sub, material_hardship)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-9 }
+```{r state-policy-10 }
 binary_group(childcare_sub, material_hardship, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-10 }
+```{r state-policy-11 }
 binary_group(childcare_sub, material_hardship, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-11 }
+```{r state-policy-12 }
 binary_group(childcare_sub, material_hardship, race_poverty)
 ```
 
 **Statistical tests**
 
-```{r, results = 'asis'}
+```{r state-policy-13, results = 'asis'}
 concurrent = scored %>%
   filter(!is.na(material_hardship)) %>%
   filter(!is.na(childcare_sub)) %>%
@@ -211,7 +212,7 @@ broom::tidy(model) %>%
   kable_styling(full_width = T)
 ```
 
-```{r, results = 'asis'}
+```{r state-policy-14, results = 'asis'}
 model = glm(material_hardship ~ race_ethnic*poverty_cat, data = concurrent)
 
 broom::tidy(model) %>%
@@ -224,7 +225,7 @@ broom::tidy(model) %>%
 ```
 
 
-```{r, results = 'asis'}
+```{r state-policy-15, results = 'asis'}
 model = glm(material_hardship ~ childcare_sub*race_ethnic, data = concurrent)
 
 broom::tidy(model) %>%
@@ -236,7 +237,7 @@ broom::tidy(model) %>%
   kable_styling(full_width = T)
 ```
 
-```{r, results = 'asis'}
+```{r state-policy-16, results = 'asis'}
 model = glm(material_hardship ~ childcare_sub*poverty_cat, data = concurrent)
 
 broom::tidy(model) %>%
@@ -244,19 +245,19 @@ broom::tidy(model) %>%
   mutate(term = str_remove(term, "childcare_sub"),
          term = str_remove(term, "poverty_cat")) %>%
   kable(., digits = 2, booktabs = T, 
-        caption = "Statistical model with legislation by race") %>%
+        caption = "Statistical model with legislation by income") %>%
   kable_styling(full_width = T)
 ```
 
 ### Single caregivers
 
-```{r state-policy-12 }
+```{r state-policy-17 }
 binary_group(childcare_sub, material_hardship, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-13 }
+```{r state-policy-18 }
 binary_group(childcare_sub, material_hardship, disability_cat)
 ```
 
@@ -264,7 +265,7 @@ binary_group(childcare_sub, material_hardship, disability_cat)
 ### Over time
 
 
-```{r state-policy-14 }
+```{r state-policy-19 }
 time_policy_binary(childcare_sub, material_hardship)
 ```
 
@@ -279,32 +280,32 @@ Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education
 
 ### All
 
-```{r state-policy-15 }
+```{r state-policy-20 }
 policy_binary(earlychild_financing, material_hardship)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-16 }
+```{r state-policy-21 }
 binary_group(earlychild_financing, material_hardship, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-17 }
+```{r state-policy-22 }
 binary_group(earlychild_financing, material_hardship, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-18 }
+```{r state-policy-23 }
 binary_group(earlychild_financing, material_hardship, race_poverty)
 ```
 
 
 **Statistical tests**
 
-```{r, results = 'asis'}
+```{r state-policy-24, results = 'asis'}
 concurrent = scored %>%
   filter(!is.na(material_hardship)) %>%
   filter(!is.na(earlychild_financing)) %>%
@@ -326,7 +327,7 @@ broom::tidy(model) %>%
   kable_styling(full_width = T)
 ```
 
-```{r, results = 'asis'}
+```{r state-policy-25, results = 'asis'}
 model = glm(material_hardship ~ race_ethnic*poverty_cat, data = concurrent)
 
 broom::tidy(model) %>%
@@ -339,7 +340,7 @@ broom::tidy(model) %>%
 ```
 
 
-```{r, results = 'asis'}
+```{r state-policy-26, results = 'asis'}
 model = glm(material_hardship ~ earlychild_financing*race_ethnic, data = concurrent)
 
 broom::tidy(model) %>%
@@ -351,7 +352,7 @@ broom::tidy(model) %>%
   kable_styling(full_width = T)
 ```
 
-```{r, results = 'asis'}
+```{r state-policy-27, results = 'asis'}
 model = glm(material_hardship ~ earlychild_financing*poverty_cat, data = concurrent)
 
 broom::tidy(model) %>%
@@ -359,19 +360,19 @@ broom::tidy(model) %>%
   mutate(term = str_remove(term, "earlychild_financing"),
          term = str_remove(term, "poverty_cat")) %>%
   kable(., digits = 2, booktabs = T, 
-        caption = "Statistical model with legislation by race") %>%
+        caption = "Statistical model with legislation by income") %>%
   kable_styling(full_width = T)
 ```
 
 ### Single caregivers
 
-```{r state-policy-19 }
+```{r state-policy-28 }
 binary_group(earlychild_financing, material_hardship, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-20 }
+```{r state-policy-29 }
 binary_group(earlychild_financing, material_hardship, disability_cat)
 ```
 
@@ -379,7 +380,7 @@ binary_group(earlychild_financing, material_hardship, disability_cat)
 ### Over time
 
 
-```{r state-policy-21 }
+```{r state-policy-30 }
 time_policy_binary(earlychild_financing, material_hardship)
 ```
 
@@ -394,37 +395,37 @@ Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education
 
 ### All
 
-```{r state-policy-22 }
+```{r state-policy-31 }
 policy_binary(prek_legislation, material_hardship)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-23 }
+```{r state-policy-32 }
 binary_group(prek_legislation, material_hardship, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-24 }
+```{r state-policy-33 }
 binary_group(prek_legislation, material_hardship, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-25 }
+```{r state-policy-34 }
 binary_group(prek_legislation, material_hardship, race_poverty)
 ```
 
 ### Single caregivers
 
-```{r state-policy-26 }
+```{r state-policy-35 }
 binary_group(prek_legislation, material_hardship, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-27 }
+```{r state-policy-36 }
 binary_group(prek_legislation, material_hardship, disability_cat)
 ```
 
@@ -432,7 +433,7 @@ binary_group(prek_legislation, material_hardship, disability_cat)
 ### Over time
 
 
-```{r state-policy-28 }
+```{r state-policy-37 }
 time_policy_binary(prek_legislation, material_hardship)
 ```
 
@@ -446,32 +447,32 @@ Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education
 
 ### All
 
-```{r state-policy-29 }
+```{r state-policy-38 }
 policy_binary(prenatal_legislation, material_hardship)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-30 }
+```{r state-policy-39 }
 binary_group(prenatal_legislation, material_hardship, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-31 }
+```{r state-policy-40 }
 binary_group(prenatal_legislation, material_hardship, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-32 }
+```{r state-policy-41 }
 binary_group(prenatal_legislation, material_hardship, race_poverty)
 ```
 
 
 **Statistical tests**
 
-```{r, results = 'asis'}
+```{r state-policy-42, results = 'asis'}
 concurrent = scored %>%
   filter(!is.na(material_hardship)) %>%
   filter(!is.na(prenatal_legislation)) %>%
@@ -493,7 +494,7 @@ broom::tidy(model) %>%
   kable_styling(full_width = T)
 ```
 
-```{r, results = 'asis'}
+```{r state-policy-43, results = 'asis'}
 model = glm(material_hardship ~ race_ethnic*poverty_cat, data = concurrent)
 
 broom::tidy(model) %>%
@@ -506,7 +507,7 @@ broom::tidy(model) %>%
 ```
 
 
-```{r, results = 'asis'}
+```{r state-policy-44, results = 'asis'}
 model = glm(material_hardship ~ prenatal_legislation*race_ethnic, data = concurrent)
 
 broom::tidy(model) %>%
@@ -518,7 +519,7 @@ broom::tidy(model) %>%
   kable_styling(full_width = T)
 ```
 
-```{r, results = 'asis'}
+```{r state-policy-45, results = 'asis'}
 model = glm(material_hardship ~ prenatal_legislation*poverty_cat, data = concurrent)
 
 broom::tidy(model) %>%
@@ -526,19 +527,19 @@ broom::tidy(model) %>%
   mutate(term = str_remove(term, "prenatal_legislation"),
          term = str_remove(term, "poverty_cat")) %>%
   kable(., digits = 2, booktabs = T, 
-        caption = "Statistical model with legislation by race") %>%
+        caption = "Statistical model with legislation by income") %>%
   kable_styling(full_width = T)
 ```
 
 ### Single caregivers
 
-```{r state-policy-33 }
+```{r state-policy-46 }
 binary_group(prenatal_legislation, material_hardship, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-34 }
+```{r state-policy-47 }
 binary_group(prenatal_legislation, material_hardship, disability_cat)
 ```
 
@@ -546,7 +547,7 @@ binary_group(prenatal_legislation, material_hardship, disability_cat)
 ### Over time
 
 
-```{r state-policy-35 }
+```{r state-policy-48 }
 time_policy_binary(prenatal_legislation, material_hardship)
 ```
 
@@ -558,44 +559,44 @@ Caregivers report levels of anxiety, depression, loneliness and stress. All vari
 
 ### All
 
-```{r state-policy-36 }
+```{r state-policy-49 }
 policy_cont(childcare_sub, mental_health)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-37 }
+```{r state-policy-50 }
 cont_group(childcare_sub, mental_health, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-38 }
+```{r state-policy-51 }
 cont_group(childcare_sub, mental_health, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-39 }
+```{r state-policy-52 }
 cont_group(childcare_sub, mental_health, race_poverty)
 ```
 
 ### Single caregivers
 
-```{r state-policy-40 }
+```{r state-policy-53 }
 cont_group(childcare_sub, mental_health, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-41 }
+```{r state-policy-54 }
 cont_group(childcare_sub, mental_health, disability_cat)
 ```
 
 
 ### Over time
 
-```{r state-policy-42 }
+```{r state-policy-55 }
 time_policy_cont(childcare_sub, mental_health)
 ```
 
@@ -609,44 +610,44 @@ Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education
 
 ### All
 
-```{r state-policy-43 }
+```{r state-policy-56 }
 policy_cont(earlychild_financing, mental_health)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-44 }
+```{r state-policy-57 }
 cont_group(earlychild_financing, mental_health, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-45 }
+```{r state-policy-58 }
 cont_group(earlychild_financing, mental_health, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-46 }
+```{r state-policy-59 }
 cont_group(earlychild_financing, mental_health, race_poverty)
 ```
 
 ### Single caregivers
 
-```{r state-policy-47 }
+```{r state-policy-60 }
 cont_group(earlychild_financing, mental_health, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-48 }
+```{r state-policy-61 }
 cont_group(earlychild_financing, mental_health, disability_cat)
 ```
 
 
 ### Over time
 
-```{r state-policy-49 }
+```{r state-policy-62 }
 time_policy_cont(earlychild_financing, mental_health)
 ```
 
@@ -662,44 +663,44 @@ Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education
 
 ### All
 
-```{r state-policy-50 }
+```{r state-policy-63 }
 policy_cont(prek_legislation, mental_health)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-51 }
+```{r state-policy-64 }
 cont_group(prek_legislation, mental_health, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-52 }
+```{r state-policy-65 }
 cont_group(prek_legislation, mental_health, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-53 }
+```{r state-policy-66 }
 cont_group(prek_legislation, mental_health, race_poverty)
 ```
 
 ### Single caregivers
 
-```{r state-policy-54 }
+```{r state-policy-67 }
 cont_group(prek_legislation, mental_health, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-55 }
+```{r state-policy-68 }
 cont_group(prek_legislation, mental_health, disability_cat)
 ```
 
 
 ### Over time
 
-```{r state-policy-56 }
+```{r state-policy-69 }
 time_policy_cont(prek_legislation, mental_health)
 ```
 
@@ -713,43 +714,247 @@ Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education
 
 ### All
 
-```{r state-policy-57 }
+```{r state-policy-70 }
 policy_cont(prenatal_legislation, mental_health)
 ```
 
 ### Race/ethnicity
 
-```{r state-policy-58 }
+```{r state-policy-71 }
 cont_group(prenatal_legislation, mental_health, race_ethnic)
 ```
 
 ### Income
 
-```{r state-policy-59 }
+```{r state-policy-72 }
 cont_group(prenatal_legislation, mental_health, poverty_cat)
 ```
 
 ### Race/ethnicity x Income
 
-```{r state-policy-60 }
+```{r state-policy-73 }
 cont_group(prenatal_legislation, mental_health, race_poverty)
 ```
 
 ### Single caregivers
 
-```{r state-policy-61 }
+```{r state-policy-74 }
 cont_group(prenatal_legislation, mental_health, single_cat)
 ```
 
 ### Disability
 
-```{r state-policy-62 }
+```{r state-policy-75 }
 cont_group(prenatal_legislation, mental_health, disability_cat)
 ```
 
 
 ### Over time
 
-```{r state-policy-63 }
+```{r state-policy-76 }
 time_policy_cont(prenatal_legislation, mental_health)
+```
+
+# Child mental health problems
+
+Caregivers report levels of child fussiness and fear. All variables are POMP scored (i.e., rescaled to have a minimum value of 0 and maximum of 100) and these scores are averaged to create a single child mental health composite.
+
+## Child Care (Subsidy, Quality and Access){.tabset}
+
+### All
+
+```{r state-policy-77 }
+policy_cont(childcare_sub, child_mental)
+```
+
+### Race/ethnicity
+
+```{r state-policy-78 }
+cont_group(childcare_sub, child_mental, race_ethnic)
+```
+
+### Income
+
+```{r state-policy-79 }
+cont_group(childcare_sub, child_mental, poverty_cat)
+```
+
+### Race/ethnicity x Income
+
+```{r state-policy-80 }
+cont_group(childcare_sub, child_mental, race_poverty)
+```
+
+### Single caregivers
+
+```{r state-policy-81 }
+cont_group(childcare_sub, child_mental, single_cat)
+```
+
+### Disability
+
+```{r state-policy-82 }
+cont_group(childcare_sub, child_mental, disability_cat)
+```
+
+
+### Over time
+
+```{r state-policy-83 }
+time_policy_cont(childcare_sub, child_mental)
+```
+
+## Early Childhood Financing{.tabset}
+
+Legislation in seven states that addressed funding policies or grant funds for specific early childhood programs.
+
+![](figure/ec_legislation.png)
+
+Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education-2019-state-legislative-action-report.aspx)
+
+### All
+
+```{r state-policy-84 }
+policy_cont(earlychild_financing, child_mental)
+```
+
+### Race/ethnicity
+
+```{r state-policy-85 }
+cont_group(earlychild_financing, child_mental, race_ethnic)
+```
+
+### Income
+
+```{r state-policy-86 }
+cont_group(earlychild_financing, child_mental, poverty_cat)
+```
+
+### Race/ethnicity x Income
+
+```{r state-policy-87 }
+cont_group(earlychild_financing, child_mental, race_poverty)
+```
+
+### Single caregivers
+
+```{r state-policy-88 }
+cont_group(earlychild_financing, child_mental, single_cat)
+```
+
+### Disability
+
+```{r state-policy-89 }
+cont_group(earlychild_financing, child_mental, disability_cat)
+```
+
+
+### Over time
+
+```{r state-policy-90 }
+time_policy_cont(earlychild_financing, child_mental)
+```
+
+
+## Prekindergarten and school readiness{.tabset}
+
+Legislation in seven states that addressed funding policies or grant funds for specific early childhood programs.
+
+![](figure/prek_ready.png)
+
+Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education-2019-state-legislative-action-report.aspx)
+
+
+### All
+
+```{r state-policy-91 }
+policy_cont(prek_legislation, child_mental)
+```
+
+### Race/ethnicity
+
+```{r state-policy-92 }
+cont_group(prek_legislation, child_mental, race_ethnic)
+```
+
+### Income
+
+```{r state-policy-93 }
+cont_group(prek_legislation, child_mental, poverty_cat)
+```
+
+### Race/ethnicity x Income
+
+```{r state-policy-94 }
+cont_group(prek_legislation, child_mental, race_poverty)
+```
+
+### Single caregivers
+
+```{r state-policy-95 }
+cont_group(prek_legislation, child_mental, single_cat)
+```
+
+### Disability
+
+```{r state-policy-96 }
+cont_group(prek_legislation, child_mental, disability_cat)
+```
+
+
+### Over time
+
+```{r state-policy-97 }
+time_policy_cont(prek_legislation, child_mental)
+```
+
+
+## Prenatal, Infant, Toddler legislation{.tabset}
+
+
+![](figure/prenatal_legislation.png)
+
+Source: [NCSL](https://www.ncsl.org/research/human-services/early-care-education-2019-state-legislative-action-report.aspx)
+
+### All
+
+```{r state-policy-98 }
+policy_cont(prenatal_legislation, child_mental)
+```
+
+### Race/ethnicity
+
+```{r state-policy-99 }
+cont_group(prenatal_legislation, child_mental, race_ethnic)
+```
+
+### Income
+
+```{r state-policy-100 }
+cont_group(prenatal_legislation, child_mental, poverty_cat)
+```
+
+### Race/ethnicity x Income
+
+```{r state-policy-101 }
+cont_group(prenatal_legislation, child_mental, race_poverty)
+```
+
+### Single caregivers
+
+```{r state-policy-102 }
+cont_group(prenatal_legislation, child_mental, single_cat)
+```
+
+### Disability
+
+```{r state-policy-103 }
+cont_group(prenatal_legislation, child_mental, disability_cat)
+```
+
+
+### Over time
+
+```{r state-policy-104 }
+time_policy_cont(prenatal_legislation, child_mental)
 ```

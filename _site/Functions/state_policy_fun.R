@@ -168,6 +168,7 @@ cont_group = function(policy, variable, group, data = scored){
     mutate_at(vars({{group}}), 
               .funs = function(x) str_replace(x, ", ", "\\\n")) %>%
     filter(!is.na({{policy}})) %>%
+    filter(!is.na({{variable}})) %>%
     filter(!is.na({{group}})) %>%
     group_by(CaregiverID) %>%
     filter(Week == max(Week)) %>%
@@ -202,6 +203,7 @@ time_policy_cont = function(policy, variable, data = scored){
   
   plot = data %>%
     filter(!is.na({{policy}})) %>%
+    filter(!is.na({{variable}})) %>%
     group_by(Week, Date, {{policy}}) %>%
     summarize(
       n = n(),
@@ -232,6 +234,7 @@ time_cont_group = function(policy, variable, group, data = scored){
   plot = data %>%
     filter(!is.na({{group}})) %>%
     filter(!is.na({{policy}})) %>%
+    filter(!is.na({{variable}})) %>%
     group_by(Week, Date, {{group}}, {{policy}}) %>%
     summarize(
       n = n(),
