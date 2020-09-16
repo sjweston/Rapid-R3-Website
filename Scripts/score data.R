@@ -283,6 +283,54 @@ scored = scored %>%
                  "TN", "NC", "SC", "MS", "AL",
                  "GA", "FL") ~ "Not expanded"))
 
+# state early childhood financing  ----------------------------------------
+
+scored = scored %>%
+  mutate(earlychild_financing = case_when(
+    state %in% c("CA", "CO", "LA",
+                 "IN", "NV", "VA", 
+                 "WA") ~ "Early Childhood Financing",
+    !is.na(state) ~ "No legislation",
+    TRUE ~ NA_character_))
+
+
+
+# state prek readiness ----------------------------------------------------
+
+scored = scored %>%
+  mutate(prek_legislation = case_when(
+    state %in% c("CO", "MD", "NY", "OR",
+                 "TN", "TX", "UT", "WA") ~ "Prekindergarten and School Readiness",
+    !is.na(state) ~ "No legislation",
+    TRUE ~ NA_character_))
+
+
+# prenatal legislation ----------------------------------------------------
+
+scored = scored %>%
+  mutate(prenatal_legislation = case_when(
+    state %in% c("CA", "CO", "IL", 
+                 "IN", "ME", "MD",
+                 "NJ", "TX", "WA") ~ "Prenatal, Infant, Toddlers",
+    !is.na(state) ~ "No legislation",
+    TRUE ~ NA_character_))
+
+# childcare subsidy ----------------------------------------------------
+
+scored = scored %>%
+  mutate(childcare_sub = case_when(
+    state %in% c("AL", "AR", "CA", "CO",
+                 "CT", "HI", "IL", "KY",
+                 "LA", "ME", "MO", "NV",
+                 "NH", "NY", "NC", "ND",
+                 "OK", "OR", "SC", "TX",
+                 "UT", "VT", "VA", "WA") ~ "Child Care  (Subsidy, Quality and Access)",
+    !is.na(state) ~ "No legislation",
+    TRUE ~ NA_character_))
+
+# Clean workspace ---------------------------------------------------------
+
+
 rm(list = setdiff(ls(), c("scored", "master", "combine.cat", 
                           "find_items", "contains_items", "identify_state",
                           "select_first")))

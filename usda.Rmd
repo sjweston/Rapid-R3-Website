@@ -349,7 +349,50 @@ plot_both = plot1 %>%
        title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
 ggplotly(plot_both, tooltip = "text")
+
+plot1 %>%
+  rename(percent = hardship) %>%
+  mutate(Date = format(Date, "%B %d")) %>%
+  write.csv(here("figure data/0914_hardship_race_income_actual.csv"))
 ```
+
+```{r}
+model = glm(material_hardship ~ Week*race_ethnic*poverty_cat, data = hardship_scored, family = "binomial")
+summary(model)
+library(sjPlot)
+model_param = plot_model(model, type = "pred", terms = c("Week", "race_ethnic", "poverty_cat"))
+
+week_date = hardship_scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date)) %>%
+  mutate(Date = format(Date, "%B %d"))
+
+as.data.frame(model_param$data) %>%
+  select(x, predicted, group, facet) %>%
+  rename(Week = x,
+         percent = predicted,
+         race = group,
+         income = facet) %>%
+  mutate(percent = round(100*percent,1)) %>%
+  left_join(week_date) %>%
+  write.csv(here("figure data/0914_hardship_race_income_estimated.csv"))
+
+as.data.frame(model_param$data) %>%
+  rename(Week = x,
+         hardship = predicted,
+         race = group,
+         income = facet) %>%
+  mutate(hardship = 100*hardship) %>%
+  mutate(income = str_to_sentence(income)) %>%
+  full_join(select(plot1, Week, Date)) %>%
+  ggplot(aes(x = Date, y = hardship, color = race)) +
+  geom_point(data = plot1, alpha = .5) +
+  geom_line() +
+  facet_wrap(~income) +
+  labs(x = NULL, y = "Percent")+
+  theme_pubr()
+```
+
 
 
 ## Medicaid expansion
