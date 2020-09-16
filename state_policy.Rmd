@@ -40,7 +40,9 @@ scored = scored %>%
   mutate_at(vars(anxiety, depress, lonely, stress), pomp) %>%
   rowwise() %>%
   mutate(mental_health = mean(c(anxiety, depress, lonely, stress), na.rm=T)) %>%
-  mutate(material_hardship = sum(c_across(starts_with("diff_pay_")), na.rm=T)) %>%
+  mutate(material_hardship = case_when(
+    Week == 0 ~ NA_real_,
+    TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
   ungroup() %>%
  mutate(
    black_cat = factor(black, labels = c("non-Black", "Black")),
@@ -120,6 +122,45 @@ Caregivers grouped into two categories: trouble paying for 1+ basic need, or no 
 
 For these analyses, data collected in even numbered weeks starting in August were merged with data in the previous week -- this was due to a shift to a recruitment strategy that prioritized recruiting underrepresented communities and marginalized caregivers every other week.
 
+## Sources of material hardship
+
+```{r}
+sources = scored %>%
+  select(Week, CaregiverID, race_poverty, starts_with("diff_pay")) %>%
+  filter(Week > 0) %>%
+  filter(!is.na(race_poverty)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  select(-Week, -CaregiverID) %>%
+  gather(need, response, -race_poverty) %>%
+  mutate(need = str_remove(need, "diff_pay_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(race_poverty, need) %>%
+  summarize(percent = 100*mean(response)) %>%
+  ungroup() %>%
+  arrange(race_poverty, desc(percent)) %>%
+  mutate(order = row_number())
+  
+  
+sources %>%
+  ggplot(aes(x = order, y = percent, fill = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  # Add categories to axis
+  scale_x_continuous(
+    breaks = sources$order,
+    labels = sources$need,
+    expand = c(0,0)
+  ) +
+  guides(fill = F) +
+  labs(x = NULL) +
+  facet_wrap(~race_poverty, scales = "free_y")+
+  theme_pubr()
+  
+```
+
+
 ## Child Care (Subsidy, Quality and Access){.tabset}
 
 ### All
@@ -144,6 +185,67 @@ binary_group(childcare_sub, material_hardship, poverty_cat)
 
 ```{r state-policy-11 }
 binary_group(childcare_sub, material_hardship, race_poverty)
+```
+
+**Statistical tests**
+
+```{r, results = 'asis'}
+concurrent = scored %>%
+  filter(!is.na(material_hardship)) %>%
+  filter(!is.na(childcare_sub)) %>%
+  filter(!is.na(race_poverty)) %>%
+  mutate(race_ethnic = factor(race_ethnic, levels = c("White", "Black", "LatinX"))) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+
+model = glm(material_hardship ~ childcare_sub*race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat"),
+         term = str_remove(term, "childcare_sub")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with three-way interaction") %>%
+  kable_styling(full_width = T)
+```
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with race by income") %>%
+  kable_styling(full_width = T)
+```
+
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ childcare_sub*race_ethnic, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "childcare_sub")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by race") %>%
+  kable_styling(full_width = T)
+```
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ childcare_sub*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "childcare_sub"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by race") %>%
+  kable_styling(full_width = T)
 ```
 
 ### Single caregivers
@@ -197,6 +299,68 @@ binary_group(earlychild_financing, material_hardship, poverty_cat)
 
 ```{r state-policy-18 }
 binary_group(earlychild_financing, material_hardship, race_poverty)
+```
+
+
+**Statistical tests**
+
+```{r, results = 'asis'}
+concurrent = scored %>%
+  filter(!is.na(material_hardship)) %>%
+  filter(!is.na(earlychild_financing)) %>%
+  filter(!is.na(race_poverty)) %>%
+  mutate(race_ethnic = factor(race_ethnic, levels = c("White", "Black", "LatinX"))) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+
+model = glm(material_hardship ~ earlychild_financing*race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat"),
+         term = str_remove(term, "earlychild_financing")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with three-way interaction") %>%
+  kable_styling(full_width = T)
+```
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with race by income") %>%
+  kable_styling(full_width = T)
+```
+
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ earlychild_financing*race_ethnic, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "earlychild_financing")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by race") %>%
+  kable_styling(full_width = T)
+```
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ earlychild_financing*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "earlychild_financing"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by race") %>%
+  kable_styling(full_width = T)
 ```
 
 ### Single caregivers
@@ -302,6 +466,68 @@ binary_group(prenatal_legislation, material_hardship, poverty_cat)
 
 ```{r state-policy-32 }
 binary_group(prenatal_legislation, material_hardship, race_poverty)
+```
+
+
+**Statistical tests**
+
+```{r, results = 'asis'}
+concurrent = scored %>%
+  filter(!is.na(material_hardship)) %>%
+  filter(!is.na(prenatal_legislation)) %>%
+  filter(!is.na(race_poverty)) %>%
+  mutate(race_ethnic = factor(race_ethnic, levels = c("White", "Black", "LatinX"))) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+
+model = glm(material_hardship ~ prenatal_legislation*race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat"),
+         term = str_remove(term, "prenatal_legislation")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with three-way interaction") %>%
+  kable_styling(full_width = T)
+```
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with race by income") %>%
+  kable_styling(full_width = T)
+```
+
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ prenatal_legislation*race_ethnic, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "prenatal_legislation")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by race") %>%
+  kable_styling(full_width = T)
+```
+
+```{r, results = 'asis'}
+model = glm(material_hardship ~ prenatal_legislation*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "prenatal_legislation"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by race") %>%
+  kable_styling(full_width = T)
 ```
 
 ### Single caregivers
