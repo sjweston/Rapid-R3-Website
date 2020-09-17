@@ -319,12 +319,13 @@ scored = scored %>%
 
 scored = scored %>%
   mutate(childcare_sub = case_when(
-    state %in% c("AL", "AR", "CA", "CO",
-                 "CT", "HI", "IL", "KY",
-                 "LA", "ME", "MO", "NV",
-                 "NH", "NY", "NC", "ND",
-                 "OK", "OR", "SC", "TX",
-                 "UT", "VT", "VA", "WA") ~ "Child Care  (Subsidy, Quality and Access)",
+    state %in% c("AK", "WA", "OR", "CA", "HI",
+                 "NV", "UT", "CO", "NM", "OK",
+                 "TX", "IA", "LA", "WI", "IL",
+                 "KY", "TN", "MS", "MI", "NC",
+                 "PA", "VA", "SC", "NY", "NJ",
+                 "MD", "DC", "FL", "VT", "MA",
+                 "CT", "ME", "RI") ~ "Funding to childcare providers",
     !is.na(state) ~ "No legislation",
     TRUE ~ NA_character_))
 
