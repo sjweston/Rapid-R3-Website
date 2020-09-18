@@ -33,7 +33,7 @@ source(here("Functions/pomp.R"))
 
 ```{r}
 scored = scored %>%
-  mutate(poverty150 = ifelse(is.na(poverty150), poverty150s, poverty150)) %>%
+  mutate(poverty200 = ifelse(is.na(poverty200), poverty200s, poverty200)) %>%
   mutate(num_adults = household_size-num_children_raw) %>%
   rename(children = num_children_raw,
          household = household_size,
@@ -106,17 +106,17 @@ black_caregivers %>%
 
 ```{r, results = 'asis'}
 black_caregivers %>%
-  filter(!is.na(poverty150)) %>%
-  mutate(poverty150 = factor(poverty150, 
-                             labels = c("High Income", "Low Income"))) %>%
-  select(poverty150, income, children, household, adults, employDecrease) %>%
-  group_by(poverty150) %>%
+  filter(!is.na(poverty200)) %>%
+  mutate(poverty200 = factor(poverty200, 
+                             labels = c("above Poverty", "200xFPL"))) %>%
+  select(poverty200, income, children, household, adults, employDecrease) %>%
+  group_by(poverty200) %>%
   summarize_all(list(mean = ~mean(.x, na.rm=T),
                      sd = ~sd(.x, na.rm=T),
                      min = ~min(.x, na.rm=T),
                      max = ~max(.x, na.rm=T),
                      n = ~length(which(!is.na(.x))))) %>%
-  gather("variable", "value", -poverty150) %>% 
+  gather("variable", "value", -poverty200) %>% 
   separate(variable, into = c("variable", "stat")) %>%
   spread(stat, value) %>%
   mutate_at(vars(mean, sd, min, max), papaja::printnum) %>%
@@ -127,19 +127,19 @@ black_caregivers %>%
         booktabs = T,
         caption = "Descriptive statistics for demographic variables. Adults calculated by subtracting the number of children from household size; if resulting number was less than 1, the number of adults was imputed as 1.") %>%
   kable_styling(full_width = T) %>%
-  group_rows("High Income", 1, 5) %>%
-  group_rows("Low Income", 6, 10) 
+  group_rows("above Poverty", 1, 5) %>%
+  group_rows("200xFPL", 6, 10) 
 ```
 
 ```{r}
 black_caregivers %>%
-  filter(!is.na(poverty150)) %>%
-  mutate(poverty150 = factor(poverty150, 
-                             labels = c("High Income", "Low Income"))) %>%
-  select(poverty150, income, children, household, adults,employDecrease) %>%
-  gather("variable", "value", -poverty150) %>%
+  filter(!is.na(poverty200)) %>%
+  mutate(poverty200 = factor(poverty200, 
+                             labels = c("above Poverty", "200xFPL"))) %>%
+  select(poverty200, income, children, household, adults,employDecrease) %>%
+  gather("variable", "value", -poverty200) %>%
   mutate(value = ifelse(value > 250000, 250000, value)) %>%
-  ggplot(aes(x = value, fill = poverty150)) +
+  ggplot(aes(x = value, fill = poverty200)) +
   geom_density(alpha = .3) +
   facet_wrap(~variable, scales = "free") +
   labs(caption = "Income values censored at $250,000") +
@@ -243,8 +243,8 @@ ggplotly(plot)
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(black) & !is.na(poverty150)) %>%
-  select(CaregiverID, black, poverty150, 
+  filter(!is.na(black) & !is.na(poverty200)) %>%
+  select(CaregiverID, black, poverty200, 
          access_telehealth_self, access_telehealth_child, access_mentalhealth) %>%
   gather("variable", "value", -CaregiverID) %>%
   group_by(CaregiverID, variable) %>%
@@ -253,12 +253,12 @@ plot = scored %>%
   spread(variable, value) %>% 
   ungroup() %>%
   mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
-  mutate_at(vars(poverty150), factor, labels = c("High income", "Low income")) %>%
-  group_by(black, poverty150) %>%
+  mutate_at(vars(poverty200), factor, labels = c("above Poverty", "200xFPL")) %>%
+  group_by(black, poverty200) %>%
   summarize_at(vars(access_telehealth_self, access_telehealth_child, access_mentalhealth), 
                list(mean = ~100*mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
-  gather("variable", "value", -black, -poverty150) %>%
+  gather("variable", "value", -black, -poverty200) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
          variable = str_remove(variable, "_mean"),
          variable = str_remove(variable, "_N")) %>% 
@@ -272,10 +272,10 @@ plot = scored %>%
   spread(stat, value) %>%
   ggplot(aes(x = variable, 
              y = percent, 
-             fill = poverty150,
+             fill = poverty200,
              text = paste0(
                "\nGroup: ", black,
-               "\nIncome: ", poverty150,
+               "\nIncome: ", poverty200,
                "\nVariable: ", variable,
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
@@ -375,13 +375,13 @@ ggplotly(plot, tooltip = "text")
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(black) & !is.na(poverty150)) %>%
-  group_by(black, poverty150, Week) %>%
+  filter(!is.na(black) & !is.na(poverty200)) %>%
+  group_by(black, poverty200, Week) %>%
   summarize_at(vars(access_telehealth_self, access_telehealth_child, access_mentalhealth), 
                list(mean = ~100*mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   ungroup() %>%
-  gather("variable", "value", -black, -poverty150, -Week) %>%
+  gather("variable", "value", -black, -poverty200, -Week) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
          variable = str_remove(variable, "_mean"),
          variable = str_remove(variable, "_N")) %>% 
@@ -393,17 +393,17 @@ plot = scored %>%
                                       "Fitness classes",
                                       "Educational courses")),
          black = factor(black, labels = c("non-Black", "Black")),
-         poverty150 = factor(poverty150, labels = c("High income", "Low income"))) %>%
+         poverty200 = factor(poverty200, labels = c("above Poverty", "200xFPL"))) %>%
   spread(stat, value) %>%
   filter(!is.na(percent)) %>% 
   ggplot(aes(x = Week, 
              y = percent, 
              group = 1, 
-             color = poverty150,
+             color = poverty200,
              text = paste0(
                "Week: ", Week,
                "\nRace: ", black,
-               "\nIncome: ", poverty150,
+               "\nIncome: ", poverty200,
                "\nVariable: ", variable,
                "\nN:", N,
                "\nPercent: ", round(percent,1))
@@ -510,8 +510,8 @@ ggplotly(plot)
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(black) & !is.na(poverty150)) %>%
-  select(CaregiverID, black, poverty150, 
+  filter(!is.na(black) & !is.na(poverty200)) %>%
+  select(CaregiverID, black, poverty200, 
          access_parenting, access_fitness, access_education) %>%
   gather("variable", "value", -CaregiverID) %>%
   group_by(CaregiverID, variable) %>%
@@ -520,12 +520,12 @@ plot = scored %>%
   spread(variable, value) %>% 
   ungroup() %>%
   mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
-  mutate_at(vars(poverty150), factor, labels = c("High income", "Low income")) %>%
-  group_by(black, poverty150) %>%
+  mutate_at(vars(poverty200), factor, labels = c("above Poverty", "200xFPL")) %>%
+  group_by(black, poverty200) %>%
   summarize_at(vars(access_parenting, access_fitness, access_education), 
                list(mean = ~100*mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
-  gather("variable", "value", -black, -poverty150) %>%
+  gather("variable", "value", -black, -poverty200) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
          variable = str_remove(variable, "_mean"),
          variable = str_remove(variable, "_N")) %>% 
@@ -539,10 +539,10 @@ plot = scored %>%
   spread(stat, value) %>%
   ggplot(aes(x = variable, 
              y = percent, 
-             fill = poverty150,
+             fill = poverty200,
              text = paste0(
                "\nGroup: ", black,
-               "\nIncome: ", poverty150,
+               "\nIncome: ", poverty200,
                "\nVariable: ", variable,
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
@@ -642,13 +642,13 @@ ggplotly(plot, tooltip = "text")
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(black) & !is.na(poverty150)) %>%
-  group_by(black, poverty150, Week) %>%
+  filter(!is.na(black) & !is.na(poverty200)) %>%
+  group_by(black, poverty200, Week) %>%
   summarize_at(vars(access_parenting, access_fitness, access_education), 
                list(mean = ~100*mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   ungroup() %>%
-  gather("variable", "value", -black, -poverty150, -Week) %>%
+  gather("variable", "value", -black, -poverty200, -Week) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
          variable = str_remove(variable, "_mean"),
          variable = str_remove(variable, "_N")) %>% 
@@ -660,17 +660,17 @@ plot = scored %>%
                                       "Fitness classes",
                                       "Educational courses")),
          black = factor(black, labels = c("non-Black", "Black")),
-         poverty150 = factor(poverty150, labels = c("High income", "Low income"))) %>%
+         poverty200 = factor(poverty200, labels = c("above Poverty", "200xFPL"))) %>%
   spread(stat, value) %>%
   filter(!is.na(percent)) %>% 
   ggplot(aes(x = Week, 
              y = percent, 
              group = 1, 
-             color = poverty150,
+             color = poverty200,
              text = paste0(
                "Week: ", Week,
                "\nRace: ", black,
-               "\nIncome: ", poverty150,
+               "\nIncome: ", poverty200,
                "\nVariable: ", variable,
                "\nN:", N,
                "\nPercent: ", round(percent,1))
@@ -744,17 +744,17 @@ ggplotly(plot, tooltip = "text")
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(black) & !is.na(poverty150)) %>%
-  group_by(black, poverty150, Week) %>%
+  filter(!is.na(black) & !is.na(poverty200)) %>%
+  group_by(black, poverty200, Week) %>%
   summarize(percent = 100*mean(delay_healthcare,na.rm=T),
             N = length(which(!is.na(delay_healthcare)))) %>%
   ungroup() %>%
   filter(!is.nan(percent)) %>%
   mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
-  mutate_at(vars(poverty150), factor, labels = c("High income", "Low income")) %>%
+  mutate_at(vars(poverty200), factor, labels = c("above Poverty", "200xFPL")) %>%
   ggplot(aes(x = Week,
              y = percent, 
-             color = poverty150,
+             color = poverty200,
              group = 1,
              text = paste0(
                "Week: ", Week,
@@ -861,20 +861,20 @@ ggplotly(plot, tooltip = "text")
 
 ```{r}
 plot = scored %>%
-  filter(!is.na(black) & !is.na(poverty150)) %>%
+  filter(!is.na(black) & !is.na(poverty200)) %>%
   filter(delay_healthcare == 1) %>%
-  select(CaregiverID, black, poverty150, starts_with("hc_barrier")) %>%
-  group_by(CaregiverID, black, poverty150) %>%
+  select(CaregiverID, black, poverty200, starts_with("hc_barrier")) %>%
+  group_by(CaregiverID, black, poverty200) %>%
   summarize_all(~max(.x, na.rm=T)) %>%
   ungroup() %>%
-  gather(variable, value, -black, -poverty150, -CaregiverID) %>%
+  gather(variable, value, -black, -poverty200, -CaregiverID) %>%
   filter(is.finite(value)) %>%
-  group_by(black, poverty150, variable) %>%
+  group_by(black, poverty200, variable) %>%
   summarize(percent = 100*mean(value, na.rm=T),
             N = length(which(!is.na(value)))) %>%
   ungroup() %>%
   mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
-    mutate_at(vars(poverty150), factor, labels = c("High income", "Low income")) %>%
+    mutate_at(vars(poverty200), factor, labels = c("above Poverty", "200xFPL")) %>%
   mutate(variable = str_remove(variable, "hc_barrier_")) %>%
   mutate(variable = factor(variable, 
                            levels = c("cost", "time", "childcare", "covid",
@@ -885,11 +885,11 @@ plot = scored %>%
                                       "Caring for family members", "Other"))) %>%
   ggplot(aes(x = variable,
              y = percent, 
-             fill = poverty150,
+             fill = poverty200,
              text = paste0(
                "Reason: ", variable,
                "\nGroup: ", black,
-               "\n Income: ", poverty150,
+               "\n Income: ", poverty200,
                "\nN: ", N,
                "\nPercent: ", round(percent,1)
              ))) +

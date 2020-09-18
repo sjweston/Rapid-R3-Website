@@ -257,21 +257,27 @@ hardship_group = function(group, data = hardship_scored){
   plot = data %>%
     filter(!is.na({{group}})) %>%
     group_by(Week, Date, {{group}}) %>%
-    summarize(count = n(),
-              hardship = 100*sum(material_hardship)/count)  %>%
+     summarize(count = n(),
+            hardship = sum(material_hardship)/count) %>%
+      mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+      mutate_at(vars(hardship, moe), ~100*.x) %>%
        ungroup()   %>%
     ggplot(aes(x = Date,
              y = hardship,
              group = 1,
              color = {{group}},
+             fill = {{group}},
              text = paste0(
                "Date: ", Date,
                "\n Count: ", count,
                "\n Percent: ", round(hardship)))) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
   geom_point() +
   geom_line() +
   geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-  labs(x = NULL, y = NULL, color = NULL,
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL,
        title = "Percent of households experiencing at least one material hardship") +
   theme_pubr()
   
@@ -287,7 +293,9 @@ hardship_group = function(group, data = hardship_scored){
 plot = hardship_scored %>%
   group_by(Week, Date) %>%
   summarize(count = n(),
-            hardship = 100*sum(material_hardship)/count) %>%
+            hardship = sum(material_hardship)/count) %>%
+  mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+  mutate_at(vars(hardship, moe), ~100*.x) %>%
   ggplot(aes(x = Date, 
              y = hardship, 
              text = paste0(
@@ -296,6 +304,9 @@ plot = hardship_scored %>%
                "\n Percent: ", round(hardship)
              ),
              group = 1)) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
   geom_point() + 
   geom_line() +
   geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
@@ -304,6 +315,18 @@ plot = hardship_scored %>%
 
 ggplotly(plot, tooltip = "text")
 ```
+
+```{r}
+hardship_scored %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            percent = sum(material_hardship)/count) %>%
+  mutate(moe = 1.96*sqrt((percent*(1-percent))/count)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  select(-count) %>%
+  write.csv(file = here("figure data/0917_hardship_over_time.csv"))
+```
+
 
 ## Black
 
@@ -323,7 +346,7 @@ hardship_group(poverty_cat)
 hardship_group(black_poverty)
 ```
 
-```{r, eval = F}
+```{r}
 plot1 = hardship_scored %>%
     filter(!is.na(black_poverty)) %>%
     group_by(Week, Date, black_poverty) %>%

@@ -46,6 +46,7 @@ plot = scored %>%
   geom_bar(stat = "count") +
   labs(x = NULL,
        title = "Number of caregivers by kindergarten delay choice") +
+  facet_grid(race_ethnic ~ poverty_cat, scales = "free") +
   theme_pubr()
 
 ggplotly(plot)
