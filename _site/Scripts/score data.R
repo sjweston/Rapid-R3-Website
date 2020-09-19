@@ -30,6 +30,7 @@ master = master %>%
 
 source(here("Functions/score_report.R"))
 source(here("Scripts/demo groups.R"))
+source(here("Functions/pomp.R"))
 
 
 # get variable names and levels -------------------------------------------
@@ -264,6 +265,45 @@ zipincome$zip = as.character(zipincome$zip)
 zipincome = filter(zipincome, !is.na(zip))
 
 scored = left_join(scored, zipincome)
+
+
+# composites --------------------------------------------------------------
+
+
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, lonely, stress, fussy, fear), pomp) %>%
+  rowwise() %>%
+  mutate(mental_health = mean(c(anxiety, depress, lonely, stress), na.rm=T),
+         child_mental = mean(c(fussy, fear), na.rm=T)) %>%
+  mutate(material_hardship = case_when(
+    Week == 0 ~ NA_real_,
+    TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
+  ungroup() %>%
+  mutate(
+    black_cat = factor(black, labels = c("non-Black", "Black")),
+    poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
+    single_cat = factor(single, labels = c("Dual parent", "Single parent")),
+    disability_cat = factor(disability, labels = c("No disability", "Child with disability")),
+    race_ethnic = case_when(
+      black == 1 ~ "Black",
+      latinx == 1 ~ "LatinX",
+      !is.na(black) ~ "White",
+      !is.na(latinx) ~ "White",
+      TRUE ~ NA_character_),
+    race_poverty = case_when(
+      black == 1 & poverty150 == 1 ~ "Low income, Black",
+      black == 1 & poverty150 == 0 ~ "High income, Black",
+      latinx == 1 & poverty150 == 1 ~ "Low income, LatinX",
+      latinx == 1 & poverty150 == 0 ~ "High income, LatinX",
+      white == 1 & poverty150 == 1 ~ "Low income, White",
+      white == 1 & poverty150 == 0 ~ "High income, White",
+      TRUE ~ NA_character_)) %>%
+  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0))  %>%
+  group_by(Week) %>%
+  mutate(Date_group =case_when(
+    Week == 0 ~ as.Date("2020-03-01"),
+    TRUE ~ min(Date)
+  )) %>% ungroup()
 
 
 # state medicaid ----------------------------------------------------------

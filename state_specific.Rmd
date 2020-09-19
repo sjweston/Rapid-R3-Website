@@ -1,0 +1,603 @@
+---
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+params: 
+  mainstate: "MI" 
+  title: "my title!"
+---
+
+---
+title: `r params$title`
+---
+
+```{r state-specific-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r state-specific-2 }
+library(here)
+library(haven)
+library(tidyverse)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+library(plotly)
+```
+
+```{r state-specific-3}
+source(here("Scripts/score data.R"))
+mainstate = params$mainstate
+statedata = scored %>% filter(state == mainstate)
+```
+
+# Well-being
+
+## Caregiver{.tabset}
+
+### Overall
+
+Caregivers complete measures of anxiety, depression, stress, and loneliness. These measures are averaged to create a single mental health variable, called "well-being" which ranges from 0 (worst possible mental health) to 100 (best possible mental health).
+
+```{r state-specific-4}
+state_mh = statedata %>%
+  filter(!is.na(mental_health)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = 100-mean(mental_health),
+            sd = sd(mental_health)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(mental_health)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = 100-mean(mental_health),
+            sd = sd(mental_health)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Well-being Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average caregiver well-being by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+### Anxiety
+
+```{r state-specific-5}
+state_mh = statedata %>%
+  filter(!is.na(anxiety)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(anxiety),
+            sd = sd(anxiety)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(anxiety)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(anxiety),
+            sd = sd(anxiety)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Anxiety Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average caregiver anxiety by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+### Depression
+
+```{r state-specific-6}
+state_mh = statedata %>%
+  filter(!is.na(depress)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(depress),
+            sd = sd(depress)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(depress)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(depress),
+            sd = sd(depress)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Anxiety Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average caregiver depression by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+### Stress
+
+```{r state-specific-7}
+state_mh = statedata %>%
+  filter(!is.na(stress)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(stress),
+            sd = sd(stress)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(stress)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(stress),
+            sd = sd(stress)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Anxiety Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average caregiver stress by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+### Loneliness
+
+```{r state-specific-8}
+state_mh = statedata %>%
+  filter(!is.na(lonely)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(lonely),
+            sd = sd(lonely)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(lonely)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(lonely),
+            sd = sd(lonely)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Anxiety Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average caregiver loneliness by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+
+## Child{.tabset}
+
+### Overall
+
+Caregivers complete measures of child internalizing and externalizing behavior. These measures are averaged to create a single mental health variable, called "well-being" which ranges from 0 (worst possible mental health) to 100 (best possible mental health).
+
+```{r state-specific-9}
+state_mh = statedata %>%
+  filter(!is.na(child_mental)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = 100-mean(child_mental),
+            sd = sd(child_mental)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(child_mental)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = 100-mean(child_mental),
+            sd = sd(child_mental)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Well-being Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average child well-being by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+### Internalizing behaviors (fear)
+
+```{r state-specific-10}
+state_mh = statedata %>%
+  filter(!is.na(fear)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(fear),
+            sd = sd(fear)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(fear)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(fear),
+            sd = sd(fear)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Anxiety Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average child fear by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+### Externalizing behavior (fussiness)
+
+```{r state-specific-11}
+state_mh = statedata %>%
+  filter(!is.na(fussy)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(fussy),
+            sd = sd(fussy)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) 
+
+plot = scored %>%
+  filter(!is.na(fussy)) %>%
+  group_by(Date_group) %>%
+  summarize(n = n(),
+            wellbeing = mean(fussy),
+            sd = sd(fussy)) %>%
+  mutate(moe = sd/sqrt(n)*qt(.975, df = n-1)) %>%
+  ggplot(aes(x = Date_group, 
+             y = wellbeing, 
+             group = 1,
+             text = paste0(
+               "Anxiety Average: ", round(wellbeing,1),
+               "\nSample size: ", n
+             ))) +
+  # geom_ribbon(aes(ymin = wellbeing-moe, 
+  #                 ymax = wellbeing+moe,
+  #                 fill = "US Average"),
+              # alpha = .2) +
+  geom_point(aes(color = "US Average")) +
+  geom_line(aes(color = "US Average")) +
+  geom_ribbon(aes(ymin = wellbeing-moe,
+                  ymax = wellbeing+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Average child fussiness by week") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+```
+
+# Material Hardship{.tabset}
+
+
+_Which needs are hard to pay for?:_
+  - _Food_
+  - _Housing_
+  - _Utilities (electric, water, trash)_
+  - _Healthcare_
+  - _Social_
+  - _Emotional_
+  - _Childcare_
+  - _Other_
+
+Caregivers grouped into two categories: trouble paying for 1+ basic need, or no trouble paying for any.
+
+## Overall
+
+```{r state-specific-12}
+state_mh = scored %>%
+  filter(state == mainstate) %>%
+  filter(!is.na(material_hardship)) %>%
+  group_by(Date_group) %>%
+  summarize(
+    n = n(),
+    percent = mean(material_hardship)
+  ) %>%
+  mutate(
+    moe = 1.96*sqrt((percent*(1-percent))/n)
+  ) %>%
+  mutate_at(vars(percent, moe), ~100*.x)
+
+plot = scored %>%
+  filter(!is.na(material_hardship)) %>%
+  group_by(Date_group) %>%
+  summarize(
+    n = n(),
+    percent = mean(material_hardship)
+  ) %>%
+  mutate(
+    moe = 1.96*sqrt((percent*(1-percent))/n)
+  ) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date_group,
+             y = percent, 
+             group = 1, 
+             text = round(percent,1))) +
+  geom_point(aes(color = "Entire US")) +
+  geom_line(aes(color = "Entire US")) +
+  geom_ribbon(aes(ymin = percent-moe,
+                  ymax = percent+moe,
+                  fill = mainstate),
+              data = state_mh,
+              alpha = .2) +
+  geom_point(data = state_mh, aes(color = mainstate)) +
+  geom_line(data = state_mh, aes(color = mainstate)) +
+  scale_color_manual(breaks = c(mainstate, "US Average"), values = c("red", "black")) +
+#  scale_fill_manual(values = c("red", "black")) +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL, title = "Percent of caregivers experiencing material hardship") +
+  theme_pubclean()
+  
+plot = ggplotly(plot, tooltip = "text")
+
+for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+        plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+}
+
+plot
+
+```
+
+## Sources
+
+```{r state-specific-13}
+state_sources = scored %>%
+  filter(state == mainstate) %>%
+  select(Week, CaregiverID, starts_with("diff_pay")) %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  select(-Week, -CaregiverID) %>%
+  gather(need, response) %>%
+  mutate(need = str_remove(need, "diff_pay_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(need) %>%
+  summarize(percent = 100*mean(response)) %>%
+  ungroup() %>%
+  mutate(group = mainstate)
+
+sources = scored %>%
+  select(Week, CaregiverID, starts_with("diff_pay")) %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  select(-Week, -CaregiverID) %>%
+  gather(need, response) %>%
+  mutate(need = str_remove(need, "diff_pay_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(need) %>%
+  summarize(percent = 100*mean(response)) %>%
+  ungroup() %>%
+  mutate(group = "Entire US") %>%
+  full_join(state_sources) %>%
+  arrange(group, desc(percent)) %>%
+  mutate(order = row_number()) 
+
+sources %>%
+  ggplot(aes(x = order, y = percent, fill = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  # Add categories to axis
+  scale_x_continuous(
+    breaks = sources$order,
+    labels = sources$need,
+    expand = c(0,0)
+  ) +
+  guides(fill = F) +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers having difficulty paying for needs") +
+  facet_wrap(~group, scales = "free_y")+
+  theme_pubr()
+```
+
