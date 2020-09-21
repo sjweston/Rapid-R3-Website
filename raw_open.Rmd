@@ -45,14 +45,15 @@ data(zipcode)
 
 master = master %>%
   mutate(State = map(DEMO.001, identify_state)) %>%
-  select(CaregiverID, Week, starts_with("OPEN"), DEMO.001, State, RaceGroup, CaregiverAge) %>%
+  select(CaregiverID, Week, starts_with("OPEN"), State, FPL.150, RaceGroup, CaregiverAge) %>%
   arrange(Week) %>%
   group_by(CaregiverID) %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%
-  mutate_at(vars(DEMO.001, State, RaceGroup, CaregiverAge), na.locf0) %>%
+  mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge), na.locf0) %>%
   ungroup() %>%
+  select(-CaregiverID) %>%
   rename(canuse = OPEN.006,
-         zipcode = DEMO.001) %>%
+         `Below 1.5xFPL` = FPL.150) %>%
   gather("Question", "Response", starts_with("OPEN")) %>%
   filter(Response != "")
 
