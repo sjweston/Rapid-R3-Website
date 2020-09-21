@@ -277,7 +277,7 @@ time_cont_group = function(policy, variable, group, data = scored){
                text = paste0(
                  "Date: ", Date,
                  "\n Count: ", n,
-                 "\n Mean: ", round(mean)))) +
+                 "\n Mean: ", round(mean,2)))) +
     geom_point() +
     geom_line() +
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
