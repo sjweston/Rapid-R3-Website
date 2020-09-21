@@ -1,3 +1,9 @@
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+
 policy_binary = function(policy, variable, data = scored){
   
   plot = data %>%
@@ -80,24 +86,32 @@ time_policy_binary = function(policy, variable, data = scored){
     filter(!is.na({{policy}})) %>%
     group_by(Week, Date, {{policy}}) %>%
     summarize(count = n(),
-              percent = 100*sum({{variable}})/count)  %>%
+              percent = sum({{variable}})/count)  %>%
+    mutate(moe = map2_dbl(percent, count, moe.p)) %>%
+    mutate_at(vars(percent, moe), ~100*.x) %>%
     ungroup()   %>%
     ggplot(aes(x = Date,
                y = percent,
                group = 1,
                color = {{policy}},
+               fill = {{policy}},
                text = paste0(
                  "Date: ", Date,
                  "\n Count: ", count,
                  "\n Percent: ", round(percent)))) +
+    geom_ribbon(aes(ymin = percent-moe, 
+                    ymax = percent+moe),
+                alpha = .2) +
     geom_point() +
     geom_line() +
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-    labs(x = NULL, y = "Percent", color = NULL) +
+    labs(x = NULL, y = "Percent", color = NULL, fill = NULL) +
     theme_pubr()
   
   ggplotly(plot, tooltip = "text")
 }
+
+
 
 time_binary_group = function(policy, variable, group, data = scored){
   
@@ -107,7 +121,9 @@ time_binary_group = function(policy, variable, group, data = scored){
     filter(!is.na({{policy}})) %>%
     group_by(Week, Date, {{group}}, {{policy}}) %>%
     summarize(count = n(),
-              percent = 100*sum({{variable}})/count)  %>%
+              percent = sum({{variable}})/count)  %>%
+    mutate(moe = map2_dbl(percent, count, moe.p)) %>%
+    mutate_at(vars(percent, moe), ~100*.x) %>%
     ungroup()   %>%
     ggplot(aes(x = Date,
                y = percent,
@@ -117,14 +133,26 @@ time_binary_group = function(policy, variable, group, data = scored){
                  "Date: ", Date,
                  "\n Count: ", count,
                  "\n Percent: ", round(percent)))) +
+    geom_ribbon(aes(ymin = percent-moe, 
+                    ymax = percent+moe, 
+                    fill = {{policy}}),
+                alpha = .2) +
     geom_point() +
     geom_line() +
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
-    labs(x = NULL, y = "Percent", color = NULL) +
+    labs(x = NULL, y = "Percent", color = NULL, fill = NULL) +
     facet_wrap(facets = vars({{group}})) + 
     theme_pubr()
   
-  ggplotly(plot, tooltip = "text")
+  plot = ggplotly(plot, tooltip = "text")
+  for (i in 1:length(plot$x$data)){
+    if (!is.null(plot$x$data[[i]]$name)){
+      plot$x$data[[i]]$name =  gsub("\\(","",str_split(plot$x$data[[i]]$name,",")[[1]][1])
+    }
+  }
+  
+  return(plot)
+  
 }
 
 
@@ -255,6 +283,72 @@ time_cont_group = function(policy, variable, group, data = scored){
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
     labs(x = NULL, y = "Mean", color = NULL) +
     facet_wrap(facets = vars({{group}})) + 
+    theme_pubr()
+  
+  ggplotly(plot, tooltip = "text")
+}
+
+group_categorical_long = function(group, category, response, data = scored){
+  plot = data %>%
+    filter(!is.na({{response}})) %>%
+    filter(!is.na({{group}})) %>%
+    group_by({{category}}, {{group}}) %>%
+    summarize(
+      n = n(),
+      percent = mean({{response}})) %>%
+    ungroup() %>%
+    mutate(moe = map2_dbl(percent, n, moe.p)) %>%
+    mutate_at(vars(percent, moe), ~100*.x) %>%
+    arrange({{group}}, desc(percent)) %>%
+    mutate(order = row_number())
+  
+  names(plot)[names(plot) == deparse(substitute(category))] = "category"
+  
+  plot = plot %>% ggplot(aes(
+    x = order, 
+    y = percent, 
+    fill = percent,
+    text = paste0(round(percent,1), "%"))) +
+    geom_bar(stat = "identity") +
+    geom_errorbar(aes(ymin = percent-moe, 
+                      ymax = percent + moe), 
+                  width = .2) +
+    coord_flip() +
+    scale_x_continuous(breaks = plot$order, labels = plot$category) +
+    facet_wrap(facets = vars({{group}}), scales = "free_y") +
+    guides(fill = F) +
+    labs(x = NULL, y = NULL, fill = NULL, title = "Percent of households") +
+    theme_pubr()
+  
+  ggplotly(plot, tooltip = "text")
+}
+
+time_group_cat_long = function(group, category, response, data = scored){
+  plot = data %>%
+    filter(!is.na({{response}})) %>%
+    filter(!is.na({{group}})) %>%
+    group_by(Date, {{category}}, {{group}}) %>%
+    summarize(
+      n = n(),
+      percent = mean({{response}})) %>%
+    ungroup() %>%
+    mutate(moe = map2_dbl(percent, n, moe.p)) %>%
+    mutate_at(vars(percent, moe), ~100*.x) %>% 
+    ggplot(aes(
+    x = Date, 
+    y = percent,
+    group = 1,
+    color = {{group}},
+    fill = {{group}},
+    text = paste0(round(percent,1), "%"))) +
+    geom_ribbon(aes(ymin = percent-moe, 
+                      ymax = percent + moe), 
+                  alpha = .2) +
+    geom_point() +
+    geom_line() +
+    facet_wrap(facets = vars({{category}}), scales = "free") +
+    guides(fill = F) +
+    labs(x = NULL, y = NULL, fill = NULL, title = "Percent of households") +
     theme_pubr()
   
   ggplotly(plot, tooltip = "text")

@@ -511,15 +511,34 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$which_wellbaby_missed.5 = data$HEALTH.013.a
     
     newdata$miss_vaccine.1 = case_when(
+      data$HEALTH.009.b == 1 ~ 1, 
+      data$HEALTH.009.b == 0 ~ 0, 
+      data$HEALTH.009.b.2 == 1 ~ 1, 
+      data$HEALTH.009.b.2 == 0 ~ 0, 
       data$HEALTH.004 != 1 ~ 0,
-      data$HEALTH.009.a == 1 ~ 1, 
-      data$HEALTH.009.a == 0 ~ 0, 
       TRUE ~ NA_real_)
 
     newdata$miss_vaccine.2 = data$HEALTH.010.b
     newdata$miss_vaccine.3 = data$HEALTH.011.b
     newdata$miss_vaccine.4 = data$HEALTH.012.b
     newdata$miss_vaccine.5 = data$HEALTH.013.b
+    
+    newdata$miss_vaccine_any = case_when(
+      data$HEALTH.009.b == 1 ~ 1, 
+      data$HEALTH.009.b.2 == 1 ~ 1, 
+      data$HEALTH.010.b == 1 ~ 1, 
+      data$HEALTH.011.b == 1 ~ 1, 
+      data$HEALTH.012.b == 1 ~ 1, 
+      data$HEALTH.013.b == 1 ~ 1, 
+      data$HEALTH.009.b == 0 ~ 0, 
+      data$HEALTH.009.b.2 == 0 ~ 0, 
+      data$HEALTH.010.b == 0 ~ 0, 
+      data$HEALTH.011.b == 0 ~ 0, 
+      data$HEALTH.012.b == 0 ~ 0, 
+      data$HEALTH.013.b == 0 ~ 0, 
+      data$HEALTH.004 != 1 ~ 0,
+      TRUE ~ NA_real_
+    )
     
     data = combine.cat(x = data, 
                        cols = find_items("HEALTH.004\\.a_.{1}$", data), 

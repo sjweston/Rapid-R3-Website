@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Material Hardship follow-up</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.1/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="0prelim_april27.html">April 27</a>
+    </li>
+    <li>
+      <a href="disability.html">Children with disabilities</a>
+    </li>
+    <li>
+      <a href="single.html">Single parents</a>
+    </li>
+    <li>
+      <a href="poverty.html">Low-income households</a>
+    </li>
+    <li>
+      <a href="childcare.html">Childcare</a>
+    </li>
+    <li>
+      <a href="access_by_race.html">Race/Ethnicity</a>
+    </li>
+    <li>
+      <a href="0prelim_may22.html">May 22</a>
+    </li>
+    <li>
+      <a href="0prelim_may29.html">May 29</a>
+    </li>
+    <li>
+      <a href="inequality.html">racial_inequality</a>
+    </li>
+    <li>
+      <a href="canary.html">Canary</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="social_support2.html">Additional hardship and support</a>
+    </li>
+    <li>
+      <a href="hardship_cares.html">Hardship trends post CARES</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li>
+      <a href="usda.html">Food insecurity</a>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texax</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Material Hardship follow-up</h1>
+
+</div>
+
+
+<p>Material hardship is assesssed with the following question: <em>Which needs are hard to pay for? Check all that apply:</em> - <em>Food</em> - <em>Housing</em> - <em>Utilities (electric, water, trash)</em> - <em>Healthcare</em> - <em>Social</em> - <em>Emotional</em> - <em>Childcare</em> - <em>Other</em></p>
+<div id="representativeness-disclaimer" class="section level1">
+<h1>Representativeness disclaimer</h1>
+<p>These analyses are based on responses collected from 8303 caregivers between the dates of April 06, 2020 and September 08, 2020. These caregivers represent a range of voices: 10.33% are Black/African American, 19.81% are LatinX, and 27.45% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are <em>not</em> weighted.</p>
+</div>
+<div id="has-hardship" class="section level1 tabset">
+<h1>Has hardship</h1>
+<p>Caregivers grouped into two categories: trouble paying for 1+ basic need, or no trouble paying for any.</p>
+<p>For these analyses, data collected in even numbered weeks starting in August were merged with data in the previous week – this was due to a shift to a recruitment strategy that prioritized recruiting underrepresented communities and marginalized caregivers every other week.</p>
+<div id="overall" class="section level2 tabset">
+<h2>Overall</h2>
+<div id="all" class="section level3">
+<h3>All</h3>
+<div id="htmlwidget-0a6de381689910cd73f1" style="width:1152px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-0a6de381689910cd73f1">{"x":{"data":[{"orientation":"v","width":0.9,"base":0,"x":[0],"y":[55.9792264589313],"text":"56%","type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"0","legendgroup":"0","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[1],"y":[44.0207735410687],"text":"44%","type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"1","legendgroup":"1","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[0],"y":[55.9792264589313],"text":"56%","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[1.52026178501456],"arrayminus":[1.52026178501456],"type":"data","width":41.3397129186603,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"0","legendgroup":"0","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1],"y":[44.0207735410687],"text":"44%","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[1.71436381030477],"arrayminus":[1.71436381030477],"type":"data","width":41.3397129186603,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"1","legendgroup":"1","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":54.2565379825654,"r":7.97011207970112,"b":39.0535491905355,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers experiencing material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.545,1.545],"tickmode":"array","ticktext":["No","Yes"],"tickvals":[0,1],"categoryorder":"array","categoryarray":["No","Yes"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-2.87497441219729,60.3744626561431],"tickmode":"array","ticktext":["0","20","40","60"],"tickvals":[0,20,40,60],"categoryorder":"array","categoryarray":["0","20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"4c0671df356e":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"},"4c06752d0329":{"ymin":{},"ymax":{},"x":{},"y":{},"fill":{},"text":{}}},"cur_data":"4c0671df356e","visdat":{"4c0671df356e":["function (y) ","x"],"4c06752d0329":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="raceethnicity" class="section level3">
+<h3>Race/ethnicity</h3>
+<div id="htmlwidget-c21582a2d939dea09981" style="width:1152px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c21582a2d939dea09981">{"x":{"data":[{"orientation":"v","width":0.9,"base":0,"x":[1],"y":[58.3126550868486],"text":"Count: 806<br /> Percent: 58","type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Black","legendgroup":"Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[2],"y":[52.4752475247525],"text":"Count: 1414<br /> Percent: 52","type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"LatinX","legendgroup":"LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[3],"y":[39.8939304655274],"text":"Count: 5091<br /> Percent: 40","type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"White","legendgroup":"White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1],"y":[58.3126550868486],"text":"Count: 806<br /> Percent: 58","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[3.40386303292057],"arrayminus":[3.40386303292057],"type":"data","width":9.00000000000001,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"Black","legendgroup":"Black","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2],"y":[52.4752475247525],"text":"Count: 1414<br /> Percent: 52","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[2.60296630536852],"arrayminus":[2.60296630536852],"type":"data","width":8.99999999999997,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"LatinX","legendgroup":"LatinX","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[3],"y":[39.8939304655274],"text":"Count: 5091<br /> Percent: 40","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[1.34513880253564],"arrayminus":[1.34513880253564],"type":"data","width":8.99999999999997,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"White","legendgroup":"White","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":35.1282689912827,"r":7.97011207970112,"b":39.0535491905355,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","LatinX","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","LatinX","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-25,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.08582590598846,64.8023440257577],"tickmode":"array","ticktext":["0","20","40","60"],"tickvals":[0,20,40,60],"categoryorder":"array","categoryarray":["0","20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"4c066b6456b8":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"},"4c06879811d":{"ymin":{},"ymax":{},"x":{},"y":{},"fill":{},"text":{}}},"cur_data":"4c066b6456b8","visdat":{"4c066b6456b8":["function (y) ","x"],"4c06879811d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="race-by-income" class="section level3">
+<h3>Race by income</h3>
+<div id="htmlwidget-619431c9da24729c70fa" style="width:1152px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-619431c9da24729c70fa">{"x":{"data":[{"orientation":"v","width":0.9,"base":0,"x":[1],"y":[47.075208913649],"text":"Count: 359<br /> Percent: 47","type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"High income, Black","legendgroup":"High income, Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[2],"y":[42.6611796982167],"text":"Count: 729<br /> Percent: 43","type":"bar","marker":{"autocolorscale":false,"color":"rgba(183,159,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"High income, LatinX","legendgroup":"High income, LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[3],"y":[26.8488160291439],"text":"Count: 2745<br /> Percent: 27","type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"High income, White","legendgroup":"High income, White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[4],"y":[67.9180887372014],"text":"Count: 293<br /> Percent: 68","type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Low income, Black","legendgroup":"Low income, Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[5],"y":[67.0506912442396],"text":"Count: 434<br /> Percent: 67","type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Low income, LatinX","legendgroup":"Low income, LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[6],"y":[66.8918918918919],"text":"Count: 1036<br /> Percent: 67","type":"bar","marker":{"autocolorscale":false,"color":"rgba(245,100,227,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Low income, White","legendgroup":"Low income, White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1],"y":[47.075208913649],"text":"Count: 359<br /> Percent: 47","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[5.16338550535858],"arrayminus":[5.16338550535858],"type":"data","width":4.64516129032259,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"High income, Black","legendgroup":"High income, Black","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2],"y":[42.6611796982167],"text":"Count: 729<br /> Percent: 43","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[3.59031963576747],"arrayminus":[3.59031963576747],"type":"data","width":4.64516129032256,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"High income, LatinX","legendgroup":"High income, LatinX","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[3],"y":[26.8488160291439],"text":"Count: 2745<br /> Percent: 27","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[1.65789929299245],"arrayminus":[1.65789929299245],"type":"data","width":4.64516129032256,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"High income, White","legendgroup":"High income, White","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[4],"y":[67.9180887372014],"text":"Count: 293<br /> Percent: 68","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[5.34496795535202],"arrayminus":[5.34496795535202],"type":"data","width":4.64516129032256,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"Low income, Black","legendgroup":"Low income, Black","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[5],"y":[67.0506912442396],"text":"Count: 434<br /> Percent: 67","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[4.42217566461055],"arrayminus":[4.42217566461055],"type":"data","width":4.64516129032256,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"Low income, LatinX","legendgroup":"Low income, LatinX","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[6],"y":[66.8918918918919],"text":"Count: 1036<br /> Percent: 67","type":"scatter","mode":"lines","opacity":1,"line":{"color":"transparent"},"error_y":{"array":[2.86569598732963],"arrayminus":[2.86569598732963],"type":"data","width":4.64516129032256,"symmetric":false,"color":"rgba(0,0,0,1)"},"name":"Low income, White","legendgroup":"Low income, White","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":35.1282689912827,"r":7.97011207970112,"b":39.0535491905355,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,6.6],"tickmode":"array","ticktext":["High income, Black","High income, LatinX","High income, White","Low income, Black","Low income, LatinX","Low income, White"],"tickvals":[1,2,3,4,5,6],"categoryorder":"array","categoryarray":["High income, Black","High income, LatinX","High income, White","Low income, Black","Low income, LatinX","Low income, White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-25,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.66315283462767,76.926209527181],"tickmode":"array","ticktext":["0","20","40","60"],"tickvals":[0,20,40,60],"categoryorder":"array","categoryarray":["0","20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"4c06181022fb":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"},"4c064b689914":{"ymin":{},"ymax":{},"x":{},"y":{},"fill":{},"text":{}}},"cur_data":"4c06181022fb","visdat":{"4c06181022fb":["function (y) ","x"],"4c064b689914":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="over-time" class="section level2 tabset">
+<h2>Over time</h2>
+<div id="all-1" class="section level3">
+<h3>All</h3>
+<div id="htmlwidget-6a342dd249ed0b5cd0e7" style="width:1152px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6a342dd249ed0b5cd0e7">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,null,null,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,null,18358],"y":[40.8584602266214,41.6184274378169,36.2721200302503,33.5280796954533,31.9300053073994,30.2388603320547,28.9144873052794,32.8837713572881,35.5167979514132,34.2318744273174,30.9619231151775,31.6652520579968,38.1788101511345,35.765830172865,33.5208379835887,32.9130950064359,32.8298122267941,32.0079298110245,34.8414094470728,35.0167428487266,null,null,40.9951031532478,40.3478252038944,37.8364281656292,38.3743762548813,38.5411240240848,39.2064347436841,41.4583691153913,43.5821961381736,37.3981348861849,36.3920287748568,39.5181255726826,40.4091279745127,38.1605324401803,34.30792950733,36.0333290170577,38.3918063731727,39.9841723465537,42.5949823662638,47.7815725621832,47.7779034097423,null,40.8584602266214],"text":["Date: 2020-04-06<br /> Count: 792<br /> Percent: 44","Date: 2020-04-14<br /> Count: 1000<br /> Percent: 45","Date: 2020-04-20<br /> Count: 918<br /> Percent: 39","Date: 2020-04-27<br /> Count: 857<br /> Percent: 37","Date: 2020-05-04<br /> Count: 839<br /> Percent: 35","Date: 2020-05-11<br /> Count: 1014<br /> Percent: 33","Date: 2020-05-19<br /> Count: 1142<br /> Percent: 32","Date: 2020-05-25<br /> Count: 1264<br /> Percent: 36","Date: 2020-06-01<br /> Count: 1512<br /> Percent: 38","Date: 2020-06-08<br /> Count: 1280<br /> Percent: 37","Date: 2020-06-15<br /> Count: 1164<br /> Percent: 34","Date: 2020-06-22<br /> Count: 1057<br /> Percent: 35","Date: 2020-06-29<br /> Count: 1272<br /> Percent: 41","Date: 2020-07-06<br /> Count: 1124<br /> Percent: 39","Date: 2020-07-13<br /> Count: 1100<br /> Percent: 36","Date: 2020-07-20<br /> Count: 1114<br /> Percent: 36","Date: 2020-07-27<br /> Count: 1146<br /> Percent: 36","Date: 2020-08-11<br /> Count: 1028<br /> Percent: 35","Date: 2020-08-25<br /> Count: 1189<br /> Percent: 38","Date: 2020-09-08<br /> Count: 1013<br /> Percent: 38","Date: NA<br /> Count: 8303<br /> Percent: NA","Date: NA<br /> Count: 8303<br /> Percent: NA","Date: 2020-09-08<br /> Count: 1013<br /> Percent: 38","Date: 2020-08-25<br /> Count: 1189<br /> Percent: 38","Date: 2020-08-11<br /> Count: 1028<br /> Percent: 35","Date: 2020-07-27<br /> Count: 1146<br /> Percent: 36","Date: 2020-07-20<br /> Count: 1114<br /> Percent: 36","Date: 2020-07-13<br /> Count: 1100<br /> Percent: 36","Date: 2020-07-06<br /> Count: 1124<br /> Percent: 39","Date: 2020-06-29<br /> Count: 1272<br /> Percent: 41","Date: 2020-06-22<br /> Count: 1057<br /> Percent: 35","Date: 2020-06-15<br /> Count: 1164<br /> Percent: 34","Date: 2020-06-08<br /> Count: 1280<br /> Percent: 37","Date: 2020-06-01<br /> Count: 1512<br /> Percent: 38","Date: 2020-05-25<br /> Count: 1264<br /> Percent: 36","Date: 2020-05-19<br /> Count: 1142<br /> Percent: 32","Date: 2020-05-11<br /> Count: 1014<br /> Percent: 33","Date: 2020-05-04<br /> Count: 839<br /> Percent: 35","Date: 2020-04-27<br /> Count: 857<br /> Percent: 37","Date: 2020-04-20<br /> Count: 918<br /> Percent: 39","Date: 2020-04-14<br /> Count: 1000<br /> Percent: 45","Date: 2020-04-06<br /> Count: 792<br /> Percent: 44","Date: NA<br /> Count: 8303<br /> Percent: NA","Date: 2020-04-06<br /> Count: 792<br /> Percent: 44"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(51,51,51,0.2)","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[null,18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[null,44.3181818181818,44.7,39.4335511982571,36.7561260210035,35.1609058402861,33.1360946745562,31.6112084063047,35.5221518987342,37.962962962963,36.875,33.6769759450172,34.5316934720908,40.8805031446541,38.6120996441281,36.3636363636364,35.7271095152603,35.6020942408377,34.9221789883268,37.5946173254836,38.0059230009872],"text":["Date: NA<br /> Count: 8303<br /> Percent: NA","Date: 2020-04-06<br /> Count: 792<br /> Percent: 44","Date: 2020-04-14<br /> Count: 1000<br /> Percent: 45","Date: 2020-04-20<br /> Count: 918<br /> Percent: 39","Date: 2020-04-27<br /> Count: 857<br /> Percent: 37","Date: 2020-05-04<br /> Count: 839<br /> Percent: 35","Date: 2020-05-11<br /> Count: 1014<br /> Percent: 33","Date: 2020-05-19<br /> Count: 1142<br /> Percent: 32","Date: 2020-05-25<br /> Count: 1264<br /> Percent: 36","Date: 2020-06-01<br /> Count: 1512<br /> Percent: 38","Date: 2020-06-08<br /> Count: 1280<br /> Percent: 37","Date: 2020-06-15<br /> Count: 1164<br /> Percent: 34","Date: 2020-06-22<br /> Count: 1057<br /> Percent: 35","Date: 2020-06-29<br /> Count: 1272<br /> Percent: 41","Date: 2020-07-06<br /> Count: 1124<br /> Percent: 39","Date: 2020-07-13<br /> Count: 1100<br /> Percent: 36","Date: 2020-07-20<br /> Count: 1114<br /> Percent: 36","Date: 2020-07-27<br /> Count: 1146<br /> Percent: 36","Date: 2020-08-11<br /> Count: 1028<br /> Percent: 35","Date: 2020-08-25<br /> Count: 1189<br /> Percent: 38","Date: 2020-09-08<br /> Count: 1013<br /> Percent: 38"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,null],"y":[44.3181818181818,44.7,39.4335511982571,36.7561260210035,35.1609058402861,33.1360946745562,31.6112084063047,35.5221518987342,37.962962962963,36.875,33.6769759450172,34.5316934720908,40.8805031446541,38.6120996441281,36.3636363636364,35.7271095152603,35.6020942408377,34.9221789883268,37.5946173254836,38.0059230009872,null],"text":["Date: 2020-04-06<br /> Count: 792<br /> Percent: 44","Date: 2020-04-14<br /> Count: 1000<br /> Percent: 45","Date: 2020-04-20<br /> Count: 918<br /> Percent: 39","Date: 2020-04-27<br /> Count: 857<br /> Percent: 37","Date: 2020-05-04<br /> Count: 839<br /> Percent: 35","Date: 2020-05-11<br /> Count: 1014<br /> Percent: 33","Date: 2020-05-19<br /> Count: 1142<br /> Percent: 32","Date: 2020-05-25<br /> Count: 1264<br /> Percent: 36","Date: 2020-06-01<br /> Count: 1512<br /> Percent: 38","Date: 2020-06-08<br /> Count: 1280<br /> Percent: 37","Date: 2020-06-15<br /> Count: 1164<br /> Percent: 34","Date: 2020-06-22<br /> Count: 1057<br /> Percent: 35","Date: 2020-06-29<br /> Count: 1272<br /> Percent: 41","Date: 2020-07-06<br /> Count: 1124<br /> Percent: 39","Date: 2020-07-13<br /> Count: 1100<br /> Percent: 36","Date: 2020-07-20<br /> Count: 1114<br /> Percent: 36","Date: 2020-07-27<br /> Count: 1146<br /> Percent: 36","Date: 2020-08-11<br /> Count: 1028<br /> Percent: 35","Date: 2020-08-25<br /> Count: 1189<br /> Percent: 38","Date: 2020-09-08<br /> Count: 1013<br /> Percent: 38","Date: NA<br /> Count: 8303<br /> Percent: NA"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474],"y":[27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,27.9711330424342,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283,48.7249268250283],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":54.2565379825654,"r":7.97011207970112,"b":39.0535491905355,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of households experiencing at least one material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18350.25,18520.75],"tickmode":"array","ticktext":["Apr","May","Jun","Jul","Aug","Sep"],"tickvals":[18353,18383,18414,18444,18475,18506],"categoryorder":"array","categoryarray":["Apr","May","Jun","Jul","Aug","Sep"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[27.9711330424342,48.7249268250283],"tickmode":"array","ticktext":["30","35","40","45"],"tickvals":[30,35,40,45],"categoryorder":"array","categoryarray":["30","35","40","45"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"4c061e1a6e4a":{"ymin":{},"ymax":{},"x":{},"y":{},"text":{},"type":"scatter"},"4c06593ecbb6":{"x":{},"y":{},"text":{}},"4c0629b04780":{"x":{},"y":{},"text":{}},"4c06742639e1":{"xintercept":{}}},"cur_data":"4c061e1a6e4a","visdat":{"4c061e1a6e4a":["function (y) ","x"],"4c06593ecbb6":["function (y) ","x"],"4c0629b04780":["function (y) ","x"],"4c06742639e1":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="raceethnicity-1" class="section level3">
+<h3>Race/ethnicity</h3>
+<div id="htmlwidget-8a3a10814f0780c0f072" style="width:1152px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8a3a10814f0780c0f072">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[38.2302588087168,52.3393287300657,51.1103357347745,38.0907770757472,27.7910777280078,38.1834547202667,38.9280631496604,43.0440075767796,47.1128944954811,49.1102071096153,43.4478873166635,50.1455461968775,49.4181970789202,52.1533730120332,38.6792169726775,40.6779902070569,37.7824625404199,37.0578518154666,38.0745963435789,33.9656399735235,51.7486457407622,56.5682607992783,56.8196992049416,55.1309232863518,58.4955635119514,56.4027502404372,66.7037698451096,65.2484695877465,68.1153233683399,65.4128721770074,67.8709249658564,63.5254033768593,61.3038185101769,62.5212122126584,60.517843981032,56.6533667164366,63.6041381784901,70.5391488013079,70.0744643733826,58.5439347396703,38.2302588087168],"text":["Date: 2020-04-06<br /> Count: 93<br /> Percent: 48","Date: 2020-04-14<br /> Count: 116<br /> Percent: 61","Date: 2020-04-20<br /> Count: 97<br /> Percent: 61","Date: 2020-04-27<br /> Count: 59<br /> Percent: 51","Date: 2020-05-04<br /> Count: 45<br /> Percent: 42","Date: 2020-05-11<br /> Count: 77<br /> Percent: 49","Date: 2020-05-19<br /> Count: 69<br /> Percent: 51","Date: 2020-05-25<br /> Count: 115<br /> Percent: 52","Date: 2020-06-01<br /> Count: 141<br /> Percent: 55","Date: 2020-06-08<br /> Count: 106<br /> Percent: 58","Date: 2020-06-15<br /> Count: 79<br /> Percent: 54","Date: 2020-06-22<br /> Count: 115<br /> Percent: 59","Date: 2020-06-29<br /> Count: 150<br /> Percent: 57","Date: 2020-07-06<br /> Count: 175<br /> Percent: 59","Date: 2020-07-13<br /> Count: 122<br /> Percent: 48","Date: 2020-07-20<br /> Count: 121<br /> Percent: 50","Date: 2020-07-27<br /> Count: 127<br /> Percent: 46","Date: 2020-08-11<br /> Count: 98<br /> Percent: 47","Date: 2020-08-25<br /> Count: 112<br /> Percent: 47","Date: 2020-09-08<br /> Count: 119<br /> Percent: 43","Date: 2020-09-08<br /> Count: 119<br /> Percent: 43","Date: 2020-08-25<br /> Count: 112<br /> Percent: 47","Date: 2020-08-11<br /> Count: 98<br /> Percent: 47","Date: 2020-07-27<br /> Count: 127<br /> Percent: 46","Date: 2020-07-20<br /> Count: 121<br /> Percent: 50","Date: 2020-07-13<br /> Count: 122<br /> Percent: 48","Date: 2020-07-06<br /> Count: 175<br /> Percent: 59","Date: 2020-06-29<br /> Count: 150<br /> Percent: 57","Date: 2020-06-22<br /> Count: 115<br /> Percent: 59","Date: 2020-06-15<br /> Count: 79<br /> Percent: 54","Date: 2020-06-08<br /> Count: 106<br /> Percent: 58","Date: 2020-06-01<br /> Count: 141<br /> Percent: 55","Date: 2020-05-25<br /> Count: 115<br /> Percent: 52","Date: 2020-05-19<br /> Count: 69<br /> Percent: 51","Date: 2020-05-11<br /> Count: 77<br /> Percent: 49","Date: 2020-05-04<br /> Count: 45<br /> Percent: 42","Date: 2020-04-27<br /> Count: 59<br /> Percent: 51","Date: 2020-04-20<br /> Count: 97<br /> Percent: 61","Date: 2020-04-14<br /> Count: 116<br /> Percent: 61","Date: 2020-04-06<br /> Count: 93<br /> Percent: 48","Date: 2020-04-06<br /> Count: 93<br /> Percent: 48"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"Black","legendgroup":"Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[51.0431736017489,48.8297357889617,37.4581668932688,28.2922735594568,34.9909356098418,26.8581207776546,30.3151127923973,37.2177792549051,40.8422704556692,39.529463637016,36.1769921979441,38.4230796566208,43.9364519400597,41.1269431815078,45.8904415858718,43.7138546973944,45.8205604566799,45.4845701216808,39.8014718588492,47.0613280852006,63.1427535474524,53.6658648245679,60.0709854338748,59.7631958884977,57.2385262549865,59.1786828380913,54.3276022730376,53.4630752467015,53.1023440721927,49.4044031508931,52.1372030296507,51.8561422427435,49.5292086969021,43.9116913313141,42.0160514077758,52.3106516917455,43.8165699779582,54.7293331067312,64.0536997938604,68.3116651079285,51.0431736017489],"text":["Date: 2020-04-06<br /> Count: 124<br /> Percent: 60","Date: 2020-04-14<br /> Count: 163<br /> Percent: 56","Date: 2020-04-20<br /> Count: 128<br /> Percent: 46","Date: 2020-04-27<br /> Count: 147<br /> Percent: 36","Date: 2020-05-04<br /> Count: 126<br /> Percent: 44","Date: 2020-05-11<br /> Count: 151<br /> Percent: 34","Date: 2020-05-19<br /> Count: 194<br /> Percent: 37","Date: 2020-05-25<br /> Count: 249<br /> Percent: 43","Date: 2020-06-01<br /> Count: 315<br /> Percent: 46","Date: 2020-06-08<br /> Count: 240<br /> Percent: 46","Date: 2020-06-15<br /> Count: 215<br /> Percent: 43","Date: 2020-06-22<br /> Count: 177<br /> Percent: 46","Date: 2020-06-29<br /> Count: 423<br /> Percent: 49","Date: 2020-07-06<br /> Count: 220<br /> Percent: 48","Date: 2020-07-13<br /> Count: 217<br /> Percent: 53","Date: 2020-07-20<br /> Count: 210<br /> Percent: 50","Date: 2020-07-27<br /> Count: 197<br /> Percent: 53","Date: 2020-08-11<br /> Count: 180<br /> Percent: 53","Date: 2020-08-25<br /> Count: 199<br /> Percent: 47","Date: 2020-09-08<br /> Count: 147<br /> Percent: 55","Date: 2020-09-08<br /> Count: 147<br /> Percent: 55","Date: 2020-08-25<br /> Count: 199<br /> Percent: 47","Date: 2020-08-11<br /> Count: 180<br /> Percent: 53","Date: 2020-07-27<br /> Count: 197<br /> Percent: 53","Date: 2020-07-20<br /> Count: 210<br /> Percent: 50","Date: 2020-07-13<br /> Count: 217<br /> Percent: 53","Date: 2020-07-06<br /> Count: 220<br /> Percent: 48","Date: 2020-06-29<br /> Count: 423<br /> Percent: 49","Date: 2020-06-22<br /> Count: 177<br /> Percent: 46","Date: 2020-06-15<br /> Count: 215<br /> Percent: 43","Date: 2020-06-08<br /> Count: 240<br /> Percent: 46","Date: 2020-06-01<br /> Count: 315<br /> Percent: 46","Date: 2020-05-25<br /> Count: 249<br /> Percent: 43","Date: 2020-05-19<br /> Count: 194<br /> Percent: 37","Date: 2020-05-11<br /> Count: 151<br /> Percent: 34","Date: 2020-05-04<br /> Count: 126<br /> Percent: 44","Date: 2020-04-27<br /> Count: 147<br /> Percent: 36","Date: 2020-04-20<br /> Count: 128<br /> Percent: 46","Date: 2020-04-14<br /> Count: 163<br /> Percent: 56","Date: 2020-04-06<br /> Count: 124<br /> Percent: 60","Date: 2020-04-06<br /> Count: 124<br /> Percent: 60"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,186,56,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,186,56,0.2)","hoveron":"points","name":"LatinX","legendgroup":"LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[36.4034907536946,35.8231475018324,31.700272564609,31.9584316264397,29.5156973472243,27.9687994379329,25.899867396367,28.1946759350018,30.3047355994329,29.1252992249879,26.5086152750823,25.0789993423175,29.185477173856,27.4552413199227,26.7780954675454,26.5006411680339,26.626839009939,25.8169294862735,31.1792252333338,30.4281134485662,30.4281134485662,37.2228932628432,37.4638762489923,32.3164038470598,32.8853561120122,32.9103703556537,33.3009559158538,34.167867345827,36.1440357201268,31.4655032754836,32.5718444950326,35.1145294688023,35.9831431884459,34.2497685094426,31.8930791337809,34.4515827276722,36.6519673234344,39.3165299711026,38.8199586492638,42.9563254523978,44.4327461801033,36.4034907536946],"text":["Date: 2020-04-06<br /> Count: 574<br /> Percent: 40","Date: 2020-04-14<br /> Count: 721<br /> Percent: 39","Date: 2020-04-20<br /> Count: 692<br /> Percent: 35","Date: 2020-04-27<br /> Count: 651<br /> Percent: 36","Date: 2020-05-04<br /> Count: 668<br /> Percent: 33","Date: 2020-05-11<br /> Count: 785<br /> Percent: 31","Date: 2020-05-19<br /> Count: 879<br /> Percent: 29","Date: 2020-05-25<br /> Count: 900<br /> Percent: 31","Date: 2020-06-01<br /> Count: 1056<br /> Percent: 33","Date: 2020-06-08<br /> Count: 934<br /> Percent: 32","Date: 2020-06-15<br /> Count: 870<br /> Percent: 30","Date: 2020-06-22<br /> Count: 764<br /> Percent: 28","Date: 2020-06-29<br /> Count: 698<br /> Percent: 33","Date: 2020-07-06<br /> Count: 727<br /> Percent: 31","Date: 2020-07-13<br /> Count: 759<br /> Percent: 30","Date: 2020-07-20<br /> Count: 781<br /> Percent: 30","Date: 2020-07-27<br /> Count: 820<br /> Percent: 30","Date: 2020-08-11<br /> Count: 750<br /> Percent: 29","Date: 2020-08-25<br /> Count: 877<br /> Percent: 34","Date: 2020-09-08<br /> Count: 745<br /> Percent: 34","Date: 2020-09-08<br /> Count: 745<br /> Percent: 34","Date: 2020-09-08<br /> Count: 745<br /> Percent: 34","Date: 2020-08-25<br /> Count: 877<br /> Percent: 34","Date: 2020-08-11<br /> Count: 750<br /> Percent: 29","Date: 2020-07-27<br /> Count: 820<br /> Percent: 30","Date: 2020-07-20<br /> Count: 781<br /> Percent: 30","Date: 2020-07-13<br /> Count: 759<br /> Percent: 30","Date: 2020-07-06<br /> Count: 727<br /> Percent: 31","Date: 2020-06-29<br /> Count: 698<br /> Percent: 33","Date: 2020-06-22<br /> Count: 764<br /> Percent: 28","Date: 2020-06-15<br /> Count: 870<br /> Percent: 30","Date: 2020-06-08<br /> Count: 934<br /> Percent: 32","Date: 2020-06-01<br /> Count: 1056<br /> Percent: 33","Date: 2020-05-25<br /> Count: 900<br /> Percent: 31","Date: 2020-05-19<br /> Count: 879<br /> Percent: 29","Date: 2020-05-11<br /> Count: 785<br /> Percent: 31","Date: 2020-05-04<br /> Count: 668<br /> Percent: 33","Date: 2020-04-27<br /> Count: 651<br /> Percent: 36","Date: 2020-04-20<br /> Count: 692<br /> Percent: 35","Date: 2020-04-14<br /> Count: 721<br /> Percent: 39","Date: 2020-04-06<br /> Count: 574<br /> Percent: 40","Date: 2020-04-06<br /> Count: 574<br /> Percent: 40"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(97,156,255,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(97,156,255,0.2)","hoveron":"points","name":"White","legendgroup":"White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[48.3870967741936,61.2068965517241,60.8247422680412,50.8474576271186,42.2222222222222,49.3506493506493,50.7246376811594,52.1739130434783,55.3191489361702,58.4905660377358,54.4303797468354,59.1304347826087,57.3333333333333,59.4285714285714,47.5409836065574,49.5867768595041,46.4566929133858,46.9387755102041,47.3214285714286,42.8571428571429],"text":["Date: 2020-04-06<br /> Count: 93<br /> Percent: 48","Date: 2020-04-14<br /> Count: 116<br /> Percent: 61","Date: 2020-04-20<br /> Count: 97<br /> Percent: 61","Date: 2020-04-27<br /> Count: 59<br /> Percent: 51","Date: 2020-05-04<br /> Count: 45<br /> Percent: 42","Date: 2020-05-11<br /> Count: 77<br /> Percent: 49","Date: 2020-05-19<br /> Count: 69<br /> Percent: 51","Date: 2020-05-25<br /> Count: 115<br /> Percent: 52","Date: 2020-06-01<br /> Count: 141<br /> Percent: 55","Date: 2020-06-08<br /> Count: 106<br /> Percent: 58","Date: 2020-06-15<br /> Count: 79<br /> Percent: 54","Date: 2020-06-22<br /> Count: 115<br /> Percent: 59","Date: 2020-06-29<br /> Count: 150<br /> Percent: 57","Date: 2020-07-06<br /> Count: 175<br /> Percent: 59","Date: 2020-07-13<br /> Count: 122<br /> Percent: 48","Date: 2020-07-20<br /> Count: 121<br /> Percent: 50","Date: 2020-07-27<br /> Count: 127<br /> Percent: 46","Date: 2020-08-11<br /> Count: 98<br /> Percent: 47","Date: 2020-08-25<br /> Count: 112<br /> Percent: 47","Date: 2020-09-08<br /> Count: 119<br /> Percent: 43"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"(Black,1)","legendgroup":"(Black,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[59.6774193548387,56.441717791411,46.09375,36.0544217687075,43.6507936507937,34.4370860927152,37.1134020618557,43.3734939759036,46.3492063492063,45.8333333333333,42.7906976744186,45.7627118644068,48.6997635933806,47.7272727272727,52.5345622119816,50.4761904761905,52.7918781725888,52.7777777777778,46.7336683417085,55.1020408163265],"text":["Date: 2020-04-06<br /> Count: 124<br /> Percent: 60","Date: 2020-04-14<br /> Count: 163<br /> Percent: 56","Date: 2020-04-20<br /> Count: 128<br /> Percent: 46","Date: 2020-04-27<br /> Count: 147<br /> Percent: 36","Date: 2020-05-04<br /> Count: 126<br /> Percent: 44","Date: 2020-05-11<br /> Count: 151<br /> Percent: 34","Date: 2020-05-19<br /> Count: 194<br /> Percent: 37","Date: 2020-05-25<br /> Count: 249<br /> Percent: 43","Date: 2020-06-01<br /> Count: 315<br /> Percent: 46","Date: 2020-06-08<br /> Count: 240<br /> Percent: 46","Date: 2020-06-15<br /> Count: 215<br /> Percent: 43","Date: 2020-06-22<br /> Count: 177<br /> Percent: 46","Date: 2020-06-29<br /> Count: 423<br /> Percent: 49","Date: 2020-07-06<br /> Count: 220<br /> Percent: 48","Date: 2020-07-13<br /> Count: 217<br /> Percent: 53","Date: 2020-07-20<br /> Count: 210<br /> Percent: 50","Date: 2020-07-27<br /> Count: 197<br /> Percent: 53","Date: 2020-08-11<br /> Count: 180<br /> Percent: 53","Date: 2020-08-25<br /> Count: 199<br /> Percent: 47","Date: 2020-09-08<br /> Count: 147<br /> Percent: 55"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,186,56,1)"}},"hoveron":"points","name":"(LatinX,1)","legendgroup":"(LatinX,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,186,56,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[40.418118466899,39.3897364771151,35.2601156069364,35.6374807987711,33.0838323353293,31.2101910828025,28.8964732650739,31.2222222222222,33.1439393939394,32.1199143468951,29.5402298850575,28.2722513089005,32.6647564469914,30.8115543328748,30.0395256916996,29.7055057618438,29.7560975609756,29.0666666666667,34.3215507411631,33.8255033557047],"text":["Date: 2020-04-06<br /> Count: 574<br /> Percent: 40","Date: 2020-04-14<br /> Count: 721<br /> Percent: 39","Date: 2020-04-20<br /> Count: 692<br /> Percent: 35","Date: 2020-04-27<br /> Count: 651<br /> Percent: 36","Date: 2020-05-04<br /> Count: 668<br /> Percent: 33","Date: 2020-05-11<br /> Count: 785<br /> Percent: 31","Date: 2020-05-19<br /> Count: 879<br /> Percent: 29","Date: 2020-05-25<br /> Count: 900<br /> Percent: 31","Date: 2020-06-01<br /> Count: 1056<br /> Percent: 33","Date: 2020-06-08<br /> Count: 934<br /> Percent: 32","Date: 2020-06-15<br /> Count: 870<br /> Percent: 30","Date: 2020-06-22<br /> Count: 764<br /> Percent: 28","Date: 2020-06-29<br /> Count: 698<br /> Percent: 33","Date: 2020-07-06<br /> Count: 727<br /> Percent: 31","Date: 2020-07-13<br /> Count: 759<br /> Percent: 30","Date: 2020-07-20<br /> Count: 781<br /> Percent: 30","Date: 2020-07-27<br /> Count: 820<br /> Percent: 30","Date: 2020-08-11<br /> Count: 750<br /> Percent: 29","Date: 2020-08-25<br /> Count: 877<br /> Percent: 34","Date: 2020-09-08<br /> Count: 745<br /> Percent: 34"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(97,156,255,1)"}},"hoveron":"points","name":"(White,1)","legendgroup":"(White,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(97,156,255,1)","dash":"solid"},"frame":null}],"layout":{"margin":{"t":35.1282689912827,"r":7.97011207970112,"b":39.0535491905355,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18350.25,18520.75],"tickmode":"array","ticktext":["Apr","May","Jun","Jul","Aug","Sep"],"tickvals":[18353,18383,18414,18444,18475,18506],"categoryorder":"array","categoryarray":["Apr","May","Jun","Jul","Aug","Sep"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[22.805991869368,72.8121562742575],"tickmode":"array","ticktext":["30","40","50","60","70"],"tickvals":[30,40,50,60,70],"categoryorder":"array","categoryarray":["30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"4c065bdb66c2":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"4c06213779ab":{"x":{},"y":{},"colour":{},"text":{}},"4c064114da96":{"x":{},"y":{},"colour":{},"text":{}}},"cur_data":"4c065bdb66c2","visdat":{"4c065bdb66c2":["function (y) ","x"],"4c06213779ab":["function (y) ","x"],"4c064114da96":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="race-by-income-1" class="section level3">
+<h3>Race by income</h3>
+<div id="htmlwidget-f438fbc1563cea9b38a8" style="width:1152px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f438fbc1563cea9b38a8">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[17.3485161756089,30.4672014327185,32.5144738697441,13.7141348577651,10.6776631314994,16.4643392031855,32.4156862770226,28.5457689577428,35.2862147963706,32.9684871890421,24.7203957053265,38.3429777253763,28.8793308244128,40.7883950806816,28.484252714444,31.0049045239581,29.2301869597538,28.5534337967312,28.0663989370399,26.5204636097142,47.5536104643598,50.3119794413385,52.0435811286419,50.2878853294029,53.2056217918314,50.4631157066086,63.1077088154223,55.7360537909719,65.5031761207776,56.3606853757546,62.4860582655034,59.9518804417246,57.8178674058935,71.5843137229774,50.2023274634812,52.4802316053427,50.2858651422349,62.7236213683511,58.8945006949411,47.5163486892559,17.3485161756089],"text":["Date: 2020-04-06<br /> Count: 37<br /> Percent: 32","Date: 2020-04-14<br /> Count: 47<br /> Percent: 45","Date: 2020-04-20<br /> Count: 42<br /> Percent: 48","Date: 2020-04-27<br /> Count: 25<br /> Percent: 32","Date: 2020-05-04<br /> Count: 19<br /> Percent: 32","Date: 2020-05-11<br /> Count: 30<br /> Percent: 33","Date: 2020-05-19<br /> Count: 25<br /> Percent: 52","Date: 2020-05-25<br /> Count: 44<br /> Percent: 43","Date: 2020-06-01<br /> Count: 63<br /> Percent: 48","Date: 2020-06-08<br /> Count: 44<br /> Percent: 48","Date: 2020-06-15<br /> Count: 37<br /> Percent: 41","Date: 2020-06-22<br /> Count: 52<br /> Percent: 52","Date: 2020-06-29<br /> Count: 52<br /> Percent: 42","Date: 2020-07-06<br /> Count: 77<br /> Percent: 52","Date: 2020-07-13<br /> Count: 76<br /> Percent: 39","Date: 2020-07-20<br /> Count: 76<br /> Percent: 42","Date: 2020-07-27<br /> Count: 83<br /> Percent: 40","Date: 2020-08-11<br /> Count: 67<br /> Percent: 40","Date: 2020-08-25<br /> Count: 74<br /> Percent: 39","Date: 2020-09-08<br /> Count: 81<br /> Percent: 37","Date: 2020-09-08<br /> Count: 81<br /> Percent: 37","Date: 2020-08-25<br /> Count: 74<br /> Percent: 39","Date: 2020-08-11<br /> Count: 67<br /> Percent: 40","Date: 2020-07-27<br /> Count: 83<br /> Percent: 40","Date: 2020-07-20<br /> Count: 76<br /> Percent: 42","Date: 2020-07-13<br /> Count: 76<br /> Percent: 39","Date: 2020-07-06<br /> Count: 77<br /> Percent: 52","Date: 2020-06-29<br /> Count: 52<br /> Percent: 42","Date: 2020-06-22<br /> Count: 52<br /> Percent: 52","Date: 2020-06-15<br /> Count: 37<br /> Percent: 41","Date: 2020-06-08<br /> Count: 44<br /> Percent: 48","Date: 2020-06-01<br /> Count: 63<br /> Percent: 48","Date: 2020-05-25<br /> Count: 44<br /> Percent: 43","Date: 2020-05-19<br /> Count: 25<br /> Percent: 52","Date: 2020-05-11<br /> Count: 30<br /> Percent: 33","Date: 2020-05-04<br /> Count: 19<br /> Percent: 32","Date: 2020-04-27<br /> Count: 25<br /> Percent: 32","Date: 2020-04-20<br /> Count: 42<br /> Percent: 48","Date: 2020-04-14<br /> Count: 47<br /> Percent: 45","Date: 2020-04-06<br /> Count: 37<br /> Percent: 32","Date: 2020-04-06<br /> Count: 37<br /> Percent: 32"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"High income, Black","legendgroup":"High income, Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[30.9710362042975,36.1426306561924,15.5024237473764,12.8164730464789,15.8312041327353,14.8328340556453,19.8894044478199,23.2200572561973,33.148434599639,31.0975758727108,24.2415241537548,21.2656623884333,30.5841731168888,25.8329623359345,31.3622714608272,33.2500510872548,34.4670760328419,37.8349199626143,32.8245288110634,43.5241609328862,64.7111331847609,51.104042617508,56.0781235156466,52.1995906338248,50.6209166546806,48.3252285391728,43.1325549054448,43.193604660889,39.786969190514,40.7991262527492,47.9721915691497,47.7764208916904,39.2799427438027,37.5363381264375,33.8851146623034,39.7243514228203,32.2539494887323,39.0430307980782,58.5942114490707,58.8248821630494,30.9710362042975],"text":["Date: 2020-04-06<br /> Count: 49<br /> Percent: 45","Date: 2020-04-14<br /> Count: 76<br /> Percent: 47","Date: 2020-04-20<br /> Count: 55<br /> Percent: 27","Date: 2020-04-27<br /> Count: 71<br /> Percent: 23","Date: 2020-05-04<br /> Count: 54<br /> Percent: 28","Date: 2020-05-11<br /> Count: 78<br /> Percent: 24","Date: 2020-05-19<br /> Count: 101<br /> Percent: 29","Date: 2020-05-25<br /> Count: 128<br /> Percent: 31","Date: 2020-06-01<br /> Count: 173<br /> Percent: 40","Date: 2020-06-08<br /> Count: 129<br /> Percent: 40","Date: 2020-06-15<br /> Count: 123<br /> Percent: 33","Date: 2020-06-22<br /> Count: 95<br /> Percent: 31","Date: 2020-06-29<br /> Count: 225<br /> Percent: 37","Date: 2020-07-06<br /> Count: 116<br /> Percent: 34","Date: 2020-07-13<br /> Count: 128<br /> Percent: 40","Date: 2020-07-20<br /> Count: 124<br /> Percent: 42","Date: 2020-07-27<br /> Count: 120<br /> Percent: 43","Date: 2020-08-11<br /> Count: 115<br /> Percent: 47","Date: 2020-08-25<br /> Count: 112<br /> Percent: 42","Date: 2020-09-08<br /> Count: 85<br /> Percent: 54","Date: 2020-09-08<br /> Count: 85<br /> Percent: 54","Date: 2020-08-25<br /> Count: 112<br /> Percent: 42","Date: 2020-08-11<br /> Count: 115<br /> Percent: 47","Date: 2020-07-27<br /> Count: 120<br /> Percent: 43","Date: 2020-07-20<br /> Count: 124<br /> Percent: 42","Date: 2020-07-13<br /> Count: 128<br /> Percent: 40","Date: 2020-07-06<br /> Count: 116<br /> Percent: 34","Date: 2020-06-29<br /> Count: 225<br /> Percent: 37","Date: 2020-06-22<br /> Count: 95<br /> Percent: 31","Date: 2020-06-15<br /> Count: 123<br /> Percent: 33","Date: 2020-06-08<br /> Count: 129<br /> Percent: 40","Date: 2020-06-01<br /> Count: 173<br /> Percent: 40","Date: 2020-05-25<br /> Count: 128<br /> Percent: 31","Date: 2020-05-19<br /> Count: 101<br /> Percent: 29","Date: 2020-05-11<br /> Count: 78<br /> Percent: 24","Date: 2020-05-04<br /> Count: 54<br /> Percent: 28","Date: 2020-04-27<br /> Count: 71<br /> Percent: 23","Date: 2020-04-20<br /> Count: 55<br /> Percent: 27","Date: 2020-04-14<br /> Count: 76<br /> Percent: 47","Date: 2020-04-06<br /> Count: 49<br /> Percent: 45","Date: 2020-04-06<br /> Count: 49<br /> Percent: 45"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(183,159,0,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(183,159,0,0.2)","hoveron":"points","name":"High income, LatinX","legendgroup":"High income, LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[19.9280181388337,19.809748448806,15.4920876778377,17.2925428830664,17.4428025652353,15.2691163509554,16.2444645751091,17.2685483644359,20.5294396867796,16.8137004918999,17.3943332866275,17.6476139055187,15.6469853148251,16.4354339355075,18.6587711574774,16.7712121674419,20.3313816205513,18.75491233567,23.3671362406192,22.8726781931503,30.5926683415032,30.4282432973346,25.8143760538431,27.2068187190072,23.6061463231241,25.8286563086735,23.9273778558758,23.3653603641873,25.1169649281746,24.3681188206522,23.5532719851644,27.3767579681617,24.1627134058089,22.8236357833139,22.4501818946586,25.7150921716068,25.8892752987518,23.4552807432149,28.5598167685853,30.0719818611663,19.9280181388337],"text":["Date: 2020-04-06<br /> Count: 280<br /> Percent: 25","Date: 2020-04-14<br /> Count: 368<br /> Percent: 24","Date: 2020-04-20<br /> Count: 380<br /> Percent: 19","Date: 2020-04-27<br /> Count: 352<br /> Percent: 22","Date: 2020-05-04<br /> Count: 380<br /> Percent: 22","Date: 2020-05-11<br /> Count: 456<br /> Percent: 19","Date: 2020-05-19<br /> Count: 558<br /> Percent: 20","Date: 2020-05-25<br /> Count: 531<br /> Percent: 21","Date: 2020-06-01<br /> Count: 597<br /> Percent: 24","Date: 2020-06-08<br /> Count: 545<br /> Percent: 20","Date: 2020-06-15<br /> Count: 522<br /> Percent: 21","Date: 2020-06-22<br /> Count: 463<br /> Percent: 21","Date: 2020-06-29<br /> Count: 405<br /> Percent: 20","Date: 2020-07-06<br /> Count: 441<br /> Percent: 20","Date: 2020-07-13<br /> Count: 517<br /> Percent: 22","Date: 2020-07-20<br /> Count: 530<br /> Percent: 20","Date: 2020-07-27<br /> Count: 589<br /> Percent: 24","Date: 2020-08-11<br /> Count: 534<br /> Percent: 22","Date: 2020-08-25<br /> Count: 606<br /> Percent: 27","Date: 2020-09-08<br /> Count: 505<br /> Percent: 27","Date: 2020-09-08<br /> Count: 505<br /> Percent: 27","Date: 2020-08-25<br /> Count: 606<br /> Percent: 27","Date: 2020-08-11<br /> Count: 534<br /> Percent: 22","Date: 2020-07-27<br /> Count: 589<br /> Percent: 24","Date: 2020-07-20<br /> Count: 530<br /> Percent: 20","Date: 2020-07-13<br /> Count: 517<br /> Percent: 22","Date: 2020-07-06<br /> Count: 441<br /> Percent: 20","Date: 2020-06-29<br /> Count: 405<br /> Percent: 20","Date: 2020-06-22<br /> Count: 463<br /> Percent: 21","Date: 2020-06-15<br /> Count: 522<br /> Percent: 21","Date: 2020-06-08<br /> Count: 545<br /> Percent: 20","Date: 2020-06-01<br /> Count: 597<br /> Percent: 24","Date: 2020-05-25<br /> Count: 531<br /> Percent: 21","Date: 2020-05-19<br /> Count: 558<br /> Percent: 20","Date: 2020-05-11<br /> Count: 456<br /> Percent: 19","Date: 2020-05-04<br /> Count: 380<br /> Percent: 22","Date: 2020-04-27<br /> Count: 352<br /> Percent: 22","Date: 2020-04-20<br /> Count: 380<br /> Percent: 19","Date: 2020-04-14<br /> Count: 368<br /> Percent: 24","Date: 2020-04-06<br /> Count: 280<br /> Percent: 25","Date: 2020-04-06<br /> Count: 280<br /> Percent: 25"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,186,56,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,186,56,0.2)","hoveron":"points","name":"High income, White","legendgroup":"High income, White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[31.4797408225479,55.0661498300625,46.8491448561435,28.0865338205021,31.9421598295941,35.4808679988615,25.701117633169,46.2694680039693,44.5631047170586,47.2234595366399,60.7278636178775,53.4357868457773,58.5928365795366,56.1395849022916,48.0564329489808,48.0564329489808,46.0438744730894,44.1436066049165,49.4822281978764,39.4537798588213,71.0725359306524,80.2475015318534,78.4370385563738,75.9073450391057,76.3880114954637,76.3880114954637,78.1461293834227,78.9071634204634,81.4479340844553,93.1182902282764,80.0492677360873,73.6187134647596,76.8074550729537,63.1877712557198,71.1857986678052,80.5578401704059,71.9134661794979,78.8651408581422,83.0290882651756,68.5202591774521,31.4797408225479],"text":["Date: 2020-04-06<br /> Count: 28<br /> Percent: 50","Date: 2020-04-14<br /> Count: 42<br /> Percent: 69","Date: 2020-04-20<br /> Count: 35<br /> Percent: 63","Date: 2020-04-27<br /> Count: 20<br /> Percent: 50","Date: 2020-05-04<br /> Count: 16<br /> Percent: 56","Date: 2020-05-11<br /> Count: 30<br /> Percent: 53","Date: 2020-05-19<br /> Count: 27<br /> Percent: 44","Date: 2020-05-25<br /> Count: 39<br /> Percent: 62","Date: 2020-06-01<br /> Count: 44<br /> Percent: 59","Date: 2020-06-08<br /> Count: 33<br /> Percent: 64","Date: 2020-06-15<br /> Count: 26<br /> Percent: 77","Date: 2020-06-22<br /> Count: 43<br /> Percent: 67","Date: 2020-06-29<br /> Count: 80<br /> Percent: 69","Date: 2020-07-06<br /> Count: 70<br /> Percent: 67","Date: 2020-07-13<br /> Count: 45<br /> Percent: 62","Date: 2020-07-20<br /> Count: 45<br /> Percent: 62","Date: 2020-07-27<br /> Count: 41<br /> Percent: 61","Date: 2020-08-11<br /> Count: 31<br /> Percent: 61","Date: 2020-08-25<br /> Count: 37<br /> Percent: 65","Date: 2020-09-08<br /> Count: 38<br /> Percent: 55","Date: 2020-09-08<br /> Count: 38<br /> Percent: 55","Date: 2020-08-25<br /> Count: 37<br /> Percent: 65","Date: 2020-08-11<br /> Count: 31<br /> Percent: 61","Date: 2020-07-27<br /> Count: 41<br /> Percent: 61","Date: 2020-07-20<br /> Count: 45<br /> Percent: 62","Date: 2020-07-13<br /> Count: 45<br /> Percent: 62","Date: 2020-07-06<br /> Count: 70<br /> Percent: 67","Date: 2020-06-29<br /> Count: 80<br /> Percent: 69","Date: 2020-06-22<br /> Count: 43<br /> Percent: 67","Date: 2020-06-15<br /> Count: 26<br /> Percent: 77","Date: 2020-06-08<br /> Count: 33<br /> Percent: 64","Date: 2020-06-01<br /> Count: 44<br /> Percent: 59","Date: 2020-05-25<br /> Count: 39<br /> Percent: 62","Date: 2020-05-19<br /> Count: 27<br /> Percent: 44","Date: 2020-05-11<br /> Count: 30<br /> Percent: 53","Date: 2020-05-04<br /> Count: 16<br /> Percent: 56","Date: 2020-04-27<br /> Count: 20<br /> Percent: 50","Date: 2020-04-20<br /> Count: 35<br /> Percent: 63","Date: 2020-04-14<br /> Count: 42<br /> Percent: 69","Date: 2020-04-06<br /> Count: 28<br /> Percent: 50","Date: 2020-04-06<br /> Count: 28<br /> Percent: 50"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,191,196,0.2)","hoveron":"points","name":"Low income, Black","legendgroup":"Low income, Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[57.6716259475147,48.1084558302466,55.7984507887343,35.2259441156896,47.217907111999,18.5382467538439,39.2421939936404,44.0776588630926,49.5851689460485,53.6557385945032,49.3641496101483,59.5703783176768,58.8610317891264,57.0734314864798,65.5111908017918,56.9016280955177,60.2885184778125,55.8736292201872,45.405511905039,47.9226869088197,73.5058845197517,67.4150009154738,79.7195911187958,82.13572394643,78.2335070396175,84.4888091982082,77.9915035784552,74.024874251142,83.8258480974175,73.9691837231851,76.6472917085271,70.4148310539515,67.0334522480186,66.6401589475361,48.1284199128227,76.5916166975248,64.7740558843104,84.2015492112656,74.1137663919757,85.9181176422289,57.6716259475147],"text":["Date: 2020-04-06<br /> Count: 39<br /> Percent: 72","Date: 2020-04-14<br /> Count: 54<br /> Percent: 61","Date: 2020-04-20<br /> Count: 40<br /> Percent: 70","Date: 2020-04-27<br /> Count: 44<br /> Percent: 50","Date: 2020-05-04<br /> Count: 42<br /> Percent: 62","Date: 2020-05-11<br /> Count: 39<br /> Percent: 33","Date: 2020-05-19<br /> Count: 51<br /> Percent: 53","Date: 2020-05-25<br /> Count: 72<br /> Percent: 56","Date: 2020-06-01<br /> Count: 85<br /> Percent: 60","Date: 2020-06-08<br /> Count: 66<br /> Percent: 65","Date: 2020-06-15<br /> Count: 60<br /> Percent: 62","Date: 2020-06-22<br /> Count: 53<br /> Percent: 72","Date: 2020-06-29<br /> Count: 149<br /> Percent: 66","Date: 2020-07-06<br /> Count: 77<br /> Percent: 68","Date: 2020-07-13<br /> Count: 80<br /> Percent: 75","Date: 2020-07-20<br /> Count: 74<br /> Percent: 68","Date: 2020-07-27<br /> Count: 66<br /> Percent: 71","Date: 2020-08-11<br /> Count: 59<br /> Percent: 68","Date: 2020-08-25<br /> Count: 78<br /> Percent: 56","Date: 2020-09-08<br /> Count: 56<br /> Percent: 61","Date: 2020-09-08<br /> Count: 56<br /> Percent: 61","Date: 2020-08-25<br /> Count: 78<br /> Percent: 56","Date: 2020-08-11<br /> Count: 59<br /> Percent: 68","Date: 2020-07-27<br /> Count: 66<br /> Percent: 71","Date: 2020-07-20<br /> Count: 74<br /> Percent: 68","Date: 2020-07-13<br /> Count: 80<br /> Percent: 75","Date: 2020-07-06<br /> Count: 77<br /> Percent: 68","Date: 2020-06-29<br /> Count: 149<br /> Percent: 66","Date: 2020-06-22<br /> Count: 53<br /> Percent: 72","Date: 2020-06-15<br /> Count: 60<br /> Percent: 62","Date: 2020-06-08<br /> Count: 66<br /> Percent: 65","Date: 2020-06-01<br /> Count: 85<br /> Percent: 60","Date: 2020-05-25<br /> Count: 72<br /> Percent: 56","Date: 2020-05-19<br /> Count: 51<br /> Percent: 53","Date: 2020-05-11<br /> Count: 39<br /> Percent: 33","Date: 2020-05-04<br /> Count: 42<br /> Percent: 62","Date: 2020-04-27<br /> Count: 44<br /> Percent: 50","Date: 2020-04-20<br /> Count: 40<br /> Percent: 70","Date: 2020-04-14<br /> Count: 54<br /> Percent: 61","Date: 2020-04-06<br /> Count: 39<br /> Percent: 72","Date: 2020-04-06<br /> Count: 39<br /> Percent: 72"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(97,156,255,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(97,156,255,0.2)","hoveron":"points","name":"Low income, LatinX","legendgroup":"Low income, LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18513,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[54.5947342673825,60.2424565106367,55.7518595401575,51.1509123781171,47.7282718239129,51.0522914752878,51.0522914752878,51.093797629975,52.5248533003146,56.5934826332917,55.6214166286963,48.2513542592378,58.7003898258899,56.5123679985018,52.1326231529846,57.2064335469309,47.7282718239129,49.9923104631979,57.016991660256,54.3634132391004,54.3634132391004,70.6365867608996,72.3163416730773,68.5262080553206,66.8348349722036,73.5627972222998,69.1272193667005,73.9224146101938,75.7823687947998,66.0343600264765,71.0452500379703,71.8833385587612,67.4751466996854,66.7869970720117,67.7447010059152,67.7447010059152,66.8348349722036,69.2030699227679,71.5208677325697,74.7575434893633,71.3895177011215,54.5947342673825],"text":["Date: 2020-04-06<br /> Count: 127<br /> Percent: 63","Date: 2020-04-14<br /> Count: 160<br /> Percent: 68","Date: 2020-04-20<br /> Count: 143<br /> Percent: 64","Date: 2020-04-27<br /> Count: 113<br /> Percent: 60","Date: 2020-05-04<br /> Count: 103<br /> Percent: 57","Date: 2020-05-11<br /> Count: 133<br /> Percent: 59","Date: 2020-05-19<br /> Count: 133<br /> Percent: 59","Date: 2020-05-25<br /> Count: 151<br /> Percent: 59","Date: 2020-06-01<br /> Count: 165<br /> Percent: 60","Date: 2020-06-08<br /> Count: 151<br /> Percent: 64","Date: 2020-06-15<br /> Count: 150<br /> Percent: 63","Date: 2020-06-22<br /> Count: 119<br /> Percent: 57","Date: 2020-06-29<br /> Count: 116<br /> Percent: 67","Date: 2020-07-06<br /> Count: 115<br /> Percent: 65","Date: 2020-07-13<br /> Count: 127<br /> Percent: 61","Date: 2020-07-20<br /> Count: 130<br /> Percent: 65","Date: 2020-07-27<br /> Count: 103<br /> Percent: 57","Date: 2020-08-11<br /> Count: 108<br /> Percent: 59","Date: 2020-08-25<br /> Count: 150<br /> Percent: 65","Date: 2020-09-08<br /> Count: 136<br /> Percent: 62","Date: 2020-09-08<br /> Count: 136<br /> Percent: 62","Date: 2020-09-08<br /> Count: 136<br /> Percent: 62","Date: 2020-08-25<br /> Count: 150<br /> Percent: 65","Date: 2020-08-11<br /> Count: 108<br /> Percent: 59","Date: 2020-07-27<br /> Count: 103<br /> Percent: 57","Date: 2020-07-20<br /> Count: 130<br /> Percent: 65","Date: 2020-07-13<br /> Count: 127<br /> Percent: 61","Date: 2020-07-06<br /> Count: 115<br /> Percent: 65","Date: 2020-06-29<br /> Count: 116<br /> Percent: 67","Date: 2020-06-22<br /> Count: 119<br /> Percent: 57","Date: 2020-06-15<br /> Count: 150<br /> Percent: 63","Date: 2020-06-08<br /> Count: 151<br /> Percent: 64","Date: 2020-06-01<br /> Count: 165<br /> Percent: 60","Date: 2020-05-25<br /> Count: 151<br /> Percent: 59","Date: 2020-05-19<br /> Count: 133<br /> Percent: 59","Date: 2020-05-11<br /> Count: 133<br /> Percent: 59","Date: 2020-05-04<br /> Count: 103<br /> Percent: 57","Date: 2020-04-27<br /> Count: 113<br /> Percent: 60","Date: 2020-04-20<br /> Count: 143<br /> Percent: 64","Date: 2020-04-14<br /> Count: 160<br /> Percent: 68","Date: 2020-04-06<br /> Count: 127<br /> Percent: 63","Date: 2020-04-06<br /> Count: 127<br /> Percent: 63"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(245,100,227,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(245,100,227,0.2)","hoveron":"points","name":"Low income, White","legendgroup":"Low income, White","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[32.4324324324324,44.6808510638298,47.6190476190476,32,31.5789473684211,33.3333333333333,52,43.1818181818182,47.6190476190476,47.7272727272727,40.5405405405405,51.9230769230769,42.3076923076923,51.9480519480519,39.4736842105263,42.1052631578947,39.7590361445783,40.2985074626866,39.1891891891892,37.037037037037],"text":["Date: 2020-04-06<br /> Count: 37<br /> Percent: 32","Date: 2020-04-14<br /> Count: 47<br /> Percent: 45","Date: 2020-04-20<br /> Count: 42<br /> Percent: 48","Date: 2020-04-27<br /> Count: 25<br /> Percent: 32","Date: 2020-05-04<br /> Count: 19<br /> Percent: 32","Date: 2020-05-11<br /> Count: 30<br /> Percent: 33","Date: 2020-05-19<br /> Count: 25<br /> Percent: 52","Date: 2020-05-25<br /> Count: 44<br /> Percent: 43","Date: 2020-06-01<br /> Count: 63<br /> Percent: 48","Date: 2020-06-08<br /> Count: 44<br /> Percent: 48","Date: 2020-06-15<br /> Count: 37<br /> Percent: 41","Date: 2020-06-22<br /> Count: 52<br /> Percent: 52","Date: 2020-06-29<br /> Count: 52<br /> Percent: 42","Date: 2020-07-06<br /> Count: 77<br /> Percent: 52","Date: 2020-07-13<br /> Count: 76<br /> Percent: 39","Date: 2020-07-20<br /> Count: 76<br /> Percent: 42","Date: 2020-07-27<br /> Count: 83<br /> Percent: 40","Date: 2020-08-11<br /> Count: 67<br /> Percent: 40","Date: 2020-08-25<br /> Count: 74<br /> Percent: 39","Date: 2020-09-08<br /> Count: 81<br /> Percent: 37"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"(High income, Black,1)","legendgroup":"(High income, Black,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[44.8979591836735,47.3684210526316,27.2727272727273,22.5352112676056,27.7777777777778,24.3589743589744,28.7128712871287,31.25,40.4624277456647,39.5348837209302,32.520325203252,30.5263157894737,36.8888888888889,34.4827586206897,39.84375,41.9354838709677,43.3333333333333,46.9565217391304,41.9642857142857,54.1176470588235],"text":["Date: 2020-04-06<br /> Count: 49<br /> Percent: 45","Date: 2020-04-14<br /> Count: 76<br /> Percent: 47","Date: 2020-04-20<br /> Count: 55<br /> Percent: 27","Date: 2020-04-27<br /> Count: 71<br /> Percent: 23","Date: 2020-05-04<br /> Count: 54<br /> Percent: 28","Date: 2020-05-11<br /> Count: 78<br /> Percent: 24","Date: 2020-05-19<br /> Count: 101<br /> Percent: 29","Date: 2020-05-25<br /> Count: 128<br /> Percent: 31","Date: 2020-06-01<br /> Count: 173<br /> Percent: 40","Date: 2020-06-08<br /> Count: 129<br /> Percent: 40","Date: 2020-06-15<br /> Count: 123<br /> Percent: 33","Date: 2020-06-22<br /> Count: 95<br /> Percent: 31","Date: 2020-06-29<br /> Count: 225<br /> Percent: 37","Date: 2020-07-06<br /> Count: 116<br /> Percent: 34","Date: 2020-07-13<br /> Count: 128<br /> Percent: 40","Date: 2020-07-20<br /> Count: 124<br /> Percent: 42","Date: 2020-07-27<br /> Count: 120<br /> Percent: 43","Date: 2020-08-11<br /> Count: 115<br /> Percent: 47","Date: 2020-08-25<br /> Count: 112<br /> Percent: 42","Date: 2020-09-08<br /> Count: 85<br /> Percent: 54"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(183,159,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(183,159,0,1)"}},"hoveron":"points","name":"(High income, LatinX,1)","legendgroup":"(High income, LatinX,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(183,159,0,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[25,24.1847826086957,19.4736842105263,21.5909090909091,21.5789473684211,18.859649122807,19.5340501792115,20.7156308851224,23.9530988274707,20.1834862385321,20.8812260536398,21.3822894168467,19.5061728395062,20.1814058956916,22.2437137330754,20.188679245283,23.7691001697793,22.2846441947566,26.8976897689769,26.7326732673267],"text":["Date: 2020-04-06<br /> Count: 280<br /> Percent: 25","Date: 2020-04-14<br /> Count: 368<br /> Percent: 24","Date: 2020-04-20<br /> Count: 380<br /> Percent: 19","Date: 2020-04-27<br /> Count: 352<br /> Percent: 22","Date: 2020-05-04<br /> Count: 380<br /> Percent: 22","Date: 2020-05-11<br /> Count: 456<br /> Percent: 19","Date: 2020-05-19<br /> Count: 558<br /> Percent: 20","Date: 2020-05-25<br /> Count: 531<br /> Percent: 21","Date: 2020-06-01<br /> Count: 597<br /> Percent: 24","Date: 2020-06-08<br /> Count: 545<br /> Percent: 20","Date: 2020-06-15<br /> Count: 522<br /> Percent: 21","Date: 2020-06-22<br /> Count: 463<br /> Percent: 21","Date: 2020-06-29<br /> Count: 405<br /> Percent: 20","Date: 2020-07-06<br /> Count: 441<br /> Percent: 20","Date: 2020-07-13<br /> Count: 517<br /> Percent: 22","Date: 2020-07-20<br /> Count: 530<br /> Percent: 20","Date: 2020-07-27<br /> Count: 589<br /> Percent: 24","Date: 2020-08-11<br /> Count: 534<br /> Percent: 22","Date: 2020-08-25<br /> Count: 606<br /> Percent: 27","Date: 2020-09-08<br /> Count: 505<br /> Percent: 27"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,186,56,1)"}},"hoveron":"points","name":"(High income, White,1)","legendgroup":"(High income, White,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,186,56,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[50,69.0476190476191,62.8571428571429,50,56.25,53.3333333333333,44.4444444444444,61.5384615384615,59.0909090909091,63.6363636363636,76.9230769230769,67.4418604651163,68.75,67.1428571428571,62.2222222222222,62.2222222222222,60.9756097560976,61.2903225806452,64.8648648648649,55.2631578947368],"text":["Date: 2020-04-06<br /> Count: 28<br /> Percent: 50","Date: 2020-04-14<br /> Count: 42<br /> Percent: 69","Date: 2020-04-20<br /> Count: 35<br /> Percent: 63","Date: 2020-04-27<br /> Count: 20<br /> Percent: 50","Date: 2020-05-04<br /> Count: 16<br /> Percent: 56","Date: 2020-05-11<br /> Count: 30<br /> Percent: 53","Date: 2020-05-19<br /> Count: 27<br /> Percent: 44","Date: 2020-05-25<br /> Count: 39<br /> Percent: 62","Date: 2020-06-01<br /> Count: 44<br /> Percent: 59","Date: 2020-06-08<br /> Count: 33<br /> Percent: 64","Date: 2020-06-15<br /> Count: 26<br /> Percent: 77","Date: 2020-06-22<br /> Count: 43<br /> Percent: 67","Date: 2020-06-29<br /> Count: 80<br /> Percent: 69","Date: 2020-07-06<br /> Count: 70<br /> Percent: 67","Date: 2020-07-13<br /> Count: 45<br /> Percent: 62","Date: 2020-07-20<br /> Count: 45<br /> Percent: 62","Date: 2020-07-27<br /> Count: 41<br /> Percent: 61","Date: 2020-08-11<br /> Count: 31<br /> Percent: 61","Date: 2020-08-25<br /> Count: 37<br /> Percent: 65","Date: 2020-09-08<br /> Count: 38<br /> Percent: 55"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"(Low income, Black,1)","legendgroup":"(Low income, Black,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[71.7948717948718,61.1111111111111,70,50,61.9047619047619,33.3333333333333,52.9411764705882,55.5555555555556,60,65.1515151515152,61.6666666666667,71.6981132075472,66.4429530201342,67.5324675324675,75,67.5675675675676,71.2121212121212,67.7966101694915,56.4102564102564,60.7142857142857],"text":["Date: 2020-04-06<br /> Count: 39<br /> Percent: 72","Date: 2020-04-14<br /> Count: 54<br /> Percent: 61","Date: 2020-04-20<br /> Count: 40<br /> Percent: 70","Date: 2020-04-27<br /> Count: 44<br /> Percent: 50","Date: 2020-05-04<br /> Count: 42<br /> Percent: 62","Date: 2020-05-11<br /> Count: 39<br /> Percent: 33","Date: 2020-05-19<br /> Count: 51<br /> Percent: 53","Date: 2020-05-25<br /> Count: 72<br /> Percent: 56","Date: 2020-06-01<br /> Count: 85<br /> Percent: 60","Date: 2020-06-08<br /> Count: 66<br /> Percent: 65","Date: 2020-06-15<br /> Count: 60<br /> Percent: 62","Date: 2020-06-22<br /> Count: 53<br /> Percent: 72","Date: 2020-06-29<br /> Count: 149<br /> Percent: 66","Date: 2020-07-06<br /> Count: 77<br /> Percent: 68","Date: 2020-07-13<br /> Count: 80<br /> Percent: 75","Date: 2020-07-20<br /> Count: 74<br /> Percent: 68","Date: 2020-07-27<br /> Count: 66<br /> Percent: 71","Date: 2020-08-11<br /> Count: 59<br /> Percent: 68","Date: 2020-08-25<br /> Count: 78<br /> Percent: 56","Date: 2020-09-08<br /> Count: 56<br /> Percent: 61"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(97,156,255,1)"}},"hoveron":"points","name":"(Low income, LatinX,1)","legendgroup":"(Low income, LatinX,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(97,156,255,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513],"y":[62.992125984252,67.5,63.6363636363636,60.1769911504425,57.2815533980583,59.3984962406015,59.3984962406015,58.9403973509934,60,64.2384105960265,63.3333333333333,57.1428571428571,67.2413793103448,65.2173913043478,60.6299212598425,65.3846153846154,57.2815533980583,59.2592592592593,64.6666666666667,62.5],"text":["Date: 2020-04-06<br /> Count: 127<br /> Percent: 63","Date: 2020-04-14<br /> Count: 160<br /> Percent: 68","Date: 2020-04-20<br /> Count: 143<br /> Percent: 64","Date: 2020-04-27<br /> Count: 113<br /> Percent: 60","Date: 2020-05-04<br /> Count: 103<br /> Percent: 57","Date: 2020-05-11<br /> Count: 133<br /> Percent: 59","Date: 2020-05-19<br /> Count: 133<br /> Percent: 59","Date: 2020-05-25<br /> Count: 151<br /> Percent: 59","Date: 2020-06-01<br /> Count: 165<br /> Percent: 60","Date: 2020-06-08<br /> Count: 151<br /> Percent: 64","Date: 2020-06-15<br /> Count: 150<br /> Percent: 63","Date: 2020-06-22<br /> Count: 119<br /> Percent: 57","Date: 2020-06-29<br /> Count: 116<br /> Percent: 67","Date: 2020-07-06<br /> Count: 115<br /> Percent: 65","Date: 2020-07-13<br /> Count: 127<br /> Percent: 61","Date: 2020-07-20<br /> Count: 130<br /> Percent: 65","Date: 2020-07-27<br /> Count: 103<br /> Percent: 57","Date: 2020-08-11<br /> Count: 108<br /> Percent: 59","Date: 2020-08-25<br /> Count: 150<br /> Percent: 65","Date: 2020-09-08<br /> Count: 136<br /> Percent: 62"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(245,100,227,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(245,100,227,1)"}},"hoveron":"points","name":"(Low income, White,1)","legendgroup":"(Low income, White,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(245,100,227,1)","dash":"solid"},"frame":null}],"layout":{"margin":{"t":35.1282689912827,"r":7.97011207970112,"b":39.0535491905355,"l":43.8356164383562},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18350.25,18520.75],"tickmode":"array","ticktext":["Apr","May","Jun","Jul","Aug","Sep"],"tickvals":[18353,18383,18414,18444,18475,18506],"categoryorder":"array","categoryarray":["Apr","May","Jun","Jul","Aug","Sep"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[6.55563177666059,97.2403215831153],"tickmode":"array","ticktext":["25","50","75"],"tickvals":[25,50,75],"categoryorder":"array","categoryarray":["25","50","75"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"Percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"4c0630328d38":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"4c0646d57040":{"x":{},"y":{},"colour":{},"text":{}},"4c0666bc9e14":{"x":{},"y":{},"colour":{},"text":{}}},"cur_data":"4c0630328d38","visdat":{"4c0630328d38":["function (y) ","x"],"4c0646d57040":["function (y) ","x"],"4c0666bc9e14":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

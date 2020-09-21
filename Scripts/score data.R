@@ -298,13 +298,27 @@ scored = scored %>%
       white == 1 & poverty150 == 1 ~ "Low income, White",
       white == 1 & poverty150 == 0 ~ "High income, White",
       TRUE ~ NA_character_)) %>%
-  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0))  %>%
+  mutate(num_hardship = material_hardship,
+    material_hardship = ifelse(material_hardship > 0, 1, 0))  %>%
   group_by(Week) %>%
   mutate(Date_group =case_when(
     Week == 0 ~ as.Date("2020-03-01"),
     TRUE ~ min(Date)
   )) %>% ungroup()
 
+scored = scored %>%
+  mutate(missed_vaccine_any = case_when(
+    miss_vaccine.1 == 1 ~ 1,
+    miss_vaccine.2 == 1 ~ 1,
+    miss_vaccine.3 == 1 ~ 1,
+    miss_vaccine.4 == 1 ~ 1,
+    miss_vaccine.5 == 1 ~ 1,
+    !is.na(miss_vaccine.1) ~ 0,
+    !is.na(miss_vaccine.2) ~ 0,
+    !is.na(miss_vaccine.3) ~ 0,
+    !is.na(miss_vaccine.4) ~ 0,
+    !is.na(miss_vaccine.5) ~ 0
+  ))
 
 # state medicaid ----------------------------------------------------------
 

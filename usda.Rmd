@@ -416,6 +416,18 @@ as.data.frame(model_param$data) %>%
   theme_pubr()
 ```
 
+```{r, eval = F}
+hardship_scored = hardship_scored %>%
+  mutate(d_black = ifelse(race_ethnic == "Black", 1, 0),
+         d_latinx = ifelse(race_ethnic == "Latinx", 1, 0),
+         high_income = ifelse(poverty150 == 1, 0, 1))
+model = glm(material_hardship ~ Week*d_black*d_latinx*high_income, data = hardship_scored, family = "binomial")
+
+simple_slopes(model, 
+              levels = list(d_black = c(0,1),
+                            d_latinx = c(0,1),
+                            poverty150 = c(0,1)))
+```
 
 
 ## Medicaid expansion

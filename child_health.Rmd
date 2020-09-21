@@ -1,0 +1,237 @@
+---
+title: "Well-baby and vaccines"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+```{r usda-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=10)
+options(knitr.kable.NA = '')
+```
+
+```{r usda-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r}
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+```
+
+
+```{r usda-3 }
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+source(here("Functions/state_policy_fun.R"))
+cutoffv = 1
+
+scored = scored %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week, 
+    (Week %% 2) == 0 ~ NA_real_,
+    TRUE ~ Week)) %>%
+  filter(!is.na(Week)) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date))) %>%
+  ungroup() %>%
+  mutate(poverty_cat = ifelse(poverty150 == 1, "Below 1.5 x FPL", "Out of poverty"))
+```
+
+# Well-baby
+
+## Overall{.tabset}
+
+### All
+
+```{r}
+plot = scored %>%
+  filter(!is.na(missed_wellbaby)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  group_by(missed_wellbaby) %>%
+  summarize(n = n()) %>%
+  mutate(percent = n/sum(n),
+         moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = missed_wellbaby, 
+             y = percent, 
+             fill = as.factor(missed_wellbaby),
+             text = paste0(round(percent, 1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .3) +
+  scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) +
+  guides(fill = F) +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers miss well-baby") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Race/ethnicity
+
+```{r}
+policy_binary(race_ethnic, missed_wellbaby)
+```
+
+### Race by income
+
+```{r}
+time_binary_group(race_ethnic, missed_wellbaby, poverty_cat)
+```
+
+## Over time
+
+### All
+
+```{r}
+plot = scored %>%
+  filter(!is.na(missed_wellbaby)) %>%
+  filter(Week > 0) %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            hardship = sum(missed_wellbaby)/count) %>%
+  mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+  mutate_at(vars(hardship, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = hardship, 
+             group = 1,
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)
+             ))) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
+  geom_point() + 
+  geom_line() +
+  labs(x = NULL, y = NULL, title = "Percent of households missed well-baby visit") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Race/ethnicity
+
+```{r}
+time_policy_binary(race_ethnic, missed_wellbaby)
+```
+
+### Race by income
+
+```{r}
+time_binary_group(race_ethnic, missed_wellbaby, poverty150)
+```
+
+
+# Vaccine
+
+## Overall{.tabset}
+
+### All
+
+```{r}
+plot = scored %>%
+  filter(!is.na(miss_vaccine_any)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  group_by(miss_vaccine_any) %>%
+  summarize(n = n()) %>%
+  mutate(percent = n/sum(n),
+         moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = miss_vaccine_any, 
+             y = percent, 
+             fill = as.factor(miss_vaccine_any),
+             text = paste0(round(percent, 1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .3) +
+  scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) +
+  guides(fill = F) +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers miss vaccination") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Race/ethnicity
+
+```{r}
+policy_binary(race_ethnic, miss_vaccine_any)
+```
+
+### Race by income
+
+```{r}
+time_binary_group(race_ethnic, miss_vaccine_any, poverty_cat)
+```
+
+## Over time
+
+### All
+
+```{r}
+plot = scored %>%
+  filter(!is.na(miss_vaccine_any)) %>%
+  filter(Week > 0) %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            hardship = sum(miss_vaccine_any)/count) %>%
+  mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+  mutate_at(vars(hardship, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = hardship, 
+             group = 1,
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)
+             ))) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
+  geom_point() + 
+  geom_line() +
+  labs(x = NULL, y = NULL, title = "Percent of households missed vaccination") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Race/ethnicity
+
+```{r}
+time_policy_binary(race_ethnic, miss_vaccine_any)
+```
+
+### Race by income
+
+```{r}
+time_binary_group(race_ethnic, miss_vaccine_any, poverty150)
+```
+
+
