@@ -34,7 +34,7 @@ policy_binary = function(policy, variable, data = scored){
                   position = position_dodge(1),
                   width = .1) +
     labs(x = NULL, y = "Percent", fill = NULL) +
-    theme_pubr() +
+    theme_pubclean() +
     theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1))
 
   ggplotly(plot, tooltip = "text")
@@ -75,7 +75,7 @@ binary_group = function(policy, variable, group, data = scored){
     labs(x = NULL, y = "Percent", fill = NULL) +
     facet_wrap(facets = vars({{group}}), scales = "free_x") +
     scale_x_discrete(labels = NULL)+
-    theme_pubr() 
+    theme_pubclean() 
   
   ggplotly(plot, tooltip = "text")
 }
@@ -106,7 +106,7 @@ time_policy_binary = function(policy, variable, data = scored){
     geom_line() +
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
     labs(x = NULL, y = "Percent", color = NULL, fill = NULL) +
-    theme_pubr()
+    theme_pubclean()
   
   ggplotly(plot, tooltip = "text")
 }
@@ -142,7 +142,7 @@ time_binary_group = function(policy, variable, group, data = scored){
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
     labs(x = NULL, y = "Percent", color = NULL, fill = NULL) +
     facet_wrap(facets = vars({{group}})) + 
-    theme_pubr()
+    theme_pubclean()
   
   plot = ggplotly(plot, tooltip = "text")
   for (i in 1:length(plot$x$data)){
@@ -184,7 +184,7 @@ policy_cont = function(policy, variable, data = scored){
                   position = position_dodge(1),
                   width = .1) +
     labs(x = NULL, y = "Mean", fill = NULL) +
-    theme_pubr() +
+    theme_pubclean() +
     theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1))
 
   ggplotly(plot, tooltip = "text")
@@ -223,7 +223,7 @@ cont_group = function(policy, variable, group, data = scored){
     labs(x = NULL, y = "Mean", fill = NULL) +
     facet_wrap(facets = vars({{group}}), scales = "free_x") +
     scale_x_discrete(labels = NULL)+
-    theme_pubr() 
+    theme_pubclean() 
   
   ggplotly(plot, tooltip = "text")
 }
@@ -252,7 +252,7 @@ time_policy_cont = function(policy, variable, data = scored){
     geom_line() +
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
     labs(x = NULL, y = "Mean", color = NULL) +
-    theme_pubr()
+    theme_pubclean()
   
   ggplotly(plot, tooltip = "text")
 }
@@ -283,7 +283,7 @@ time_cont_group = function(policy, variable, group, data = scored){
     #geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
     labs(x = NULL, y = "Mean", color = NULL) +
     facet_wrap(facets = vars({{group}})) + 
-    theme_pubr()
+    theme_pubclean()
   
   ggplotly(plot, tooltip = "text")
 }
@@ -318,7 +318,7 @@ group_categorical_long = function(group, category, response, data = scored){
     facet_wrap(facets = vars({{group}}), scales = "free_y") +
     guides(fill = F) +
     labs(x = NULL, y = NULL, fill = NULL, title = "Percent of households") +
-    theme_pubr()
+    theme_pubclean()
   
   ggplotly(plot, tooltip = "text")
 }
@@ -349,7 +349,7 @@ time_group_cat_long = function(group, category, response, data = scored){
     facet_wrap(facets = vars({{category}}), scales = "free") +
     guides(fill = F) +
     labs(x = NULL, y = NULL, fill = NULL, title = "Percent of households") +
-    theme_pubr()
+    theme_pubclean()
   
   ggplotly(plot, tooltip = "text")
 }
