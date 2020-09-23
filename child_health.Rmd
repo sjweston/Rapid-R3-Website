@@ -25,6 +25,8 @@ conflict_prefer("filter", "dplyr")
 conflict_prefer("lag", "dplyr")
 conflict_prefer("map", "purrr")
 library(plotly)
+library(knitr)
+library(kableExtra)
 ```
 
 ```{r}
@@ -92,17 +94,32 @@ ggplotly(plot, tooltip = "text")
 policy_binary(race_ethnic, missed_wellbaby)
 ```
 
+```{r, results="asis"}
+policy_binary_sig(race_ethnic, missed_wellbaby)
+```
+
+
 ## Poverty status
 
 ```{r}
 policy_binary(poverty_cat, missed_wellbaby)
 ```
 
+```{r, results="asis"}
+policy_binary_sig(poverty_cat, missed_wellbaby)
+```
+
+
 ## Race by income
 
 ```{r}
 binary_group(race_ethnic, missed_wellbaby, poverty_cat)
 ```
+
+```{r, results="asis"}
+policy_binary_sig(race_poverty, missed_wellbaby)
+```
+
 
 ## Over time
 
@@ -171,11 +188,21 @@ ggplotly(plot, tooltip = "text")
 policy_binary(race_ethnic, miss_vaccine_any)
 ```
 
+```{r, results="asis"}
+policy_binary_sig(race_ethnic, miss_vaccine_any)
+```
+
+
 ## Poverty status
 
 ```{r}
 policy_binary(poverty_cat, miss_vaccine_any)
 ```
+
+```{r, results="asis"}
+policy_binary_sig(poverty_cat, miss_vaccine_any)
+```
+
 
 
 ## Race by income
@@ -183,6 +210,11 @@ policy_binary(poverty_cat, miss_vaccine_any)
 ```{r}
 binary_group(race_ethnic, miss_vaccine_any, poverty_cat)
 ```
+
+```{r, results="asis"}
+policy_binary_sig(race_poverty, miss_vaccine_any)
+```
+
 
 ## Over time
 
@@ -214,7 +246,7 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-# Which visit missed?
+# Which visit missed?{.tabset}
 
 ## All
 
@@ -323,6 +355,9 @@ ggplotly(plot, tooltip = "text")
 wellbaby.age(race_ethnic)
 ```
 
+```{r, results="asis"}
+policy_binary_sig(race_poverty, miss_vaccine_any)
+```
 
 ## Poverty status
 

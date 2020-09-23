@@ -40,6 +40,29 @@ policy_binary = function(policy, variable, data = scored){
   ggplotly(plot, tooltip = "text")
 }
 
+policy_binary_sig = function(policy, variable, data = scored){
+  
+  data = data %>%
+    filter(!is.na({{variable}})) %>%
+    filter(!is.na({{policy}})) %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    filter(row_number() == max(row_number())) %>%
+    ungroup() 
+  
+  names(data)[names(data) == deparse(substitute(policy))] = "policy"
+  names(data)[names(data) == deparse(substitute(variable))] = "variable"
+  
+  broom::tidy(pairwise.t.test(data$variable, 
+                              data$policy,
+                              p.adjust.method = "holm")) %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(., 
+          booktabs = T,
+          caption = "p-values adjusted for multiple comparisions using the Holm method") %>%
+    kable_styling()
+}
+
 binary_group = function(policy, variable, group, data = scored){
   
   plot = data %>%
