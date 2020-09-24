@@ -121,6 +121,16 @@ policy_binary_sig(race_poverty, missed_wellbaby)
 ```
 
 
+## Child insurance
+
+```{r}
+policy_binary(childinsurance_type, missed_wellbaby)
+```
+
+```{r, results="asis"}
+policy_binary_sig(childinsurance_type, missed_wellbaby)
+```
+
 ## Over time
 
 ```{r}
@@ -215,6 +225,15 @@ binary_group(race_ethnic, miss_vaccine_any, poverty_cat)
 policy_binary_sig(race_poverty, miss_vaccine_any)
 ```
 
+## Child insurance
+
+```{r}
+policy_binary(childinsurance_type, miss_vaccine_any)
+```
+
+```{r, results="asis"}
+policy_binary_sig(childinsurance_type, miss_vaccine_any)
+```
 
 ## Over time
 
@@ -355,17 +374,13 @@ ggplotly(plot, tooltip = "text")
 wellbaby.age(race_ethnic)
 ```
 
-```{r, results="asis"}
-policy_binary_sig(race_poverty, miss_vaccine_any)
-```
-
 ## Poverty status
 
 ```{r}
 wellbaby.age(poverty_cat)
 ```
 
-## Poverty status
+## Race by income
 
 ```{r}
 plot = scored %>%
@@ -416,6 +431,13 @@ plot = scored %>%
                                    hjust = 1, 
                                    vjust = 1))
 ggplotly(plot, tooltip = "text")
+```
+
+
+## Child insurance
+
+```{r}
+wellbaby.age(childinsurance_type, filter(scored, childinsurance_type != "Don't Know"))
 ```
 
 # Barriers to healthcare{.tabset}
@@ -536,3 +558,9 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
+
+## Child insurance
+
+```{r}
+barrer.group(childinsurance_type, filter(scored, childinsurance_type != "Don't Know"))
+```

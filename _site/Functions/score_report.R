@@ -453,7 +453,35 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$HI_othergov = ifelse(is.na(data$HEALTH.001), NA, 0)
     newdata$HI_othergov = ifelse(data$HEALTH.001.a_9 == 1, 1, newdata$HI_othergov)
     newdata$HI_othergov[is.na(newdata$HI_othergov) & !is.na(data$HEALTH.001)] = 0
-    }
+  }
+  
+  newdata$insurance_type = case_when(
+    data$HEALTH.001 == 0 ~ "No insurance",
+    data$HEALTH.001.a.2_1 == 1 ~ "Private",
+    data$HEALTH.001.a.2_2 == 1 ~ "Private",
+    data$HEALTH.001.a.2_3 == 1 ~ "State",
+    data$HEALTH.001.a.2_4 == 1 ~ "State",
+    data$HEALTH.001.a.2_5 == 1 ~ "State",
+    data$HEALTH.001.a.2_6 == 1 ~ "State",
+    data$HEALTH.001.a.2_7 == 1 ~ "State",
+    data$HEALTH.001.a.2_8 == 1 ~ "Other",
+    TRUE ~ NA_character_
+  )
+  
+  newdata$childinsurance_type = case_when(
+    data$HEALTH.002 == 0 ~ "No insurance",
+    data$HEALTH.002.a.2_1 == 1 ~ "Private",
+    data$HEALTH.002.a.2_2 == 1 ~ "State",
+    data$HEALTH.002.a.2_3 == 1 ~ "State",
+    data$HEALTH.002.a.2_4 == 1 ~ "State",
+    data$HEALTH.002.a.2_5 == 1 ~ "State",
+    data$HEALTH.002.a.2_6 == 1 ~ "State",
+    data$HEALTH.002.a.2_7 == 1 ~ "State",
+    data$HEALTH.002.a.2_8 == 1 ~ "State",
+    data$HEALTH.002.a.2_9 == 1 ~ "State",
+    data$HEALTH.002.a.2_10 == 1 ~ "Don't Know",
+    TRUE ~ NA_character_
+  )
   if(contains_items("HEALTH.002", data)){
     newdata$child_insurance = ifelse(data$HEALTH.002 == 1, 1, 0)
     #child has insurance through private company

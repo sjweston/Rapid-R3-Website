@@ -104,7 +104,7 @@ scored = scored %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", 
-                      "zip", "state", "region",
+                      "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability", "employment_change",
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
@@ -112,7 +112,7 @@ scored = scored %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", 
-                      "zip", "state", "region", 
+                      "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability",  "employment_change",
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
