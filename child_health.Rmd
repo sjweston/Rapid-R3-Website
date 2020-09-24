@@ -265,6 +265,12 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
+```{r}
+scored = scored %>%
+  mutate(childinsurance_type = ifelse(childinsurance_type == "Don't Know", NA, childinsurance_type))
+```
+
+
 # Which visit missed?{.tabset}
 
 ## All
@@ -437,7 +443,7 @@ ggplotly(plot, tooltip = "text")
 ## Child insurance
 
 ```{r}
-wellbaby.age(childinsurance_type, filter(scored, childinsurance_type != "Don't Know"))
+wellbaby.age(childinsurance_type)
 ```
 
 # Barriers to healthcare{.tabset}
@@ -562,5 +568,5 @@ ggplotly(plot, tooltip = "text")
 ## Child insurance
 
 ```{r}
-barrer.group(childinsurance_type, filter(scored, childinsurance_type != "Don't Know"))
+barrer.group(childinsurance_type)
 ```
