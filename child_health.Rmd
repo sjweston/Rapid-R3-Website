@@ -696,6 +696,123 @@ scored %>%
   theme_pubclean()
 ```
 
+# Barriers to healthcare (Contextual vs non) {.tabset}
+
+```{r}
+scored = scored %>%
+  mutate(miss_context = case_when(
+    missed_wb_caring.for.family == 1 ~ 1,
+    missed_wb_inability.find.childcare == 1 ~ 1,
+    missed_wb_time.away.from.work == 1 ~ 1,
+    missed_wb_caring.for.family == 0 ~ 0,
+    missed_wb_inability.find.childcare == 0 ~ 0,
+    missed_wb_time.away.from.work == 0 ~ 0,
+    TRUE ~ NA_real_)) 
+```
+
+
+## All
+
+```{r}
+plot = scored %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  filter(!is.na(miss_context)) %>%
+  group_by(miss_context) %>%
+  summarize(n = n()) %>%
+  mutate(percent = n/sum(n),
+         moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = miss_context, 
+             y = percent, 
+             fill = as.factor(miss_context),
+             text = paste0(round(percent, 1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .3) +
+  scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) +
+  guides(fill = F) +
+  labs(x = NULL, y = NULL) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Race/ethnicity
+
+```{r}
+policy_binary(race_ethnic, miss_context)
+```
+
+```{r, results="asis"}
+policy_binary_sig(race_ethnic, miss_context)
+```
+
+
+## Poverty status
+
+```{r}
+policy_binary(poverty_cat, miss_context)
+```
+
+```{r, results="asis"}
+policy_binary_sig(poverty_cat, miss_context)
+```
+
+
+## Race by income
+
+```{r}
+binary_group(race_ethnic, miss_context, poverty_cat)
+```
+
+```{r, results="asis"}
+policy_binary_sig(race_poverty, miss_context)
+```
+
+
+## Child insurance
+
+```{r}
+policy_binary(childinsurance_type, miss_context)
+```
+
+```{r, results="asis"}
+policy_binary_sig(childinsurance_type, miss_context)
+```
+
+## Over time
+
+```{r}
+plot = scored %>%
+  filter(!is.na(miss_context)) %>%
+  filter(Week > 0) %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            hardship = sum(miss_context)/count) %>%
+  mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+  mutate_at(vars(hardship, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = hardship, 
+             group = 1,
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)
+             ))) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
+  geom_point() + 
+  geom_line() +
+  labs(x = NULL, y = NULL, title = "Percent of households missed well-baby visit because of contextual reasons") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
 # Child health insurance demos
 
 ## All
