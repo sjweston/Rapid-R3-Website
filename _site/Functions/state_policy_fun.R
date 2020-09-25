@@ -376,3 +376,111 @@ time_group_cat_long = function(group, category, response, data = scored){
   
   ggplotly(plot, tooltip = "text")
 }
+
+
+policy_cat = function(policy, variable, data = scored){
+  
+  plot = data %>%
+    mutate_at(vars({{variable}}), ~ifelse(is.na(.x), "Missing", .x)) %>%
+    filter(!is.na({{policy}})) %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    filter(row_number() == max(row_number())) %>%
+    ungroup() %>%
+    group_by({{policy}}, {{variable}}) %>%
+    summarize(count = n()) %>%
+    group_by({{policy}}) %>%
+    mutate(percent = count/sum(count),
+           n = sum(count))   %>%
+    mutate(
+      moe = 1.96*sqrt((percent*(1-percent))/n),
+      moe = 100*moe,
+      percent = 100*percent)  %>%
+    ggplot(aes(x = {{variable}},
+               y = percent,
+               #group = 1,
+               fill = {{policy}},
+               text = paste0(
+                 "Count: ", count,
+                 "\n Percent: ", round(percent)))) +
+    geom_bar(stat = "identity", position = position_dodge(1)) +
+    geom_errorbar(aes(ymin = percent-moe, ymax = percent + moe),
+                  position = position_dodge(1),
+                  width = .1) +
+    labs(x = NULL, y = "Percent", fill = NULL) +
+    theme_pubclean() +
+    theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1))
+  
+  ggplotly(plot, tooltip = "text")
+}
+
+cat_group = function(policy, variable, group, data = scored){
+  
+  plot = data %>%
+    mutate_at(vars({{variable}}), ~ifelse(is.na(.x), "Missing", .x)) %>%
+    filter(!is.na({{policy}})) %>%
+    filter(!is.na({{group}}))   %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    filter(row_number() == max(row_number())) %>%
+    ungroup() %>%
+    group_by({{policy}}, {{group}}, {{variable}}) %>%
+    summarize(count = n()) %>%
+    group_by({{policy}}, {{group}}) %>%
+    mutate(percent = count/sum(count),
+           n = sum(count))    %>%
+    mutate(
+      moe = 1.96*sqrt((percent*(1-percent))/n),
+      moe = 100*moe,
+      percent = 100*percent)  %>%
+    ggplot(aes(x = {{variable}},
+               y = percent,
+               #group = 1,
+               fill = {{policy}},
+               text = paste0(
+                 "Count: ", count,
+                 "\n Percent: ", round(percent)))) +
+    geom_bar(stat = "identity", position = position_dodge(1)) +
+    geom_errorbar(aes(ymin = percent-moe, ymax = percent + moe),
+                  position = position_dodge(1),
+                  width = .1) +
+    labs(x = NULL, y = "Percent", fill = NULL)   +
+    facet_wrap(facets = vars({{group}})) +
+    theme_pubclean() +
+    theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1))
+
+  ggplotly(plot, tooltip = "text")
+}
+
+policy_cat_sig = function(policy, variable, data = scored){
+  
+  data %>%
+    filter(!is.na({{policy}})) %>%
+    mutate_at(vars({{variable}}), ~ifelse(is.na(.x), "Missing", .x)) %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    filter(row_number() == max(row_number())) %>%
+    ungroup() %>%
+    group_by({{policy}}, {{variable}}) %>%
+    summarize(cases = n()) %>%
+    group_by({{policy}}) %>%
+    mutate(total = sum(cases)) %>%
+    group_by({{variable}}) %>%
+    nest() %>%
+    mutate(pvalues = map(data, ~broom::tidy(pairwise.prop.test(.x$cases, .x$total, p.adjust.method = "none")))) %>%
+    mutate(data1 = map(data, rename_all, ~paste0(.x, "1"))) %>%
+    mutate(data1 = map(data1, ~mutate(.x, group1 = as.character(row_number())))) %>%
+    mutate(data2 = map(data, rename_all, ~paste0(.x, "2"))) %>%
+    mutate(data2 = map(data2, ~mutate(.x, group2 = as.character(row_number())))) %>%
+    mutate(pvalues = map2(data1, pvalues, right_join)) %>%
+    mutate(pvalues = map2(data2, pvalues, right_join)) %>%
+    select(pvalues) %>%
+    unnest(cols = c(pvalues)) %>%
+    select(-group1, -group2, -cases1, -cases2, -total1, -total2) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+           p.value = papaja::printp(p.value)) %>%
+    kable(., 
+          booktabs = T,
+          caption = "p-values adjusted for multiple comparisions using the Holm method") %>%
+    kable_styling()
+}

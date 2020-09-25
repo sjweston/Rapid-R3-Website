@@ -27,6 +27,7 @@ conflict_prefer("map", "purrr")
 library(plotly)
 library(knitr)
 library(kableExtra)
+library(DT)
 ```
 
 ```{r}
@@ -267,7 +268,10 @@ ggplotly(plot, tooltip = "text")
 
 ```{r}
 scored = scored %>%
-  mutate(childinsurance_type = ifelse(childinsurance_type == "Don't Know", NA, childinsurance_type))
+  mutate(
+    childinsurance_full = childinsurance_type,
+    childinsurance_type = ifelse(childinsurance_type == "Don't Know", NA,
+                                 childinsurance_type))
 ```
 
 
@@ -520,10 +524,70 @@ ggplotly(plot, tooltip = "text")
 barrer.group(race_ethnic)
 ```
 
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(race_ethnic)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  select(race_ethnic, contains("missed_wb")) %>%
+  gather("reason", "response", -race_ethnic) %>%
+  filter(!is.na(response)) %>%
+  mutate(reason = str_remove(reason, "missed_wb_"),
+         reason = str_replace_all(reason, "\\.", " ")) %>%
+  group_by(reason,race_ethnic) %>%
+  summarize(n = n(),
+            count = sum(response)) %>%
+  group_by(reason) %>%
+  nest() %>%
+  mutate(pvalues = map(data, ~broom::tidy(pairwise.prop.test(.x$count, .x$n, p.adjust.method = "holm")))) %>%
+  mutate(data1 = map(data, rename_all, ~paste0(.x, "1"))) %>%
+  mutate(data1 = map(data1, ~mutate(.x, group1 = as.character(row_number())))) %>%
+  mutate(data2 = map(data, rename_all, ~paste0(.x, "2"))) %>%
+  mutate(data2 = map(data2, ~mutate(.x, group2 = as.character(row_number())))) %>%
+  mutate(pvalues = map2(data1, pvalues, right_join)) %>%
+  mutate(pvalues = map2(data2, pvalues, right_join)) %>%
+  select(pvalues) %>%
+  unnest(cols = c(pvalues)) %>%
+  mutate(p.value = papaja::printp(p.value)) %>% 
+  select(reason, race_ethnic1, race_ethnic2, p.value) %>%
+  DT::datatable(., rownames = F)
+```
+
 ## Poverty status
 
 ```{r}
 barrer.group(poverty_cat)
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(poverty_cat)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  select(poverty_cat, contains("missed_wb")) %>%
+  gather("reason", "response", -poverty_cat) %>%
+  filter(!is.na(response)) %>%
+  mutate(reason = str_remove(reason, "missed_wb_"),
+         reason = str_replace_all(reason, "\\.", " ")) %>%
+  group_by(reason,poverty_cat) %>%
+  summarize(n = n(),
+            count = sum(response)) %>%
+  group_by(reason) %>%
+  nest() %>%
+  mutate(pvalues = map(data, ~broom::tidy(pairwise.prop.test(.x$count, .x$n, p.adjust.method = "holm")))) %>%
+  mutate(data1 = map(data, rename_all, ~paste0(.x, "1"))) %>%
+  mutate(data1 = map(data1, ~mutate(.x, group1 = as.character(row_number())))) %>%
+  mutate(data2 = map(data, rename_all, ~paste0(.x, "2"))) %>%
+  mutate(data2 = map(data2, ~mutate(.x, group2 = as.character(row_number())))) %>%
+  mutate(pvalues = map2(data1, pvalues, right_join)) %>%
+  mutate(pvalues = map2(data2, pvalues, right_join)) %>%
+  select(pvalues) %>%
+  unnest(cols = c(pvalues)) %>%
+  mutate(p.value = papaja::printp(p.value)) %>% 
+  select(reason,  poverty_cat1,  poverty_cat2, p.value) %>%
+  DT::datatable(., rownames = F)
 ```
 
 ## Race by income
@@ -564,9 +628,136 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  select(race_ethnic, poverty_cat, contains("missed_wb")) %>%
+  gather("reason", "response", -race_ethnic, -poverty_cat) %>%
+  filter(!is.na(response)) %>%
+  mutate(reason = str_remove(reason, "missed_wb_"),
+         reason = str_replace_all(reason, "\\.", " ")) %>%
+  group_by(reason,race_ethnic, poverty_cat) %>%
+  summarize(n = n(),
+            count = sum(response)) %>%
+  group_by(reason) %>%
+  nest() %>%
+  mutate(pvalues = map(data, ~broom::tidy(pairwise.prop.test(.x$count, .x$n, p.adjust.method = "holm")))) %>%
+  mutate(data1 = map(data, rename_all, ~paste0(.x, "1"))) %>%
+  mutate(data1 = map(data1, ~mutate(.x, group1 = as.character(row_number())))) %>%
+  mutate(data2 = map(data, rename_all, ~paste0(.x, "2"))) %>%
+  mutate(data2 = map(data2, ~mutate(.x, group2 = as.character(row_number())))) %>%
+  mutate(pvalues = map2(data1, pvalues, right_join)) %>%
+  mutate(pvalues = map2(data2, pvalues, right_join)) %>%
+  select(pvalues) %>%
+  unnest(cols = c(pvalues)) %>%
+  mutate(p.value = papaja::printp(p.value)) %>% 
+  select(reason, race_ethnic1, poverty_cat1, race_ethnic2, poverty_cat2, p.value) %>%
+  DT::datatable(., rownames = F)
+```
+
+
 
 ## Child insurance
 
 ```{r}
 barrer.group(childinsurance_type)
 ```
+
+## Over time
+
+```{r}
+scored %>%
+  filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
+  select(Week, Date, race_ethnic, poverty_cat, contains("missed_wb")) %>%
+  gather("reason", "response", -Week, -Date, -race_ethnic, -poverty_cat) %>%
+  filter(!is.na(response)) %>%
+  mutate(reason = str_remove(reason, "missed_wb_"),
+         reason = str_replace_all(reason, "\\.", " ")) %>%
+  group_by(reason, Week, race_ethnic, poverty_cat) %>%
+  summarize(Date = min(Date), 
+            n = n(),
+            count = sum(response)) %>%
+  mutate(percent = count/n,
+         moe = map2_dbl(percent, n, moe.p)) %>%
+    mutate_at(vars(percent, moe), ~100*.x) %>%
+  ungroup() %>%
+  filter(reason == "concern for covid") %>%
+  ggplot(aes(x = Date, y = percent, color = race_ethnic, fill = race_ethnic)) +
+  geom_ribbon(aes(ymin = percent-moe, 
+                    ymax = percent+moe),
+                alpha = .3) +
+  geom_point() +
+  geom_line() +
+  facet_grid(reason~poverty_cat, scales = "free") +
+  labs(x = NULL, y = NULL, title = "Percent missed well-baby visits because of") +
+  theme_pubclean()
+```
+
+# Child health insurance demos
+
+## All
+
+```{r}
+plot = scored %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  group_by(childinsurance_full) %>%
+  summarize(n = n()) %>%
+  mutate(percent = n/sum(n),
+         moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = childinsurance_full, 
+             y = percent, 
+             fill = as.factor(childinsurance_full),
+             text = paste0(round(percent, 1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .3) +
+  #scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) +
+  guides(fill = F) +
+  labs(x = NULL, y = NULL, title = "Distribution of child insurance type") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Race/ethnic
+
+```{r}
+policy_cat(race_ethnic, childinsurance_full)
+```
+
+```{r}
+policy_cat_sig(race_ethnic, childinsurance_full)
+```
+
+## Poverty status
+
+
+```{r}
+policy_cat(poverty_cat, childinsurance_full)
+```
+
+```{r}
+policy_cat_sig(poverty_cat, childinsurance_full)
+```
+
+## Race x income
+
+```{r}
+cat_group(race_ethnic, childinsurance_full, poverty_cat)
+```
+
+```{r}
+policy_cat_sig(race_poverty, childinsurance_full)
+```
+
+
+
+
+
