@@ -7,7 +7,7 @@ output:
 ---
 
 
-```{r usda-1, echo = F}
+```{r child-health-1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, 
                       warning = FALSE, 
                       message = FALSE, 
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.kable.NA = '')
 ```
 
-```{r usda-2 }
+```{r child-health-2 }
 library(conflicted)
 library(here)
 library(ggpubr)
@@ -30,7 +30,7 @@ library(kableExtra)
 library(DT)
 ```
 
-```{r}
+```{r child-health-3}
 moe.p = function(p, n){
   q = 1-p
   moe = 1.96*sqrt((p*q)/n)
@@ -39,7 +39,7 @@ moe.p = function(p, n){
 ```
 
 
-```{r usda-3 }
+```{r child-health-4 }
 source(here("Scripts/score data.R")) 
 source(here("Functions/pomp.R"))
 source(here("Functions/state_policy_fun.R"))
@@ -62,7 +62,7 @@ scored = scored %>%
 
 ## All
 
-```{r}
+```{r child-health-5}
 plot = scored %>%
   filter(!is.na(missed_wellbaby)) %>%
   group_by(CaregiverID) %>%
@@ -91,50 +91,50 @@ ggplotly(plot, tooltip = "text")
 
 ## Race/ethnicity
 
-```{r}
+```{r child-health-6}
 policy_binary(race_ethnic, missed_wellbaby)
 ```
 
-```{r, results="asis"}
+```{r child-health-7, results="asis"}
 policy_binary_sig(race_ethnic, missed_wellbaby)
 ```
 
 
 ## Poverty status
 
-```{r}
+```{r child-health-8}
 policy_binary(poverty_cat, missed_wellbaby)
 ```
 
-```{r, results="asis"}
+```{r child-health-9, results="asis"}
 policy_binary_sig(poverty_cat, missed_wellbaby)
 ```
 
 
 ## Race by income
 
-```{r}
+```{r child-health-10}
 binary_group(race_ethnic, missed_wellbaby, poverty_cat)
 ```
 
-```{r, results="asis"}
+```{r child-health-11, results="asis"}
 policy_binary_sig(race_poverty, missed_wellbaby)
 ```
 
 
 ## Child insurance
 
-```{r}
+```{r child-health-12}
 policy_binary(childinsurance_type, missed_wellbaby)
 ```
 
-```{r, results="asis"}
+```{r child-health-13, results="asis"}
 policy_binary_sig(childinsurance_type, missed_wellbaby)
 ```
 
 ## Over time
 
-```{r}
+```{r child-health-14}
 plot = scored %>%
   filter(!is.na(missed_wellbaby)) %>%
   filter(Week > 0) %>%
@@ -166,7 +166,7 @@ ggplotly(plot, tooltip = "text")
 
 ## All
 
-```{r}
+```{r child-health-15}
 plot = scored %>%
   filter(!is.na(miss_vaccine_any)) %>%
   group_by(CaregiverID) %>%
@@ -195,22 +195,22 @@ ggplotly(plot, tooltip = "text")
 
 ## Race/ethnicity
 
-```{r}
+```{r child-health-16}
 policy_binary(race_ethnic, miss_vaccine_any)
 ```
 
-```{r, results="asis"}
+```{r child-health-17, results="asis"}
 policy_binary_sig(race_ethnic, miss_vaccine_any)
 ```
 
 
 ## Poverty status
 
-```{r}
+```{r child-health-18}
 policy_binary(poverty_cat, miss_vaccine_any)
 ```
 
-```{r, results="asis"}
+```{r child-health-19, results="asis"}
 policy_binary_sig(poverty_cat, miss_vaccine_any)
 ```
 
@@ -218,27 +218,27 @@ policy_binary_sig(poverty_cat, miss_vaccine_any)
 
 ## Race by income
 
-```{r}
+```{r child-health-20}
 binary_group(race_ethnic, miss_vaccine_any, poverty_cat)
 ```
 
-```{r, results="asis"}
+```{r child-health-21, results="asis"}
 policy_binary_sig(race_poverty, miss_vaccine_any)
 ```
 
 ## Child insurance
 
-```{r}
+```{r child-health-22}
 policy_binary(childinsurance_type, miss_vaccine_any)
 ```
 
-```{r, results="asis"}
+```{r child-health-23, results="asis"}
 policy_binary_sig(childinsurance_type, miss_vaccine_any)
 ```
 
 ## Over time
 
-```{r}
+```{r child-health-24}
 plot = scored %>%
   filter(!is.na(miss_vaccine_any)) %>%
   filter(Week > 0) %>%
@@ -266,7 +266,7 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r}
+```{r child-health-25}
 scored = scored %>%
   mutate(
     childinsurance_full = childinsurance_type,
@@ -279,7 +279,7 @@ scored = scored %>%
 
 ## All
 
-```{r}
+```{r child-health-26}
 plot = scored %>%
   filter(!is.na(missed_wellbaby)) %>%
   group_by(CaregiverID) %>%
@@ -326,7 +326,7 @@ ggplotly(plot, tooltip = "text")
 ```
 
 
-```{r}
+```{r child-health-27}
 wellbaby.age = function(group, data = scored){ 
   plot = data %>%
     filter(!is.na(missed_wellbaby)) %>%
@@ -380,19 +380,19 @@ ggplotly(plot, tooltip = "text")
 
 ## Race/ethnicity
 
-```{r}
+```{r child-health-28}
 wellbaby.age(race_ethnic)
 ```
 
 ## Poverty status
 
-```{r}
+```{r child-health-29}
 wellbaby.age(poverty_cat)
 ```
 
 ## Race by income
 
-```{r}
+```{r child-health-30}
 plot = scored %>%
     filter(!is.na(missed_wellbaby)) %>%
     filter(!is.na(race_ethnic)) %>%
@@ -446,7 +446,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Child insurance
 
-```{r}
+```{r child-health-31}
 wellbaby.age(childinsurance_type)
 ```
 
@@ -454,7 +454,7 @@ wellbaby.age(childinsurance_type)
 
 ## All
 
-```{r}
+```{r child-health-32}
 scored %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -482,7 +482,7 @@ scored %>%
 
 ## Race/ethnicity
 
-```{r}
+```{r child-health-33}
 barrer.group = function(group, data = scored){
 plot = scored %>%
   filter(!is.na({{group}})) %>%
@@ -520,11 +520,11 @@ ggplotly(plot, tooltip = "text")
 }
 ```
 
-```{r}
+```{r child-health-34}
 barrer.group(race_ethnic)
 ```
 
-```{r, results = 'asis'}
+```{r child-health-35, results = 'asis'}
 scored %>%
   filter(!is.na(race_ethnic)) %>%
   group_by(CaregiverID) %>%
@@ -556,11 +556,11 @@ scored %>%
 
 ## Poverty status
 
-```{r}
+```{r child-health-36}
 barrer.group(poverty_cat)
 ```
 
-```{r, results = 'asis'}
+```{r child-health-37, results = 'asis'}
 scored %>%
   filter(!is.na(poverty_cat)) %>%
   group_by(CaregiverID) %>%
@@ -592,7 +592,7 @@ scored %>%
 
 ## Race by income
 
-```{r}
+```{r child-health-38}
 plot = scored %>%
   filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
   group_by(CaregiverID) %>%
@@ -628,7 +628,7 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r child-health-39, results = 'asis'}
 scored %>%
   filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
   group_by(CaregiverID) %>%
@@ -644,7 +644,10 @@ scored %>%
             count = sum(response)) %>%
   group_by(reason) %>%
   nest() %>%
-  mutate(pvalues = map(data, ~broom::tidy(pairwise.prop.test(.x$count, .x$n, p.adjust.method = "holm")))) %>%
+  mutate(pvalues = map(data, 
+                       ~broom::tidy(pairwise.prop.test(.x$count, 
+                                                             .x$n, 
+                                                             p.adjust.method = "holm")))) %>%
   mutate(data1 = map(data, rename_all, ~paste0(.x, "1"))) %>%
   mutate(data1 = map(data1, ~mutate(.x, group1 = as.character(row_number())))) %>%
   mutate(data2 = map(data, rename_all, ~paste0(.x, "2"))) %>%
@@ -655,20 +658,20 @@ scored %>%
   unnest(cols = c(pvalues)) %>%
   mutate(p.value = papaja::printp(p.value)) %>% 
   select(reason, race_ethnic1, poverty_cat1, race_ethnic2, poverty_cat2, p.value) %>%
-  DT::datatable(., rownames = F)
+  DT::datatable(., rownames = F, filter = "top")
 ```
 
 
 
 ## Child insurance
 
-```{r}
+```{r child-health-40}
 barrer.group(childinsurance_type)
 ```
 
 ## Over time
 
-```{r}
+```{r child-health-41}
 scored %>%
   filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
   select(Week, Date, race_ethnic, poverty_cat, contains("missed_wb")) %>%
@@ -696,128 +699,128 @@ scored %>%
   theme_pubclean()
 ```
 
-# Barriers to healthcare (Contextual vs non) {.tabset}
+<!-- # Barriers to healthcare (Contextual vs non) {.tabset} -->
 
-```{r}
-scored = scored %>%
-  mutate(miss_context = case_when(
-    missed_wb_caring.for.family == 1 ~ 1,
-    missed_wb_inability.find.childcare == 1 ~ 1,
-    missed_wb_time.away.from.work == 1 ~ 1,
-    missed_wb_caring.for.family == 0 ~ 0,
-    missed_wb_inability.find.childcare == 0 ~ 0,
-    missed_wb_time.away.from.work == 0 ~ 0,
-    TRUE ~ NA_real_)) 
-```
+<!-- ```{r} -->
+<!-- scored = scored %>% -->
+<!--   mutate(miss_context = case_when( -->
+<!--     missed_wb_caring.for.family == 1 ~ 1, -->
+<!--     missed_wb_inability.find.childcare == 1 ~ 1, -->
+<!--     missed_wb_time.away.from.work == 1 ~ 1, -->
+<!--     missed_wb_caring.for.family == 0 ~ 0, -->
+<!--     missed_wb_inability.find.childcare == 0 ~ 0, -->
+<!--     missed_wb_time.away.from.work == 0 ~ 0, -->
+<!--     TRUE ~ NA_real_))  -->
+<!-- ``` -->
 
+
+<!-- ## All -->
+
+<!-- ```{r} -->
+<!-- plot = scored %>% -->
+<!--   group_by(CaregiverID) %>% -->
+<!--   filter(row_number() == max(row_number())) %>% -->
+<!--   ungroup() %>% -->
+<!--   filter(!is.na(miss_context)) %>% -->
+<!--   group_by(miss_context) %>% -->
+<!--   summarize(n = n()) %>% -->
+<!--   mutate(percent = n/sum(n), -->
+<!--          moe = map2_dbl(percent, n, moe.p)) %>% -->
+<!--   mutate_at(vars(percent, moe), ~100*.x) %>% -->
+<!--   ggplot(aes(x = miss_context,  -->
+<!--              y = percent,  -->
+<!--              fill = as.factor(miss_context), -->
+<!--              text = paste0(round(percent, 1), "%"))) + -->
+<!--   geom_bar(stat = "identity") + -->
+<!--   geom_errorbar(aes(ymin = percent-moe,  -->
+<!--                     ymax = percent + moe),  -->
+<!--                 width = .3) + -->
+<!--   scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) + -->
+<!--   guides(fill = F) + -->
+<!--   labs(x = NULL, y = NULL) + -->
+<!--   theme_pubclean() -->
+
+<!-- ggplotly(plot, tooltip = "text") -->
+<!-- ``` -->
+
+<!-- ## Race/ethnicity -->
+
+<!-- ```{r} -->
+<!-- policy_binary(race_ethnic, miss_context) -->
+<!-- ``` -->
+
+<!-- ```{r, results="asis"} -->
+<!-- policy_binary_sig(race_ethnic, miss_context) -->
+<!-- ``` -->
+
+
+<!-- ## Poverty status -->
+
+<!-- ```{r} -->
+<!-- policy_binary(poverty_cat, miss_context) -->
+<!-- ``` -->
+
+<!-- ```{r, results="asis"} -->
+<!-- policy_binary_sig(poverty_cat, miss_context) -->
+<!-- ``` -->
+
+
+<!-- ## Race by income -->
+
+<!-- ```{r} -->
+<!-- binary_group(race_ethnic, miss_context, poverty_cat) -->
+<!-- ``` -->
+
+<!-- ```{r, results="asis"} -->
+<!-- policy_binary_sig(race_poverty, miss_context) -->
+<!-- ``` -->
+
+
+<!-- ## Child insurance -->
+
+<!-- ```{r} -->
+<!-- policy_binary(childinsurance_type, miss_context) -->
+<!-- ``` -->
+
+<!-- ```{r, results="asis"} -->
+<!-- policy_binary_sig(childinsurance_type, miss_context) -->
+<!-- ``` -->
+
+<!-- ## Over time -->
+
+<!-- ```{r} -->
+<!-- plot = scored %>% -->
+<!--   filter(!is.na(miss_context)) %>% -->
+<!--   filter(Week > 0) %>% -->
+<!--   group_by(Week, Date) %>% -->
+<!--   summarize(count = n(), -->
+<!--             hardship = sum(miss_context)/count) %>% -->
+<!--   mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>% -->
+<!--   mutate_at(vars(hardship, moe), ~100*.x) %>% -->
+<!--   ggplot(aes(x = Date,  -->
+<!--              y = hardship,  -->
+<!--              group = 1, -->
+<!--              text = paste0( -->
+<!--                "Date: ", Date,  -->
+<!--                "\n Count: ", count, -->
+<!--                "\n Percent: ", round(hardship) -->
+<!--              ))) + -->
+<!--   geom_ribbon(aes(ymin = hardship-moe,  -->
+<!--                   ymax = hardship + moe), -->
+<!--               alpha = .2) + -->
+<!--   geom_point() +  -->
+<!--   geom_line() + -->
+<!--   labs(x = NULL, y = NULL, title = "Percent of households missed well-baby visit because of contextual reasons") + -->
+<!--   theme_pubclean() -->
+
+<!-- ggplotly(plot, tooltip = "text") -->
+<!-- ``` -->
+
+# Child health insurance demos{.tabset}
 
 ## All
 
-```{r}
-plot = scored %>%
-  group_by(CaregiverID) %>%
-  filter(row_number() == max(row_number())) %>%
-  ungroup() %>%
-  filter(!is.na(miss_context)) %>%
-  group_by(miss_context) %>%
-  summarize(n = n()) %>%
-  mutate(percent = n/sum(n),
-         moe = map2_dbl(percent, n, moe.p)) %>%
-  mutate_at(vars(percent, moe), ~100*.x) %>%
-  ggplot(aes(x = miss_context, 
-             y = percent, 
-             fill = as.factor(miss_context),
-             text = paste0(round(percent, 1), "%"))) +
-  geom_bar(stat = "identity") +
-  geom_errorbar(aes(ymin = percent-moe, 
-                    ymax = percent + moe), 
-                width = .3) +
-  scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) +
-  guides(fill = F) +
-  labs(x = NULL, y = NULL) +
-  theme_pubclean()
-
-ggplotly(plot, tooltip = "text")
-```
-
-## Race/ethnicity
-
-```{r}
-policy_binary(race_ethnic, miss_context)
-```
-
-```{r, results="asis"}
-policy_binary_sig(race_ethnic, miss_context)
-```
-
-
-## Poverty status
-
-```{r}
-policy_binary(poverty_cat, miss_context)
-```
-
-```{r, results="asis"}
-policy_binary_sig(poverty_cat, miss_context)
-```
-
-
-## Race by income
-
-```{r}
-binary_group(race_ethnic, miss_context, poverty_cat)
-```
-
-```{r, results="asis"}
-policy_binary_sig(race_poverty, miss_context)
-```
-
-
-## Child insurance
-
-```{r}
-policy_binary(childinsurance_type, miss_context)
-```
-
-```{r, results="asis"}
-policy_binary_sig(childinsurance_type, miss_context)
-```
-
-## Over time
-
-```{r}
-plot = scored %>%
-  filter(!is.na(miss_context)) %>%
-  filter(Week > 0) %>%
-  group_by(Week, Date) %>%
-  summarize(count = n(),
-            hardship = sum(miss_context)/count) %>%
-  mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
-  mutate_at(vars(hardship, moe), ~100*.x) %>%
-  ggplot(aes(x = Date, 
-             y = hardship, 
-             group = 1,
-             text = paste0(
-               "Date: ", Date, 
-               "\n Count: ", count,
-               "\n Percent: ", round(hardship)
-             ))) +
-  geom_ribbon(aes(ymin = hardship-moe, 
-                  ymax = hardship + moe),
-              alpha = .2) +
-  geom_point() + 
-  geom_line() +
-  labs(x = NULL, y = NULL, title = "Percent of households missed well-baby visit because of contextual reasons") +
-  theme_pubclean()
-
-ggplotly(plot, tooltip = "text")
-```
-
-# Child health insurance demos
-
-## All
-
-```{r}
+```{r child-health-42}
 plot = scored %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -845,33 +848,59 @@ ggplotly(plot, tooltip = "text")
 
 ## Race/ethnic
 
-```{r}
+```{r child-health-43}
 policy_cat(race_ethnic, childinsurance_full)
 ```
 
-```{r}
+```{r child-health-44}
 policy_cat_sig(race_ethnic, childinsurance_full)
 ```
 
 ## Poverty status
 
 
-```{r}
+```{r child-health-45}
 policy_cat(poverty_cat, childinsurance_full)
 ```
 
-```{r}
+```{r child-health-46}
 policy_cat_sig(poverty_cat, childinsurance_full)
 ```
 
 ## Race x income
 
-```{r}
+```{r child-health-47}
 cat_group(race_ethnic, childinsurance_full, poverty_cat)
 ```
 
-```{r}
-policy_cat_sig(race_poverty, childinsurance_full)
+```{r child-health-48, results = 'asis'}
+scored %>%
+  filter(!is.na(race_ethnic)) %>%
+  filter(!is.na(poverty_cat)) %>%
+    mutate_at(vars(childinsurance_full), ~ifelse(is.na(.x), "Missing", .x)) %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    filter(row_number() == max(row_number())) %>%
+    ungroup() %>%
+    group_by(race_ethnic, poverty_cat, childinsurance_full) %>%
+    summarize(cases = n()) %>%
+    group_by(race_ethnic, poverty_cat) %>%
+    mutate(total = sum(cases)) %>%
+    group_by(childinsurance_full) %>%
+    nest() %>%
+    mutate(pvalues = map(data, ~broom::tidy(pairwise.prop.test(.x$cases, .x$total, p.adjust.method = "none")))) %>%
+    mutate(data1 = map(data, rename_all, ~paste0(.x, "1"))) %>%
+    mutate(data1 = map(data1, ~mutate(.x, group1 = as.character(row_number())))) %>%
+    mutate(data2 = map(data, rename_all, ~paste0(.x, "2"))) %>%
+    mutate(data2 = map(data2, ~mutate(.x, group2 = as.character(row_number())))) %>%
+    mutate(pvalues = map2(data1, pvalues, right_join)) %>%
+    mutate(pvalues = map2(data2, pvalues, right_join)) %>%
+    select(pvalues) %>%
+    unnest(cols = c(pvalues)) %>%
+    select(-group1, -group2, -cases1, -cases2, -total1, -total2) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+           p.value = papaja::printp(p.value)) %>%
+  DT::datatable(., rownames = F, filter = "top")
 ```
 
 

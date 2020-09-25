@@ -471,15 +471,25 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   newdata$childinsurance_type = case_when(
     data$HEALTH.002 == 0 ~ "No insurance",
     data$HEALTH.002.a.2_1 == 1 ~ "Private",
-    data$HEALTH.002.a.2_2 == 1 ~ "State",
+    data$HEALTH.002.a.2_2 == 1 ~ "Private",
     data$HEALTH.002.a.2_3 == 1 ~ "State",
     data$HEALTH.002.a.2_4 == 1 ~ "State",
     data$HEALTH.002.a.2_5 == 1 ~ "State",
     data$HEALTH.002.a.2_6 == 1 ~ "State",
     data$HEALTH.002.a.2_7 == 1 ~ "State",
     data$HEALTH.002.a.2_8 == 1 ~ "State",
-    data$HEALTH.002.a.2_9 == 1 ~ "State",
+    data$HEALTH.002.a.2_9 == 1 ~ "Other",
     data$HEALTH.002.a.2_10 == 1 ~ "Don't Know",
+    data$HEALTH.002.a_1 == 1 ~ "Private",
+    data$HEALTH.002.a_2 == 1 ~ "State",
+    data$HEALTH.002.a_3 == 1 ~ "State",
+    data$HEALTH.002.a_4 == 1 ~ "State",
+    data$HEALTH.002.a_5 == 1 ~ "State",
+    data$HEALTH.002.a_6 == 1 ~ "State",
+    data$HEALTH.002.a_7 == 1 ~ "State",
+    data$HEALTH.002.a_8 == 1 ~ "State",
+    data$HEALTH.002.a_9 == 1 ~ "Other",
+    data$HEALTH.002.a_10 == 1 ~ "Don't Know",
     TRUE ~ NA_character_
   )
   if(contains_items("HEALTH.002", data)){
