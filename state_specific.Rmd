@@ -36,7 +36,7 @@ scored = scored %>%
 mainstate = params$mainstate
 statedata = scored %>% filter(state == mainstate)
 
-scored$group = "US"
+scored$group = "Entire RAPID sample"
 statedata$group = mainstate
 
 stateplus = full_join(scored, statedata)
