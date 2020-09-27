@@ -65,7 +65,17 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
 
   }
   
-  newdata$age = data$CaregiverAge
+  newdata$age = factor(data$CaregiverAge,
+                       labels = c("18-24",
+                                  "24-30",
+                                  "30-36",
+                                  "36-40",
+                                  "40-46",
+                                  "46-50",
+                                  "50-56",
+                                  "56-60",
+                                  "60+" ))
+  
   newdata$language = data$UserLanguage
   
   
