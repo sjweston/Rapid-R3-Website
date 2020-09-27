@@ -103,7 +103,7 @@ scored = scored %>%
   arrange(Week) %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
-                      "hawaii", "other_race", "latinx", 
+                      "hawaii", "other_race", "latinx", "age",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability", "employment_change",
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
@@ -111,7 +111,7 @@ scored = scored %>%
   arrange(desc(Week)) %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
-                      "hawaii", "other_race", "latinx", 
+                      "hawaii", "other_race", "latinx", "age",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability",  "employment_change",
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
@@ -281,20 +281,21 @@ scored = scored %>%
   ungroup() %>%
   mutate(
     black_cat = factor(black, labels = c("non-Black", "Black")),
+    latinx_cat = factor(latinx, labels = c("non-Latinx", "Latinx")),
     poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
     single_cat = factor(single, labels = c("Dual parent", "Single parent")),
     disability_cat = factor(disability, labels = c("No disability", "Child with disability")),
     race_ethnic = case_when(
       black == 1 ~ "Black",
-      latinx == 1 ~ "LatinX",
+      latinx == 1 ~ "Latinx",
       !is.na(black) ~ "White",
       !is.na(latinx) ~ "White",
       TRUE ~ NA_character_),
     race_poverty = case_when(
       black == 1 & poverty150 == 1 ~ "Low income, Black",
       black == 1 & poverty150 == 0 ~ "High income, Black",
-      latinx == 1 & poverty150 == 1 ~ "Low income, LatinX",
-      latinx == 1 & poverty150 == 0 ~ "High income, LatinX",
+      latinx == 1 & poverty150 == 1 ~ "Low income, Latinx",
+      latinx == 1 & poverty150 == 0 ~ "High income, Latinx",
       white == 1 & poverty150 == 1 ~ "Low income, White",
       white == 1 & poverty150 == 0 ~ "High income, White",
       TRUE ~ NA_character_)) %>%

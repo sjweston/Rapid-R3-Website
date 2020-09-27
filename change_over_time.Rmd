@@ -167,21 +167,15 @@ scored %>%
 ## By income
 
 ```{r change-over-time-11}
-income_vec = scored$income[!is.na(scored$income)]
-income_vec = income_vec/1000
 employment = scored %>%
-  mutate(income = income/1000) %>%
-  mutate(income = cut(income, 
-                      breaks =  quantile(income_vec, 
-                                         probs = seq(.1, .9, length.out = 3)))
-         ) %>%
-  filter(!is.na(income)) %>%
-  select(Week, contains("working"), income) %>%
-  gather("key", "value", -Week, -income) %>%
+  filter(!is.na(poverty_cat)) %>%
+  select(Week, contains("working"), poverty_cat) %>%
+  gather("key", "value", -Week, -poverty_cat) %>%
   separate(key, into = c("Variable", "time")) %>%
   mutate(Week = ifelse(time == "pre", 0, Week)) %>%
   select(-time) %>%
-  group_by(Week, income) %>%
+  group_by(Week, poverty_cat) %>%
+    mutate(value = as.numeric(value)) %>%
   filter(!is.na(value)) %>%
   summarize(total = n(),
             perc = sum(value)/total,
@@ -189,15 +183,11 @@ employment = scored %>%
   mutate(Variable = "working")
 
 insurance = scored %>%
-    mutate(income = income/1000) %>%
-   mutate(income = cut(income, 
-                      breaks =  quantile(income_vec, 
-                                         probs = seq(.1, .9, length.out = 3)))
-         ) %>%
-  filter(!is.na(income)) %>%
-  select(Week, contains("insurance"), income) %>%
-  gather("Variable", "value", -Week, -income) %>%
-  group_by(Variable, Week, income) %>%
+  filter(!is.na(poverty_cat)) %>%
+  select(Week, contains("insurance"), poverty_cat) %>%
+  gather("Variable", "value", -Week, -poverty_cat) %>%
+  group_by(Variable, Week, poverty_cat) %>%
+  mutate(value = as.numeric(value)) %>%
   filter(!is.na(value)) %>%
   summarize(total = n(),
             perc = sum(value)/total,
@@ -208,7 +198,7 @@ insurance = scored %>%
 full_join(employment, insurance) %>%
   ggplot(aes(x = Week, y = percent, color = Variable)) +
   geom_point(size = 2) +
-  geom_line(aes(linetype = income)) +
+  geom_line(aes(linetype = poverty_cat)) +
   scale_x_continuous(breaks = c(0:total_weeks))+
     scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
   theme_minimal()
@@ -226,6 +216,7 @@ employment = scored %>%
   mutate(Week = ifelse(time == "pre", 0, Week)) %>%
   select(-time) %>%
   group_by(Week, region) %>%
+  mutate(value = as.numeric(value)) %>%
   filter(!is.na(value)) %>%
   summarize(total = n(),
             perc = sum(value)/total,
@@ -236,6 +227,7 @@ insurance = scored %>%
   select(Week, contains("insurance"), region) %>%
   gather("Variable", "value", -Week, -region) %>%
   group_by(Variable, Week, region) %>%
+  mutate(value = as.numeric(value)) %>%
   filter(!is.na(value)) %>%
   summarize(total = n(),
             perc = sum(value)/total,
@@ -269,6 +261,7 @@ employment = scored %>%
   select(-time) %>%
   group_by(Week, demo) %>%
   filter(!is.na(value)) %>%
+  mutate(value = as.numeric(value)) %>%
   summarize(total = n(),
             perc = sum(value)/total,
             percent = perc*100) %>%
@@ -281,6 +274,7 @@ insurance = scored %>%
   filter(demo_value == 1) %>%
   group_by(Variable, Week, demo) %>%
   filter(!is.na(value)) %>%
+  mutate(value = as.numeric(value)) %>%
   summarize(total = n(),
             perc = sum(value)/total,
             percent = perc*100) %>%

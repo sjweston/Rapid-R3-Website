@@ -29,17 +29,73 @@ library(plotly)
 
 ```{r state-specific-3}
 source(here("Scripts/score data.R"))
+source(here("Functions/core_funs.R"))
+scored = scored %>%
+  mutate(wellbeing = 100-mental_health)
+
 mainstate = params$mainstate
 statedata = scored %>% filter(state == mainstate)
+
+scored$group = "US"
+statedata$group = mainstate
+
+stateplus = full_join(scored, statedata)
 ```
 
-# Well-being
+# Demographics
 
-## Caregiver{.tabset}
+## Age
 
-### Overall
+```{r}
+dist_cat_group(age, group, stateplus)
+```
+
+## Race
+
+```{r}
+dist_cat_group(race_cat, group, stateplus)
+```
+
+## Ethnicity
+
+```{r}
+dist_cat_group(latinx_cat, group, stateplus)
+```
+
+
+
+# Caregiver Well-being
+
+## Overall{.tabset}
 
 Caregivers complete measures of anxiety, depression, stress, and loneliness. These measures are averaged to create a single mental health variable, called "well-being" which ranges from 0 (worst possible mental health) to 100 (best possible mental health).
+
+### Across the sample
+
+```{r}
+average_by_group(wellbeing, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(wellbeing, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(wellbeing, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(wellbeing, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+
+### Over time
 
 ```{r state-specific-4}
 state_mh = statedata %>%
@@ -93,7 +149,35 @@ for (i in 1:length(plot$x$data)){
 plot
 ```
 
-### Anxiety
+## Anxiety{.tabset}
+
+
+### Across the sample
+
+```{r}
+average_by_group(anxiety, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(anxiety, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(anxiety, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(anxiety, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+
+### Over time
 
 ```{r state-specific-5}
 state_mh = statedata %>%
@@ -147,7 +231,34 @@ for (i in 1:length(plot$x$data)){
 plot
 ```
 
-### Depression
+## Depression{.tabset}
+
+
+### Across the sample
+
+```{r}
+average_by_group(depress, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(depress, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(depress, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(depress, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+### Over time
 
 ```{r state-specific-6}
 state_mh = statedata %>%
@@ -201,8 +312,34 @@ for (i in 1:length(plot$x$data)){
 plot
 ```
 
-### Stress
+## Stress{.tabset}
 
+
+### Across the sample
+
+```{r}
+average_by_group(stress, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(stress, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(stress, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(stress, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+### Over time
 ```{r state-specific-7}
 state_mh = statedata %>%
   filter(!is.na(stress)) %>%
@@ -255,7 +392,34 @@ for (i in 1:length(plot$x$data)){
 plot
 ```
 
-### Loneliness
+## Loneliness{.tabset}
+
+
+### Across the sample
+
+```{r}
+average_by_group(lonely, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(lonely, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(lonely, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(lonely, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+### Over time
 
 ```{r state-specific-8}
 state_mh = statedata %>%
@@ -310,11 +474,37 @@ plot
 ```
 
 
-## Child{.tabset}
+# Child well-being{.tabset}
 
-### Overall
+## Overall{.tabset}
 
 Caregivers complete measures of child internalizing and externalizing behavior. These measures are averaged to create a single mental health variable, called "well-being" which ranges from 0 (worst possible mental health) to 100 (best possible mental health).
+
+### Across the sample
+
+```{r}
+average_by_group(child_mental, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(child_mental, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(child_mental, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(child_mental, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+### Over time
 
 ```{r state-specific-9}
 state_mh = statedata %>%
@@ -368,7 +558,34 @@ for (i in 1:length(plot$x$data)){
 plot
 ```
 
-### Internalizing behaviors (fear)
+## Internalizing behaviors (fear){.tabset}
+
+
+### Across the sample
+
+```{r}
+average_by_group(fear, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(fear, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(fear, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(fear, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+### Over time
 
 ```{r state-specific-10}
 state_mh = statedata %>%
@@ -422,7 +639,34 @@ for (i in 1:length(plot$x$data)){
 plot
 ```
 
-### Externalizing behavior (fussiness)
+## Externalizing behavior (fussiness){.tabset}
+
+
+### Across the sample
+
+```{r}
+average_by_group(fussy, group, label = "caregiver well-being", stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+average_by_group2(fussy, race_ethnic, group, label = "caregiver well-being", stateplus)
+```
+
+### Income
+
+```{r}
+average_by_group2(fussy, poverty_cat, group, label = "caregiver well-being", stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+average_by_group2(fussy, race_ethnic, poverty_cat, label = "caregiver well-being", statedata)
+```
+
+### Over time
 
 ```{r state-specific-11}
 state_mh = statedata %>%
@@ -491,7 +735,32 @@ _Which needs are hard to pay for?:_
 
 Caregivers grouped into two categories: trouble paying for 1+ basic need, or no trouble paying for any.
 
-## Overall
+### Across the sample
+
+```{r}
+percent_by_group(material_hardship, group, stateplus)
+```
+
+### Race/ethnicity
+
+```{r}
+percent_by_group2(material_hardship, race_ethnic, group, stateplus)
+```
+
+### Income
+
+```{r}
+percent_by_group2(material_hardship, poverty_cat, group, stateplus)
+```
+
+### Race by income (state only)
+
+```{r}
+percent_by_group2(material_hardship, race_ethnic, poverty_cat, statedata)
+```
+
+
+### Over time
 
 ```{r state-specific-12}
 state_mh = scored %>%
@@ -548,7 +817,7 @@ plot
 
 ```
 
-## Sources
+## Sources of hardship
 
 ```{r state-specific-13}
 state_sources = scored %>%

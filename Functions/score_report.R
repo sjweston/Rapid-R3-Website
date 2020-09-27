@@ -65,6 +65,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
 
   }
   
+  newdata$age = data$CaregiverAge
   newdata$language = data$UserLanguage
   
   
