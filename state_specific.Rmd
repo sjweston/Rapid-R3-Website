@@ -40,7 +40,34 @@ scored$group = "US"
 statedata$group = mainstate
 
 stateplus = full_join(scored, statedata)
+
+state_cross = statedata %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
 ```
+
+RAPID has sampled `r nrow(state_cross)` caregivers from your state.
+
+```{r}
+plot = statedata %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  summarize(
+    Date = min(Date),
+    Number = n() 
+  ) %>%
+  ggplot(aes(x = Date,
+             y = Number)) +
+  geom_line()+
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Number of caregivers by survey week") +
+  theme_pubclean()
+
+ggplotly(plot)
+```
+
+
+
 
 # Demographics
 
