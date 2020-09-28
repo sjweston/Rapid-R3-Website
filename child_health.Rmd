@@ -281,7 +281,7 @@ scored = scored %>%
 
 ```{r child-health-26}
 plot = scored %>%
-  filter(!is.na(missed_wellbaby)) %>%
+  filter(missed_wellbaby == 1) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
   ungroup() %>%
@@ -329,7 +329,7 @@ ggplotly(plot, tooltip = "text")
 ```{r child-health-27}
 wellbaby.age = function(group, data = scored){ 
   plot = data %>%
-    filter(!is.na(missed_wellbaby)) %>%
+    filter(missed_wellbaby == 1) %>%
     filter(!is.na({{group}})) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -394,7 +394,7 @@ wellbaby.age(poverty_cat)
 
 ```{r child-health-30}
 plot = scored %>%
-    filter(!is.na(missed_wellbaby)) %>%
+    filter(missed_wellbaby == 1) %>%
     filter(!is.na(race_ethnic)) %>%
   filter(!is.na(poverty_cat)) %>%
   group_by(CaregiverID) %>%
@@ -456,6 +456,7 @@ wellbaby.age(childinsurance_type)
 
 ```{r child-health-32}
 scored %>%
+  filter(missed_wellbaby == 1) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
   ungroup() %>%
@@ -485,6 +486,7 @@ scored %>%
 ```{r child-health-33}
 barrer.group = function(group, data = scored){
 plot = scored %>%
+  filter(missed_wellbaby == 1) %>%
   filter(!is.na({{group}})) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -526,6 +528,7 @@ barrer.group(race_ethnic)
 
 ```{r child-health-35, results = 'asis'}
 scored %>%
+  filter(missed_wellbaby == 1) %>%
   filter(!is.na(race_ethnic)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -562,6 +565,7 @@ barrer.group(poverty_cat)
 
 ```{r child-health-37, results = 'asis'}
 scored %>%
+  filter(missed_wellbaby == 1) %>%
   filter(!is.na(poverty_cat)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -594,6 +598,7 @@ scored %>%
 
 ```{r child-health-38}
 plot = scored %>%
+  filter(missed_wellbaby == 1) %>%
   filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -630,6 +635,7 @@ ggplotly(plot, tooltip = "text")
 
 ```{r child-health-39, results = 'asis'}
 scored %>%
+  filter(missed_wellbaby == 1) %>%
   filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -673,6 +679,7 @@ barrer.group(childinsurance_type)
 
 ```{r child-health-41}
 scored %>%
+  filter(missed_wellbaby == 1) %>%
   filter(!is.na(race_ethnic) & !is.na(poverty_cat)) %>%
   select(Week, Date, race_ethnic, poverty_cat, contains("missed_wb")) %>%
   gather("reason", "response", -Week, -Date, -race_ethnic, -poverty_cat) %>%

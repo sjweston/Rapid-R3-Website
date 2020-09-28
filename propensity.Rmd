@@ -1,0 +1,223 @@
+---
+title: "Changing my trajectory"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+  
+---
+
+```{r change-over-time-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(haven)
+# require(devtools)
+# install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(brolgar)
+library(lme4)
+library(ggpubr)
+library(twang)
+```
+
+
+```{r score datafile, echo = F, warning = F, message = F}
+# score master --------------------------------------------------------
+
+source(here("Scripts/score data.R"))
+```
+
+```{r}
+scored = scored %>%
+  mutate(has_childcare = case_when(
+    cc2_centerbased == 1 ~ 1,
+    cc2_paid == 1 ~ 1,
+    cc2_homebased == 1 ~ 1,
+    cc2_unpaid == 1 ~ 0,
+    cc2_centerbased == 0 ~ 0,
+    cc2_paid == 0 ~ 0,
+    cc2_homebased == 0 ~ 0,
+    cc2_unpaid == 0 ~ 0,
+    TRUE ~ NA_real_
+  ),
+  wellbeing = 100-mental_health,
+  child_wellbeing = 100-child_mental)
+
+scored = filter(scored, Week > 0)
+```
+
+
+# Child care
+
+```{r}
+#identify group
+scored = scored %>%
+  select(CaregiverID, Week, has_childcare) %>%
+  group_by(CaregiverID) %>%
+  filter(!is.na(has_childcare)) %>%
+  arrange(Week) %>%
+  mutate(mean_childcare = mean(has_childcare, na.rm=T),
+         starts_childcare = has_childcare[1],
+         childcare_trajectory = case_when(
+           mean_childcare == 1 ~ "Always",
+           mean_childcare == 0 ~ "Never",
+           starts_childcare == 0 ~ "Gains",
+           TRUE ~ "Loses"
+         )) %>% 
+  group_by(CaregiverID, childcare_trajectory) %>%
+  filter(row_number() == 1) %>%
+  select(CaregiverID, childcare_trajectory) %>%
+  full_join(scored)
+
+#identify wave
+scored = scored %>%
+  group_by(CaregiverID) %>%
+  filter(has_childcare == 1) %>%
+  summarize(first_childcare = min(Week)) %>%
+  full_join(scored) 
+
+scored = scored %>%
+  group_by(CaregiverID) %>%
+  filter(has_childcare == 0) %>%
+  summarize(first_nochildcare = min(Week)) %>%
+  full_join(scored) 
+
+set.seed(200928)
+scored = scored %>%
+  group_by(CaregiverID) %>%
+  sample_n(1) %>%
+  select(CaregiverID, Week) %>%
+  rename(random_week = Week) %>%
+  full_join(scored)
+
+#identify knot and splines
+scored = scored %>%
+  mutate(knot = case_when(
+    childcare_trajectory == "Gains" ~ first_childcare,
+    childcare_trajectory == "Loses" ~ first_nochildcare,
+    childcare_trajectory %in% c("Never", "Always") ~ random_week,
+    )) %>%
+    mutate(SL1 = ifelse(Week <= knot, Week-knot, 0),
+           SL2 = ifelse(Week > knot, Week-knot, 0))
+```
+
+```{r, results = 'hide'}
+# propensity score
+childcare_data = scored %>%
+  mutate(childcare_group = case_when(
+    childcare_trajectory == "Gains" ~ 1,
+    childcare_trajectory == "Never" ~ 0, 
+    TRUE ~ NA_real_
+  )) %>%
+  filter(!is.na(childcare_group)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  mutate_at(vars(race_cat, state, language, childinsurance_type), factor) %>%
+  ungroup()
+
+ps.childcare = ps(childcare_group ~ black + latinx + poverty150 + age + single + state + language + num_children_raw + childinsurance_type, 
+                  data = as.data.frame(childcare_data),
+                  n.trees = 1500, 
+                  interaction.depth = 2,
+                  verbose = TRUE)
+
+childcare_data$weights = get.weights(ps.childcare, stop.method = "es.mean")
+
+childcare_data = childcare_data %>%
+  select(CaregiverID, weights) %>%
+  full_join(scored) %>%
+  filter(!is.na(weights))
+```
+
+## Caregiver mental health
+
+```{r, results = 'asis'}
+# trajectory
+
+adult_model = lmer(wellbeing ~ SL1*childcare_trajectory + SL2*childcare_trajectory + (1|CaregiverID),
+                   data = childcare_data,
+                   weights = childcare_data$weights)
+
+broom::tidy(adult_model, conf.int = TRUE) %>%
+  filter(group == "fixed") %>%
+  select(-group) %>%
+  kable(., booktabs = T, digits = 2) %>%
+  kable_styling(full_width = T)
+```
+
+```{r}
+hypothetical = data.frame(
+  CaregiverID = rep("000", 21),
+  childcare_trajectory = rep(c("Gains", "Never"), each = 21),
+  SL1 = rep(c(-10:0, rep(0, 10)),2),
+  SL2 = rep(c(rep(0, 10), 0:10),2)
+)
+
+hypothetical$predicted = predict(adult_model, 
+                    newdata = hypothetical, 
+                    allow.new.levels = T)
+
+hypothetical %>%
+  mutate(Time = SL1 + SL2) %>%
+  ggplot(aes(
+    x = Time, 
+    y = predicted,
+    color = childcare_trajectory
+  )) +
+  geom_line() +
+  labs(x = "Weeks to childcare", 
+       y = "Adult mental health", 
+       color = "Childcare experience") +
+  theme_pubr()
+```
+
+
+## Caregiver mental health
+
+```{r, results = 'asis'}
+# trajectory
+
+child_model = lmer(child_wellbeing ~ SL1*childcare_trajectory + SL2*childcare_trajectory + (1|CaregiverID),
+                   data = childcare_data,
+                   weights = childcare_data$weights)
+
+broom::tidy(child_model, conf.int = TRUE) %>%
+  filter(group == "fixed") %>%
+  select(-group) %>%
+  kable(., booktabs = T, digits = 2) %>%
+  kable_styling(full_width = T)
+```
+
+```{r}
+hypothetical = data.frame(
+  CaregiverID = rep("000", 21),
+  childcare_trajectory = rep(c("Gains", "Never"), each = 21),
+  SL1 = rep(c(-10:0, rep(0, 10)),2),
+  SL2 = rep(c(rep(0, 10), 0:10),2)
+)
+
+hypothetical$predicted = predict(child_model, 
+                    newdata = hypothetical, 
+                    allow.new.levels = T)
+
+hypothetical %>%
+  mutate(Time = SL1 + SL2) %>%
+  ggplot(aes(
+    x = Time, 
+    y = predicted,
+    color = childcare_trajectory
+  )) +
+  geom_line() +
+  labs(x = "Weeks to childcare", 
+       y = "Child mental health", 
+       color = "Childcare experience") +
+  theme_pubr()
+```
+
+

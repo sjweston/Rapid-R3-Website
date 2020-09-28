@@ -311,6 +311,34 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
         
   }
   
+  # newdata$has_childcare = case_when(
+  #   # data$POLICY.009.b == 1 ~ 1,
+  #   data$POLICY.016_1 == 1 ~ 1,
+  #   data$POLICY.016_4 == 1 ~ 1,
+  #   data$POLICY.016_2 == 1 ~ 0,
+  #   data$POLICY.016_3 == 1 ~ 0,
+  #   # data$POLICY.019.a_1 == 1 ~ 1,
+  #   # data$POLICY.019.a_4 == 1 ~ 1,
+  #   # data$POLICY.019.a_5 == 1 ~ 1,
+  #   # data$POLICY.004_5 == 1 ~ 1,
+  #   # data$POLICY.004_6 == 1 ~ 1,
+  #   # data$POLICY.004_7 == 1 ~ 1,
+  #   # data$POLICY.004_8 == 1 ~ 1,
+  #   # data$POLICY.004_9 == 1 ~ 1,
+  #   # data$POLICY.004_10 == 1 ~ 1,
+  #   # data$POLICY.009.b == 2 ~ 0,
+  #   # data$POLICY.019.a_2 == 1 ~ 0,
+  #   # data$POLICY.019.a_3 == 1 ~ 0,
+  #   # data$POLICY.019.a_6 == 1 ~ 0,
+  #   # data$POLICY.004_1 == 1 ~ 0,
+  #   # data$POLICY.004_2 == 1 ~ 0,
+  #   # data$POLICY.004_3 == 1 ~ 0,
+  #   # data$POLICY.004_4 == 1 ~ 0,
+  #   # data$POLICY.004_11 == 1 ~ 0,
+  #   # data$POLICY.004_12 == 1 ~ 0,
+  #   TRUE ~ NA_real_
+  # )
+  
   if(contains_items("POLICY.018\\_[0-9]$", data)){
     data = combine.cat(x = data, 
                        cols = find_items("POLICY.018\\_[0-9]$", data), 
