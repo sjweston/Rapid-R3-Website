@@ -33,7 +33,7 @@ library(twang)
 source(here("Scripts/score data.R"))
 ```
 
-```{r}
+```{r propensity-1}
 scored = scored %>%
   mutate(has_childcare = case_when(
     cc2_centerbased == 1 ~ 1,
@@ -55,7 +55,7 @@ scored = filter(scored, Week > 0)
 
 # Child care
 
-```{r}
+```{r propensity-2}
 #identify group
 scored = scored %>%
   select(CaregiverID, Week, has_childcare) %>%
@@ -107,7 +107,7 @@ scored = scored %>%
            SL2 = ifelse(Week > knot, Week-knot, 0))
 ```
 
-```{r, results = 'hide'}
+```{r propensity-3, results = 'hide'}
 # propensity score
 childcare_data = scored %>%
   mutate(childcare_group = case_when(
@@ -137,7 +137,7 @@ childcare_data = childcare_data %>%
 
 ## Caregiver mental health
 
-```{r, results = 'asis'}
+```{r propensity-4, results = 'asis'}
 # trajectory
 
 adult_model = lmer(wellbeing ~ SL1*childcare_trajectory + SL2*childcare_trajectory + (1|CaregiverID),
@@ -151,7 +151,7 @@ broom::tidy(adult_model, conf.int = TRUE) %>%
   kable_styling(full_width = T)
 ```
 
-```{r}
+```{r propensity-5}
 hypothetical = data.frame(
   CaregiverID = rep("000", 21),
   childcare_trajectory = rep(c("Gains", "Never"), each = 21),
@@ -180,7 +180,7 @@ hypothetical %>%
 
 ## Caregiver mental health
 
-```{r, results = 'asis'}
+```{r propensity-6, results = 'asis'}
 # trajectory
 
 child_model = lmer(child_wellbeing ~ SL1*childcare_trajectory + SL2*childcare_trajectory + (1|CaregiverID),
@@ -194,7 +194,7 @@ broom::tidy(child_model, conf.int = TRUE) %>%
   kable_styling(full_width = T)
 ```
 
-```{r}
+```{r propensity-7}
 hypothetical = data.frame(
   CaregiverID = rep("000", 21),
   childcare_trajectory = rep(c("Gains", "Never"), each = 21),

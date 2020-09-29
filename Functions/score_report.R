@@ -751,6 +751,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
   }
   
+  newdata$current_income = data$currentallyearly
   
   if(contains_items("JOB.005", data)){
     data = combine.cat(x = data, 

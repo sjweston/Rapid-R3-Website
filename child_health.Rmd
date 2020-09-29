@@ -117,6 +117,21 @@ policy_binary_sig(poverty_cat, missed_wellbaby)
 binary_group(race_ethnic, missed_wellbaby, poverty_cat)
 ```
 
+```{r}
+scored %>%
+  filter(!is.na(missed_wellbaby)) %>%
+  filter(!is.na(race_ethnic)) %>%
+  filter(!is.na(poverty_cat)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(race_ethnic, poverty_cat) %>%
+  summarize(count = n(),
+            percent = round(100*sum(missed_wellbaby)/count, 1)) %>%
+  write.csv(., here("figure data/092920_missWB_race_poverty.csv"))
+```
+
+
 ```{r child-health-11, results="asis"}
 policy_binary_sig(race_poverty, missed_wellbaby)
 ```

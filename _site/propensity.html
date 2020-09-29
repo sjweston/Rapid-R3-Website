@@ -549,6 +549,9 @@ div.tocify {
     <li>
       <a href="child_health.html">Well-baby and vaccines</a>
     </li>
+    <li>
+      <a href="propensity.html">Effect of childcare (prop score)</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -647,101 +650,6 @@ div.tocify {
 
 <div id="child-care" class="section level1">
 <h1>Child care</h1>
-<pre><code>## Fitting gbm model
-## Iter   TrainDeviance   ValidDeviance   StepSize   Improve
-##      1        0.6995             nan     0.0100       nan
-##      2        0.6982             nan     0.0100       nan
-##      3        0.6971             nan     0.0100       nan
-##      4        0.6959             nan     0.0100       nan
-##      5        0.6948             nan     0.0100       nan
-##      6        0.6937             nan     0.0100       nan
-##      7        0.6926             nan     0.0100       nan
-##      8        0.6915             nan     0.0100       nan
-##      9        0.6905             nan     0.0100       nan
-##     10        0.6894             nan     0.0100       nan
-##     20        0.6804             nan     0.0100       nan
-##     40        0.6670             nan     0.0100       nan
-##     60        0.6579             nan     0.0100       nan
-##     80        0.6513             nan     0.0100       nan
-##    100        0.6462             nan     0.0100       nan
-##    120        0.6420             nan     0.0100       nan
-##    140        0.6385             nan     0.0100       nan
-##    160        0.6355             nan     0.0100       nan
-##    180        0.6329             nan     0.0100       nan
-##    200        0.6307             nan     0.0100       nan
-##    220        0.6287             nan     0.0100       nan
-##    240        0.6271             nan     0.0100       nan
-##    260        0.6257             nan     0.0100       nan
-##    280        0.6246             nan     0.0100       nan
-##    300        0.6235             nan     0.0100       nan
-##    320        0.6224             nan     0.0100       nan
-##    340        0.6214             nan     0.0100       nan
-##    360        0.6204             nan     0.0100       nan
-##    380        0.6195             nan     0.0100       nan
-##    400        0.6187             nan     0.0100       nan
-##    420        0.6178             nan     0.0100       nan
-##    440        0.6170             nan     0.0100       nan
-##    460        0.6162             nan     0.0100       nan
-##    480        0.6154             nan     0.0100       nan
-##    500        0.6146             nan     0.0100       nan
-##    520        0.6138             nan     0.0100       nan
-##    540        0.6132             nan     0.0100       nan
-##    560        0.6124             nan     0.0100       nan
-##    580        0.6119             nan     0.0100       nan
-##    600        0.6112             nan     0.0100       nan
-##    620        0.6105             nan     0.0100       nan
-##    640        0.6097             nan     0.0100       nan
-##    660        0.6091             nan     0.0100       nan
-##    680        0.6084             nan     0.0100       nan
-##    700        0.6079             nan     0.0100       nan
-##    720        0.6073             nan     0.0100       nan
-##    740        0.6068             nan     0.0100       nan
-##    760        0.6062             nan     0.0100       nan
-##    780        0.6057             nan     0.0100       nan
-##    800        0.6051             nan     0.0100       nan
-##    820        0.6046             nan     0.0100       nan
-##    840        0.6041             nan     0.0100       nan
-##    860        0.6037             nan     0.0100       nan
-##    880        0.6032             nan     0.0100       nan
-##    900        0.6027             nan     0.0100       nan
-##    920        0.6023             nan     0.0100       nan
-##    940        0.6019             nan     0.0100       nan
-##    960        0.6014             nan     0.0100       nan
-##    980        0.6011             nan     0.0100       nan
-##   1000        0.6007             nan     0.0100       nan
-##   1020        0.6004             nan     0.0100       nan
-##   1040        0.6001             nan     0.0100       nan
-##   1060        0.5998             nan     0.0100       nan
-##   1080        0.5995             nan     0.0100       nan
-##   1100        0.5992             nan     0.0100       nan
-##   1120        0.5989             nan     0.0100       nan
-##   1140        0.5986             nan     0.0100       nan
-##   1160        0.5983             nan     0.0100       nan
-##   1180        0.5981             nan     0.0100       nan
-##   1200        0.5978             nan     0.0100       nan
-##   1220        0.5976             nan     0.0100       nan
-##   1240        0.5974             nan     0.0100       nan
-##   1260        0.5971             nan     0.0100       nan
-##   1280        0.5969             nan     0.0100       nan
-##   1300        0.5967             nan     0.0100       nan
-##   1320        0.5965             nan     0.0100       nan
-##   1340        0.5963             nan     0.0100       nan
-##   1360        0.5961             nan     0.0100       nan
-##   1380        0.5959             nan     0.0100       nan
-##   1400        0.5957             nan     0.0100       nan
-##   1420        0.5955             nan     0.0100       nan
-##   1440        0.5954             nan     0.0100       nan
-##   1460        0.5952             nan     0.0100       nan
-##   1480        0.5950             nan     0.0100       nan
-##   1500        0.5948             nan     0.0100       nan
-## 
-## Diagnosis of unweighted analysis
-## Optimizing with ks.mean.ATE stopping rule
-##    Optimized at 1301 
-## Diagnosis of ks.mean.ATE weights
-## Optimizing with es.mean.ATE stopping rule
-##    Optimized at 1132 
-## Diagnosis of es.mean.ATE weights</code></pre>
 <div id="caregiver-mental-health" class="section level2">
 <h2>Caregiver mental health</h2>
 <table class="table" style="margin-left: auto; margin-right: auto;">
@@ -773,19 +681,19 @@ conf.high
 (Intercept)
 </td>
 <td style="text-align:right;">
-57.46
+57.48
 </td>
 <td style="text-align:right;">
-0.70
+0.72
 </td>
 <td style="text-align:right;">
-82.49
+79.76
 </td>
 <td style="text-align:right;">
-56.10
+56.07
 </td>
 <td style="text-align:right;">
-58.83
+58.89
 </td>
 </tr>
 <tr>
@@ -793,19 +701,19 @@ conf.high
 SL1
 </td>
 <td style="text-align:right;">
-0.18
+0.20
 </td>
 <td style="text-align:right;">
 0.04
 </td>
 <td style="text-align:right;">
-4.68
+5.02
 </td>
 <td style="text-align:right;">
-0.10
+0.12
 </td>
 <td style="text-align:right;">
-0.25
+0.27
 </td>
 </tr>
 <tr>
@@ -813,19 +721,19 @@ SL1
 childcare_trajectoryNever
 </td>
 <td style="text-align:right;">
-0.27
+0.16
 </td>
 <td style="text-align:right;">
-0.77
+0.79
 </td>
 <td style="text-align:right;">
-0.36
+0.20
 </td>
 <td style="text-align:right;">
--1.23
+-1.39
 </td>
 <td style="text-align:right;">
-1.78
+1.71
 </td>
 </tr>
 <tr>
@@ -833,19 +741,19 @@ childcare_trajectoryNever
 SL2
 </td>
 <td style="text-align:right;">
-0.20
+0.21
 </td>
 <td style="text-align:right;">
-0.04
+0.05
 </td>
 <td style="text-align:right;">
-4.55
+4.51
 </td>
 <td style="text-align:right;">
 0.12
 </td>
 <td style="text-align:right;">
-0.29
+0.30
 </td>
 </tr>
 <tr>
@@ -853,19 +761,19 @@ SL2
 SL1:childcare_trajectoryNever
 </td>
 <td style="text-align:right;">
-0.05
+0.00
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
-0.63
+0.05
 </td>
 <td style="text-align:right;">
--0.10
+-0.15
 </td>
 <td style="text-align:right;">
-0.20
+0.16
 </td>
 </tr>
 <tr>
@@ -873,24 +781,24 @@ SL1:childcare_trajectoryNever
 childcare_trajectoryNever:SL2
 </td>
 <td style="text-align:right;">
--0.07
+-0.10
 </td>
 <td style="text-align:right;">
 0.08
 </td>
 <td style="text-align:right;">
--0.97
+-1.30
 </td>
 <td style="text-align:right;">
--0.22
+-0.25
 </td>
 <td style="text-align:right;">
-0.07
+0.05
 </td>
 </tr>
 </tbody>
 </table>
-<p><img src="propensity_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="propensity_files/figure-html/propensity-5-1.png" width="672" /></p>
 </div>
 <div id="caregiver-mental-health-1" class="section level2">
 <h2>Caregiver mental health</h2>
@@ -923,19 +831,19 @@ conf.high
 (Intercept)
 </td>
 <td style="text-align:right;">
-59.27
+59.28
 </td>
 <td style="text-align:right;">
-0.74
+0.76
 </td>
 <td style="text-align:right;">
-80.46
+77.78
 </td>
 <td style="text-align:right;">
-57.83
+57.79
 </td>
 <td style="text-align:right;">
-60.71
+60.78
 </td>
 </tr>
 <tr>
@@ -943,19 +851,19 @@ conf.high
 SL1
 </td>
 <td style="text-align:right;">
-0.38
+0.42
 </td>
 <td style="text-align:right;">
 0.05
 </td>
 <td style="text-align:right;">
-7.35
+7.77
 </td>
 <td style="text-align:right;">
-0.28
+0.31
 </td>
 <td style="text-align:right;">
-0.48
+0.52
 </td>
 </tr>
 <tr>
@@ -963,19 +871,19 @@ SL1
 childcare_trajectoryNever
 </td>
 <td style="text-align:right;">
-1.69
+1.55
 </td>
 <td style="text-align:right;">
-0.83
+0.85
 </td>
 <td style="text-align:right;">
-2.04
+1.81
 </td>
 <td style="text-align:right;">
-0.07
+-0.13
 </td>
 <td style="text-align:right;">
-3.31
+3.22
 </td>
 </tr>
 <tr>
@@ -983,19 +891,19 @@ childcare_trajectoryNever
 SL2
 </td>
 <td style="text-align:right;">
-0.33
+0.36
 </td>
 <td style="text-align:right;">
 0.06
 </td>
 <td style="text-align:right;">
-5.45
+5.61
 </td>
 <td style="text-align:right;">
-0.21
+0.23
 </td>
 <td style="text-align:right;">
-0.45
+0.48
 </td>
 </tr>
 <tr>
@@ -1003,19 +911,19 @@ SL2
 SL1:childcare_trajectoryNever
 </td>
 <td style="text-align:right;">
--0.19
+-0.32
 </td>
 <td style="text-align:right;">
-0.10
+0.11
 </td>
 <td style="text-align:right;">
--1.84
+-3.04
 </td>
 <td style="text-align:right;">
--0.40
+-0.53
 </td>
 <td style="text-align:right;">
-0.01
+-0.11
 </td>
 </tr>
 <tr>
@@ -1023,24 +931,24 @@ SL1:childcare_trajectoryNever
 childcare_trajectoryNever:SL2
 </td>
 <td style="text-align:right;">
--0.22
+-0.24
 </td>
 <td style="text-align:right;">
-0.10
+0.11
 </td>
 <td style="text-align:right;">
--2.18
+-2.31
 </td>
 <td style="text-align:right;">
--0.42
+-0.45
 </td>
 <td style="text-align:right;">
--0.02
+-0.04
 </td>
 </tr>
 </tbody>
 </table>
-<p><img src="propensity_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="propensity_files/figure-html/propensity-7-1.png" width="672" /></p>
 </div>
 </div>
 

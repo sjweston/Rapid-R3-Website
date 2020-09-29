@@ -22,6 +22,7 @@ master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 Mast
 
 master = filter(master, CaregiverID != "") 
 master = master %>%
+  filter(is.na(Excluded11_25)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == max(row_number())) %>%
   ungroup()
@@ -106,6 +107,7 @@ scored = scored %>%
                       "hawaii", "other_race", "latinx", "age",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability", "employment_change",
+                      "current_income",
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   arrange(desc(Week)) %>%

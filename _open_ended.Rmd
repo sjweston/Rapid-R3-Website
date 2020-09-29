@@ -36,20 +36,10 @@ conflict_prefer("map", "purrr")
 open_ended = scored %>%
   filter(language != "ES") %>%
   filter(language != "SPA") %>%
-  select(CaregiverID, Week, contains("OPEN"), black, poverty150) %>%
-  select(-contains("006")) %>%
+  select(-contains("OPEN.006")) %>%
   gather("question", "response", contains("OPEN")) %>%
   mutate(question = str_extract(question, ".$")) %>%
-  filter(!is.na(response)) %>%
-  filter(!(response %in% c("", "None","None.","NA","NA.",
-                         "none","none.","na","na.","Na", "Na.", 
-                         "N/A","N/A.", "N/a","N/a.", "n/a","n/a.",
-                         "No", "No.", "Nope", "nope","Nope.", "nope.", "no", "no.", "No thank you", "No thank you.",
-                         "no thank you", "no thank you.","No, thank you", "No, thank you.",
-                         "no, thank you", "no, thank you.", "Nothing", "ty", "nothing", "not really", "Not really", "Ni", "ni", 
-                         " No", "Not at this time", "No, thx", "Nope !", "NONE", "Nope!", "not at this time", 
-                         "Not at the moment", "No thanks", "no thanks", "Nothing I can think of.", "Nothing I can think of.",
-                         "^no[.]{0-6}", "^No[.]{0-6}", "Not right now", "not right now", "I do not"))) %>%
+  filter(!is.na(response)) 
   group_by(question) %>%
   nest()
 ```
@@ -61,13 +51,6 @@ open_ended = scored %>%
 ## How many topics
 
 ```{r prep q1, results='hide'}
-open1_tidy = open_ended$data[[1]] %>%
-  unnest_tokens(output = word, input = response, token = "words") %>%
-  anti_join(get_stopwords()) %>%
-  filter(!str_detect(word, "[0-9]+")) 
-
-
-
 processed1 <- textProcessor(open_ended$data[[1]]$response, metadata = open_ended$data[[1]])
 out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)
 docs1 <- out1$documents
