@@ -39,7 +39,7 @@ open_ended = scored %>%
   select(-contains("OPEN.006")) %>%
   gather("question", "response", contains("OPEN")) %>%
   mutate(question = str_extract(question, ".$")) %>%
-  filter(!is.na(response)) 
+  filter(!is.na(response)) %>%
   group_by(question) %>%
   nest()
 ```
@@ -514,11 +514,6 @@ What is helping you and your family the most right now?
 ## How many topics?
 
 ```{r prep q2, results = 'hide'}
-open2_tidy = open_ended$data[[2]] %>%
-  unnest_tokens(output = word, input = response, token = "words") %>%
-  anti_join(get_stopwords()) %>%
-  filter(!str_detect(word, "[0-9]+"))
-
 processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])
 out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)
 docs2 <- out2$documents
@@ -1002,13 +997,6 @@ findThoughts(topics_rapid2, texts = out2$meta$response,
 ## How many topics
 
 ```{r prep q3, results='hide'}
-open3_tidy = open_ended$data[[3]] %>%
-  unnest_tokens(output = word, input = response, token = "words") %>%
-  anti_join(get_stopwords()) %>%
-  filter(!str_detect(word, "[0-9]+")) 
-
-
-
 processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]])
 out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta)
 docs3 <- out3$documents
@@ -1386,11 +1374,6 @@ iclust(topics_only_wide)
 ## How many topics?
 
 ```{r prep q4, results = 'hide'}
-open4_tidy = open_ended$data[[4]] %>%
-  unnest_tokens(output = word, input = response, token = "words") %>%
-  anti_join(get_stopwords()) %>%
-  filter(!str_detect(word, "[0-9]+"))
-
 processed4 <- textProcessor(open_ended$data[[4]]$response, metadata = open_ended$data[[4]])
 out4 <- prepDocuments(processed4$documents, processed4$vocab, processed4$meta)
 docs4 <- out4$documents

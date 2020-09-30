@@ -1,4 +1,3 @@
-7+(1.96*0.8165)
 x = c(400, 410, 370, 410, 380, 420, 410, 390, 390, 430)
 length(x)
 mean(x)
@@ -700,33 +699,147 @@ open_ended = scored %>%#
   filter(language != "ES") %>%#
   filter(language != "SPA") %>%#
   select(-contains("OPEN.006")) %>%#
-  gather("question", "response", contains("OPEN"))
-open_ended = scored %>%#
-  filter(language != "ES") %>%#
-  filter(language != "SPA") %>%#
-  select(-contains("OPEN.006")) %>%#
-  gather("question", "response", contains("OPEN")) %>%#
-  mutate(question = str_extract(question, ".$"))
-open_ended = scored %>%#
-  filter(language != "ES") %>%#
-  filter(language != "SPA") %>%#
-  select(-contains("OPEN.006")) %>%#
   gather("question", "response", contains("OPEN")) %>%#
   mutate(question = str_extract(question, ".$")) %>%#
   filter(!is.na(response)) %>%#
   group_by(question) %>%#
   nest()
-processed1 <- textProcessor(open_ended$data[[1]]$response, #
-                            metadata = open_ended$data[[1]])
-out1 <- prepDocuments(processed1$documents,  #
-                      processed1$vocab,#
-                      processed1$meta)#
-#
+processed1 <- textProcessor(open_ended$data[[1]]$response, metadata = open_ended$data[[1]])#
+out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)#
 docs1 <- out1$documents#
 vocab1 <- out1$vocab#
-meta1 <- out1$meta
+meta1 <- out1$meta#
+#
 heldout1 = make.heldout(docs1, vocab1)
-findingk_1 = searchK(heldout1$documents, heldout1$vocab, #
-                     K = seq(from = 5, to = 100, by = 5),#
-                     #prevalence =~ s(Week),#
-                     verbose = F)
+heldout1 = make.heldout(docs1, vocab1)
+set.seed(07312020)#
+plan(multiprocess)#
+#
+many_models1 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
+                                          verbose = FALSE)))#
+k_result1 <- many_models1 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
+         residual = map(topic_model, checkResiduals, heldout1$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models1, k_result1, file = here("../../Data Management R3/R Data/open1_many_models.Rdata"))
+processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])#
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
+docs2 <- out2$documents#
+vocab2 <- out2$vocab#
+meta2 <- out2$meta#
+#
+heldout2 = make.heldout(docs2, vocab2)
+processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])#
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
+docs2 <- out2$documents#
+vocab2 <- out2$vocab#
+meta2 <- out2$meta#
+#
+heldout2 = make.heldout(docs2, vocab2)#
+set.seed(07322020)#
+plan(multiprocess)#
+#
+many_models2 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, heldout2$vocab, K = .,#
+                                          verbose = FALSE)))#
+#
+k_result2 <- many_models2 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models2, k_result2, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))
+processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])#
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
+docs2 <- out2$documents#
+vocab2 <- out2$vocab#
+meta2 <- out2$meta#
+#
+heldout2 = make.heldout(docs2, vocab2)#
+set.seed(07322020)#
+plan(multiprocess)#
+#
+many_models2 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, heldout2$vocab, K = .,#
+                                          verbose = FALSE)))#
+#
+k_result2 <- many_models2 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models2, k_result2, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))#
+processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]])#
+out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta)#
+docs3 <- out3$documents#
+vocab3 <- out3$vocab#
+meta3 <- out3$meta#
+#
+heldout3 = make.heldout(docs3, vocab3)
+processed2 <- textProcessor(open_ended$data[[2]]$response, metadata = open_ended$data[[2]])#
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
+docs2 <- out2$documents#
+vocab2 <- out2$vocab#
+meta2 <- out2$meta#
+#
+heldout2 = make.heldout(docs2, vocab2)#
+set.seed(07322020)#
+plan(multiprocess)#
+#
+many_models2 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, heldout2$vocab, K = .,#
+                                          verbose = FALSE)))#
+#
+k_result2 <- many_models2 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models2, k_result2, file = here("../../Data Management R3/R Data/open2_many_models.Rdata"))#
+processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]])#
+out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta)#
+docs3 <- out3$documents#
+vocab3 <- out3$vocab#
+meta3 <- out3$meta#
+#
+heldout3 = make.heldout(docs3, vocab3)#
+set.seed(07332020)#
+plan(multiprocess)#
+#
+many_models3 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout3$documents, heldout3$vocab, K = .,#
+                                          verbose = FALSE)))#
+#
+k_result3 <- many_models3 %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout3$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout3$missing),#
+         residual = map(topic_model, checkResiduals, heldout3$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models3, k_result3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))
