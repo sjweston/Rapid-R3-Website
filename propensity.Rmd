@@ -4,7 +4,6 @@ output:
   html_document:
     toc: TRUE
     toc_float: TRUE
-  
 ---
 
 ```{r change-over-time-1, echo = F}
@@ -26,7 +25,6 @@ library(ggpubr)
 library(twang)
 library(plotly)
 ```
-
 
 ```{r score datafile, echo = F, warning = F, message = F}
 # score master --------------------------------------------------------
@@ -52,22 +50,21 @@ scored = scored %>%
 
 scored = filter(scored, Week > 0)
 ```
+
 # Composing the childcare variable
 
 Caregivers were considered to **not have childcare** if:
 
-* They answered "No" to the question, "This week, have you used any non-parental care for your child(ren) under the age of 5?"
-* OR if they reported using at least five hours of unpaid care by a relative, friend or neighbor for any child age 5 or under and _none_ of the types of care listed below. 
-  
+-   They answered "No" to the question, "This week, have you used any non-parental care for your child(ren) under the age of 5?"
+-   OR if they reported using at least five hours of unpaid care by a relative, friend or neighbor for any child age 5 or under and *none* of the types of care listed below.
+
 Caregivers were considered to **have childcare** if they reported using any of the following:
-    
-* Any type of paid or unpaid center-based care, such as a pre-school, day care center, public pre-kindergarten, Head Start, or faith-based nursery school. Please do not include kindergarten.
-* At least five hours of paid care by a relative, friend or neighbor for any child age 5 or under
-* At least 5 hours of paid care from a home-based child care provider. Please include home-based care where the provider is paid to care for your child even if you are not making the payment.
 
+-   Any type of paid or unpaid center-based care, such as a pre-school, day care center, public pre-kindergarten, Head Start, or faith-based nursery school. Please do not include kindergarten.
+-   At least five hours of paid care by a relative, friend or neighbor for any child age 5 or under
+-   At least 5 hours of paid care from a home-based child care provider. Please include home-based care where the provider is paid to care for your child even if you are not making the payment.
 
-_Note: these questions were asked in weeks 5, 6, 9-current._
-
+*Note: these questions were asked in weeks 5, 6, 9-current.*
 
 ```{r propensity-2}
 #identify group
@@ -150,7 +147,7 @@ childcare_data = childcare_data %>%
   filter(!is.na(weights))
 ```
 
-# Descriptives{.tabset}
+# Descriptives {.tabset}
 
 ## All
 
@@ -267,7 +264,7 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-# Descriptives (no Never){.tabset}
+# Descriptives (no Never) {.tabset}
 
 ## All
 
@@ -391,12 +388,11 @@ ggplotly(plot, tooltip = "text")
 
 # Propensity score weighting
 
-From Olmos \& Govindasamy (2015):
+From [Olmos & Govindasamy (2015)](http://www.math.umd.edu/~slud/s818M-MissingData/PropensityScoreWeightingR.pdf):
 
-> Propensity score weighting is one of the techniques used in controlling for selection biases in nonexperimental studies. Propensity scores can be used as weights to account for selection assignment differences between treatment and comparison groups. One of the advantages of this approach is
-that all the individuals in the study can be used for the outcomes evaluation. 
+> Propensity score weighting is one of the techniques used in controlling for selection biases in non-experimental studies. Propensity scores can be used as weights to account for selection assignment differences between treatment and comparison groups. One of the advantages of this approach is that all the individuals in the study can be used for the outcomes evaluation.
 
-An individual's propensity for for gaining childcare (versus never having childcare) was determined by a linear model including caregiver race (Black versus not), ethnicity (Latinx versus not), family income relative to 150% of the federal poveryt level, caregiver age, whether the caregiver was single, state of residence, language in which they completed the RAPID survey, the number of children in the household, and the type of health insurance covering the child's healthcare. 
+An individual's propensity for for gaining childcare (versus never having childcare) was determined by a linear model including caregiver race (Black versus not), ethnicity (Latinx versus not), family income relative to 150% of the federal poverty level, caregiver age, whether the caregiver was single, state of residence, language in which they completed the RAPID survey, the number of children in the household, and the type of health insurance covering the child's healthcare.
 
 # Caregiver mental health
 
@@ -440,7 +436,6 @@ hypothetical %>%
   theme_pubr()
 ```
 
-
 # Child mental health
 
 ```{r propensity-6, results = 'asis'}
@@ -482,5 +477,3 @@ hypothetical %>%
        color = "Childcare experience") +
   theme_pubr()
 ```
-
-
