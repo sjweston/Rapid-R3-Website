@@ -29,10 +29,20 @@ library(kableExtra)
 ```{r riser1-3 }
 source(here("Scripts/score data.R")) 
 source(here("Functions/pomp.R"))
+source(here("Functions/core_funs.R"))
 ```
 
 ```{r}
+dates = scored %>%
+  group_by(Week) %>%
+  summarize(start = min(Date),
+            stop = max(Date))
+```
+
+
+```{r}
 scored = scored %>%
+  filter(Week < 25) %>%
   mutate(poverty200 = ifelse(is.na(poverty200), poverty200s, poverty200)) %>%
   mutate(num_adults = household_size-num_children_raw) %>%
   rename(children = num_children_raw,
@@ -904,4 +914,105 @@ ggplotly(plot, tooltip = "text")
 ```
 
 
+# Paying for basic needs{.tabset}
 
+## Black vs non-Black
+
+```{r}
+plot = scored %>%
+  filter(!is.na(difficulty_basics_cat)) %>%
+  filter(!is.na(black_cat)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  group_by(black_cat, difficulty_basics_cat) %>%
+  summarize(count = n()) %>%
+  group_by(black_cat) %>%
+  mutate(percent = count/sum(count),
+         n = sum(count),
+         moe = map2_dbl(percent,  n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = difficulty_basics_cat, 
+             y = percent, 
+             fill = black_cat,
+             text = paste0(
+               "Percent: ",round(percent,1),
+               "\nSample size: ", n))) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe, ymax = percent+moe), 
+                width = .5, 
+                position = position_dodge(1)) +
+  labs(x = NULL, y = "Percent of group", title = "Caregivers having trouble paying for basics", fill = NULL) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust =1))
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Race/ethnicity
+
+```{r}
+plot = scored %>%
+  filter(!is.na(difficulty_basics_cat)) %>%
+  filter(!is.na(race_ethnic)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  group_by(race_ethnic, difficulty_basics_cat) %>%
+  summarize(count = n()) %>%
+  group_by(race_ethnic) %>%
+  mutate(percent = count/sum(count),
+         n = sum(count),
+         moe = map2_dbl(percent,  n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = difficulty_basics_cat, 
+             y = percent, 
+             fill = race_ethnic,
+             text = paste0(
+               "Percent: ",round(percent,1),
+               "\nSample size: ", n))) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe, ymax = percent+moe), 
+                width = .5, 
+                position = position_dodge(1)) +
+  labs(x = NULL, y = "Percent of group", title = "Caregivers having trouble paying for basics", fill = NULL) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust =1))
+
+ggplotly(plot, tooltip = "text")
+```
+
+
+
+
+## Black by income
+
+```{r}
+plot = scored %>%
+  filter(!is.na(difficulty_basics_cat)) %>%
+  filter(!is.na(black_cat)) %>%
+  filter(!is.na(poverty_cat)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  group_by(black_cat, poverty_cat, difficulty_basics_cat) %>%
+  summarize(count = n()) %>%
+  group_by(black_cat, poverty_cat) %>%
+  mutate(percent = count/sum(count),
+         n = sum(count),
+         moe = map2_dbl(percent,  n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = difficulty_basics_cat, 
+             y = percent, 
+             fill = black_cat,
+             text = paste0(
+               "Percent: ",round(percent,1),
+               "\nSample size: ", n))) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe, ymax = percent+moe), 
+                width = .5, 
+                position = position_dodge(1)) +
+  labs(x = NULL, y = "Percent of group", title = "Caregivers having trouble paying for basics", fill = NULL) +
+  facet_wrap(~poverty_cat) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust =1))
+
+ggplotly(plot, tooltip = "text")
+```

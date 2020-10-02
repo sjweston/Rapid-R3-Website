@@ -740,16 +740,14 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$lone_increase = ifelse(lone_change > 0, 1, 0)
   }
   
-  
-  if(contains_items("incomeM2", data)){
-    data$JOB.001_3_TEXT = as.numeric(data$JOB.001_3_TEXT)
-    data$JOB.001_16 = as.numeric(data$JOB.001_16)
-    income = rowMeans(data[,c("incomeM2Y", "incomeW2Y", "incomeM2Y2", "incomeW2Y2", "JOB.001_3_TEXT", "JOB.001_16")], na.rm=T)
-    newdata$income = income
-    income = income/1000
-    newdata$income.cat = cut(income, breaks =  quantile(income, probs = c(0, .25, .5, .75, 1), na.rm=T))
+    newdata$income = data$allyearly
+    newdata$income.cat = cut(newdata$income, breaks =  quantile(newdata$income, probs = c(0, .25, .5, .75, 1), na.rm=T))
     newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
-  }
+  
+  
+  newdata$JOB.002 = data$JOB.002
+  newdata$STATE_CODED = data$STATE_CODED
+  newdata$income = data$allyearly
   
   newdata$current_income = data$currentallyearly
   

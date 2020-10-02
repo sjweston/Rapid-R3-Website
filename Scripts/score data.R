@@ -12,6 +12,8 @@ library(jsonlite)
 library(readr)
 library(zoo) # for rolling averages and sums!
 
+load(here("../../Data Management R3/R Data/scored.Rdata"))
+
 scored_in_environ = length(which(grepl("scored", ls()))) > 0
 
 if(!scored_in_environ){
@@ -32,6 +34,7 @@ master = master %>%
 source(here("Functions/score_report.R"))
 source(here("Scripts/demo groups.R"))
 source(here("Functions/pomp.R"))
+source(here("Functions/fpl.R"))
 
 
 # get variable names and levels -------------------------------------------
@@ -107,19 +110,23 @@ scored = scored %>%
                       "hawaii", "other_race", "latinx", "age",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability", "employment_change",
-                      "current_income",
-                      "poverty100", "poverty125", "poverty150", "poverty200"), 
+                      "current_income", "JOB.002", "STATE_CODED"), 
             na.locf0) %>% # carry these variables down through NA's
   arrange(desc(Week)) %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", "age",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
-                      "single", "disability",  "employment_change",
-                      "poverty100", "poverty125", "poverty150", "poverty200"), 
+                      "single", "disability",  "employment_change"), 
             na.locf0) %>% # carry these variables down through NA's
   ungroup()
-  
+
+
+# federal poverty level ---------------------------------------------------
+
+scored = scored %>%
+  rowwise() %>%
+  mutate(FPL = FPL.function(JOB.002, STATE_CODED, income))
 
 # baseline week -----------------------------------------------------------
 
