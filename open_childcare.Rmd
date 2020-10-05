@@ -9,6 +9,8 @@ output:
 ```{r chunk 1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
+
+num_topics = 33
 ```
 
 ```{r packages}
@@ -185,7 +187,7 @@ save(stm_child, file = here("../../Data Management R3/R Data/open_child_model.Rd
 
 ```{r}
 load(file = here("../../Data Management R3/R Data/topics_child.Rdata"))
-topics_child = stm_child33
+topics_child = get(paste0("stm_child", num_topics))
 ```
 
 ```{r, eval = F}
@@ -222,7 +224,7 @@ gamma_terms <- td_gamma1 %>%
          topic = reorder(topic, gamma))
 
 gamma_terms %>%
-  #top_n(15, gamma) %>%
+  top_n(15, gamma) %>%
   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
   geom_col(show.legend = FALSE) +
   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
@@ -881,8 +883,8 @@ topic_freq = td_gamma %>%
 
 
 ```{r}
-predict_topics<-estimateEffect(formula = 1:33 ~ question + race_ethnic + poverty150 + mental_health + s(Week), 
-                               stmobj = stm_child33, 
+predict_topics<-estimateEffect(formula = 1:num_topics ~ question + race_ethnic + poverty150 + mental_health + s(Week), 
+                               stmobj = topics_child, 
                                metadata = out1$meta, 
                                uncertainty = "Global")
 ```
@@ -897,6 +899,11 @@ mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_healt
 race_plot_data = race_effect %>%
   select(topic, covariate.value, estimate) %>%
   spread(covariate.value, estimate)
+
+poverty_plot_data = poverty_effect %>%
+  select(topic, covariate.value, estimate) %>%
+  spread(covariate.value, estimate) %>%
+  mutate(poverty = `0`-`1`)
 
 mental_plot_data = mental_effect %>%
   group_by(topic) %>%
@@ -921,5 +928,16 @@ full_join(race_plot_data, mental_plot_data) %>%
 ```
 
 
+```{r}
+full_join(poverty_plot_data, mental_plot_data) %>%
+  full_join(topic_freq) %>%
+  ggplot(aes(x = poverty, y = estimate)) +
+  geom_point(aes(size = freq), color = "grey") +
+  geom_text_repel(aes(label = topic)) +
+  scale_x_continuous(NULL, breaks = c(-.015, .02), labels = c("Low Income", "High Income")) +
+  scale_y_continuous("Mental health problems", breaks = NULL) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(size = 18, color = "Black"))
+```
 
 
