@@ -934,7 +934,8 @@ full_join(poverty_plot_data, mental_plot_data) %>%
   ggplot(aes(x = poverty, y = estimate)) +
   geom_point(aes(size = freq), color = "grey") +
   geom_text_repel(aes(label = topic)) +
-  scale_x_continuous(NULL, breaks = c(-.015, .02), labels = c("Low Income", "High Income")) +
+  scale_x_continuous(NULL, breaks = c(-.02, .01), 
+                     labels = c("Low Income", "High Income")) +
   scale_y_continuous("Mental health problems", breaks = NULL) +
   theme_pubclean() +
   theme(axis.text.x = element_text(size = 18, color = "Black"))
