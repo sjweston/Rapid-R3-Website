@@ -128,6 +128,28 @@ scored = scored %>%
   rowwise() %>%
   mutate(FPL = FPL.function(JOB.002, STATE_CODED, income))
 
+scored = scored %>%
+  mutate(
+    poverty100 = case_when(
+      FPL == 1 ~ 1, 
+      !is.na(FPL) ~ 0),
+    poverty125 = case_when(
+      FPL == 1 ~ 1, 
+      FPL == 2 ~ 1, 
+      !is.na(FPL) ~ 0),
+    poverty150 = case_when(
+      FPL == 1 ~ 1, 
+      FPL == 2 ~ 1, 
+      FPL == 3 ~ 1, 
+      !is.na(FPL) ~ 0),
+    poverty200 = case_when(
+      FPL == 1 ~ 1, 
+      FPL == 2 ~ 1, 
+      FPL == 3 ~ 1, 
+      FPL == 4 ~ 1, 
+      !is.na(FPL) ~ 0),
+    )
+
 # baseline week -----------------------------------------------------------
 
 pre_pandemic = scored %>%
@@ -278,9 +300,9 @@ scored = left_join(scored, zipincome)
 
 # composites --------------------------------------------------------------
 
+scored[,c("anxiety","depress", "lonely", "stress", "fussy", "fear")] = apply(scored[,c("anxiety","depress", "lonely", "stress", "fussy", "fear")], 2, pomp)
 
 scored = scored %>%
-  mutate_at(vars(anxiety, depress, lonely, stress, fussy, fear), pomp) %>%
   rowwise() %>%
   mutate(mental_health = mean(c(anxiety, depress, lonely, stress), na.rm=T),
          child_mental = mean(c(fussy, fear), na.rm=T)) %>%

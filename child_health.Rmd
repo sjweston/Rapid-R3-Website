@@ -295,7 +295,7 @@ scored = scored %>%
 ## All
 
 ```{r child-health-26}
-plot = scored %>%
+plotdata = scored %>%
   filter(missed_wellbaby == 1) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -322,7 +322,9 @@ plot = scored %>%
   summarize(n = n()) %>%
   mutate(percent = n/sum(n),
          moe = map2_dbl(percent, n, moe.p)) %>%
-  mutate_at(vars(percent, moe), ~100*.x) %>%
+  mutate_at(vars(percent, moe), ~100*.x) 
+
+plot = plotdata %>%
   ggplot(aes(x = age,
              y = percent,
              text = paste0(
@@ -338,7 +340,13 @@ plot = scored %>%
                                    hjust = 1, 
                                    vjust = 1))
 ggplotly(plot, tooltip = "text")
+
+plotdata %>%
+  select(age, percent) %>%
+  write.csv("figure data/1005_missedwb_ages.csv", row.names = F)
 ```
+
+
 
 
 ```{r child-health-27}
