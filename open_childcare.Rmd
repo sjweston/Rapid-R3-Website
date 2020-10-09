@@ -26,6 +26,7 @@ library(conflicted)
 library(LDAvis)
 library(tidystm)
 library(ggrepel)
+library(plotly)
 conflict_prefer("summarize", "dplyr")
 ```
 
@@ -71,7 +72,9 @@ open_ended = open_ended %>%
   filter(about_childcare == 1)
 ```
 
-# Question 1
+# Challenges
+
+_What are the biggest challenges and concerns for you and your family right now?_
 
 ```{r -open-childcare-5 }
 open_ended1 = open_ended %>% filter(question == "1")
@@ -467,7 +470,9 @@ labelTopics(topics_child, topics = tx, n = 5)
 findThoughts(topics_child, texts, topics = tx, n = 5)
 ```
 
-# Effects
+# Effects{.tabset}
+
+
 
 ```{r -open-childcare-46 }
 # extract topic frequencies
@@ -482,7 +487,7 @@ topic_freq = td_gamma %>%
 
 
 ```{r -open-childcare-47 }
-predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic + poverty150 + mental_health + s(Week), 
+predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic*mental_health + poverty150*mental_health + s(Week), 
                                stmobj = topics_child, 
                                metadata = out1$meta, 
                                uncertainty = "Global")
@@ -493,6 +498,119 @@ race_effect = extract.estimateEffect(predict_topics, covariate = "race_ethnic")
 poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150")
 mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
 ```
+
+## Mental health{.tabset}
+
+### All
+
+```{r open-childcare-1}
+document_classification_1 = td_gamma %>%
+  mutate(gamma = ifelse(gamma >= prob_threshold, 1, 0),
+         topic = paste0("topic_", topic)) %>%
+  spread(topic, gamma)
+
+document_classification_1 = cbind(document_classification_1, out1$meta) 
+plot = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name) %>%
+  filter(includes == 1) %>%
+  summarize(
+    n = n(),
+    mental_health = mean(mental_health)) %>%
+  ggplot(aes(x = reorder(topic_name, mental_health),  
+             y = mental_health,
+             text = paste0(
+               "Topic ", topic_name,
+               "\nMental Health: ", round(mental_health, 1),
+               "\nNumber of responses: ", n
+             ))) +
+  geom_point(aes(size = n)) +
+  geom_text(aes(label = topic_name, y = mental_health + 1)) +
+  scale_x_discrete(breaks = NULL) +
+  labs(x = NULL, y = "Mental Health Problems", size = "Number of resposnes") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### By race
+
+```{r open-childcare-2}
+document_classification_1 = td_gamma %>%
+  mutate(gamma = ifelse(gamma >= prob_threshold, 1, 0),
+         topic = paste0("topic_", topic)) %>%
+  spread(topic, gamma)
+
+document_classification_1 = cbind(document_classification_1, out1$meta) 
+plot = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name, race_ethnic) %>%
+  filter(includes == 1) %>%
+  summarize(
+    n = n(),
+    mental_health = mean(mental_health)) %>%
+   arrange(race_ethnic, mental_health) %>%
+  ungroup() %>%
+  mutate(order = row_number()) %>%
+  ggplot(aes(x = order,  
+             y = mental_health,
+             text = paste0(
+               "Topic ", topic_name,
+               "\nMental Health: ", round(mental_health, 1),
+               "\nNumber of responses: ", n
+             ))) +
+  geom_point(aes(size = n), alpha = .7) +
+  geom_text(aes(label = topic_name, y = mental_health + 2), size = 3) +
+  scale_x_discrete(breaks = NULL) +
+  labs(x = NULL, y = "Mental Health Problems", size = "Number of resposnes") +
+  facet_wrap(~race_ethnic, scales = "free_x")+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### By income
+
+```{r open-childcare-3}
+document_classification_1 = td_gamma %>%
+  mutate(gamma = ifelse(gamma >= prob_threshold, 1, 0),
+         topic = paste0("topic_", topic)) %>%
+  spread(topic, gamma)
+
+document_classification_1 = cbind(document_classification_1, out1$meta) 
+plot = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name, poverty_cat) %>%
+  filter(includes == 1) %>%
+  summarize(
+    n = n(),
+    mental_health = mean(mental_health)) %>%
+  arrange(poverty_cat, mental_health) %>%
+  ungroup() %>%
+  mutate(order = row_number()) %>%
+  ggplot(aes(x = order,  
+             y = mental_health,
+             text = paste0(
+               "Topic ", topic_name,
+               "\nMental Health: ", round(mental_health, 1),
+               "\nNumber of responses: ", n
+             ))) +
+  geom_point(aes(size = n), alpha = .7) +
+  geom_text(aes(label = topic_name, y = mental_health + 2),
+            size = 3) +
+  scale_x_continuous(breaks = NULL) +
+  labs(x = NULL, y = "Mental Health Problems", size = "Number of resposnes") +
+  facet_wrap(~poverty_cat, scales = "free_x")+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+
+## Race by Mental Health
 
 ```{r -open-childcare-49 }
 race_plot_data = race_effect %>%
@@ -527,6 +645,7 @@ full_join(race_plot_data, mental_plot_data) %>%
   theme(axis.text.x = element_text(size = 18, color = "Black"))
 ```
 
+## Poverty by Mental Health
 
 ```{r -open-childcare-50 }
 full_join(poverty_plot_data, mental_plot_data) %>%
@@ -1005,13 +1124,13 @@ findThoughts(topics_child2, texts, topics = tx, n = 5)
 <!-- ``` -->
 
 
-# Effects
+# Effects{.tabset}
+
+
 
 ```{r -open-childcare-88 }
 # extract topic frequencies
 td_gamma <- tidy(topics_child2, matrix = "gamma")
-
-prob_threshold = .1
 
 topic_freq = td_gamma %>%
   mutate(contains = ifelse(gamma < prob_threshold, 0, 1)) %>%
@@ -1033,6 +1152,118 @@ race_effect = extract.estimateEffect(predict_topics, covariate = "race_ethnic")
 poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150")
 mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
 ```
+
+## Mental health{.tabset}
+
+### All
+
+```{r open-childcare-4}
+document_classification_1 = td_gamma %>%
+  mutate(gamma = ifelse(gamma >= prob_threshold, 1, 0),
+         topic = paste0("topic_", topic)) %>%
+  spread(topic, gamma)
+
+document_classification_1 = cbind(document_classification_1, out2$meta) 
+plot = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name) %>%
+  filter(includes == 1) %>%
+  summarize(
+    n = n(),
+    mental_health = mean(mental_health)) %>%
+  ggplot(aes(x = reorder(topic_name, mental_health),  
+             y = mental_health,
+             text = paste0(
+               "Topic ", topic_name,
+               "\nMental Health: ", round(mental_health, 1),
+               "\nNumber of responses: ", n
+             ))) +
+  geom_point(aes(size = n)) +
+  geom_text(aes(label = topic_name, y = mental_health + 1)) +
+  scale_x_discrete(breaks = NULL) +
+  labs(x = NULL, y = "Mental Health Problems", size = "Number of resposnes") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### By race
+
+```{r open-childcare-5}
+document_classification_1 = td_gamma %>%
+  mutate(gamma = ifelse(gamma >= prob_threshold, 1, 0),
+         topic = paste0("topic_", topic)) %>%
+  spread(topic, gamma)
+
+document_classification_1 = cbind(document_classification_1, out2$meta) 
+plot = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name, race_ethnic) %>%
+  filter(includes == 1) %>%
+  summarize(
+    n = n(),
+    mental_health = mean(mental_health)) %>%
+   arrange(race_ethnic, mental_health) %>%
+  ungroup() %>%
+  mutate(order = row_number()) %>%
+  ggplot(aes(x = order,  
+             y = mental_health,
+             text = paste0(
+               "Topic ", topic_name,
+               "\nMental Health: ", round(mental_health, 1),
+               "\nNumber of responses: ", n
+             ))) +
+  geom_point(aes(size = n), alpha = .7) +
+  geom_text(aes(label = topic_name, y = mental_health + 2), size = 3) +
+  scale_x_discrete(breaks = NULL) +
+  labs(x = NULL, y = "Mental Health Problems", size = "Number of resposnes") +
+  facet_grid(race_ethnic~., scales = "free_x")+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### By income
+
+```{r open-childcare-6}
+document_classification_1 = td_gamma %>%
+  mutate(gamma = ifelse(gamma >= prob_threshold, 1, 0),
+         topic = paste0("topic_", topic)) %>%
+  spread(topic, gamma)
+
+document_classification_1 = cbind(document_classification_1, out2$meta) 
+plot = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name, poverty_cat) %>%
+  filter(includes == 1) %>%
+  summarize(
+    n = n(),
+    mental_health = mean(mental_health)) %>%
+  arrange(poverty_cat, mental_health) %>%
+  ungroup() %>%
+  mutate(order = row_number()) %>%
+  ggplot(aes(x = order,  
+             y = mental_health,
+             text = paste0(
+               "Topic ", topic_name,
+               "\nMental Health: ", round(mental_health, 1),
+               "\nNumber of responses: ", n
+             ))) +
+  geom_point(aes(size = n), alpha = .7) +
+  geom_text(aes(label = topic_name, y = mental_health + 2),
+            size = 3) +
+  scale_x_continuous(breaks = NULL) +
+  labs(x = NULL, y = "Mental Health Problems", size = "Number of resposnes") +
+  facet_grid(poverty_cat~., scales = "free_x")+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Race by Mental Health
 
 ```{r -open-childcare-91 }
 race_plot_data = race_effect %>%
@@ -1067,6 +1298,7 @@ full_join(race_plot_data, mental_plot_data) %>%
   theme(axis.text.x = element_text(size = 18, color = "Black"))
 ```
 
+## Poverty by Mental Health
 
 ```{r -open-childcare-92 }
 full_join(poverty_plot_data, mental_plot_data) %>%

@@ -27,7 +27,14 @@ library(dplyr)
 master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
 master = filter(master, CaregiverID != "") 
-master = master %>%
+master = master  %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week %% 2 == 0 ~ NA_real_,
+      TRUE ~ Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == max(row_number())) %>%
   ungroup()

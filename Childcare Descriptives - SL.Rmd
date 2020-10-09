@@ -24,6 +24,14 @@ library(haven)
 ```{r, include=FALSE}
 # load scored master data --------------------------------------------------------
 load(here::here("../../Data Management R3/R data/scored.Rdata"))
+scored = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week %% 2 == 0 ~ NA_real_,
+      TRUE ~ Week)
+  ) %>%
+  filter(!is.na(Week))
 ```
 
 ```{r, echo=FALSE, message = FALSE}
