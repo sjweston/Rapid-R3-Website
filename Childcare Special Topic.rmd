@@ -1,0 +1,848 @@
+---
+title: "Childcare Special Topic"
+author: "Sihong"
+date: "10/8/2020"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, include = FALSE}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(readr)
+library(haven)
+library(dplyr)
+```
+
+```{r, echo=FALSE, message = FALSE}
+#load master data file
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+
+master = filter(master, CaregiverID != "") 
+master = master %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup()
+```
+
+```{r, echo=FALSE, message = FALSE}
+#Score key demos
+##Race/ethnicity
+
+master <- master %>%
+    mutate(
+      minority = ifelse(RaceGroup != 5, 1, 0),
+      black = ifelse(RaceGroup == 3, 1, 0),
+      native = ifelse(RaceGroup == 1, 1, 0),
+      asian = ifelse(RaceGroup == 2, 1, 0),
+      hawaii = ifelse(RaceGroup == 4, 1, 0),
+      white = ifelse(RaceGroup == 5, 1, 0),
+      other_race = ifelse(RaceGroup %in% c(6, 7), 1, 0))
+
+master <- master %>%
+      mutate(latinx = case_when(
+        DEMO.008 == 1 ~ 1,
+        DEMO.008 == 0 ~ 0,
+        DEMO.008.2 == 0 ~ 0,
+        DEMO.008.2 == 1 ~ 1,
+        DEMO.008.2 == 2 ~ 1,
+        TRUE ~ NA_real_))
+
+master <- master %>%
+mutate (race_ethnic = case_when(
+      black == 1 ~ "Black",
+      latinx == 1 ~ "Latinx",
+      !is.na(black) ~ "White",
+      !is.na(latinx) ~ "White",
+      TRUE ~ NA_character_))  
+
+##Povertyline
+master <- master %>%
+  mutate (poverty_cat = factor(FPL.150, labels = c("High Income", "Low Income")))
+
+#Single parent status
+master <- master %>%
+      mutate(single = case_when(
+        DEMO.002 %in% c(3,4,5,7,8) ~ 1,
+        DEMO.011 %in% c(2,4) ~ 1, 
+        !is.na(DEMO.002) ~ 0,
+        !is.na(DEMO.011) ~ 0,
+        TRUE ~ NA_real_))
+master <- master %>%
+  mutate (single_cat = factor(single, labels = c("Dual parent", "Single parent")))
+
+#Child with disability
+combine.cat = function(x, cols, id, newvar.name){
+  subset = x[,c(id, "Week", cols)]
+  names(subset) = c("id", "Week", paste0("X",1:length(cols)))
+  subset = suppressWarnings(gather(subset, "key", "value", -id, -Week))
+  subset = filter(subset, !is.na(value))
+  subset$key = gsub("X", "", subset$key)
+  subset = group_by(subset, id, Week)
+  subset = summarize(subset, newvar = paste(key, collapse = ",")) %>% ungroup()
+  names(subset) = c(id,"Week", newvar.name)
+  x = suppressMessages(full_join(x, subset))
+  return(x)
+}
+find_items = function(string, data2){
+  items = names(data2)
+  locations = which(grepl(string, items))
+  final = items[locations]
+  return(final)
+}
+master <- combine.cat(x = master, 
+                       cols = find_items("HEALTH.005", master), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.005_cat")
+master$disability = ifelse(grepl("[1-4]", master$HEALTH.005_cat), 1, 0)
+master <- master %>%
+  mutate (disability_cat = factor(disability, labels = c("No disability", "Child with disability")))
+
+```
+
+```{r, echo=FALSE, message = FALSE}
+#Select childcare variables
+key_demo <- c ("race_ethnic", "poverty_cat", "disability_cat", "single_cat")
+total_weeks = max(master$Week, na.rm=T)
+ccare <- master %>%
+  select (CaregiverID, Week, BaselineWeek, key_demo, contains ("ChildC."))
+
+num_responses = function(x){length(which(!is.na(x)))}
+ccare.num = ccare %>%
+  group_by(Week) %>%
+  summarize_all(num_responses) %>%
+  gather("Variable", "num_responses",-Week) %>%
+  mutate(week = paste0("Week", Week),
+         week = factor(Week, levels = paste0("Week", c(1:total_weeks)))) %>%
+  spread(Week, num_responses)
+
+
+ccare <- ccare %>%
+  filter (Week == 10 | Week == 13)
+```
+
+```{r, echo=FALSE, message = FALSE}
+#Score Week 10 Childc. 1-10 questions
+ccare <- ccare %>%
+  mutate (pre_ohcc = case_when(
+      ChildC.001 == 1 ~ 1,
+      ChildC.001 == 2 ~ 0))
+
+ccare <- ccare %>%
+  rename ( pre_rk_quality = ChildC.002_1,
+           pre_rk_cost = ChildC.002_2,
+           pre_rk_location = ChildC.002_3, 
+           pre_rk_safety = ChildC.002_4,
+           pre_rk_qualification = ChildC.002_5,
+           pre_rk_treated = ChildC.002_6,
+           pre_rk_food = ChildC.002_7,
+           pre_rk_learning = ChildC.002_8,
+           pre_rk_space = ChildC.002_9,
+           pre_rk_other = ChildC.002_10,
+           pre_ip_quality = ChildC.003_1,
+           pre_ip_cost = ChildC.003_2,
+           pre_ip_location = ChildC.003_3,
+           pre_ip_safety = ChildC.003_4,
+           pre_ip_qualification = ChildC.003_5,
+           pre_ip_treated = ChildC.003_6,
+           pre_ip_food = ChildC.003_7,
+           pre_ip_learning = ChildC.003_8,
+           pre_ip_space = ChildC.003_9)
+
+ccare <- ccare %>%
+  mutate (post_lfcc = case_when(
+      ChildC.004 == 1 ~ 1,
+      ChildC.004 == 2 ~ 0))
+
+ccare <- ccare %>%
+  mutate (post_cg_fd = case_when(
+      ChildC.005.a == 1 ~ 1,
+      ChildC.005.a == 2 ~ 0))
+
+ccare <- ccare %>%
+  mutate (post_cg_af = case_when(
+      ChildC.005.b == 1 ~ 1,
+      ChildC.005.b == 2 ~ 0))
+
+ccare <- ccare %>%
+  rename ( post_cg_close = ChildC.005.c_1,
+           post_cg_afford = ChildC.005.c_2,
+           post_cg_needs = ChildC.005.c_3,
+           post_cg_covid = ChildC.005.c_4,
+           post_cg_other = ChildC.005.c_5,
+           post_gov = ChildC.006,
+           post_bts_funds = ChildC.007_1,
+           post_bts_paystaff = ChildC.007_2,
+           post_bts_rdfee = ChildC.007_4,
+           post_bts_closecc = ChildC.007_5,
+           post_bts_reopencc = ChildC.007_6,
+           post_bts_hltstandards = ChildC.007_7,
+           post_bts_dontknow = ChildC.007_8,
+           post_bts_other = ChildC.007_9,
+           post_ned_financial = ChildC.008_1,
+           post_ned_access = ChildC.008_2,
+           post_ned_subsidies = ChildC.008_3,
+           post_ned_educators = ChildC.008_4,
+           post_ned_other = ChildC.008_5,
+           post_bpl_paidoff = ChildC.009_1,
+           post_bpl_flxwork = ChildC.009_2,
+           post_bpl_financial = ChildC.009_3,
+           post_bpl_locating = ChildC.009_4,
+           post_bpl_rltnbg= ChildC.009_5,
+           post_bpl_groups = ChildC.009_6,
+           post_bpl_guidance = ChildC.009_7,
+           post_bpl_info = ChildC.009_8,
+           post_bpl_camp = ChildC.009_9,
+           post_bpl_other = ChildC.009_10,
+           post_budget = ChildC.010  )
+
+```
+
+```{r, echo=FALSE, message = FALSE}
+#Select analytical variables
+ccare <- ccare %>%
+  select (CaregiverID, Week, BaselineWeek, key_demo, contains ("pre_"), contains ("post_"))
+```
+
+# Before COVID-19, Childcare Situations
+## Percentage of Families Using Out-of-Home Childcare
+### Total Responses
+  Out of the 1280 respondents, there were 49.77% of caregivers reporting using out-of-home childcare before COVID-19.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_pre <- ccare %>%
+  filter (Week == 10) %>%
+  summarise (n = n(),
+             Percent = sum(pre_ohcc, na.rm = TRUE)/n*100)
+print(cc_pre)
+```
+
+### Breakdown by Race
+  Before COVID-19, there were 54.72% of Black caregivers, 49.73% of White caregivers, and 47.70% of Latinx caregivers reporting using out-of-home childcare. The differences across racial/ethnic groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_pre <- ccare %>%
+  filter (Week == 10) %>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             Percent = sum(pre_ohcc, na.rm = TRUE)/n*100)
+
+cc_pre %>%
+  ggplot (mapping = aes (x = Percent, y = race_ethnic, fill = race_ethnic)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare$pre_ohcc, ccare$race_ethnic))
+```
+
+### Breakdown by Income
+  Before COVID-19, both low-income and high-income families reported similar percentage of using out-of-home childcare.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_pre <- ccare %>%
+  filter (Week == 10 & poverty_cat != "NA") %>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(),
+             Percent = sum(pre_ohcc, na.rm = TRUE)/n*100)
+
+cc_pre %>%
+  ggplot (mapping = aes (x = Percent, y = poverty_cat, fill = poverty_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare$pre_ohcc, ccare$poverty_cat))
+
+```
+
+### Breakdown by Single Parent Status
+  Before COVID-19, single parents reported slightly more usage of out-of-home childcare. However, the differences were not statistically significant.  
+  
+```{r, echo=FALSE, message = FALSE}
+cc_pre <- ccare %>%
+  filter (Week == 10 & single_cat != "NA") %>%
+  group_by (single_cat)%>%
+  summarise (n = n(),
+             Percent = sum(pre_ohcc, na.rm = TRUE)/n*100)
+
+cc_pre %>%
+  ggplot (mapping = aes (x = Percent, y = single_cat, fill = single_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare$pre_ohcc, ccare$single_cat))
+
+```
+
+### Breakdown by Child Disability Status
+  Before COVID-19, parents of children with disability reported less usage of out-of-home childcare. However, the differences were not statistically significant.  
+  
+```{r, echo=FALSE, message = FALSE}
+cc_pre <- ccare %>%
+  filter (Week == 10 & disability_cat != "NA") %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             Percent = sum(pre_ohcc, na.rm = TRUE)/n*100)
+
+cc_pre %>%
+  ggplot (mapping = aes (x = Percent, y = disability_cat, fill = disability_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare$pre_ohcc, ccare$disability_cat))
+
+```
+
+## Important Reasons Caregivers Selected Pre-COVID Childcare Arrangements
+
+```{r, echo=FALSE, message = FALSE}
+cc_rs <- ccare %>%
+  filter (Week == 10 ) %>%
+  summarise (a.quality = mean (pre_rk_quality, na.rm = TRUE),
+             c.cost = mean (pre_rk_cost, na.rm = TRUE),
+             b.location_proximity = mean (pre_rk_location, na.rm = TRUE),
+             d.safety_cleaniness = mean (pre_rk_safety, na.rm = TRUE),
+             f.qualification_staff = mean (pre_rk_qualification, na.rm = TRUE),
+             g.way_treated = mean (pre_rk_treated, na.rm = TRUE),
+             i.food_program = mean (pre_rk_food, na.rm = TRUE),
+             e.curriculum_learning = mean (pre_rk_learning, na.rm = TRUE),
+             h.space_for_mychild = mean (pre_rk_space, na.rm = TRUE),
+             j.other = mean (pre_rk_other, na.rm = TRUE)
+             ) %>%
+  pivot_longer(cols = c("a.quality","c.cost", "b.location_proximity", "d.safety_cleaniness", "f.qualification_staff","g.way_treated", "i.food_program", "e.curriculum_learning", "h.space_for_mychild", "j.other" ), names_to = "Reasons", values_to = "Mean_rank" )
+
+cc_rs %>%
+  ggplot (mapping = aes (x = Mean_rank, y = Reasons)) +
+  geom_col () +
+  geom_text (aes(label = round(Mean_rank,2)),vjust = 1.6, color = "black") 
+```
+  
+  *Note. Lower mean rank scores indicates more important reasons for selecting childcare arrangements. 
+  
+## Important Itmes Caregivers Want to Improve in Pre-COVID Childcare Arrangements
+
+```{r, echo=FALSE, message = FALSE}
+cc_rs <- ccare %>%
+  filter (Week == 10 ) %>%
+  summarise (b.quality = mean (pre_ip_quality, na.rm = TRUE),
+             a.cost = mean (pre_ip_cost, na.rm = TRUE),
+             e.location_proximity = mean (pre_ip_location, na.rm = TRUE),
+             c.safety_cleaniness = mean (pre_ip_safety, na.rm = TRUE),
+             d.qualification_staff = mean (pre_ip_qualification, na.rm = TRUE),
+             g.way_treated = mean (pre_ip_treated, na.rm = TRUE),
+             h.food_program = mean (pre_ip_food, na.rm = TRUE),
+             f.curriculum_learning = mean (pre_ip_learning, na.rm = TRUE),
+             i.space_for_mychild = mean (pre_ip_space, na.rm = TRUE))%>%
+  pivot_longer(cols = c("b.quality","a.cost", "e.location_proximity", "c.safety_cleaniness", "d.qualification_staff","g.way_treated", "h.food_program", "f.curriculum_learning", "i.space_for_mychild" ), names_to = "Improves", values_to = "Mean_rank" )
+
+cc_rs %>%
+  ggplot (mapping = aes (x = Mean_rank, y = Improves)) +
+  geom_col () +
+  geom_text (aes(label = round(Mean_rank,2)),vjust = 1.6, color = "black") 
+```
+  
+  *Note. Lower mean rank scores indicates items that caregivers want to improve the most.
+  
+# Childcare Situations After COVID-19
+## Caregivers Looking for Childcare Currently
+### Total Responses
+  Out of the 1280 respondents, there were 14.61% of caregivers looking for childcare currently.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10) %>%
+  summarise (n = n(),
+             Percent = sum(post_lfcc, na.rm = TRUE)/n*100)
+print(cc_post)
+```
+
+### Breakdown by Race
+  There were 25.47% of Black caregivers, 13.58% of White caregivers, and 13.81% of Latinx caregivers reporting currently looking for childcare. The differences across racial/ethnic groups were statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10) %>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             Percent = sum(post_lfcc, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = race_ethnic, fill = race_ethnic)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare$post_lfcc, ccare$race_ethnic))
+```
+  
+### Breakdown by Income
+  There were 20.59% of low-income caregivers and 15.83% of high-income caregivers reporting currently looking for childcare. However, the differences across the two income groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & poverty_cat != "NA") %>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(),
+             Percent = sum(post_lfcc, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = poverty_cat, fill = poverty_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare$post_lfcc, ccare$poverty_cat))
+```
+
+### Breakdown by Single Parent Status
+  There were 20.30% of single-parent caregivers and 13.97% of non-single-parent caregivers reporting currently looking for childcare. The differences across the two groups was marginally statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & single_cat != "NA") %>%
+  group_by (single_cat)%>%
+  summarise (n = n(),
+             Percent = sum(post_lfcc, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = single_cat, fill = single_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare$post_lfcc, ccare$single_cat))
+```
+
+### Breakdown by Child Disability Status
+  There were 22.2% of caregivers of children with disability and 14.45% of caregivers of children without disability reporting currently looking for childcare. However, The differences across the two  groups not statistically significant.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & disability_cat != "NA") %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             Percent = sum(post_lfcc, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = disability_cat, fill = disability_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+fisher.test(table(ccare$post_lfcc, ccare$disability_cat))
+```
+  *Note. Small sample of children with disability (n = 27)
+
+## Among Caregivers Currently Looking for Childcare, Challenges Caregivers are Experiences with Childcare
+  *Note. \
+  1) This section only included respondents who reported currently looking for childcare (n = 187)\
+  2) With relatively small sample size, results need to be interpreted cautiously
+  
+### Challenges Finding Childcare
+#### Total Responses
+  Out of the 187 respondents, there were 88.24% of caregivers reporting experiencing challenges finding childcare.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & post_lfcc == 1) %>%
+  summarise (n = n(),
+             Percent = sum(post_cg_fd, na.rm = TRUE)/n*100)
+print(cc_post)
+```
+
+#### Breakdown by Race
+  There were 81.84% of Black caregivers, 87.40% of White caregivers, and 96.97% of Latinx caregivers reporting currently experiencing challenges finding childcare. The differences across racial/ethnic groups were not statistically significant. 
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & post_lfcc == 1) %>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_fd, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = race_ethnic, fill = race_ethnic)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+ccare_cg <- ccare %>%
+  filter (Week == 10 & post_lfcc == 1)
+
+fisher.test(table(ccare_cg$post_cg_fd, ccare_cg$race_ethnic))
+```
+
+#### Breakdown by Income
+  There were 92.86% of low-income caregivers and 81.82% of high-income caregivers currently experiencing challenges finding childcare. The differences across the two groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & poverty_cat != "NA" & post_lfcc == 1) %>%
+  group_by (poverty_cat )%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_fd, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = poverty_cat, fill = poverty_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+fisher.test(table(ccare_cg$post_cg_fd, ccare_cg$poverty_cat))
+```
+  *Note. Very small sample size. 
+  
+
+#### Breakdown by Single Parent Status
+  There were 85.19% of single-parent caregivers and 88.75% of non-single-parent caregivers currently experiencing challenges finding childcare. The differences across the two groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & single_cat != "NA" & post_lfcc == 1) %>%
+  group_by (single_cat )%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_fd, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = single_cat, fill = single_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+fisher.test(table(ccare_cg$post_cg_fd, ccare_cg$single_cat))
+```
+
+#### Breakdown by Child Disability Status
+  There were 83.33% of caregivers of children with disability and 88.4% of caregivers of children without disability currently experiencing challenges finding childcare. The differences across the two groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & disability_cat != "NA"& post_lfcc == 1) %>%
+  group_by (disability_cat )%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_fd, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = disability_cat, fill = disability_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+fisher.test(table(ccare_cg$post_cg_fd, ccare_cg$disability_cat))
+```
+*Note. Small sample size of children with disability (n = 27). 
+
+### Challenges Affording Childcare Among Caregivers Currently Looking for Childcare
+  *Note. This section has small numbers of respondents (n = 187). Interpret results with causion
+  
+#### Total Responses
+  Out of the 187 respondents who are currently looking for childcare, there were 68.45% of caregivers reporting experiencing challenges affording childcare.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & post_lfcc == 1) %>%
+  summarise (n = n(),
+             Percent = sum(post_cg_af, na.rm = TRUE)/n*100)
+print(cc_post)
+```
+
+#### Breakdown by Race
+  There were 81.48% of Black caregivers, 62.99% of White caregivers, and 78.79% of Latinx caregivers reporting currently experiencing challenges affording  childcare. The differences across racial/ethnic groups were marginally statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & post_lfcc == 1) %>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_af, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = race_ethnic, fill = race_ethnic)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare_cg$post_cg_af, ccare_cg$race_ethnic))
+```
+
+#### Breakdown by Income
+  There were 85.71% of low-income caregivers and 68.18% of high-income caregivers currently experiencing challenges affording childcare. The differences across the two groups were not statistically significant (becuase of the small sample size). 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & poverty_cat != "NA"& post_lfcc == 1) %>%
+  group_by (poverty_cat )%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_af, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = poverty_cat, fill = poverty_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+fisher.test(table(ccare_cg$post_cg_af, ccare_cg$poverty_cat))
+```
+  *Note: Very small sample size. 
+
+#### Breakdown by Single Parent Status
+  There were 74.07% of single-parent caregivers and 67.50% of non-single-parent caregivers currently experiencing challenges affording childcare. The differences across the two groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & single_cat != "NA"& post_lfcc == 1) %>%
+  group_by (single_cat )%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_af, na.rm = TRUE)/n*100)
+
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = single_cat, fill = single_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare_cg$post_cg_af, ccare_cg$single_cat))
+```
+
+#### Breakdown by Child Disability Status
+  There were 66.67% of caregivers of children with disability and 68.51% of caregivers of children without disability currently experiencing challenges affording childcare. The differences across the two groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+
+cc_post <- ccare %>%
+  filter (Week == 10 & disability_cat != "NA"& post_lfcc == 1) %>%
+  group_by (disability_cat )%>%
+  summarise (n = n(),
+             Percent = sum(post_cg_af, na.rm = TRUE)/n*100)
+cc_post %>%
+  ggplot (mapping = aes (x = Percent, y = disability_cat, fill = disability_cat)) +
+  geom_col () +
+  geom_text (aes(label = round(Percent,2)),vjust = 1.6, color = "black") +
+  coord_flip()
+
+summary(table(ccare_cg$post_cg_af, ccare_cg$disability_cat))
+```
+ 
+### Challenges in Childcare that Caregivers are Facing
+  Among all the caregivers currently looking for childcare, the main challenges they face include:\
+  1) can't find a child care arrangement where they can be confident their child will not be exposed to COVID-19 (51.87%)\
+  2) regular childcare program was closed (35.29%)\
+  3) no longer be able to afford childcare (24.60%)\
+  4) regular childcare program was open but no longer meet needs (11.23%)\
+  5) other reasons.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 & post_lfcc == 1) %>%
+  summarise (n = n(),
+             c.no_longer_afford_cc = sum(post_cg_afford, na.rm = TRUE)/n*100,
+             b.cc_program_closed = sum(post_cg_close, na.rm = TRUE)/n*100,
+             d.not_meet_needs = sum(post_cg_needs, na.rm = TRUE)/n*100,
+             a.covid = sum(post_cg_covid, na.rm = TRUE)/n*100,
+             e.other = sum(post_cg_other, na.rm = TRUE)/n*100,
+             )%>%
+  pivot_longer(cols = c("c.no_longer_afford_cc","b.cc_program_closed", "d.not_meet_needs", "a.covid", "e.other"), names_to = "challenges", values_to = "percent" )
+
+cc_post %>%
+  ggplot (mapping = aes (x = percent, y = challenges, fill = challenges)) +
+  geom_col () +
+  geom_text (aes(label = round(percent,2)),vjust = 1.6, color = "black")   
+```
+
+# Caregivers' Perception About Government's Actions to Support Childcare
+## Caregivers' Reports on Whether the Government is Doing Enough to Support Childcare
+### Total Responses
+  There were 50.7% of caregivers thinking the government should do a lot more to support childcare; 23.44% reporting the government should do somewhat more, and only 8.20% of caregivers thinking the government has done enough to support childcare. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  count (post_gov) %>%
+  mutate(prop = prop.table(n))
+
+cc_post$post_gov = as.factor (cc_post$post_gov)
+
+cc_post %>%
+  filter (post_gov != "NA") %>%
+  ggplot (mapping = aes (x = prop*100, y = post_gov, fill = post_gov)) +
+  geom_col ()+
+  coord_flip()+
+  geom_text (aes(label = round(prop*100,2)),vjust = 1.6, color = "black")   
+```
+  
+  Note. 0 = not sure, 1 = doing enough, 2 = should do somewhat more, 3 = should do a lot more. 
+  
+### Comparison Across Race/Ethnicity Groups
+  The average satisfaction about government's actions to support childcare in Black, Latinx, and White caregivers were 2.21, 2.02, and 2.08, respectively (with higher score indicating reduced satisfaction). ANOVA suggested that the differences across the three groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  group_by (race_ethnic)%>%
+  summarise (post_gov_mn = mean (post_gov, na.rm = TRUE))
+print (cc_post)
+
+ccare_10 <- ccare %>%
+  filter (Week == 10)
+
+anova(aov(post_gov~race_ethnic, data = ccare_10))
+pairwise.t.test(ccare_10$post_gov, ccare_10$race_ethnic, p.adj = "holm")
+     
+```
+
+### Comparison Across Income Groups
+  The average satisfaction about government's actions to support childcare in high- and low-income caregivers were 2.02 and 1.87, respectively (with higher score indicating reduced satisfaction). t test suggested that the differences across the two groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  group_by (poverty_cat)%>%
+  summarise (post_gov_mn = mean (post_gov, na.rm = TRUE))
+
+t.test(ccare_10$post_gov~ccare_10$poverty_cat)
+     
+```
+
+### Comparison Across Single Parent Status
+  The average satisfaction about government's actions to support childcare in single- and non-single caregivers were 2.28 and 2.06, respectively (with higher score indicating reduced satisfaction). t test suggested that the differences across the two groups were statistically significant (p < .05). Single parents were less satisfied with the government's childcare actions.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  group_by (single_cat)%>%
+  summarise (post_gov_mn = mean (post_gov, na.rm = TRUE))
+
+t.test(ccare_10$post_gov~ccare_10$single_cat)
+     
+```
+
+### Comparison Across Child Disability Status
+  The average satisfaction about government's actions to support childcare in caregivers of children with and without disability were 1.73 and 2.08, respectively (with higher score indicating reduced satisfaction). t test suggested that the differences across the two groups were not statistically significant. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  group_by (disability_cat)%>%
+  summarise (post_gov_mn = mean (post_gov, na.rm = TRUE))
+
+t.test(ccare_10$post_gov~ccare_10$disability_cat)
+     
+```
+
+## Brightspots Caregivers Perceived in Government's Actions to Support Childcare
+  Some caregivers perceived the "bright spots" in government's actions to support childcare as below:\
+  1) Close childcare center to keep kids safe(38.44%)\
+  2) Reopening childcare to allow essential workers and others go to work (35.00%)\
+  3) Publish health standards to keep kids safe (34.69%)\
+  Only few caregivers perceived government's actions in providing funds to keep  childcare open, paying staff more, reducing or eliminating tuition and fees to make childcare more affordable as bright spots.\
+  Additionally, 36.25% of caregivers responded "don't know/can't think of any bright spots".
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  summarise (n = n(),
+             d.funds_open_ccprogram = sum(post_bts_funds, na.rm = TRUE)/n*100,
+             f.pay_staff_more = sum(post_bts_paystaff, na.rm = TRUE)/n*100,
+             e.reduce_tuition_fees = sum(post_bts_rdfee, na.rm = TRUE)/n*100,
+             a.closecc_keep_safe= sum(post_bts_closecc, na.rm = TRUE)/n*100,
+             b.reopen_cc = sum(post_bts_reopencc, na.rm = TRUE)/n*100,
+             c.publish_health_standards = sum(post_bts_hltstandards, na.rm = TRUE)/n*100,
+             h.dontknow_notthinkany= sum(post_bts_dontknow, na.rm = TRUE)/n*100,
+             g.other = sum(post_bts_other, na.rm = TRUE)/n*100)%>%
+  pivot_longer(cols = c("d.funds_open_ccprogram","f.pay_staff_more", "e.reduce_tuition_fees", "a.closecc_keep_safe", "b.reopen_cc", "c.publish_health_standards", "h.dontknow_notthinkany", "g.other"), names_to = "brightspots", values_to = "percent" )
+
+cc_post %>%
+  ggplot (mapping = aes (x = percent, y = brightspots, fill = brightspots)) +
+  geom_col () +
+  geom_text (aes(label = round(percent,2)),vjust = 1.6, color = "black")   
+```
+
+## Caregivers' Perception on What are Still Needed to Address Current Concerns in Childcare
+  Caregivers reported that actions by government below were still needed to support childcare and address current concerns:\
+  1) Support the well-being of early childhood educators by ensuring that they have sufficient compensation and benefits (68.28%)\
+  2) Ensure more parents have access to child care by making more parents eligible for child care subsidies/assistance (59.14%)\
+  3) Stabilize and maintain the supply of child care programs by providing financial assistance to providers (51.80%)\
+  4) Increasing the amount of child care subsidies do parents don’t have to pay as much (50.23%)
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  summarise (n = n(),
+             c.financial_ast_providers = sum(post_ned_financial, na.rm = TRUE)/n*100,
+             b.ensure_cc_access = sum(post_ned_access, na.rm = TRUE)/n*100,
+             d.increase_cc_subsidies = sum(post_ned_subsidies, na.rm = TRUE)/n*100,
+             a.support_educators_benefits= sum(post_ned_educators, na.rm = TRUE)/n*100,
+             e.other = sum(post_ned_other, na.rm = TRUE)/n*100)%>%
+  pivot_longer(cols = c("c.financial_ast_providers","b.ensure_cc_access", "d.increase_cc_subsidies", "a.support_educators_benefits", "e.other"), names_to = "needs", values_to = "percent" )
+
+cc_post %>%
+  ggplot (mapping = aes (x = percent, y = needs, fill = needs)) +
+  geom_col () +
+  geom_text (aes(label = round(percent,2)),vjust = 1.6, color = "black")   
+```
+
+# What Would Make Caregivers Feel They Have a Better Childcare Plan for Next Month
+  Caregivers reported that below actions will make them feel that they have a better childcare plan for  next month:\
+  1) Flexible work arrangement (43.59%)\
+  2) Financial resources for child care or other expenses (38.44%)\
+  3) Help from relatives and neighbors (30.00%)\
+  4) More guidance on children’s health & safety in child care or camp (28.44%)\
+  5) Paid timeoff from employer (22.34%)\
+  5) More information or services from your local school system or government (22.34%)\
+  6) Camp or child care options from your local school system or government (19.45%)\
+  7) Help locating available child care (18.98%)\
+  8) Parent support groups or parenting resources (17.89%)
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  summarise (n = n(),
+             e.paid_timeoff = sum(post_bpl_paidoff, na.rm = TRUE)/n*100,
+             a.flexible_work = sum(post_bpl_flxwork, na.rm = TRUE)/n*100,
+             b.financial_resources = sum(post_bpl_financial, na.rm = TRUE)/n*100,
+             h.help_locating_cc= sum(post_bpl_locating, na.rm = TRUE)/n*100,
+             c.help_relative_neighbor = sum(post_bpl_rltnbg, na.rm = TRUE)/n*100,
+             i.parenting_support = sum(post_bpl_groups, na.rm = TRUE)/n*100,
+             d.guidance_safety_health = sum(post_bpl_guidance, na.rm = TRUE)/n*100,
+             f.information_services = sum(post_bpl_info, na.rm = TRUE)/n*100,
+             g.camp_cc_options = sum(post_bpl_camp, na.rm = TRUE)/n*100,
+             j.other = sum(post_bpl_other, na.rm = TRUE)/n*100,
+             )%>%
+  pivot_longer(cols = c("e.paid_timeoff","a.flexible_work", "b.financial_resources", "h.help_locating_cc", "c.help_relative_neighbor", "i.parenting_support","d.guidance_safety_health", "f.information_services", "g.camp_cc_options", "j.other"), names_to = "plans", values_to = "percent" )
+
+cc_post %>%
+  ggplot (mapping = aes (x = percent, y = plans, fill = plans)) +
+  geom_col () +
+  geom_text (aes(label = round(percent,2)),vjust = 1.6, color = "black")   
+```
+
+# What Caregivers Consider as Affordable Childcare for All Their Children
+  Majority of caregivers reported that childcare expenses accounting for 10%-20% of household income (36.8%) or 5-9% of household income (36.25%) as affordable childcare. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_post <- ccare %>%
+  filter (Week == 10 ) %>%
+  count (post_budget) %>%
+  mutate(prop = prop.table(n))
+
+cc_post$post_budget = as.factor (cc_post$post_budget)
+
+cc_post %>%
+  filter (post_budget != "NA") %>%
+  ggplot (mapping = aes (x = prop*100, y = post_budget, fill = post_budget)) +
+  geom_col ()+
+  coord_flip()+
+  geom_text (aes(label = round(prop*100,2)),vjust = 1.6, color = "black")   
+```
+  
+  Note. 1 = >30% of household income, 2 = 20%-30% of household income, 3 = 10%-20% of household income, 4 = 5-9% of household income, 5 = 1-4% of household income.

@@ -57,6 +57,8 @@ ccare <- ccare%>%
 ```
 
 # Ability to Return to Previous Childcare
+  Results showed that most (73.29%) of caregivers said they could go back to their previous childcare. However, there were also 14.4% saying they could not and 12.3% saying they were not sure if they could return.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -72,6 +74,8 @@ cc_return <- ccare %>%
 ```
 
 ## Breakdown by Race 
+  Latinx families were less confident in their abilities to go back to previous childcare. 
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -87,7 +91,9 @@ cc_return %>%
 
 ```
 
-## Breakdown by Income 
+## Breakdown by Income    
+  Fewer low-income families reported they could go back to previous childcare compared to high-income families.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -104,6 +110,8 @@ cc_return %>%
 ```
 
 ## Breakdown by Single Parent Status 
+  Single parents reported less likely to go back to previous childcare compared to non-single parents.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -136,7 +144,8 @@ cc_return %>%
 
 # Willingness to Return to Previous Childcare
   *Based on Data Collected from Week 7 & 8
-
+  Most (63.53%) families reported willing to return to their previous childcare. However, there were also 15.9% not willing to, and 20.58% unsure. 
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -152,6 +161,8 @@ cc_return <- ccare %>%
 ```
 
 ## Breakdown by Race 
+  A higher percentage of Black caregivers reported to be willing to return to their previous childcare, compared to White and Latinx families. 
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -168,6 +179,8 @@ cc_return %>%
 ```
 
 ## Breakdown by Income 
+  More low-income families reported being willing to return to previous childcare.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -200,6 +213,8 @@ cc_return %>%
 ```
 
 ## Breakdown by Child Disability Status 
+  Families of chlidren without disability reported more willing to return to previous childcare
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -216,7 +231,7 @@ cc_return %>%
 
 # Comfortable to Return to Previous Childcare
   *Based on Data Collected from Week 7 & 8
-
+  About half (49.61%) of families reported "a little bit comfortable and a little bit worried" about returning to previous childcare; 20.46% report not comfortable at all and very worried; 25.2% reporting very comfortable and not worried at all. 
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -252,6 +267,8 @@ cc_return %>%
   *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
   
 ## Breakdown by Income 
+  Low-income families reported more comfortable to return to previous childcare.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -270,6 +287,8 @@ cc_return %>%
   *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
   
 ## Breakdown by Single Parent Status 
+  Single-parent families reported more comfortable to return to previous childcare.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -288,6 +307,7 @@ cc_return %>%
   *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
   
 ## Breakdown by Child Disability Status 
+  Caregivers of children with disability reported more comfortable to return to previous childcare.
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -305,6 +325,8 @@ cc_return %>%
   *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
   
 # Barrier of Returning to Previous Childcare
+  The biggest barrier of caregivers' deciding to return to previous childcare was safety - 27.3% of caregivers reported concern about safety. Then, there were also 11.16% of caregivers reported no need to return to previous childcare currently, and 8.93% of caregivers reports costs being the main barrier. 
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -319,11 +341,21 @@ cc_return %>%
   ggplot ( mapping = aes (x = Percent, y = barrier)) +
   geom_col(position = 'dodge') + 
   geom_text(aes(label = round (Percent,2)),vjust = 1.6, color = "white")+
-  xlim (0,100) +
+  xlim (0,30) +
   coord_flip()
 ```
 
 # What Caregivers Want to Know to Feel comfortable Returning to Same Childcare
+  Things that caregivers want to know about the childcare facility to feel comfortable returning included:\
+  1) plans for cleaning the physical space (68.84%)\
+  2) plans if anyone affiliated with the childcare gets a confirmed or suspected diagnosis of COVID19 (66.12%)\
+  3) plans for deciding if an employee is healthy enough to work (62.31%)\
+  4) plans for deciding if a child is healthy enough to attend child care (61.50%)\
+  5) number of children in the same space (57.19%)\
+  6) social distancing mesures (54.6%)\
+  7) number of adults in the same space (50.48%)\
+  8) new and updated policies for enrollment, cost, etc. (34.06%)
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -359,7 +391,8 @@ cc_return %>%
   
 # Concerned not Able to Return to Work Because of Lack Appropriate Childcare
   *Based on Data Collected from Week 7 & 8
-
+  About half of caregivers (53.22%) reported no concern about their ability of returning to work because of lacking appropriate childcare. However, there were also 32.48% of caregivers reporting such a concern.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -375,6 +408,8 @@ cc_return <- ccare %>%
 ```
 
 ## Breakdown by Race 
+  Compared to White caregivers, Black and Latinx caregivers reported more concern about their ability of returning to work because of lacking appropriate childcare.
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -391,6 +426,8 @@ cc_return %>%
 ```
 
 ## Breakdown by Income 
+  Compared to high-income families, low-income families reported more concern about their ability of returning to work because of lacking appropriate childcare
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -407,6 +444,7 @@ cc_return %>%
 ```
 
 ## Breakdown by Single Parent Status 
+  Single parents reported more concern about their ability of returning to work because of lacking appropriate childcare.
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%
@@ -423,6 +461,8 @@ cc_return %>%
 ```
 
 ## Breakdown by Child Disability Status 
+  Caregivers of children with disability reported more concerns about their ability of returning to work because of lacking appropriate childcare
+  
 ```{r, echo=FALSE, message = FALSE}
 cc_return <- ccare %>%
   filter (Week == 7| Week == 8) %>%

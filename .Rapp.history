@@ -10,11 +10,6 @@ library(LDAvis)#
 library(tidystm)#
 library(ggrepel)#
 conflict_prefer("summarize", "dplyr")
-install.packages("tidystm")
-install.packages("devtools")
-devtools::install_github("mikajoh/tidystm", dependencies = TRUE)
-library(tidystm)
-install.packages("zipcode")
 conflict_prefer("filter", "dplyr")#
 conflict_prefer("lag", "dplyr")#
 source(here("Scripts/score data.R")) #
@@ -30,7 +25,8 @@ open_ended = scored %>%#
   filter(!is.na(mental_health)) %>%#
   gather("question", "response", contains("OPEN")) %>%#
   mutate(question = str_extract(question, ".$")) %>%#
-  filter(!is.na(response))
+  filter(!is.na(response)) #
+#
 #identify question about childcare#
 open_ended = open_ended %>%#
   mutate(about_childcare = case_when(#
@@ -49,7 +45,6 @@ open_ended = open_ended %>%#
     TRUE ~ NA_real_#
   )) %>%#
   filter(about_childcare == 1)
-table(open_ended$question)
 open_ended1 = open_ended %>% filter(question == "1")
 processed1 <- textProcessor(open_ended1$response, metadata = open_ended1)#
 out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)#
@@ -58,134 +53,37 @@ vocab1 <- out1$vocab#
 meta1 <- out1$meta#
 #
 heldout1 = make.heldout(docs1, vocab1)
-install.packages("tm")
-install.packages("SnowballC")
-library(tm)
-library(SnowballC)
-processed1 <- textProcessor(open_ended1$response, metadata = open_ended1)
-out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)#
-docs1 <- out1$documents#
-vocab1 <- out1$vocab#
-meta1 <- out1$meta#
-#
-heldout1 = make.heldout(docs1, vocab1)
-set.seed(07312020)#
-plan(multiprocess)#
-#
-many_models <- tibble(K =seq(5,150, by=5)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
-                                          heldout1$vocab, #
-                                          K = .,#
-                                          prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta1, #
-                                          verbose = FALSE)))#
-k_result <- many_models %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
-set.seed(07312020)#
-plan(multiprocess)#
-#
-many_models <- tibble(K =seq(5,150, by=5)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
-                                          heldout1$vocab, #
-                                          K = .,#
-                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta1, #
-                                          verbose = FALSE)))
-k_result <- many_models %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
-set.seed(07312020)#
-plan(multiprocess)#
-#
-many_models <- tibble(K =c(20:40)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
-                                          heldout1$vocab, #
-                                          K = .,#
-                                          prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta1, #
-                                          verbose = FALSE)))#
-k_result <- many_models %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models2.Rdata"))
-set.seed(07312020)#
-plan(multiprocess)#
-#
-many_models <- tibble(K =c(20:40)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
-                                          heldout1$vocab, #
-                                          K = .,#
-                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta1, #
-                                          verbose = FALSE)))#
-k_result <- many_models %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models2.Rdata"))
-k_result %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_point()+#
-  geom_line()+#
-  facet_wrap(~Metric, scales = "free_y") +#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
-k_result %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous(breaks = seq(0,150,10))+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
+stm_child11 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 11, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+topics_child = stm_child11
+texts = open_ended1$response[-out1$docs.removed]#
+labelTopics(topics_child, topics = 1, n = 5)#
+findThoughts(topics_child, texts, topics = 1, n = 5)
+stm_child12 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 12, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
 stm_child26 <- stm(documents = docs1, #
                     vocab = vocab1,#
                     K = 26, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+stm_child29 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 29, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+stm_child30 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 30, #
                     prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
                     data = meta1, #
                     init.type = "Spectral")
@@ -195,69 +93,8 @@ stm_child36 <- stm(documents = docs1, #
                     prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
                     data = meta1, #
                     init.type = "Spectral")
-str_extract(ls(), "stm_child")
-str_detect(ls(), "stm_child")
-str_subset(ls(), "stm_child")
-save(str_subset(ls(), "stm_child"), file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
-load(here("../../Data Management R3/R Data/openchild1_many_models2.Rdata"))
-stm_child29 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 29, #
-                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-many_models <- tibble(K =c(5:15)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
-                                          heldout1$vocab, #
-                                          K = .,#
-                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta1, #
-                                          verbose = FALSE)))#
-k_result <- many_models %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-stm_child9 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 9, #
-                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-stm_child11 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 11, #
-                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-stm_child12 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 12, #
-                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-load(here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
-k_result %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous()+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()load(here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
 save(list = str_subset(ls(), "stm_child"), file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
-open_ended2 = open_ended %>% filter(question == "1")
+open_ended2 = open_ended %>% filter(question == "2")
 processed2 <- textProcessor(open_ended2$response, metadata = open_ended2)#
 out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
 docs2 <- out2$documents#
@@ -286,6 +123,16 @@ k_result <- many_models %>%#
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
 #
 save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
+set.seed(07312020)#
+plan(multiprocess)#
+#
+many_models <- tibble(K =c(5:15)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, #
+                                          heldout2$vocab, #
+                                          K = .,#
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta2, #
+                                          verbose = FALSE)))#
 k_result <- many_models %>%#
   mutate(exclusivity = map(topic_model, exclusivity),#
          semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
@@ -296,56 +143,7 @@ k_result <- many_models %>%#
          lbound = bound + lfact,#
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
 #
-save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
-dev.off()
-many_models <- tibble(K =c(20:30)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout2$documents, #
-                                          heldout2$vocab, #
-                                          K = .,#
-                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta2, #
-                                          verbose = FALSE)))
-k_result <- many_models %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
-         residual = map(topic_model, checkResiduals, heldout2$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-stm2_child23 <- stm(documents = docs2, #
-                    vocab = vocab2,#
-                    K = 23, #
-                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-stm2_child26 <- stm(documents = docs2, #
-                    vocab = vocab2,#
-                    K = 26, #
-                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-set.seed(07312020)#
-plan(multiprocess)#
-#
-many_models <- tibble(K =seq(5,50, by=5)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
-                                          heldout1$vocab, #
-                                          K = .,#
-                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta1, #
-                                          verbose = FALSE)))
-k_result <- many_models %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild2_many_models2.Rdata"))
 k_result %>%#
   transmute(K,#
             `Lower bound` = lbound,#
@@ -361,12 +159,43 @@ k_result %>%#
        y = NULL,#
        title = "Model diagnostics by number of topics") +#
   theme_pubclean()
-stm_child30 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 30, #
+k_result %>%#
+  transmute(K,#
+            `Lower bound` = lbound,#
+            Residuals = map_dbl(residual, "dispersion"),#
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
+  gather(Metric, Value, -K) %>%#
+  ggplot(aes(K, Value, color = Metric)) +#
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
+  facet_wrap(~Metric, scales = "free_y") +#
+  scale_x_continuous(breaks = c(5:15))+#
+  labs(x = "K (number of topics)",#
+       y = NULL,#
+       title = "Model diagnostics by number of topics") +#
+  theme_pubclean()
+stm2_child6 <- stm(documents = docs2, #
+                    vocab = vocab2,#
+                    K = 6, #
                     prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")#
-#
-save(list = str_subset(ls(), "stm_child"), file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
+                    data = meta2, #
+                    init.type = "Spectral")
+stm2_child11 <- stm(documents = docs2, #
+                    vocab = vocab2,#
+                    K = 11, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta2, #
+                    init.type = "Spectral")
+stm2_child13 <- stm(documents = docs2, #
+                    vocab = vocab2,#
+                    K = 13, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta2, #
+                    init.type = "Spectral")
+stm2_child8 <- stm(documents = docs2, #
+                    vocab = vocab2,#
+                    K = 8, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta2, #
+                    init.type = "Spectral")
 save(list = str_subset(ls(), "stm2_child"), file = here("../../Data Management R3/R Data/topics_child_2.Rdata"))
