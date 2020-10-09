@@ -740,16 +740,16 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$lone_increase = ifelse(lone_change > 0, 1, 0)
   }
   
-    newdata$income = data$allyearly
+    newdata$income = data$allyearlyCurrent
     newdata$income.cat = cut(newdata$income, breaks =  quantile(newdata$income, probs = c(0, .25, .5, .75, 1), na.rm=T))
     newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
   
   
   newdata$JOB.002 = data$JOB.002
   newdata$STATE_CODED = data$STATE_CODED
-  newdata$income = data$allyearly
+  newdata$income = data$allyearlyCurrent
   
-  newdata$current_income = data$currentallyearly
+  newdata$current_income = data$allyearlyCurrent
   
   if(contains_items("JOB.005", data)){
     data = combine.cat(x = data, 

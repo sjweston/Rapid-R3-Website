@@ -46,6 +46,7 @@ source(here("Functions/state_policy_fun.R"))
 cutoffv = 1
 
 scored = scored %>%
+  filter(Week <= 27) %>%
   mutate(Week = case_when(
     Week < 17 ~ Week, 
     (Week %% 2) == 0 ~ NA_real_,
@@ -57,6 +58,23 @@ scored = scored %>%
   ungroup() %>%
   mutate(poverty_cat = ifelse(poverty150 == 1, "Below FPL", "Above FPL"))
 ```
+
+# Representativeness disclaimer
+
+```{r state-policy-7 }
+
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
 
 # Well-baby{.tabset}
 
@@ -128,7 +146,7 @@ scored %>%
   group_by(race_ethnic, poverty_cat) %>%
   summarize(count = n(),
             percent = round(100*sum(missed_wellbaby)/count, 1)) %>%
-  write.csv(., here("figure data/092920_missWB_race_poverty.csv"))
+  write.csv(., here("figure data/100920_missWB_race_poverty.csv"))
 ```
 
 
@@ -343,7 +361,7 @@ ggplotly(plot, tooltip = "text")
 
 plotdata %>%
   select(age, percent) %>%
-  write.csv("figure data/1005_missedwb_ages.csv", row.names = F)
+  write.csv("figure data/100920_missedwb_ages.csv", row.names = F)
 ```
 
 
@@ -478,7 +496,7 @@ wellbaby.age(childinsurance_type)
 ## All
 
 ```{r child-health-32}
-scored %>%
+plot = scored %>%
   filter(missed_wellbaby == 1) %>%
   group_by(CaregiverID) %>%
   filter(row_number() == max(row_number())) %>%
@@ -494,7 +512,7 @@ scored %>%
   mutate(percent = count/n,
          moe = map2_dbl(percent, n, moe.p)) %>%
     mutate_at(vars(percent, moe), ~100*.x) %>%
-  ggplot(aes(x = reason, y = percent)) +
+  ggplot(aes(x = reason, y = percent, text = paste0(round(percent,1), "%"))) +
   geom_bar(stat = "identity") +
   geom_errorbar(aes(ymin = percent-moe, 
                     ymax = percent+moe),
@@ -502,6 +520,8 @@ scored %>%
   coord_flip() +
   labs(x = NULL, y = NULL, title = "Percent missed well-baby visits because of") +
   theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
 ```
 
 ## Race/ethnicity

@@ -12,9 +12,15 @@ library(jsonlite)
 library(readr)
 library(zoo) # for rolling averages and sums!
 
-load(here("../../Data Management R3/R Data/scored.Rdata"))
-
 scored_in_environ = length(which(grepl("scored", ls()))) > 0
+
+# source functions --------------------------------------------------------
+
+source(here("Functions/score_report.R"))
+source(here("Scripts/demo groups.R"))
+source(here("Functions/pomp.R"))
+source(here("Functions/fpl.R"))
+
 
 if(!scored_in_environ){
 
@@ -24,17 +30,10 @@ master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 Mast
 
 master = filter(master, CaregiverID != "") 
 master = master %>%
-  filter(is.na(Excluded11_25)) %>%
+  filter(is.na(Exclude)) %>%
   group_by(CaregiverID, Week) %>%
   filter(row_number() == max(row_number())) %>%
   ungroup()
-
-# source functions --------------------------------------------------------
-
-source(here("Functions/score_report.R"))
-source(here("Scripts/demo groups.R"))
-source(here("Functions/pomp.R"))
-source(here("Functions/fpl.R"))
 
 
 # get variable names and levels -------------------------------------------
@@ -110,7 +109,7 @@ scored = scored %>%
                       "hawaii", "other_race", "latinx", "age",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability", "employment_change",
-                      "current_income", "JOB.002", "STATE_CODED"), 
+                      "current_income", "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   arrange(desc(Week)) %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
@@ -122,33 +121,33 @@ scored = scored %>%
   ungroup()
 
 
-# federal poverty level ---------------------------------------------------
-
-scored = scored %>%
-  rowwise() %>%
-  mutate(FPL = FPL.function(JOB.002, STATE_CODED, income))
-
-scored = scored %>%
-  mutate(
-    poverty100 = case_when(
-      FPL == 1 ~ 1, 
-      !is.na(FPL) ~ 0),
-    poverty125 = case_when(
-      FPL == 1 ~ 1, 
-      FPL == 2 ~ 1, 
-      !is.na(FPL) ~ 0),
-    poverty150 = case_when(
-      FPL == 1 ~ 1, 
-      FPL == 2 ~ 1, 
-      FPL == 3 ~ 1, 
-      !is.na(FPL) ~ 0),
-    poverty200 = case_when(
-      FPL == 1 ~ 1, 
-      FPL == 2 ~ 1, 
-      FPL == 3 ~ 1, 
-      FPL == 4 ~ 1, 
-      !is.na(FPL) ~ 0),
-    )
+# # federal poverty level ---------------------------------------------------
+# 
+# scored = scored %>%
+#   rowwise() %>%
+#   mutate(FPL = FPL.function(JOB.002, STATE_CODED, income))
+# 
+# scored = scored %>%
+#   mutate(
+#     poverty100 = case_when(
+#       FPL == 1 ~ 1, 
+#       !is.na(FPL) ~ 0),
+#     poverty125 = case_when(
+#       FPL == 1 ~ 1, 
+#       FPL == 2 ~ 1, 
+#       !is.na(FPL) ~ 0),
+#     poverty150 = case_when(
+#       FPL == 1 ~ 1, 
+#       FPL == 2 ~ 1, 
+#       FPL == 3 ~ 1, 
+#       !is.na(FPL) ~ 0),
+#     poverty200 = case_when(
+#       FPL == 1 ~ 1, 
+#       FPL == 2 ~ 1, 
+#       FPL == 3 ~ 1, 
+#       FPL == 4 ~ 1, 
+#       !is.na(FPL) ~ 0),
+#     )
 
 # baseline week -----------------------------------------------------------
 
@@ -284,7 +283,7 @@ scored = scored %>%
 
 # med income by zip -------------------------------------------------------
 
-zipincome = read.csv(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Income_Data.csv"),
+zipincome = read.csv(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Archive/Income_Data.csv"),
                      na.strings = "-")
 
 zipincome = select(zipincome, Zip_Code, Housholds_Median_Income)
@@ -369,37 +368,6 @@ scored = scored %>%
                  "TN", "NC", "SC", "MS", "AL",
                  "GA", "FL") ~ "Not expanded"))
 
-# state early childhood financing  ----------------------------------------
-
-scored = scored %>%
-  mutate(earlychild_financing = case_when(
-    state %in% c("CA", "CO", "LA",
-                 "IN", "NV", "VA", 
-                 "WA") ~ "Early Childhood Financing",
-    !is.na(state) ~ "No legislation",
-    TRUE ~ NA_character_))
-
-
-
-# state prek readiness ----------------------------------------------------
-
-scored = scored %>%
-  mutate(prek_legislation = case_when(
-    state %in% c("CO", "MD", "NY", "OR",
-                 "TN", "TX", "UT", "WA") ~ "Prekindergarten and School Readiness",
-    !is.na(state) ~ "No legislation",
-    TRUE ~ NA_character_))
-
-
-# prenatal legislation ----------------------------------------------------
-
-scored = scored %>%
-  mutate(prenatal_legislation = case_when(
-    state %in% c("CA", "CO", "IL", 
-                 "IN", "ME", "MD",
-                 "NJ", "TX", "WA") ~ "Prenatal, Infant, Toddlers",
-    !is.na(state) ~ "No legislation",
-    TRUE ~ NA_character_))
 
 # childcare subsidy ----------------------------------------------------
 
@@ -417,12 +385,7 @@ scored = scored %>%
 
 # Clean workspace ---------------------------------------------------------
 
-
-rm(list = setdiff(ls(), c("scored", "master", "combine.cat", 
-                          "find_items", "contains_items", "identify_state",
-                          "select_first")))
-
-save(scored, file = paste0(here("../../Data Management R3/R Data/"), "scored.Rdata"))
+save(scored, master, file = paste0(here("../../Data Management R3/R Data/"), "scored.Rdata"))
 } else{
   rm(scored)
   load(here("../../Data Management R3/R Data/scored.Rdata"))

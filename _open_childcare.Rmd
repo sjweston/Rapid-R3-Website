@@ -1,0 +1,1085 @@
+---
+title: "Open-ended childcare responses"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r -open-childcare-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+
+num_topics = 30
+num_topics2 = 13
+prob_threshold = .1
+```
+
+```{r -open-childcare-2 }
+library(here)
+library(stm)
+library(tidytext)
+library(furrr)
+library(ggpubr)
+library(psych)
+library(conflicted)
+library(LDAvis)
+library(tidystm)
+library(ggrepel)
+conflict_prefer("summarize", "dplyr")
+```
+
+```{r -open-childcare-3 }
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+conflict_prefer("map", "purrr")
+
+```
+
+```{r -open-childcare-4 }
+open_ended = scored %>%
+  filter(Week <= 26) %>%
+  filter(language != "ES") %>%
+  filter(language != "SPA") %>%
+  select(-contains("OPEN.006")) %>%
+  filter(!is.na(race_ethnic)) %>%
+  filter(!is.na(poverty_cat)) %>%
+  filter(!is.na(mental_health)) %>%
+  gather("question", "response", contains("OPEN")) %>%
+  mutate(question = str_extract(question, ".$")) %>%
+  filter(!is.na(response)) 
+
+#identify question about childcare
+open_ended = open_ended %>%
+  mutate(about_childcare = case_when(
+    str_detect(response, "childcare") ~ 1,
+    str_detect(response, "child care") ~ 1,
+    str_detect(response, "daycare") ~ 1,
+    str_detect(response, "day care") ~ 1,
+    str_detect(response, "nanny") ~ 1,
+    str_detect(response, "babysitter") ~ 1,
+    str_detect(response, "baby sitter") ~ 1,
+    str_detect(response, "care center") ~ 1,
+    str_detect(response, "child care") ~ 1,
+    str_detect(response, "playgroup") ~ 1,
+    str_detect(response, "play group") ~ 1,
+    str_detect(response, "class") ~ 1,
+    TRUE ~ NA_real_
+  )) %>%
+  filter(about_childcare == 1)
+```
+
+# Question 1
+
+```{r -open-childcare-5 }
+open_ended1 = open_ended %>% filter(question == "1")
+```
+
+
+## How many topics
+
+```{r -open-childcare-6, results='hide'}
+processed1 <- textProcessor(open_ended1$response, metadata = open_ended1)
+out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)
+docs1 <- out1$documents
+vocab1 <- out1$vocab
+meta1 <- out1$meta
+
+heldout1 = make.heldout(docs1, vocab1)
+```
+
+```{r -open-childcare-7, eval = F}
+set.seed(07312020)
+plan(multiprocess)
+
+many_models <- tibble(K =seq(5,50, by=5)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, 
+                                          heldout1$vocab, 
+                                          K = .,
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                                          data = meta1, 
+                                          verbose = FALSE)))
+k_result <- many_models %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),
+         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),
+         residual = map(topic_model, checkResiduals, heldout1$documents),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+```
+
+```{r -open-childcare-8}
+load(here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+
+```
+
+```{r -open-childcare-9 }
+k_result %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  scale_x_continuous()+
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics") +
+  theme_pubclean()
+```
+
+```{r -open-childcare-10, eval = F}
+findingK = searchK(out1$documents, out1$vocab, K = c(30:50), prevalence =~ race_ethnic + poverty150 + mental_health + s(Week), data = meta1, proportion = .5, verbose = F)
+```
+
+```{r -open-childcare-11, eval=FALSE, include=FALSE}
+set.seed(07312020)
+plan(multiprocess)
+
+many_models <- tibble(K =c(20:40)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, 
+                                          heldout1$vocab, 
+                                          K = .,
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                                          data = meta1, 
+                                          verbose = FALSE)))
+k_result <- many_models %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),
+         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),
+         residual = map(topic_model, checkResiduals, heldout1$documents),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models2.Rdata"))
+
+```
+
+
+```{r -open-childcare-12, eval = F}
+stm_child23 <- stm(documents = docs1, 
+                    vocab = vocab1,
+                    K = 23, 
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                    data = meta1, 
+                    init.type = "Spectral")
+
+save(list = str_subset(ls(), "stm_child"), file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
+```
+
+```{r -open-childcare-13 }
+load(file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
+topics_child = get(paste0("stm_child", num_topics))
+```
+
+```{r -open-childcare-14, eval = F}
+# assess structure visually
+toLDAvis(stm_child30, docs = docs1)
+```
+
+## Most common topics
+
+```{r -open-childcare-15 }
+td_beta1 <- tidy(topics_child)
+td_gamma1 <- tidy(topics_child, matrix = "gamma")
+
+meta1 = meta1 %>%
+  mutate(document = row_number())
+
+
+top_terms <- td_beta1 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(7, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest(cols = c(terms))
+
+gamma_terms <- td_gamma1 %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms %>%
+  top_n(15, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
+  #scale_y_continuous(limits =c(0, .10))+
+  coord_flip() +
+  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 15 topics by prevalence response",
+       subtitle = "With the top words that contribute to each topic") +
+  theme_pubr()
+```
+
+## Identify topics {.tabset}
+
+### All
+
+### 1
+
+```{r -open-childcare-16 }
+texts = open_ended1$response[-out1$docs.removed]
+labelTopics(topics_child, topics = 1, n = 5)
+findThoughts(topics_child, texts, topics = 1, n = 5)
+```
+
+### 2
+
+```{r -open-childcare-17 }
+labelTopics(topics_child, topics = 2, n = 5)
+findThoughts(topics_child, texts, topics = 2, n = 5)
+```
+
+### 3
+
+```{r -open-childcare-18 }
+labelTopics(topics_child, topics = 3, n = 5)
+findThoughts(topics_child, texts, topics = 3, n = 5)
+```
+
+### 4
+
+```{r -open-childcare-19 }
+labelTopics(topics_child, topics = 4, n = 5)
+findThoughts(topics_child, texts, topics = 4, n = 5)
+```
+
+### 5
+
+```{r -open-childcare-20 }
+labelTopics(topics_child, topics = 5, n = 5)
+findThoughts(topics_child, texts, topics = 5, n = 5)
+```
+
+### 6
+
+```{r -open-childcare-21 }
+labelTopics(topics_child, topics = 6, n = 5)
+findThoughts(topics_child, texts, topics = 6, n = 5)
+```
+
+### 7
+
+```{r -open-childcare-22 }
+labelTopics(topics_child, topics = 7, n = 5)
+findThoughts(topics_child, texts, topics = 7, n = 5)
+```
+
+### 8
+
+```{r -open-childcare-23 }
+labelTopics(topics_child, topics = 8, n = 5)
+findThoughts(topics_child, texts, topics = 8, n = 5)
+```
+
+### 9
+
+```{r -open-childcare-24 }
+tx = 9
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 10
+
+```{r -open-childcare-25 }
+tx = 10
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 11
+
+```{r -open-childcare-26 }
+tx = 11
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 12
+
+```{r -open-childcare-27 }
+tx = 12
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 13
+
+```{r -open-childcare-28 }
+tx = 13
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 14
+
+```{r -open-childcare-29 }
+tx = 14
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 15
+
+```{r -open-childcare-30 }
+tx = 15
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 16
+
+```{r -open-childcare-31 }
+tx = 16
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 17
+
+```{r -open-childcare-32 }
+tx = 17
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 18
+
+```{r -open-childcare-33 }
+tx = 18
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 19
+
+```{r -open-childcare-34 }
+tx = 19
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 20
+
+```{r -open-childcare-35 }
+tx = 20
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 21
+
+```{r -open-childcare-36 }
+tx = 21
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 22
+
+```{r -open-childcare-37 }
+tx = 22
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 23
+
+```{r -open-childcare-38 }
+tx = 23
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 24
+
+```{r -open-childcare-39 }
+tx = 24
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 25
+
+```{r -open-childcare-40 }
+tx = 25
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 26
+
+```{r -open-childcare-41 }
+tx = 26
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 27
+
+```{r -open-childcare-42 }
+tx = 27
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 28
+
+```{r -open-childcare-43 }
+tx = 28
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 29
+
+```{r -open-childcare-44 }
+tx = 29
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+### 30
+
+```{r -open-childcare-45 }
+tx = 30
+labelTopics(topics_child, topics = tx, n = 5)
+findThoughts(topics_child, texts, topics = tx, n = 5)
+```
+
+# Effects
+
+```{r -open-childcare-46 }
+# extract topic frequencies
+td_gamma <- tidy(topics_child, matrix = "gamma")
+
+topic_freq = td_gamma %>%
+  mutate(contains = ifelse(gamma < prob_threshold, 0, 1)) %>%
+  group_by(topic) %>%
+  summarize(freq = sum(contains))
+
+```
+
+
+```{r -open-childcare-47 }
+predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic + poverty150 + mental_health + s(Week), 
+                               stmobj = topics_child, 
+                               metadata = out1$meta, 
+                               uncertainty = "Global")
+```
+
+```{r -open-childcare-48 }
+race_effect = extract.estimateEffect(predict_topics, covariate = "race_ethnic")
+poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150")
+mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
+```
+
+```{r -open-childcare-49 }
+race_plot_data = race_effect %>%
+  select(topic, covariate.value, estimate) %>%
+  spread(covariate.value, estimate) %>%
+    mutate(BlacktoWhite = White-Black)
+
+poverty_plot_data = poverty_effect %>%
+  select(topic, covariate.value, estimate) %>%
+  spread(covariate.value, estimate) %>%
+  mutate(poverty = `0`-`1`)
+
+mental_plot_data = mental_effect %>%
+  group_by(topic) %>%
+  nest() %>%
+  mutate(model = map(data, ~lm(estimate~covariate.value, data = .x))) %>%
+  mutate(model = map(model, tidy)) %>%
+  select(topic, model) %>%
+  unnest(cols = c(model)) %>%
+  filter(term == "covariate.value") %>%
+  select(topic, estimate)
+
+full_join(race_plot_data, mental_plot_data) %>%
+  full_join(topic_freq) %>%
+  ggplot(aes(x = BlacktoWhite, y = estimate)) +
+  geom_point(aes(size = freq), color = "grey") +
+  geom_text_repel(aes(label = topic)) +
+  scale_x_continuous(NULL, breaks = c(min(race_plot_data$BlacktoWhite),
+                                      max(race_plot_data$BlacktoWhite)), labels = c("Black", "White")) +
+  scale_y_continuous("Mental health problems", breaks = NULL) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(size = 18, color = "Black"))
+```
+
+
+```{r -open-childcare-50 }
+full_join(poverty_plot_data, mental_plot_data) %>%
+  full_join(topic_freq) %>%
+  ggplot(aes(x = poverty, y = estimate)) +
+  geom_point(aes(size = freq), color = "grey") +
+  geom_text_repel(aes(label = topic)) +
+  scale_x_continuous(NULL, breaks = c(min(poverty_plot_data$poverty),
+                                      max(poverty_plot_data$poverty)), 
+                     labels = c("Low Income", "High Income")) +
+  scale_y_continuous("Mental health problems", breaks = NULL) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(size = 18, color = "Black"))
+```
+
+
+# Question 2
+
+```{r -open-childcare-51 }
+open_ended2 = open_ended %>% filter(question == "2")
+```
+
+
+## How many topics
+
+```{r -open-childcare-52, results='hide'}
+processed2 <- textProcessor(open_ended2$response, metadata = open_ended2)
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)
+docs2 <- out2$documents
+vocab2 <- out2$vocab
+meta2 <- out2$meta
+
+heldout2 = make.heldout(docs2, vocab2)
+```
+
+```{r -open-childcare-53, eval = F}
+set.seed(07312020)
+plan(multiprocess)
+
+many_models <- tibble(K =seq(5,50, by=5)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, 
+                                          heldout2$vocab, 
+                                          K = .,
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                                          data = meta2, 
+                                          verbose = FALSE)))
+k_result <- many_models %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),
+         residual = map(topic_model, checkResiduals, heldout2$documents),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
+```
+
+```{r -open-childcare-54 }
+load(here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
+```
+
+```{r -open-childcare-55 }
+k_result %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  scale_x_continuous()+
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics") +
+  theme_pubclean()
+```
+
+```{r -open-childcare-56, eval = F}
+findingK = searchK(out2$documents, out2$vocab, K = c(30:50), prevalence =~ race_ethnic + poverty150 + mental_health + s(Week), data = meta2, proportion = .5, verbose = F)
+```
+
+```{r -open-childcare-57, eval=FALSE, include=FALSE}
+set.seed(07312020)
+plan(multiprocess)
+
+many_models <- tibble(K =c(5:15)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, 
+                                          heldout2$vocab, 
+                                          K = .,
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                                          data = meta2, 
+                                          verbose = FALSE)))
+k_result <- many_models %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),
+         residual = map(topic_model, checkResiduals, heldout2$documents),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild2_many_models2.Rdata"))
+
+k_result %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  scale_x_continuous(breaks = c(5:15))+
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics") +
+  theme_pubclean()
+```
+
+
+```{r -open-childcare-58, eval = F}
+stm2_child6 <- stm(documents = docs2, 
+                    vocab = vocab2,
+                    K = 6, 
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                    data = meta2, 
+                    init.type = "Spectral")
+
+save(list = str_subset(ls(), "stm2_child"), file = here("../../Data Management R3/R Data/topics_child_2.Rdata"))
+```
+
+```{r -open-childcare-59 }
+load(file = here("../../Data Management R3/R Data/topics_child_2.Rdata"))
+topics_child2 = get(paste0("stm2_child", num_topics2))
+```
+
+```{r -open-childcare-60, eval = F}
+# assess structure visually
+toLDAvis(stm2_child13, docs = docs2)
+```
+
+## Most common topics
+
+```{r -open-childcare-61 }
+td_beta1 <- tidy(topics_child2)
+td_gamma1 <- tidy(topics_child2, matrix = "gamma")
+
+meta2 = meta2 %>%
+  mutate(document = row_number())
+
+
+top_terms <- td_beta1 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(7, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest(cols = c(terms))
+
+gamma_terms <- td_gamma1 %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms %>%
+  top_n(15, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
+  #scale_y_continuous(limits =c(0, .10))+
+  coord_flip() +
+  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 15 topics by prevalence response",
+       subtitle = "With the top words that contribute to each topic") +
+  theme_pubr()
+```
+
+## Identify topics {.tabset}
+
+### All
+
+### 1
+
+```{r -open-childcare-62 }
+if(is.null(out2$docs.removed)){
+  texts = open_ended2$response
+}else{
+  texts = open_ended2$response[-out2$docs.removed]}
+labelTopics(topics_child2, topics = 1, n = 5)
+findThoughts(topics_child2, texts, topics = 1, n = 5)
+```
+
+### 2
+
+```{r -open-childcare-63 }
+labelTopics(topics_child2, topics = 2, n = 5)
+findThoughts(topics_child2, texts, topics = 2, n = 5)
+```
+
+### 3
+
+```{r -open-childcare-64 }
+labelTopics(topics_child2, topics = 3, n = 5)
+findThoughts(topics_child2, texts, topics = 3, n = 5)
+```
+
+### 4
+
+```{r -open-childcare-65 }
+labelTopics(topics_child2, topics = 4, n = 5)
+findThoughts(topics_child2, texts, topics = 4, n = 5)
+```
+
+### 5
+
+```{r -open-childcare-66 }
+labelTopics(topics_child2, topics = 5, n = 5)
+findThoughts(topics_child2, texts, topics = 5, n = 5)
+```
+
+### 6
+
+```{r -open-childcare-67 }
+labelTopics(topics_child2, topics = 6, n = 5)
+findThoughts(topics_child2, texts, topics = 6, n = 5)
+```
+
+### 7
+
+```{r -open-childcare-68 }
+labelTopics(topics_child2, topics = 7, n = 5)
+findThoughts(topics_child2, texts, topics = 7, n = 5)
+```
+
+### 8
+
+```{r -open-childcare-69 }
+labelTopics(topics_child2, topics = 8, n = 5)
+findThoughts(topics_child2, texts, topics = 8, n = 5)
+```
+
+### 9
+
+```{r -open-childcare-70 }
+tx = 9
+labelTopics(topics_child2, topics = tx, n = 5)
+findThoughts(topics_child2, texts, topics = tx, n = 5)
+```
+
+### 10
+
+```{r -open-childcare-71 }
+tx = 10
+labelTopics(topics_child2, topics = tx, n = 5)
+findThoughts(topics_child2, texts, topics = tx, n = 5)
+```
+
+### 11
+
+```{r -open-childcare-72 }
+tx = 11
+labelTopics(topics_child2, topics = tx, n = 5)
+findThoughts(topics_child2, texts, topics = tx, n = 5)
+```
+
+### 12
+
+```{r -open-childcare-73 }
+tx = 12
+labelTopics(topics_child2, topics = tx, n = 5)
+findThoughts(topics_child2, texts, topics = tx, n = 5)
+```
+
+### 13
+
+```{r -open-childcare-74 }
+tx = 13
+labelTopics(topics_child2, topics = tx, n = 5)
+findThoughts(topics_child2, texts, topics = tx, n = 5)
+```
+
+<!-- ### 14 -->
+
+<!-- ```{r -open-childcare-75 } -->
+<!-- tx = 14 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 15 -->
+
+<!-- ```{r -open-childcare-76 } -->
+<!-- tx = 15 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 16 -->
+
+<!-- ```{r -open-childcare-77 } -->
+<!-- tx = 16 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 17 -->
+
+<!-- ```{r -open-childcare-78 } -->
+<!-- tx = 17 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 18 -->
+
+<!-- ```{r -open-childcare-79 } -->
+<!-- tx = 18 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 19 -->
+
+<!-- ```{r -open-childcare-80 } -->
+<!-- tx = 19 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 20 -->
+
+<!-- ```{r -open-childcare-81 } -->
+<!-- tx = 20 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 21 -->
+
+<!-- ```{r -open-childcare-82 } -->
+<!-- tx = 21 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 22 -->
+
+<!-- ```{r -open-childcare-83 } -->
+<!-- tx = 22 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 23 -->
+
+<!-- ```{r -open-childcare-84 } -->
+<!-- tx = 23 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 24 -->
+
+<!-- ```{r -open-childcare-85 } -->
+<!-- tx = 24 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 25 -->
+
+<!-- ```{r -open-childcare-86 } -->
+<!-- tx = 25 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 26 -->
+
+<!-- ```{r -open-childcare-87 } -->
+<!-- tx = 26 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 27 -->
+
+<!-- ```{r -open-childcare-37} -->
+<!-- tx = 27 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 28 -->
+
+<!-- ```{r -open-childcare-38} -->
+<!-- tx = 28 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 29 -->
+
+<!-- ```{r -open-childcare-39} -->
+<!-- tx = 29 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 30 -->
+
+<!-- ```{r -open-childcare-40} -->
+<!-- tx = 30 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 31 -->
+
+<!-- ```{r -open-childcare-41} -->
+<!-- tx = 31 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 32 -->
+
+<!-- ```{r -open-childcare-42} -->
+<!-- tx = 32 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 33 -->
+
+<!-- ```{r -open-childcare-43} -->
+<!-- tx = 33 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 34 -->
+
+<!-- ```{r} -->
+<!-- tx = 34 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 35 -->
+
+<!-- ```{r} -->
+<!-- tx = 35 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 36 -->
+
+<!-- ```{r} -->
+<!-- tx = 36 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+
+
+# Effects
+
+```{r -open-childcare-88 }
+# extract topic frequencies
+td_gamma <- tidy(topics_child2, matrix = "gamma")
+
+prob_threshold = .1
+
+topic_freq = td_gamma %>%
+  mutate(contains = ifelse(gamma < prob_threshold, 0, 1)) %>%
+  group_by(topic) %>%
+  summarize(freq = sum(contains))
+
+```
+
+
+```{r -open-childcare-89 }
+predict_topics<-estimateEffect(formula = 1:num_topics2 ~ race_ethnic + poverty150 + mental_health + s(Week), 
+                               stmobj = topics_child2, 
+                               metadata = out2$meta, 
+                               uncertainty = "Global")
+```
+
+```{r -open-childcare-90 }
+race_effect = extract.estimateEffect(predict_topics, covariate = "race_ethnic")
+poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150")
+mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
+```
+
+```{r -open-childcare-91 }
+race_plot_data = race_effect %>%
+  select(topic, covariate.value, estimate) %>%
+  spread(covariate.value, estimate) %>%
+    mutate(BlacktoWhite = White-Black)
+
+poverty_plot_data = poverty_effect %>%
+  select(topic, covariate.value, estimate) %>%
+  spread(covariate.value, estimate) %>%
+  mutate(poverty = `0`-`1`)
+
+mental_plot_data = mental_effect %>%
+  group_by(topic) %>%
+  nest() %>%
+  mutate(model = map(data, ~lm(estimate~covariate.value, data = .x))) %>%
+  mutate(model = map(model, tidy)) %>%
+  select(topic, model) %>%
+  unnest(cols = c(model)) %>%
+  filter(term == "covariate.value") %>%
+  select(topic, estimate)
+
+full_join(race_plot_data, mental_plot_data) %>%
+  full_join(topic_freq) %>%
+  ggplot(aes(x = BlacktoWhite, y = estimate)) +
+  geom_point(aes(size = freq), color = "grey") +
+  geom_text_repel(aes(label = topic)) +
+  scale_x_continuous(NULL, breaks = c(min(race_plot_data$BlacktoWhite),
+                                      max(race_plot_data$BlacktoWhite)), labels = c("Black", "White")) +
+  scale_y_continuous("Mental health problems", breaks = NULL) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(size = 18, color = "Black"))
+```
+
+
+```{r -open-childcare-92 }
+full_join(poverty_plot_data, mental_plot_data) %>%
+  full_join(topic_freq) %>%
+  ggplot(aes(x = poverty, y = estimate)) +
+  geom_point(aes(size = freq), color = "grey") +
+  geom_text_repel(aes(label = topic)) +
+  scale_x_continuous(NULL, breaks = c(min(poverty_plot_data$poverty),
+                                      max(poverty_plot_data$poverty)), 
+                     labels = c("Low Income", "High Income")) +
+  scale_y_continuous("Mental health problems", breaks = NULL) +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(size = 18, color = "Black"))
+```
+
+

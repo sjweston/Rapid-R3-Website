@@ -53,8 +53,8 @@ scored = scored %>%
          #income = factor(poverty200s, labels = c("high income","low income")),
          median_income = median_income/1000,
          median_income = cut(median_income, breaks = med_household_quantiles),
-         poverty200s = factor(poverty200s, labels = c("high income","low income")),
-         poverty150s = factor(poverty150s, labels = c("high income","low income")))
+         poverty200s = factor(poverty200, labels = c("high income","low income")),
+         poverty150s = factor(poverty150, labels = c("high income","low income")))
 ```
 
 
@@ -2578,7 +2578,7 @@ scored %>%
 # Open-ended questions
 
 ```{r 0prelim-may29-87 }
-text_data = master %>%
+text_data = scored %>%
   filter(Week %in% c(7,8)) %>%
   select(CaregiverID, Week, contains("OPEN")) 
 

@@ -17,6 +17,7 @@ options(knitr.kable.NA = '')
 ```{r 0prelim-may22-2}
 library(here)
 library(tidytext)
+source(here("Scripts/score data.R"))
 source(here("Scripts/demo groups.R"))
 
 ```
@@ -24,7 +25,6 @@ source(here("Scripts/demo groups.R"))
 
 ```{r score datafile, echo = F, warning = F, message = F}
 ## score master --------------------------------------------------------
-source(here("Scripts/score data.R"))
 scored = scored %>%
   filter(Week == 7)
 ```
@@ -721,8 +721,8 @@ scored %>%
 # Open-ended questions
 
 ```{r 0prelim-may22-24}
-text_data = scored[,c("CaregiverID", demo_groups)] %>%
-  left_join(master[master$Week == 7, c("CaregiverID", find_items("OPEN", master))])
+text_data = scored %>%
+  select(CaregiverID, all_of(demo_groups), contains("OPEN"))
 ```
 
 

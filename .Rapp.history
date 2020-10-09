@@ -1,598 +1,3 @@
-162+84+59+75
-m1 = c(15,10,7,18,5,9,12)
-m2 = c(24,23,11,25,14,14,21)
-d = m2-m1
-d
-d^2
-mean(d)
-d-mean(d)
-(d-mean(d))^2
-sum((d-mean(d))^2)
-54/6
-3/sqrt(7)
-mean(m1)
-mean(m2)
-8/1.13
-2.447*1.13
-8-2.77
-sd(m2)
-sd(m1)
-m1-m2
-mean(m1-m2)
-mean(m1)-mean(m2)
-x = c(6,21,10,10,19,30)
-mean(x)
-sd(x)
-(x-mean(x))/8.97
-zx = (x-mean(x))/8.97
-y = c(1,3,4,7,7,8)
-mean(y)
-sd(y)
-zy = (y-mean(y))/2.76
-zy
-zx*zy
-round(zx,2)*round(zy,2)
-mean(round(zx,2)*round(zy,2))
-scale(x)
-round(scale(x),2)
-round(scale(x),2)*round(scale(y),2)
-mean(round(scale(x),2)*round(scale(y),2))
-mean(scale(x)*scale(y))
-cor(x,y)
-(x-mean(x))^2
-sum((x-mean(x))^2)
-sum((x-mean(x))^2)/6
-sqrt(sum((x-mean(x))^2)/6)
-s_x
-s_x=sqrt(sum((x-mean(x))^2)/6)
-s_7=sqrt(sum((y-mean(y))^2)/6)
-s_y=sqrt(sum((y-mean(y))^2)/6)
-zx = (x-mean(x))/s_x
-zy = (y-mean(y))/s_y
-zx*zy
-mean(zx*zy)
-s_x
-sy
-s_y
-z_x
-zx
-round(zx,2)
-round(zx,2)*round(zy,2)
-mean(round(zx,2)*round(zy,2))
-round(zy,2)
-round(round(zx,2)*round(zy,2),2)
-mean(round(round(zx,2)*round(zy,2),2))
-x = c(3,4,1,1)
-ss = x*x
-ss
-ss = sum(x*x)
-ss
-s = ss/3
-s = sqrt(ss/3)
-s
-3/sqrt(3)
-data.frame(x = c(1,1,1,1,2,2,2,2), y = c(8,8,8,6,5,7,9,2))
-t.test(y~x, var.equal=T)
-data =data.frame(x = c(1,1,1,1,2,2,2,2), y = c(8,8,8,6,5,7,9,2))
-t.test(y~x, data=data, var.equal=T)
-mod = t.test(y~x, data=data, var.equal=T)
-str(mod)
-x1 = c(8,8,8,6)
-x2 = c(5,7,9,2)
-sd(x1)
-sd(x2)
-s1 = sd(x1)
-s2 = sd(x2)
-data.frame(x = rep(c(1,2), each = 4), y = c(x1,x2))
-data = data.frame(x = rep(c(1,2), each = 4), y = c(x1,x2))
-library(MVR)
-install.packages("MVR")
-library(lsr)
-lsr::independentSamplesTTest(formula=y~x, data = data)
-lsr::independentSamplesTTest(formula=y~x, data = data, var.equal=TRUE)
-test = lsr::independentSamplesTTest(formula=y~x, data = data, var.equal=TRUE)
-str(test)
-den = s1(3) + s2(3)
-den = s1*3 + s2*3
-num = 6
-den/num
-s = den/num
-s/sqrt(8)
-library(psych)
-describe(bfi, fast = T)
-plot(bfi$N1, bfi$E3)
-plot(bfi$N1, bfi$E3, jitter = T)
-library(lavaan)
-lavaan:::lav_fit_measures
-filepathdata <- "~/Downloads/"
-load(paste0(filepathdata, "fullSample.Rdata"))
-load("/Volumes/NO NAME/fullsample.Rdata")
-suppressPackageStartupMessages(library(zipcode))#
-suppressPackageStartupMessages(library(mgcv))#
-suppressPackageStartupMessages(library(maps))
-gridsize = 1000 # default is 300 # 1000 is the best value (lots of testing)#
-#
-sapaZip <- #
-function (data = data, gridsize = gridsize, DV = DV, database = database, #
-    average = average, regions = ".", size = size, miss = miss, #
-    w = NULL, ncols = NULL, main = "", mapdatabase = mapdatabase) #
-{#
-    zipData <- sapaZipPrep(data)#
-    grid <- sapaGrid(data = zipData, gridsize = gridsize)#
-    smooth <- sapaSmooth(data = grid)#
-    inside <- sapaInside(data = smooth)#
-    sapaImage(data = inside, main = main)#
-    invisible(inside)#
-}#
-#
-sapaZipPrep <-#
-function (data) #
-{#
-    zipData <- subset(data, select = c(zip, ZCTA))#
-    zip <- zipData[, 1]#
-    ZCTA <- zipData[, 2]#
-    ZCTAn <- 1 - is.na(ZCTA)#
-    zipn <- 1 - is.na(zip)#
-    zipframe <- data.frame(zip, ZCTA, ZCTAn, zipn)#
-    valid <- function(x) {#
-        sum(!is.na(x))#
-    }#
-    if (!require(zipcode)) {#
-        stop("The package zipcode must be installed:")#
-    }#
-    data(zipcode)#
-    zips <- zipcode#
-    zips$zip <- as.numeric(zips$zip)#
-    z <- zipframe[, "zip"]#
-    cnames <- colnames(zipframe)#
-    for (i in 1:ncol(zipframe)) {#
-        if (is.factor(zipframe[, i]) || is.logical(zipframe[, #
-            i])) {#
-            zipframe[, i] <- as.numeric(zipframe[, i])#
-        }#
-    }#
-    xvals <- list()#
-    xvals$mean <- t(matrix(unlist(by(zipframe, z, colMeans, na.rm = TRUE)), #
-        nrow = ncol(zipframe)))#
-    xvals$n <- t(matrix(unlist(by(zipframe, z, function(x) sapply(x, #
-        valid))), nrow = ncol(zipframe)))#
-    colnames(xvals$mean) <- colnames(zipframe)#
-    colnames(xvals$n) <- paste(colnames(xvals$mean), ".n", sep = "")#
-    rownames(xvals$mean) <- rownames(xvals$n) <- xvals$mean[, #
-        "zip"]#
-    sapa.values <- cbind(xvals$mean, xvals$n)#
-    sapa.zip <- merge(sapa.values, zips, by = "zip")#
-    return(sapa.zip)#
-}#
-#
-sapaGrid <- #
-function (data = data, gridsize = 600, DV = "ZCTAn", database = "usa", #
-    average = FALSE, regions = ".") #
-{#
-    map <- map(database = database, plot = FALSE, regions = regions)#
-    if (average) {#
-        aver = mean(data[, DV], na.rm = TRUE)#
-    }#
-    else {#
-        aver = 0#
-    }#
-    data[, DV] <- data[, DV] - aver#
-    mat <- matrix(0, gridsize, gridsize)#
-    count <- matrix(0, gridsize, gridsize)#
-    nsubs <- nrow(data)#
-    rangex <- map$range[2] - map$range[1]#
-    rangey <- map$range[4] - map$range[3]#
-    data["longitude"] <- round((data["longitude"] - map$range[1]) * #
-        gridsize/rangex)#
-    data["latitude"] <- round((data["latitude"] - map$range[3]) * #
-        gridsize/rangey)#
-    clean <- subset(data, (data[, "longitude"] > 0))#
-    clean <- subset(clean, (clean[, "longitude"] < (gridsize + #
-        1)))#
-    clean <- subset(clean, (clean[, "latitude"] < (gridsize + #
-        1)))#
-    clean <- subset(clean, (clean[, "latitude"] > 0))#
-    nsubs <- nrow(clean)#
-    DVn <- paste(DV, ".n", sep = "")#
-    for (observation in (1:nsubs)) {#
-        long <- clean[observation, "longitude"]#
-        lat <- clean[observation, "latitude"]#
-        if (!is.na(clean[observation, DV])) {#
-            mat[long, lat] <- mat[long, lat] + clean[observation, #
-                DV] * clean[observation, DVn]#
-            count[long, lat] <- count[long, lat] + clean[observation, #
-                DVn]#
-        }#
-    }#
-    av <- mat/count#
-    if (average) {#
-        av[!is.finite(av)] <- 0#
-    }#
-    else {#
-        av[!is.finite(av)] <- aver#
-    }#
-    return(list(average = av, total = mat, count = count))#
-}#
-#
-sapaSmooth <- #
-function (data = data, size = 11, miss = 0.05, w = NULL) #
-{#
-    n <- data$count#
-    n[n == 0] <- miss#
-    tot <- data$tot#
-    nvar <- ncol(tot)#
-    if (is.null(w)) {#
-        w <- matrix(1, size, size)#
-        center <- median(1:size)#
-        for (i in 1:size) {#
-            for (j in 1:size) {#
-                w[i, j] <- (sqrt((i - center)^2 + (j - center)^2))/2#
-                w[i, j] <- dnorm(w[i, j])#
-            }#
-        }#
-    }#
-    pad <- center - 1#
-    padding <- matrix(0, nvar, pad)#
-    tot1 <- cbind(padding, tot, padding)#
-    n1 <- cbind(padding, n, padding)#
-    padding <- matrix(0, pad, ncol(tot1))#
-    tot1 <- rbind(padding, tot1, padding)#
-    n1 <- rbind(padding, n1, padding)#
-    for (i in (pad + 1):(nvar + pad)) {#
-        for (j in (pad + 1):(nvar + pad)) {#
-            tot[(i - pad), (j - pad)] <- sum(tot1[(i - pad):(i + #
-                pad), (j - pad):(j + pad)] * w)/sum(n1[(i - pad):(i + #
-                pad), (j - pad):(j + pad)] * w)#
-        }#
-    }#
-    return(tot)#
-}#
-#
-sapaInside <- #
-function (data, database = "usa", regions = ".") #
-{#
-    if (!require(maps)) {#
-        stop("The package maps must be installed:")#
-    }#
-    if (!require(mgcv)) {#
-        stop("The package mgcv must be installed")#
-    }#
-    nlat = nrow(data)#
-    nlong = ncol(data)#
-    us <- map(database = database, plot = FALSE, regions = regions)#
-    bnd <- data.frame(x = us$x, y = us$y)#
-    sapa <- matrix(0, nlat * nlong, 3)#
-    x <- (rep(1:nlat, each = nlong)/nlong) * (us$range[2] - us$range[1]) + #
-        us$range[1]#
-    y <- (rep(1:nlong, nlat)/nlat) * (us$range[4] - us$range[3]) + #
-        us$range[3]#
-    z <- as.vector(t(data))#
-    is.in <- inSide(bnd, x, y)#
-    x <- x[is.in]#
-    y <- y[is.in]#
-    z <- z[is.in]#
-    n.in <- length(x)#
-    zgrid <- matrix(NA, nlat, nlong)#
-    for (location in 1:n.in) {#
-        lat <- round((y[location] - us$range[3]) * nlat/(us$range[4] - #
-            us$range[3]))#
-        long <- round((x[location] - us$range[1]) * nlong/(us$range[2] - #
-            us$range[1]))#
-        zgrid[long, lat] <- z[location]#
-    }#
-    newgrid <- list(x = (1:nlong) * (us$range[2] - us$range[1])/nlong + #
-        us$range[1], y = (1:nlat) * (us$range[4] - us$range[3])/nlat + #
-        us$range[3], z = zgrid)#
-    return(list(x = x, y = y, z = z, grid = newgrid))#
-}#
-#
-sapaImage <-#
-function (data = data, ncols = NULL, main = main, mapdatabase = "state", #
-    regions = ".") #
-{#
-    if (is.list(data)) #
-        grid <- data$grid#
-    map <- map(database = mapdatabase, plot = FALSE)#
-    rangex <- map$range[2] - map$range[1]#
-    rangey <- map$range[4] - map$range[3]#
-    if (is.null(ncols)) #
-        ncols <- ncol(data$z)#
-    gr <- colorRampPalette(c("white", "white", "blue"))#
-    colramp <- gr(ncols)#
-    image(grid, col = colramp, axes = FALSE, main = main)#
-    map <- map(mapdatabase, add = TRUE, regions = regions)#
-}#
-#
-png(file=paste(filepathdata, "USmap.png", sep = ""), width=800, height=580)#
-sapaZip(data = fullSample, gridsize = gridsize, DV = DV, database = database, average = average, regions = ".", size = 8, miss = 0.03, w = NULL, ncols = NULL, main = "", mapdatabase = mapdatabase)#
-dev.off()
-sapaZip(data = fullSample, gridsize = gridsize, DV = DV, database = database, average = average, regions = ".", size = 8, miss = 0.03, w = NULL, ncols = NULL, main = "", mapdatabase = mapdatabase)
-library(here)#
-library(tidyverse)#
-library(lavaan)#
-library(semTools)
-load(here("Google Drive/Work/Research/ongoing/norming/objects/cleaned.Rdata"))
-source(here("Google Drive/Work/Research/ongoing/norming/functions/non_empty_cols.R"))
-source(here("Google Drive/Work/Research/ongoing/norming/functions/absolute.R"))
-source(here("Google Drive/Work/Research/ongoing/norming/functions/mcdonald.R"))
-#load superKey file and select just SPI_81 scales#
-key = read_csv(here("Google Drive/Work/Research/ongoing/norming/data/superKey.csv")) %>%#
-  select(X1, contains("81")) %>%#
-  select(1:6) #only the big five
-data = data %>%#
-  mutate(paid = ifelse(sample == "sapa", "Voluntary", "Paid"),#
-         paid_amount = comp,#
-         representative = case_when(#
-           sample %in% c("escs", "johnson", "psych") ~ "Not representative",#
-           sample %in% c("qualtrics", "yougov", "mturk_low", "mturk_med", "mturk_high") ~ "Representative",#
-           TRUE ~ NA_character_),#
-         sample_m_jj = #
-           case_when(sample == "johnson" ~ NA_character_,#
-                     TRUE ~ sample),#
-         sample_m_jj_escs = case_when(#
-           sample %in% c("escs", "johnson") ~ NA_character_,#
-           TRUE ~ sample)#
-  )#
-#
-#remove beginning of scale names#
-scale_names = gsub("SPI_81_27_5_", "", names(key)[-1])#
-#create factor variable (for ordering tables and such)#
-scale_names_f = factor(scale_names, levels = scale_names)#
-#
-comparisons = c("paid", "paid_amount", "representative", "sample", "sample_m_jj", "sample_m_jj_escs")
-source(here("Google Drive/Work/Research/ongoing/norming/scripts/fun_measurement-model.R"))
-key = key %>%#
-  rename(item = X1) %>%#
-  gather(key = "scale", value = "value", -item) %>%#
-  filter(value != 0) %>%#
-  group_by(scale) %>%#
-  nest() %>%#
-  mutate(scale = gsub("SPI_81_27_5_", "", scale)) %>%#
-  mutate(items = map(data, 1)) %>%#
-  mutate(scale_key = map(data, 2)) %>%#
-  select(-data)
-psych::describe(data, fast = T)
-mi_data = expand.grid(RID = data$RID, #
-                      scale = scale_names, #
-                      comparisons = comparisons, #
-                      stringsAsFactors = F) %>%#
-  full_join(data) %>%#
-  group_by(scale, comparisons) %>%#
-  nest() %>%#
-  full_join(key, by = "scale") %>%#
-  #select just scale items and comparison groups#
-  mutate(data = map2(.x = data, #
-                     .y = items, .f = function(x,y) select(x, y, comparisons))) %>% #
-  # #rename items q_1, q_2, etc#
-  # mutate(data = map2(.x = data, .y = items, .f = function(x,y) rename_at(x, vars(matches("[0-9]")), #
-  #                                    funs(str_replace(., "[0-9]{1,}", as.character(1:length(y))))))) %>%#
-  #rename demographic variable as "groups" to indicate in measurement model which groups to assess#
-  mutate(data = map2(.x = data, .y = comparisons, .f = function(x,y) rename_at(x, vars(matches(y)),#
-                                                                        funs(str_replace(., y, "groups"))))) %>%#
-  #reverse code negatively keyed items#
-  mutate(data = map2(.x = data, .y = scale_key, #
-                     .f = function(x,y) mutate_at(x, .vars = which(y == -1), #
-                                                  .funs = function(i) 100-i))) %>%#
-  #figure out which items to keep -- these are items that have at least one response in each group#
-  mutate(keep = map(data, non_empty_cols)) %>%#
-  mutate(keep = map(keep, ~Reduce(intersect, .x))) %>%#
-  mutate(nitems = map(keep, length)) %>%#
-  ilter(nitems >=2) %>%#
-  mutate(data = map2(data, keep, ~select(.x, all_of(.y), groups))) %>%#
-  # create measurement model code#
-  mutate(model = map(keep, mm))
-mi_data = expand.grid(RID = data$RID, #
-                      scale = scale_names, #
-                      comparisons = comparisons, #
-                      stringsAsFactors = F) %>%#
-  full_join(data) %>%#
-  group_by(scale, comparisons) %>%#
-  nest() %>%#
-  full_join(key, by = "scale") %>%#
-  #select just scale items and comparison groups#
-  mutate(data = map2(.x = data, #
-                     .y = items, .f = function(x,y) select(x, y, comparisons))) %>% #
-  # #rename items q_1, q_2, etc#
-  # mutate(data = map2(.x = data, .y = items, .f = function(x,y) rename_at(x, vars(matches("[0-9]")), #
-  #                                    funs(str_replace(., "[0-9]{1,}", as.character(1:length(y))))))) %>%#
-  #rename demographic variable as "groups" to indicate in measurement model which groups to assess#
-  mutate(data = map2(.x = data, .y = comparisons, .f = function(x,y) rename_at(x, vars(matches(y)),#
-                                                                        funs(str_replace(., y, "groups"))))) %>%#
-  #reverse code negatively keyed items#
-  mutate(data = map2(.x = data, .y = scale_key, #
-                     .f = function(x,y) mutate_at(x, .vars = which(y == -1), #
-                                                  .funs = function(i) 100-i))) %>%#
-  #figure out which items to keep -- these are items that have at least one response in each group#
-  mutate(keep = map(data, non_empty_cols)) %>%#
-  mutate(keep = map(keep, ~Reduce(intersect, .x))) %>%#
-  # how many items left per group?#
-  mutate(nitems = map(keep, length)) %>%#
-  # if fewer than 2 items, can't build measurement model#
-  filter(nitems >=2) %>%#
-  mutate(data = map2(data, keep, ~select(.x, all_of(.y), groups))) %>%#
-  # create measurement model code#
-  mutate(model = map(keep, mm))
-# two groups analysis#
-mi_data = mi_data %>%#
-  mutate(model_output = map2(model, data, lavaan::cfa, missing = "FIML")) #
-  # run measurement invariance #
-mi_data = mi_data %>%#
-  mutate(config_mi_output = map2(model, data, measEq.syntax, group = "groups", #
-                                 return.fit = T, missing = "FIML"))
-mi_data = mi_data %>%#
-  mutate(metric_mi_output = map2(model, data, measEq.syntax, group = "groups", #
-                                 return.fit = T, missing = "FIML",#
-                                 group.equal = "loadings")) #
-mi_data = mi_data %>%#
-  mutate(scalar_mi_output = map2(model, data, measEq.syntax, group = "groups", #
-                                 return.fit = T, missing = "FIML",#
-                                 group.equal = c("loadings", "intercepts"))) #
-mi_data = mi_data %>%#
-  mutate(strict_mi_output = map2(model, data, measEq.syntax, group = "groups", #
-                                 return.fit = T, missing = "FIML",#
-                                 group.equal = c("loadings", "intercepts", "residuals")))#
-  #compare fits#
-mi_data = mi_data %>%#
-  mutate(compare_config = map2(model_output, config_mi_output, compareFit)) %>%#
-  mutate(compare_metric = map2(config_mi_output, metric_mi_output, compareFit)) %>%#
-  mutate(compare_scalar = map2(metric_mi_output, scalar_mi_output, compareFit)) %>%#
-  mutate(compare_strict = map2(scalar_mi_output, strict_mi_output, compareFit))
-fitmeasures = mi_data %>%#
-  mutate(model1_gammahat = map(model_output, moreFitIndices, fit.measures = "gammaHat"),#
-         model_config_gammahat = map(config_mi_output, moreFitIndices, fit.measures = "gammaHat"),#
-         model_metric_gammahat = map(metric_mi_output, moreFitIndices, fit.measures = "gammaHat"),#
-         model_scalar_gammahat = map(scalar_mi_output, moreFitIndices, fit.measures = "gammaHat"),#
-         model_strict_gammahat = map(strict_mi_output, moreFitIndices, fit.measures = "gammaHat"))#
-fitmeasures = fitmeasures %>%#
-  mutate(model1_nci = map(model_output, Mc),#
-         model_config_nci = map(config_mi_output, Mc),#
-         model_metric_nci = map(metric_mi_output, Mc),#
-         model_scalar_nci = map(scalar_mi_output, Mc),#
-         model_strict_nci = map(strict_mi_output, Mc)) #
-fitmeasures = fitmeasures %>%#
-  mutate(config_fit = map(compare_config, "fit"),#
-         config_cfi = map(config_fit, "cfi"),#
-         config_cfi = map(config_cfi, abs_d),#
-         config_nci = map2(model1_nci, model_config_nci, function(x,y) abs(x-y)),#
-         config_gammahat = map2(model1_gammahat, model_config_gammahat, function(x,y) abs(x-y)))#
-fitmeasures = fitmeasures %>%#
-  mutate(metric_fit = map(compare_metric, "fit"),#
-         metric_cfi = map(metric_fit, "cfi"),#
-         metric_cfi = map(metric_cfi, abs_d),#
-         metric_nci = map2(model_config_nci, model_metric_nci, function(x,y) abs(x-y)),#
-         metric_gammahat = map2(model_config_gammahat, model_metric_gammahat, function(x,y) abs(x-y))) #
-fitmeasures = fitmeasures %>%#
-  mutate(scalar_fit = map(compare_scalar, "fit"),#
-         scalar_cfi = map(scalar_fit, "cfi"),#
-         scalar_cfi = map(scalar_cfi, abs_d),#
-         scalar_nci = map2(model_metric_nci, model_scalar_nci, function(x,y) abs(x-y)),#
-         scalar_gammahat = map2(model_metric_gammahat, model_scalar_gammahat, function(x,y) abs(x-y))) #
-fitmeasures = fitmeasures %>%#
-  mutate(strict_fit = map(compare_strict, "fit"),#
-         strict_cfi = map(strict_fit, "cfi"),#
-         strict_cfi = map(strict_cfi, abs_d),#
-         strict_nci = map2(model_scalar_nci, model_strict_nci, function(x,y) abs(x-y)),#
-         strict_gammahat = map2(model_scalar_gammahat, model_strict_gammahat, function(x,y) abs(x-y)))
-fitmeasures = fitmeasures %>%#
-  select(-data, -contains("output"), -contains("compare"))
-save(mi_data, file = here("Google Drive/Work/Research/ongoing/norming/objects/hidden_obj/modelfit_collection.Rdata"))
-save(fitmeasures, file = here("Google Drive/Work/Research/ongoing/norming/objects/fitstatistics_collection.Rdata"))
-library(here)#
-library(tidyverse)#
-library(lordif)#
-#
-set.seed(20200406)
-load(here("Google Drive/Work/Research/ongoing/norming/objects/cleaned.Rdata"))
-#load superKey file and select just SPI_81 scales#
-key = read_csv(here("Google Drive/Work/Research/ongoing/norming/data/superKey.csv")) %>%#
-  select(X1, contains("81")) %>%#
-  select(1:6) #only the big five
-#remove beginning of scale names#
-scale_names = gsub("SPI_81_27_5_", "", names(key)[-1])#
-#create factor variable (for ordering tables and such)#
-scale_names_f = factor(scale_names, levels = scale_names)#
-#
-#demographic characteristics for measurement invariance#
-demo = c("age", "sex", "education")#
-#
-#create age bands from 18-65#
-data$age = cut(data$age, breaks = c(18, 28, 38, 48, 58, 65), include.lowest = T)#
-#
-#identify items for each scale and store in a data frame#
-key = key %>%#
-  rename(item = X1) %>%#
-  gather(key = "scale", value = "value", -item) %>%#
-  filter(value != 0) %>%#
-  group_by(scale) %>%#
-  nest() %>%#
-  ungroup() %>%#
-  mutate(scale = gsub("SPI_81_27_5_", "", scale)) %>%#
-  mutate(items = map(data, 1)) %>%#
-  mutate(scale_key = map(data, 2)) %>%#
-  select(-data)
-# create a dataframe where each row refers to a single scale. columns include the name of the scale and a data frame [wherein items are reverse scored when appropriate]#
-dif_data = expand.grid(RID = data$RID, #
-                      scale = scale_names, #
-                      demo = demo, #
-                      stringsAsFactors = F) %>%#
-  full_join(data) %>%#
-  group_by(scale, demo) %>%#
-  nest() %>%#
-  full_join(key, by = "scale") %>%#
-  #select just scale items and demographics#
-  mutate(data = map2(.x = data, #
-                     .y = items, .f = function(x,y) select(x, y, demo))) %>% #
-  # #rename items q_1, q_2, etc#
-  # mutate(data = map2(.x = data, .y = items, .f = function(x,y) rename_at(x, vars(matches("[0-9]")), #
-  #                                    funs(str_replace(., "[0-9]{1,}", as.character(1:length(y))))))) %>%#
-  #rename demographic variable as "groups" to indicate in measurement model which groups to assess#
-  mutate(data = map2(.x = data, .y = demo, .f = function(x,y) rename_at(x, vars(matches(y)),#
-                                                                        funs(str_replace(., y, "groups"))))) %>%#
-  # remove rows from data object that are missing in the groups object #
-  mutate(data =  map(data, ~filter(., !is.na(groups)))) %>%#
-  #extract column from data list into its own list#
-  mutate(groups = map(data, ~select(., matches("groups")))) %>%#
-  mutate(groups = map(groups, unlist, use.names=F)) %>%#
-  #reverse code negatively keyed items#
-  mutate(data = map2(.x = data, .y = scale_key, #
-                     .f = function(x,y) mutate_at(x, .vars = which(y == -1), #
-                                                  .f = function(i) 100-i))) %>%#
-  #select just the items#
-  mutate(data = map(data, ~select(., matches("q_"))))
-lordif(as.data.frame(dif_data$data[[1]]), group = dif_data$groups[[1]], criterion = "Beta")
-dif_data = dif_data %>%#
-  mutate(dif = map2(data, groups, .f = function(x,y) lordif(as.data.frame(x), group = y, criterion = "Beta")))
-data = data %>% filter(sex != "Other")
-dif_data = expand.grid(RID = data$RID, #
-                      scale = scale_names, #
-                      demo = demo, #
-                      stringsAsFactors = F) %>%#
-  full_join(data) %>%#
-  group_by(scale, demo) %>%#
-  nest() %>%#
-  full_join(key, by = "scale") %>%#
-  #select just scale items and demographics#
-  mutate(data = map2(.x = data, #
-                     .y = items, .f = function(x,y) select(x, y, demo))) %>% #
-  # #rename items q_1, q_2, etc#
-  # mutate(data = map2(.x = data, .y = items, .f = function(x,y) rename_at(x, vars(matches("[0-9]")), #
-  #                                    funs(str_replace(., "[0-9]{1,}", as.character(1:length(y))))))) %>%#
-  #rename demographic variable as "groups" to indicate in measurement model which groups to assess#
-  mutate(data = map2(.x = data, .y = demo, .f = function(x,y) rename_at(x, vars(matches(y)),#
-                                                                        funs(str_replace(., y, "groups"))))) %>%#
-  # remove rows from data object that are missing in the groups object #
-  mutate(data =  map(data, ~filter(., !is.na(groups)))) %>%#
-  #extract column from data list into its own list#
-  mutate(groups = map(data, ~select(., matches("groups")))) %>%#
-  mutate(groups = map(groups, unlist, use.names=F)) %>%#
-  #reverse code negatively keyed items#
-  mutate(data = map2(.x = data, .y = scale_key, #
-                     .f = function(x,y) mutate_at(x, .vars = which(y == -1), #
-                                                  .f = function(i) 100-i))) %>%#
-  #select just the items#
-  mutate(data = map(data, ~select(., matches("q_"))))#
-#
-dif_data = dif_data %>%#
-  mutate(dif = map2(data, groups, .f = function(x,y) lordif(as.data.frame(x), group = y, criterion = "Beta")))
-which(dif_data$scale == "Extra")
-which(dif_data$demo == "Age")
-which(dif_data$demo == "age")
-lordif(as.data.frame(dif_data$data[[3]]), group = dif_data$groups[[3]], criterion = "Beta")
-dif_data$items[[3]]
-names(dif_data$data[[3]])
-cor(dif_data$data[[3]], use = )
-cor(dif_data$data[[3]], use = "pairwise")
-psych::describeBy(dif_data$data[[3]], group=dif_data$groups[[3]], fast = T)
-psych::alpha(dif_data$data[[3]])
-data %>%
-key$items[key$scale == "Extra"]
-extra_items = key$items[key$scale == "Extra"][[1]]
-extra_items
-data %>% select(sample, all_of(extra_items)) %>%
-group_by(sample)
-data %>% select(sample, all_of(extra_items)) %>% group_by(sample) %>% nest() %>% mutate(data = map(data, cor, use = "pairwise")) %>% unnest()
-test =data %>% select(sample, all_of(extra_items)) %>% group_by(sample) %>% nest() %>% mutate(data = map(data, cor, use = "pairwise")) %>% unnest()
-test
 setwd("Dropbox (University of Oregon)/Rapid Response Research (R3)/Data Analysis R3/R code Rapid-R3-Website/")
 library(here)#
 library(stm)#
@@ -600,14 +5,23 @@ library(tidytext)#
 library(furrr)#
 library(ggpubr)#
 library(psych)#
-library(conflicted)
+library(conflicted)#
+library(LDAvis)#
+library(tidystm)#
+library(ggrepel)#
+conflict_prefer("summarize", "dplyr")
+install.packages("tidystm")
+install.packages("devtools")
+devtools::install_github("mikajoh/tidystm", dependencies = TRUE)
+library(tidystm)
+install.packages("zipcode")
 conflict_prefer("filter", "dplyr")#
 conflict_prefer("lag", "dplyr")#
 source(here("Scripts/score data.R")) #
 source(here("Functions/pomp.R"))#
 conflict_prefer("map", "purrr")
-describe(scored$mental_health)
 open_ended = scored %>%#
+  filter(Week <= 26) %>%#
   filter(language != "ES") %>%#
   filter(language != "SPA") %>%#
   select(-contains("OPEN.006")) %>%#
@@ -616,8 +30,7 @@ open_ended = scored %>%#
   filter(!is.na(mental_health)) %>%#
   gather("question", "response", contains("OPEN")) %>%#
   mutate(question = str_extract(question, ".$")) %>%#
-  filter(!is.na(response)) #
-#
+  filter(!is.na(response))
 #identify question about childcare#
 open_ended = open_ended %>%#
   mutate(about_childcare = case_when(#
@@ -636,8 +49,20 @@ open_ended = open_ended %>%#
     TRUE ~ NA_real_#
   )) %>%#
   filter(about_childcare == 1)
-dim(open_ended)
-processed1 <- textProcessor(open_ended$response, metadata = open_ended)#
+table(open_ended$question)
+open_ended1 = open_ended %>% filter(question == "1")
+processed1 <- textProcessor(open_ended1$response, metadata = open_ended1)#
+out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)#
+docs1 <- out1$documents#
+vocab1 <- out1$vocab#
+meta1 <- out1$meta#
+#
+heldout1 = make.heldout(docs1, vocab1)
+install.packages("tm")
+install.packages("SnowballC")
+library(tm)
+library(SnowballC)
+processed1 <- textProcessor(open_ended1$response, metadata = open_ended1)
 out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)#
 docs1 <- out1$documents#
 vocab1 <- out1$vocab#
@@ -647,10 +72,14 @@ heldout1 = make.heldout(docs1, vocab1)
 set.seed(07312020)#
 plan(multiprocess)#
 #
-many_models1 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
+many_models <- tibble(K =seq(5,150, by=5)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
+                                          heldout1$vocab, #
+                                          K = .,#
+                                          prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta1, #
                                           verbose = FALSE)))#
-k_result1 <- many_models1 %>%#
+k_result <- many_models %>%#
   mutate(exclusivity = map(topic_model, exclusivity),#
          semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
          eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
@@ -660,44 +89,18 @@ k_result1 <- many_models1 %>%#
          lbound = bound + lfact,#
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
 #
-save(many_models1, k_result1, file = here("../../Data Management R3/R Data/openchild_many_models.Rdata"))
-plan(multiprocess)
-set.seed(07312020)
-many_models1 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
-                                          verbose = FALSE)))
-k_result1 <- many_models1 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-save(many_models1, k_result1, file = here("../../Data Management R3/R Data/openchild_many_models.Rdata"))
-k_result1 %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous(breaks = seq(0,90,10))+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
 set.seed(07312020)#
 plan(multiprocess)#
 #
-many_models1 <- tibble(K = c(30:50)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
-                                          verbose = FALSE)))#
-k_result1 <- many_models1 %>%#
+many_models <- tibble(K =seq(5,150, by=5)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
+                                          heldout1$vocab, #
+                                          K = .,#
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta1, #
+                                          verbose = FALSE)))
+k_result <- many_models %>%#
   mutate(exclusivity = map(topic_model, exclusivity),#
          semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
          eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
@@ -707,8 +110,65 @@ k_result1 <- many_models1 %>%#
          lbound = bound + lfact,#
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
 #
-save(many_models1, k_result1, file = here("../../Data Management R3/R Data/openchild_many_models_tweak.Rdata"))
-k_result1 %>%#
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+set.seed(07312020)#
+plan(multiprocess)#
+#
+many_models <- tibble(K =c(20:40)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
+                                          heldout1$vocab, #
+                                          K = .,#
+                                          prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta1, #
+                                          verbose = FALSE)))#
+k_result <- many_models %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
+         residual = map(topic_model, checkResiduals, heldout1$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models2.Rdata"))
+set.seed(07312020)#
+plan(multiprocess)#
+#
+many_models <- tibble(K =c(20:40)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
+                                          heldout1$vocab, #
+                                          K = .,#
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta1, #
+                                          verbose = FALSE)))#
+k_result <- many_models %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
+         residual = map(topic_model, checkResiduals, heldout1$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
+#
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models2.Rdata"))
+k_result %>%#
+  transmute(K,#
+            `Lower bound` = lbound,#
+            Residuals = map_dbl(residual, "dispersion"),#
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
+  gather(Metric, Value, -K) %>%#
+  ggplot(aes(K, Value, color = Metric)) +#
+  geom_point()+#
+  geom_line()+#
+  facet_wrap(~Metric, scales = "free_y") +#
+  labs(x = "K (number of topics)",#
+       y = NULL,#
+       title = "Model diagnostics by number of topics") +#
+  theme_pubclean()
+k_result %>%#
   transmute(K,#
             `Lower bound` = lbound,#
             Residuals = map_dbl(residual, "dispersion"),#
@@ -718,102 +178,42 @@ k_result1 %>%#
   ggplot(aes(K, Value, color = Metric)) +#
   geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
   facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous(breaks = seq(0,90,10))+#
+  scale_x_continuous(breaks = seq(0,150,10))+#
   labs(x = "K (number of topics)",#
        y = NULL,#
        title = "Model diagnostics by number of topics") +#
   theme_pubclean()
-k_result1 %>%#
-  select(K, exclusivity, semantic_coherence) %>%#
-  filter(K %in% c(39, 32)) %>%#
-  unnest(cols = c(exclusivity, semantic_coherence)) %>%#
-  mutate(K = as.factor(K)) %>%#
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +#
-  stat_ellipse()+#
-  geom_point(size = 2, alpha = 0.7) +#
-  labs(x = "Semantic coherence",#
-       y = "Exclusivity",#
-       title = "Comparing exclusivity and semantic coherence",#
-       subtitle = "Decide to model 25 topics")+#
-  theme_pubr()
-topics_rapid1 <- stm(documents = docs1, #
+stm_child26 <- stm(documents = docs1, #
                     vocab = vocab1,#
-                    K = 39, #
+                    K = 26, #
                     prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
                     data = meta1, #
                     init.type = "Spectral")
-ls()
-plot.STM(topics=topics_rapid1, type = "perspective")
-plot.STM(topics_rapid1, type = "perspective")
-plot.STM(topics_rapid1, type = "perspective", topics = c(1,2))
-save(topics_rapid, file = here("../../Data Management R3/R Data/open_child_model.Rdata"))
-save(topics_rapid1, file = here("../../Data Management R3/R Data/open_child_model.Rdata"))
-td_beta1 <- tidy(topics_rapid1)#
-td_gamma1 <- tidy(topics_rapid1, matrix = "gamma")#
-#
-meta1 = meta1 %>%#
-  mutate(document = row_number())#
-top_terms <- td_beta1 %>%#
-  arrange(beta) %>%#
-  group_by(topic) %>%#
-  top_n(7, beta) %>%#
-  arrange(-beta) %>%#
-  select(topic, term) %>%#
-  summarise(terms = list(term)) %>%#
-  mutate(terms = map(terms, paste, collapse = ", ")) %>% #
-  unnest(cols = c(terms))#
-#
-gamma_terms <- td_gamma1 %>%#
-  group_by(topic) %>%#
-  summarise(gamma = mean(gamma)) %>%#
-  arrange(desc(gamma)) %>%#
-  left_join(top_terms, by = "topic") %>%#
-  mutate(topic = paste0("Topic ", topic),#
-         topic = reorder(topic, gamma))#
-#
-gamma_terms %>%#
-  top_n(20, gamma) %>%#
-  ggplot(aes(topic, gamma, label = terms, fill = topic)) +#
-  geom_col(show.legend = FALSE) +#
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +#
-  scale_y_continuous(limits =c(0, .10))+#
-  coord_flip() +#
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +#
-  labs(x = NULL, y = expression(gamma),#
-       title = "Top 20 topics by prevalence response to Q1",#
-       subtitle = "With the top words that contribute to each topic") +#
-  theme_pubr()
-labelTopics(topics_rapid1)
-findThoughts(topics_rapid1, topics = 1)
-findThoughts(topics_rapid1, topics = 2)
-findThoughts(topics_rapid1, topics = 3)
-findThoughts(model = topics_rapid1, texts=findThoughts(topics_rapid1, texts = out1$meta$response, #
-             topics = c(1), n = 5)#
-)
-findThoughts(topics_rapid1, texts = out1$meta$response, #
-             topics = c(1), n = 5)
-set.seed(07312020)#
-plan(multiprocess)#
-#
-many_models1 <- tibble(K =seq(10,200, by=10)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
-                                          verbose = FALSE)))
-k_result1 %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous(breaks = seq(0,90,10))+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
-k_result1 <- many_models1 %>%#
+stm_child36 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 36, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+str_extract(ls(), "stm_child")
+str_detect(ls(), "stm_child")
+str_subset(ls(), "stm_child")
+save(str_subset(ls(), "stm_child"), file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
+load(here("../../Data Management R3/R Data/openchild1_many_models2.Rdata"))
+stm_child29 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 29, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+many_models <- tibble(K =c(5:15)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
+                                          heldout1$vocab, #
+                                          K = .,#
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta1, #
+                                          verbose = FALSE)))#
+k_result <- many_models %>%#
   mutate(exclusivity = map(topic_model, exclusivity),#
          semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
          eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
@@ -822,166 +222,121 @@ k_result1 <- many_models1 %>%#
          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
          lbound = bound + lfact,#
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-k_result1 %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous(breaks = seq(0,90,10))+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
-k_result1 %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous(breaks = seq(0,200,20))+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
-topics_rapid1 <- stm(documents = docs1, #
+stm_child9 <- stm(documents = docs1, #
                     vocab = vocab1,#
-                    K = 120, #
+                    K = 9, #
                     prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
                     data = meta1, #
                     init.type = "Spectral")
-labelTopics(topics_rapid1)
-findThoughts(topics_rapid1, texts = out1$meta$response, #
-             topics = c(1), n = 5)
-labelTopics(topics_rapid1, topics=1)
-labelTopics(topics_rapid1, topics=2)
-findThoughts(topics_rapid1, texts = out1$meta$response, #
-             topics = c(2), n = 5)
-findThoughts(topics_rapid1, texts = out1$meta$response, #
-             topics = c(3), n = 5)
-labelTopics(topics_rapid1, topics=4)
+stm_child11 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 11, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+stm_child12 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 12, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+load(here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+k_result %>%#
+  transmute(K,#
+            `Lower bound` = lbound,#
+            Residuals = map_dbl(residual, "dispersion"),#
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
+  gather(Metric, Value, -K) %>%#
+  ggplot(aes(K, Value, color = Metric)) +#
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
+  facet_wrap(~Metric, scales = "free_y") +#
+  scale_x_continuous()+#
+  labs(x = "K (number of topics)",#
+       y = NULL,#
+       title = "Model diagnostics by number of topics") +#
+  theme_pubclean()load(here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+save(list = str_subset(ls(), "stm_child"), file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
+open_ended2 = open_ended %>% filter(question == "1")
+processed2 <- textProcessor(open_ended2$response, metadata = open_ended2)#
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)#
+docs2 <- out2$documents#
+vocab2 <- out2$vocab#
+meta2 <- out2$meta#
+#
+heldout2 = make.heldout(docs2, vocab2)
 set.seed(07312020)#
 plan(multiprocess)#
 #
-many_models1 <- tibble(K =seq(5,70, by=5)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
+many_models <- tibble(K =seq(5,50, by=5)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, #
+                                          heldout2$vocab, #
+                                          K = .,#
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta2, #
                                           verbose = FALSE)))#
-k_result1 <- many_models1 %>%#
+k_result <- many_models %>%#
   mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
          lbound = bound + lfact,#
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
 #
-save(many_models1, k_result1, file = here("../../Data Management R3/R Data/openchild_many_models.Rdata"))
-findingK = searchK(out1$documents, out1$vocab, #
-                   K = c(30:50), #
-                   prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                   data = meta1, proportion = .5, verbose = F)
-findingK = searchK(out1$documents, out1$vocab, #
-                   K = c(30:50), #
-                   prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                   data = meta1, proportion = .5, verbose = F)
-findingK = searchK(out1$documents, out1$vocab, K = c(30:50), prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week), data = meta1, proportion = .5, verbose = F)
-set.seed(07312020)#
-plan(multiprocess)
-findingK = searchK(out1$documents, out1$vocab, K = c(30:50), prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week), data = meta1, proportion = .5, verbose = F)
-plot(findingK)
-topics_rapid1 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 43, #
-                    prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-library(LDAvis)
-vignette("details", package = "LDAvis")
-toLDAvis(topics_rapid1, docs = docs1)
-topics_rapid1 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 41, #
-                    prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-toLDAvis(topics_rapid1, docs = docs1)
-topics_rapid1 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 37, #
-                    prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-toLDAvis(topics_rapid1, docs = docs1)
-topics_rapid1 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 31, #
-                    prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-toLDAvis(topics_rapid1, docs = docs1)
-labelTopics(topics_rapid1)
-labelTopics(topics_rapid1, topics = 1); findThoughts(topics_rapid1, texts=docs1, n=3)
-labelTopics(topics_rapid1, topics = 1); findThoughts(topics_rapid1)
-labelTopics(topics_rapid1, topics = 1); findThoughts(topics_rapid1, texts=out1$documents, n = 3)
-labelTopics(topics_rapid1, topics = 1); findThoughts(topics_rapid1, texts=open_ended$response, n = 3)
-findThoughts(topics_rapid1, texts=processed1$meta$response)
-save(topics_rapid1, prep1, file = here("../../Data Management R3/R Data/open_child_model.Rdata"))
-save(topics_rapid1, file = here("../../Data Management R3/R Data/open_child_model.Rdata"))
-findThoughts(topics_rapid1, texts=pen_ended$response)
-findThoughts(topics_rapid1, texts=open_ended$response)
-findThoughts(topics_rapid1, texts=open_ended$response, )topics_rapid1 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 31, #
-                    prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-topics_rapid1 <- stm(documents = docs1, #
-                    vocab = vocab1,#
-                    K = 31, #
-                    prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week),#
-                    data = meta1, #
-                    init.type = "Spectral")
-findThoughts(model=topics_rapid1, texts = open_ended$response, n = 3)
-texts = open_ended$response[-out1$docs.removed]#
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
+k_result <- many_models %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
 #
-findThoughts(topics_rapid1, texts, topics = 1, n = 3)
-texts = open_ended$response[-out1$docs.removed]#
-#
-findThoughts(topics_rapid1, texts, topics = 1, n = 5)
-texts = open_ended$response[-out1$docs.removed]#
-#
-findThoughts(topics_rapid1, texts, topics = 2, n = 5)
-texts = open_ended$response[-out1$docs.removed]#
-#
-findThoughts(topics_rapid1, texts, topics = 3, n = 5)
-toLDAvis(topics_rapid1, docs = docs1)
-texts = open_ended$response[-out1$docs.removed]#
-#
-findThoughts(topics_rapid1, texts, topics = 3, n = 5)
-topicCorr(topics_rapid1)
-plot(topics_rapid1)
-findThoughts(topics_rapid1, texts, topics = 21, n = 5)
-findThoughts(topics_rapid1, texts, topics = 27, n = 5)
-findThoughts(topics_rapid1, texts, topics = 16, n = 5)
-plot(topics_rapid1)
-ls()
-save(findingK, file = here("../../Data Management R3/R data/open_child_findingK.Rdata"))
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
+dev.off()
+many_models <- tibble(K =c(20:30)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, #
+                                          heldout2$vocab, #
+                                          K = .,#
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta2, #
+                                          verbose = FALSE)))
+k_result <- many_models %>%#
+  mutate(exclusivity = map(topic_model, exclusivity),#
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
+         residual = map(topic_model, checkResiduals, heldout2$documents),#
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
+         lbound = bound + lfact,#
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+stm2_child23 <- stm(documents = docs2, #
+                    vocab = vocab2,#
+                    K = 23, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
+stm2_child26 <- stm(documents = docs2, #
+                    vocab = vocab2,#
+                    K = 26, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")
 set.seed(07312020)#
 plan(multiprocess)#
 #
-many_models1 <- tibble(K =seq(5,155, by=10)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, heldout1$vocab, K = .,#
-                                          verbose = FALSE)))#
-k_result1 <- many_models1 %>%#
+many_models <- tibble(K =seq(5,50, by=5)) %>%#
+  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
+                                          heldout1$vocab, #
+                                          K = .,#
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                                          data = meta1, #
+                                          verbose = FALSE)))
+k_result <- many_models %>%#
   mutate(exclusivity = map(topic_model, exclusivity),#
          semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
          eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
@@ -990,6 +345,28 @@ k_result1 <- many_models1 %>%#
          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
          lbound = bound + lfact,#
          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-findingK = searchK(out1$documents, out1$vocab, K = c(10:100), prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week), data = meta1, proportion = .5, verbose = F)
-plan(multiprocess)
-findingK = searchK(out1$documents, out1$vocab, K = c(10:100), prevalence =~ question + race_ethnic + poverty150 + mental_health + s(Week), data = meta1, proportion = .5, verbose = F)
+save(many_models, k_result, file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+k_result %>%#
+  transmute(K,#
+            `Lower bound` = lbound,#
+            Residuals = map_dbl(residual, "dispersion"),#
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
+  gather(Metric, Value, -K) %>%#
+  ggplot(aes(K, Value, color = Metric)) +#
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +#
+  facet_wrap(~Metric, scales = "free_y") +#
+  scale_x_continuous()+#
+  labs(x = "K (number of topics)",#
+       y = NULL,#
+       title = "Model diagnostics by number of topics") +#
+  theme_pubclean()
+stm_child30 <- stm(documents = docs1, #
+                    vocab = vocab1,#
+                    K = 30, #
+                    prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                    data = meta1, #
+                    init.type = "Spectral")#
+#
+save(list = str_subset(ls(), "stm_child"), file = here("../../Data Management R3/R Data/topics_child_1.Rdata"))
+save(list = str_subset(ls(), "stm2_child"), file = here("../../Data Management R3/R Data/topics_child_2.Rdata"))

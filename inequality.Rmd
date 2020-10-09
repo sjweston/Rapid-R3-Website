@@ -13,8 +13,8 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(knitr.kable.NA = '')
 ```
 
-```{r inequality-2 }
-weighted = F
+```{r inequality-2}
+weighted = FALSE
 
 report = ifelse(weighted, "ARE WEIGHTED", "ARE NOT WEIGHTED")
 ```
@@ -29,7 +29,7 @@ Rural communities are defined as zipcodes with density smaller than 500 people p
 library(here)
 ```
 
-```{r inequality-4 }
+```{r inequality-4}
 percent_by_group = function(data, outcome, group, weights, na.rm=T){
 
   cross = count(data, {{outcome}}, {{group}},
@@ -87,6 +87,7 @@ histogram_plot = function(data, outcome, group, labels_v, weights){
 ```{r inequality-5, echo = F, warning = F, message = F}
 ## score master --------------------------------------------------------
 source(here("Scripts/score data.R"))
+weighted = FALSE
 ```
 
 ```{r inequality-6 }
@@ -143,6 +144,7 @@ scored = scored %>%
   full_join(scored)
 
 if(!weighted) scored$weight = 1
+
 ```
 
 ```{r inequality-8 }
@@ -181,7 +183,7 @@ labels1 = c("white", "black")
 labels2 = c("white", "black + latinx")
 labels3 = c("white", "poc (minus asian)")
 labels4 = c("white", "poc")
-labelsi = levels(scored$income.cat)
+labelsi = c("High Income", "Low Income")
 labels5 = c("Midwest","Northeast", "South", "West")
 labels6 = c("Rural","Urban")
 ```
@@ -295,16 +297,16 @@ wtd.t.test(x = scored$anxiety[scored$compare4 == "0"],
 ### By income
 
 ```{r inequality-23 }
-histogram_plot(scored, anxiety, income.cat, labelsi, weight)
+histogram_plot(scored, anxiety, poverty150, labelsi, weight)
 ```
 
 
 ```{r inequality-24, eval = !weighted}
-anova(lm(anxiety ~ income.cat, data = scored))
+anova(lm(anxiety ~ poverty150, data = scored))
 ```
 
 ```{r inequality-25, eval = weighted}
-anova(lm(anxiety ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(anxiety ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Geographic Region
@@ -417,16 +419,16 @@ wtd.t.test(x = scored$depress[scored$compare4 == "0"],
 ### By income
 
 ```{r inequality-44 }
-histogram_plot(scored, depress, income.cat, labelsi, weight)
+histogram_plot(scored, depress, poverty150, c("High Income", "Low Income"), weight)
 ```
 
 
 ```{r inequality-45, eval = !weighted}
-anova(lm(depress ~ income.cat, data = scored))
+anova(lm(depress ~ poverty150, data = scored))
 ```
 
 ```{r inequality-46, eval = weighted}
-anova(lm(depress ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(depress ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Geographic Region
@@ -542,22 +544,22 @@ wtd.t.test(x = scored$stress[scored$compare4 == "0"],
 ### By income
 
 ```{r inequality-65 }
-histogram_plot(scored, stress, income.cat, labelsi, weight)
+histogram_plot(scored, stress, poverty150, labelsi, weight)
 ```
 
 
 ```{r inequality-66, eval = !weighted}
-anova(lm(stress ~ income.cat, data = scored))
+anova(lm(stress ~ poverty150, data = scored))
 ```
 
 ```{r inequality-67, eval = weighted}
-anova(lm(stress ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(stress ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Geographic Region
 
 ```{r inequality-68 }
-histogram_plot(scored, stress, region, labelsi, weight)
+histogram_plot(scored, stress, region, labels5, weight)
 ```
 
 
@@ -667,22 +669,22 @@ wtd.t.test(x = scored$lonely[scored$compare4 == "0"],
 ### By income
 
 ```{r inequality-86 }
-histogram_plot(scored, lonely, income.cat, labelsi, weight)
+histogram_plot(scored, lonely, poverty150, labelsi, weight)
 ```
 
 
 ```{r inequality-87, eval = !weighted}
-anova(lm(lonely ~ income.cat, data = scored))
+anova(lm(lonely ~ poverty150, data = scored))
 ```
 
 ```{r inequality-88, eval = weighted}
-anova(lm(lonely ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(lonely ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Geographic Region
 
 ```{r inequality-89 }
-histogram_plot(scored, lonely, region, labelsi, weight)
+histogram_plot(scored, lonely, region, labels5, weight)
 ```
 
 
@@ -790,31 +792,31 @@ wtd.t.test(x = scored$fussy[scored$compare4 == "0"],
 ### By income
 
 ```{r inequality-107 }
-histogram_plot(scored, fussy, income.cat, labelsi, weight)
+histogram_plot(scored, fussy, poverty150, labelsi, weight)
 ```
 
 
 ```{r inequality-108, eval = !weighted}
-anova(lm(fussy ~ income.cat, data = scored))
+anova(lm(fussy ~ poverty150, data = scored))
 ```
 
 ```{r inequality-109, eval = weighted}
-anova(lm(fussy ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(fussy ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Geographic Region
 
 ```{r inequality-110 }
-histogram_plot(scored, fussy, income.cat, labelsi, weight)
+histogram_plot(scored, fussy, poverty150, labelsi, weight)
 ```
 
 
 ```{r inequality-111, eval = !weighted}
-anova(lm(fussy ~ income.cat, data = scored))
+anova(lm(fussy ~ poverty150, data = scored))
 ```
 
 ```{r inequality-112, eval = weighted}
-anova(lm(fussy ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(fussy ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Rural/Urban
@@ -915,33 +917,33 @@ wtd.t.test(x = scored$fear[scored$compare4 == "0"],
 ### By income
 
 ```{r inequality-128 }
-histogram_plot(scored, fear, income.cat, labelsi, weight)
+histogram_plot(scored, fear, poverty150, labelsi, weight)
 
 ```
 
 
 ```{r inequality-129, eval = !weighted}
-anova(lm(fear ~ income.cat, data = scored))
+anova(lm(fear ~ poverty150, data = scored))
 ```
 
 ```{r inequality-130, eval = weighted}
-anova(lm(fear ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(fear ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Geographic Region
 
 ```{r inequality-131 }
-histogram_plot(scored, fear, income.cat, labelsi, weight)
+histogram_plot(scored, fear, poverty150, labelsi, weight)
 
 ```
 
 
 ```{r inequality-132, eval = !weighted}
-anova(lm(fear ~ income.cat, data = scored))
+anova(lm(fear ~ poverty150, data = scored))
 ```
 
 ```{r inequality-133, eval = weighted}
-anova(lm(fear ~ income.cat, data = scored, weights = scored$weight))
+anova(lm(fear ~ poverty150, data = scored, weights = scored$weight))
 ```
 
 ### Rural/Urban
@@ -1044,7 +1046,7 @@ wtd.t.test(x = scored$income[scored$compare4 == "0"],
 ### Geographic Region
 
 ```{r inequality-149 }
-histogram_plot(scored, income, region, labelsi, weight)
+histogram_plot(scored, income, region, labels5, weight)
 ```
 
 
@@ -1179,7 +1181,7 @@ weights::wtd.chi.sq(scored$sick_leave,
 ### By income
 
 ```{r inequality-167 }
-percent_by_group(scored, sick_leave, income.cat, weight) %>%
+percent_by_group(scored, sick_leave, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -1192,12 +1194,12 @@ percent_by_group(scored, sick_leave, income.cat, weight) %>%
 ```
 
 ```{r inequality-168, eval = !weighted}
-chisq.test(scored$sick_leave, scored$income.cat)
+chisq.test(scored$sick_leave, scored$poverty150)
 ```
 
 ```{r inequality-169, eval = weighted}
 weights::wtd.chi.sq(scored$sick_leave,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -1364,7 +1366,7 @@ weights::wtd.chi.sq(scored$unemployed,
 ### By income
 
 ```{r inequality-188 }
-percent_by_group(scored, unemployed, income.cat, weight) %>%
+percent_by_group(scored, unemployed, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -1378,12 +1380,12 @@ percent_by_group(scored, unemployed, income.cat, weight) %>%
 
 
 ```{r inequality-189, eval = !weighted}
-chisq.test(scored$unemployed, scored$income.cat)
+chisq.test(scored$unemployed, scored$poverty150)
 ```
 
 ```{r inequality-190, eval = weighted}
 weights::wtd.chi.sq(scored$unemployed,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -1547,7 +1549,7 @@ weights::wtd.chi.sq(scored$employment_decreased,
 ### By income
 
 ```{r inequality-209 }
-percent_by_group(scored, employment_decreased, income.cat, weight) %>%
+percent_by_group(scored, employment_decreased, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -1560,12 +1562,12 @@ percent_by_group(scored, employment_decreased, income.cat, weight) %>%
 ```
 
 ```{r inequality-210, eval = !weighted}
-chisq.test(scored$employment_decreased, scored$income.cat)
+chisq.test(scored$employment_decreased, scored$poverty150)
 ```
 
 ```{r inequality-211, eval = weighted}
 weights::wtd.chi.sq(scored$employment_decreased,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -1753,7 +1755,7 @@ weights::wtd.chi.sq(unemployed$free_food,
 #### By income
 
 ```{r inequality-231 }
-percent_by_group(unemployed, free_food, income.cat, weight) %>%
+percent_by_group(unemployed, free_food, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -1766,12 +1768,12 @@ percent_by_group(unemployed, free_food, income.cat, weight) %>%
 ```
 
 ```{r inequality-232, eval = !weighted}
-chisq.test(unemployed$free_food, unemployed$income.cat)
+chisq.test(unemployed$free_food, unemployed$poverty150)
 ```
 
 ```{r inequality-233, eval = weighted}
 weights::wtd.chi.sq(unemployed$free_food,
-                unemployed$income.cat,
+                unemployed$poverty150,
                 weight = unemployed$weight)
 ```
 
@@ -1930,7 +1932,7 @@ weights::wtd.chi.sq(unemployed$lost_free_lunch,
 #### By income
 
 ```{r inequality-252 }
-percent_by_group(unemployed, lost_free_lunch, income.cat, weight) %>%
+percent_by_group(unemployed, lost_free_lunch, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -1943,12 +1945,12 @@ percent_by_group(unemployed, lost_free_lunch, income.cat, weight) %>%
 ```
 
 ```{r inequality-253, eval = !weighted}
-chisq.test(unemployed$lost_free_lunch, unemployed$income.cat)
+chisq.test(unemployed$lost_free_lunch, unemployed$poverty150)
 ```
 
 ```{r inequality-254, eval = weighted}
 weights::wtd.chi.sq(unemployed$lost_free_lunch,
-                unemployed$income.cat,
+                unemployed$poverty150,
                 weight = unemployed$weight)
 ```
 
@@ -2111,7 +2113,7 @@ weights::wtd.chi.sq(scored$plan_cc_samenow,
 #### By income
 
 ```{r inequality-273 }
-percent_by_group(scored, plan_cc_samenow, income.cat, weight) %>%
+percent_by_group(scored, plan_cc_samenow, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -2124,12 +2126,12 @@ percent_by_group(scored, plan_cc_samenow, income.cat, weight) %>%
 ```
 
 ```{r inequality-274, eval = !weighted}
-chisq.test(scored$plan_cc_samenow, scored$income.cat)
+chisq.test(scored$plan_cc_samenow, scored$poverty150)
 ```
 
 ```{r inequality-275, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_samenow,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -2288,7 +2290,7 @@ weights::wtd.chi.sq(scored$plan_cc_differ,
 #### By income
 
 ```{r inequality-294 }
-percent_by_group(scored, plan_cc_differ, income.cat, weight) %>%
+percent_by_group(scored, plan_cc_differ, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -2301,12 +2303,12 @@ percent_by_group(scored, plan_cc_differ, income.cat, weight) %>%
 ```
 
 ```{r inequality-295, eval = !weighted}
-chisq.test(scored$plan_cc_differ, scored$income.cat)
+chisq.test(scored$plan_cc_differ, scored$poverty150)
 ```
 
 ```{r inequality-296, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_differ,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -2466,7 +2468,7 @@ weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
 #### By income
 
 ```{r inequality-315 }
-percent_by_group(scored, plan_cc_sameCOVID, income.cat, weight) %>%
+percent_by_group(scored, plan_cc_sameCOVID, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -2479,12 +2481,12 @@ percent_by_group(scored, plan_cc_sameCOVID, income.cat, weight) %>%
 ```
 
 ```{r inequality-316, eval = !weighted}
-chisq.test(scored$plan_cc_sameCOVID, scored$income.cat)
+chisq.test(scored$plan_cc_sameCOVID, scored$poverty150)
 ```
 
 ```{r inequality-317, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_sameCOVID,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -2644,7 +2646,7 @@ weights::wtd.chi.sq(scored$plan_cc_dontknow,
 #### By income
 
 ```{r inequality-336 }
-percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
+percent_by_group(scored, plan_cc_dontknow, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -2657,19 +2659,19 @@ percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
 ```
 
 ```{r inequality-337, eval = !weighted}
-chisq.test(scored$plan_cc_dontknow, scored$income.cat)
+chisq.test(scored$plan_cc_dontknow, scored$poverty150)
 ```
 
 ```{r inequality-338, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
 #### Geographic Region
 
 ```{r inequality-339 }
-percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
+percent_by_group(scored, plan_cc_dontknow, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -2682,12 +2684,12 @@ percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
 ```
 
 ```{r inequality-340, eval = !weighted}
-chisq.test(scored$plan_cc_dontknow, scored$income.cat)
+chisq.test(scored$plan_cc_dontknow, scored$poverty150)
 ```
 
 ```{r inequality-341, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -2843,7 +2845,7 @@ weights::wtd.chi.sq(scored$lostCC,
 ### By income
 
 ```{r inequality-358 }
-percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
+percent_by_group(scored, plan_cc_dontknow, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -2856,12 +2858,12 @@ percent_by_group(scored, plan_cc_dontknow, income.cat, weight) %>%
 ```
 
 ```{r inequality-359, eval = !weighted}
-chisq.test(scored$plan_cc_dontknow, scored$income.cat)
+chisq.test(scored$plan_cc_dontknow, scored$poverty150)
 ```
 
 ```{r inequality-360, eval = weighted}
 weights::wtd.chi.sq(scored$plan_cc_dontknow,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -3026,7 +3028,7 @@ weights::wtd.chi.sq(scored$expect_center,
 #### By income
 
 ```{r inequality-379 }
-percent_by_group(scored, expect_center, income.cat, weight) %>%
+percent_by_group(scored, expect_center, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -3039,12 +3041,12 @@ percent_by_group(scored, expect_center, income.cat, weight) %>%
 ```
 
 ```{r inequality-380, eval = !weighted}
-chisq.test(scored$expect_center, scored$income.cat)
+chisq.test(scored$expect_center, scored$poverty150)
 ```
 
 ```{r inequality-381, eval = weighted}
 weights::wtd.chi.sq(scored$expect_center,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -3208,7 +3210,7 @@ weights::wtd.chi.sq(scored$expect_relative,
 #### By income
 
 ```{r inequality-401 }
-percent_by_group(scored, expect_relative, income.cat, weight) %>%
+percent_by_group(scored, expect_relative, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -3221,12 +3223,12 @@ percent_by_group(scored, expect_relative, income.cat, weight) %>%
 ```
 
 ```{r inequality-402, eval = !weighted}
-chisq.test(scored$expect_relative, scored$income.cat)
+chisq.test(scored$expect_relative, scored$poverty150)
 ```
 
 ```{r inequality-403, eval = weighted}
 weights::wtd.chi.sq(scored$expect_relative,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
@@ -3390,7 +3392,7 @@ weights::wtd.chi.sq(scored$expect_pro,
 #### By income
 
 ```{r inequality-423 }
-percent_by_group(scored, expect_pro, income.cat, weight) %>%
+percent_by_group(scored, expect_pro, poverty150, weight) %>%
   ggplot(aes(x = group, y = percent, fill = outcome)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_text(aes(label = round(percent), group = outcome, y = 5),
@@ -3403,12 +3405,12 @@ percent_by_group(scored, expect_pro, income.cat, weight) %>%
 ```
 
 ```{r inequality-424, eval = !weighted}
-chisq.test(scored$expect_pro, scored$income.cat)
+chisq.test(scored$expect_pro, scored$poverty150)
 ```
 
 ```{r inequality-425, eval = weighted}
 weights::wtd.chi.sq(scored$expect_pro,
-                scored$income.cat,
+                scored$poverty150,
                 weight = scored$weight)
 ```
 
