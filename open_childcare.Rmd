@@ -28,6 +28,10 @@ library(tidystm)
 library(ggrepel)
 library(plotly)
 conflict_prefer("summarize", "dplyr")
+
+source(here("Functions/summarySE.R"))
+source(here("Functions/raincloud.R"))
+
 ```
 
 ```{r -open-childcare-3 }
@@ -70,6 +74,11 @@ open_ended = open_ended %>%
     TRUE ~ NA_real_
   )) %>%
   filter(about_childcare == 1)
+
+# word count for each response
+
+open_ended = open_ended %>%
+  mutate(word_count = map_dbl(response, ~str_count(.x, "\\S+")))
 ```
 
 # Challenges
@@ -80,9 +89,6 @@ _What are the biggest challenges and concerns for you and your family right now?
 open_ended1 = open_ended %>% filter(question == "1")
 ```
 
-
-## How many topics
-
 ```{r -open-childcare-6, results='hide'}
 processed1 <- textProcessor(open_ended1$response, metadata = open_ended1)
 out1 <- prepDocuments(processed1$documents, processed1$vocab, processed1$meta)
@@ -92,6 +98,69 @@ meta1 <- out1$meta
 
 heldout1 = make.heldout(docs1, vocab1)
 ```
+
+## Word count{.tabset}
+
+### Race
+
+```{r}
+ggplot(meta1, aes(x=race_ethnic,y=word_count))+
+  #geom_boxplot(outlier.colour = "white") +
+  geom_flat_violin(aes(fill = race_ethnic),
+                   position = position_nudge(x = .2, y = 0),
+                   adjust = 2) +
+  geom_point(position = position_jitter(width = .15), 
+             size = .25, alpha = .5) +
+  labs(x = NULL, 
+       y = "Word Count", 
+       title = "Word count by race/ethnicity") +
+  coord_flip() + 
+  guides(fill = FALSE) +
+  theme_pubr() 
+  
+```
+
+### Income
+
+```{r}
+ggplot(meta1, aes(x=poverty_cat,y=word_count, fill = poverty_cat))+
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   adjust = 2) +
+  geom_point(position = position_jitter(width = .15), 
+             size = .25, alpha = .5) +
+  labs(x = NULL, 
+       y = "Word Count", 
+       title = "Word count by federal poverty level") +
+  coord_flip() + 
+  guides(fill = FALSE) +
+  theme_pubr() 
+  
+```
+
+### Mental health
+
+```{r}
+meta1 %>%
+  mutate(mental_cat = ifelse(mental_health < mean(mental_health, na.rm=T), "Fewer problems", "More problems")) %>%
+ggplot(aes(x=mental_cat,y=word_count, fill = mental_cat))+
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   adjust = 2) +
+  geom_point(position = position_jitter(width = .15), 
+             size = .25, alpha = .5) +
+  labs(x = NULL, 
+       y = "Word Count", 
+       title = "Word count by federal poverty level") +
+  coord_flip() + 
+  guides(fill = FALSE) +
+  theme_pubr() 
+  
+```
+
+
+
+## How many topics
+
+
 
 ```{r -open-childcare-7, eval = F}
 set.seed(07312020)
@@ -470,14 +539,30 @@ labelTopics(topics_child, topics = tx, n = 5)
 findThoughts(topics_child, texts, topics = tx, n = 5)
 ```
 
-# Effects{.tabset}
+## Clusters
+
+```{r}
+td_gamma <- tidy(topics_child, matrix = "gamma")
+
+gamma_terms_wide <- td_gamma%>%
+  full_join(meta1) %>%
+  mutate(topic = paste0("Topic", topic)) %>%
+  spread(topic, gamma) 
+
+topics_only_wide = gamma_terms_wide %>%
+  select(starts_with("Topic"))
+
+iclust(topics_only_wide)
+
+```
+
+
+## Effects{.tabset}
 
 
 
 ```{r -open-childcare-46 }
 # extract topic frequencies
-td_gamma <- tidy(topics_child, matrix = "gamma")
-
 topic_freq = td_gamma %>%
   mutate(contains = ifelse(gamma < prob_threshold, 0, 1)) %>%
   group_by(topic) %>%
@@ -499,9 +584,9 @@ poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150"
 mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
 ```
 
-## Mental health{.tabset}
+### Mental health{.tabset}
 
-### All
+#### All
 
 ```{r open-childcare-1}
 document_classification_1 = td_gamma %>%
@@ -534,7 +619,7 @@ plot = document_classification_1 %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-### By race
+#### By race
 
 ```{r open-childcare-2}
 document_classification_1 = td_gamma %>%
@@ -571,7 +656,7 @@ plot = document_classification_1 %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-### By income
+#### By income
 
 ```{r open-childcare-3}
 document_classification_1 = td_gamma %>%
@@ -610,7 +695,7 @@ ggplotly(plot, tooltip = "text")
 ```
 
 
-## Race by Mental Health
+### Race by Mental Health
 
 ```{r -open-childcare-49 }
 race_plot_data = race_effect %>%
@@ -645,7 +730,7 @@ full_join(race_plot_data, mental_plot_data) %>%
   theme(axis.text.x = element_text(size = 18, color = "Black"))
 ```
 
-## Poverty by Mental Health
+### Poverty by Mental Health
 
 ```{r -open-childcare-50 }
 full_join(poverty_plot_data, mental_plot_data) %>%
@@ -664,12 +749,11 @@ full_join(poverty_plot_data, mental_plot_data) %>%
 
 # Question 2
 
+
 ```{r -open-childcare-51 }
 open_ended2 = open_ended %>% filter(question == "2")
 ```
 
-
-## How many topics
 
 ```{r -open-childcare-52, results='hide'}
 processed2 <- textProcessor(open_ended2$response, metadata = open_ended2)
@@ -680,6 +764,65 @@ meta2 <- out2$meta
 
 heldout2 = make.heldout(docs2, vocab2)
 ```
+
+## Word count{.tabset}
+
+### Race
+
+```{r}
+ggplot(meta2, aes(x=race_ethnic,y=word_count, fill = race_ethnic))+
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   adjust = 2) +
+  geom_point(position = position_jitter(width = .15), 
+             size = .25, alpha = .5) +
+  labs(x = NULL, 
+       y = "Word Count", 
+       title = "Word count by race/ethnicity") +
+  coord_flip() + 
+  guides(fill = FALSE) +
+  theme_pubr() 
+  
+```
+
+### Income
+
+```{r}
+ggplot(meta2, aes(x=poverty_cat,y=word_count, fill = poverty_cat))+
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   adjust = 2) +
+  geom_point(position = position_jitter(width = .15), 
+             size = .25, alpha = .5) +
+  labs(x = NULL, 
+       y = "Word Count", 
+       title = "Word count by federal poverty level") +
+  coord_flip() + 
+  guides(fill = FALSE) +
+  theme_pubr() 
+  
+```
+
+### Mental health
+
+```{r}
+meta2 %>%
+  mutate(mental_cat = ifelse(mental_health < mean(mental_health, na.rm=T), "Fewer problems", "More problems")) %>%
+ggplot(aes(x=mental_cat,y=word_count, fill = mental_cat))+
+  geom_flat_violin(position = position_nudge(x = .2, y = 0),
+                   adjust = 2) +
+  geom_point(position = position_jitter(width = .15), 
+             size = .25, alpha = .5) +
+  labs(x = NULL, 
+       y = "Word Count", 
+       title = "Word count by federal poverty level") +
+  coord_flip() + 
+  guides(fill = FALSE) +
+  theme_pubr() 
+  
+```
+
+
+## How many topics
+
 
 ```{r -open-childcare-53, eval = F}
 set.seed(07312020)
@@ -1124,7 +1267,24 @@ findThoughts(topics_child2, texts, topics = tx, n = 5)
 <!-- ``` -->
 
 
-# Effects{.tabset}
+## Clusters
+
+```{r}
+td_gamma <- tidy(topics_child2, matrix = "gamma")
+
+gamma_terms_wide <- td_gamma%>%
+  full_join(meta2) %>%
+  mutate(topic = paste0("Topic", topic)) %>%
+  spread(topic, gamma) 
+
+topics_only_wide = gamma_terms_wide %>%
+  select(starts_with("Topic"))
+
+iclust(topics_only_wide)
+
+```
+
+## Effects{.tabset}
 
 
 
@@ -1153,9 +1313,9 @@ poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150"
 mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
 ```
 
-## Mental health{.tabset}
+### Mental health{.tabset}
 
-### All
+#### All
 
 ```{r open-childcare-4}
 document_classification_1 = td_gamma %>%
@@ -1188,7 +1348,7 @@ plot = document_classification_1 %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-### By race
+#### By race
 
 ```{r open-childcare-5}
 document_classification_1 = td_gamma %>%
@@ -1225,7 +1385,7 @@ plot = document_classification_1 %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-### By income
+#### By income
 
 ```{r open-childcare-6}
 document_classification_1 = td_gamma %>%
@@ -1263,7 +1423,7 @@ plot = document_classification_1 %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-## Race by Mental Health
+### Race by Mental Health
 
 ```{r -open-childcare-91 }
 race_plot_data = race_effect %>%
@@ -1298,7 +1458,7 @@ full_join(race_plot_data, mental_plot_data) %>%
   theme(axis.text.x = element_text(size = 18, color = "Black"))
 ```
 
-## Poverty by Mental Health
+### Poverty by Mental Health
 
 ```{r -open-childcare-92 }
 full_join(poverty_plot_data, mental_plot_data) %>%

@@ -148,7 +148,7 @@ group.diff = function(data, outcome, group, week){
   ttest = t.test(outcome~group, data = data)
   
   output = broom::tidy(ttest)[1:8]
-  cohens = effsize::cohen.d.formula(outcome~group, data = data)
+  cohens = effsize::cohen.d(outcome~group, data = data)
   names(output) = c("Cohen's D", "Everyone Else", "Group", "t-statistic", "p-value", "df", "Conf.Low", "Conf.High", "Cohen's D")
   output$`Cohen's D` = -1*cohens$estimate
   output = kable(output, digits = c(2,2,2,2,3,2,2,2), 
