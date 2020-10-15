@@ -1,0 +1,74 @@
+---
+title: "FINN Fact Sheet"
+date: "10/14/2020"
+output: pdf_document
+---
+
+```{r -open-childcare-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+states_to_report = c("CA", "FL", "IL", "IN", "NY", "NC", "OH", "OR", "SC", "TN", "TX", "WA")
+num_states = length(states_to_report)
+```
+
+
+
+```{r -open-childcare-2 }
+library(here)
+library(tidyverse)
+library(furrr)
+library(ggpubr)
+library(psych)
+library(conflicted)
+library(ggrepel)
+library(plotly)
+library(zoo)
+library(kableExtra)
+conflict_prefer("summarize", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("group_rows", "kableExtra")
+```
+
+```{r -open-childcare-3 }
+load(here("../../Data Management R3/R Data/scored.Rdata"))
+```
+
+```{r}
+scored = scored %>%
+  mutate_at(vars(starts_with("mh_")), ~ifelse(.x == 6, NA, .x)) %>%
+  mutate(worried_eviction = case_when(
+    mh_eviction > 1 ~ 1,
+    mh_foreclose > 1 ~ 1,
+    mh_eviction == 1 ~ 0,
+    mh_foreclose == 1 ~ 0)) %>%
+  mutate(mental_health = ifelse(mental_health > mean(mental_health, na.rm=T), 1, 0)) 
+```
+
+```{r}
+scored %>%
+  gather(variables, values, material_hardship, worried_eviction, diff_pay_house, unemploy_benefits_num, mental_health, missed_wellbaby) %>%
+  filter(!is.na(values)) %>%
+  group_by(CaregiverID, state, variables) %>%
+  filter(Week == max(Week)) %>%
+  select(CaregiverID, state, variables, values) %>%
+  group_by(state, variables) %>%
+  summarize(total = n(),
+            percent = 100*sum(values)/total) %>%
+  ungroup() %>%
+  mutate(percent = paste0(round(percent, 1), "%")) %>%
+  arrange(variables, state) %>%
+  filter(state %in% states_to_report) %>%
+  select(state, percent, total) %>%
+  kable(., col.names = c("State", "Percent", "Sample size"),
+        booktabs = T, longtable = T) %>%
+  kable_styling(latex_options = c("repeat_header")) %>%
+  group_rows("Difficulty paying for rent or mortgage", 1, num_states) %>%
+  group_rows("Difficulty paying for 1 or more basic need", 1+num_states, num_states*2) %>%
+  group_rows("Experiencing lower mental health/wellbeing", 1+2*num_states, num_states*3) %>%
+  group_rows("Missed preventive well-child/baby check up", 1+3*num_states, num_states*4) %>%
+  group_rows("Applied for and that received unemployment insurance", 1+4*num_states, num_states*5) %>%
+  group_rows("Worry about eviction or foreclosure", 1+5*num_states, num_states*6) 
+```

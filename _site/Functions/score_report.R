@@ -850,6 +850,22 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       ))
     newdata$public_benefits = data$public_benefits
     
+    newdata$unemploy_benefits = case_when(
+      data$JOB.018.a == 2 ~ "Didn't apply",
+      data$JOB.018.a == 1 ~ "Didn't apply",
+      data$JOB.018.a == 1 & data$JOB.019.b  %in% c(1,2) ~ "Yes",
+      data$JOB.018.a == 1 & data$JOB.019.b == 3 ~ "No",
+      TRUE ~ NA_character_
+    )
+    
+    newdata$unemploy_benefits_num = case_when(
+      data$JOB.018.a == 2 ~ 0,
+      data$JOB.018.a == 3 ~ 0,
+      data$JOB.018.a == 1 & data$JOB.018.b  %in% c(1,2) ~ 1,
+      data$JOB.018.a == 1 & data$JOB.018.b == 3 ~ 0,
+      TRUE ~ NA_real_
+    )
+    
     data = combine.cat(x = data, 
                        cols = find_items("JOB.015a_[0-9]{1,2}$", data), 
                        id = "CaregiverID",
@@ -1625,6 +1641,11 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     data$SCHOOL.07 == 1 ~ 0,
     TRUE ~ NA_real_
   )
+  
+  newdata$flu_child_pre = ifelse(data$HEALTH.017.a == 1, 1, 0)
+  newdata$flu_child_intention = 6-data$HEALTH.017.b
+  
+  newdata$flu_child = ifelse(data$HEALTH.017.b == 1, 1, 0)
   
   return(newdata)
 }
