@@ -27,7 +27,7 @@ conflict_prefer("map", "purrr")
 library(plotly)
 ```
 
-```{r}
+```{r mh-followup-1}
 moe.p = function(p, n){
   q = 1-p
   moe = 1.96*sqrt((p*q)/n)
@@ -67,6 +67,7 @@ scored = scored %>%
   mutate(Date = case_when(
     !is.na(Date) ~ min(Date))) %>%
   ungroup()  %>%
+  #filter(Date < "2020-07-8") %>%
   mutate(poverty_cat = ifelse(poverty150 == 1, "Below 1.5 x FPL", "Out of poverty"))
 
 n_care = length(unique(scored$CaregiverID))
@@ -94,7 +95,7 @@ For these analyses, data collected in even numbered weeks starting in August wer
 
 ### All
 
-```{r}
+```{r mh-followup-2}
 plot = scored %>%
   filter(!is.na(material_hardship)) %>%
   group_by(CaregiverID) %>%
@@ -124,19 +125,19 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/ethnicity
 
-```{r}
+```{r mh-followup-3}
 policy_binary(race_ethnic, material_hardship)
 ```
 
 ### Race by income
 
-```{r}
+```{r mh-followup-4}
 policy_binary(race_poverty, material_hardship)
 ```
 
 ### Single 
 
-```{r}
+```{r mh-followup-5}
 policy_binary(single_cat, material_hardship)
 ```
 
@@ -144,7 +145,7 @@ policy_binary(single_cat, material_hardship)
 
 ### All
 
-```{r}
+```{r mh-followup-6}
 plot = scored %>%
   filter(Week > 0) %>%
   group_by(Week, Date) %>%
@@ -174,20 +175,20 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/ethnicity
 
-```{r}
+```{r mh-followup-7}
 time_policy_binary(race_ethnic, material_hardship)
 ```
 
 ### Race by income
 
-```{r}
+```{r mh-followup-8}
 time_binary_group(race_poverty, material_hardship, poverty_cat)
 ```
 
 ### Single 
 
-```{r}
-time_binary_group(single_cat, material_hardship, poverty_cat)
+```{r mh-followup-9}
+time_policy_binary(single_cat, material_hardship)
 ```
 
 
@@ -197,7 +198,7 @@ time_binary_group(single_cat, material_hardship, poverty_cat)
 
 ### All
 
-```{r}
+```{r mh-followup-10}
 plot = scored %>%
   gather(category, response, starts_with("diff_pay")) %>%
   mutate(category = str_remove(category, "diff_pay_")) %>%
@@ -226,7 +227,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/ethnicty
 
-```{r}
+```{r mh-followup-11}
 scored_diff = scored %>%
   gather(category, response, starts_with("diff_pay")) %>%
   mutate(category = str_remove(category, "diff_pay_"))
@@ -236,13 +237,13 @@ group_categorical_long(race_ethnic, category, response, scored_diff)
 
 ### Race by income
 
-```{r}
+```{r mh-followup-12}
 group_categorical_long(race_poverty, category, response, scored_diff)
 ```
 
-### Race by income
+### Single
 
-```{r}
+```{r mh-followup-13}
 group_categorical_long(single_cat, category, response, scored_diff)
 ```
 
@@ -251,7 +252,7 @@ group_categorical_long(single_cat, category, response, scored_diff)
 
 ### All
 
-```{r}
+```{r mh-followup-14}
 plot = scored_diff %>%
   gather(category, response, starts_with("diff_pay")) %>%
   filter(!is.na(response)) %>%
@@ -275,7 +276,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/ethnicity
 
-```{r}
+```{r mh-followup-15}
 time_group_cat_long(race_ethnic, category, response, 
                     data = filter(scored_diff, category %in% c("house", "utilities", "food")))
 ```
@@ -283,14 +284,14 @@ time_group_cat_long(race_ethnic, category, response,
 
 ### Race x income
 
-```{r}
+```{r mh-followup-16}
 time_group_cat_long(race_poverty, category, response, 
                     data = filter(scored_diff, category %in% c("house", "utilities", "food")))
 ```
 
 ### Single
 
-```{r}
+```{r mh-followup-17}
 time_group_cat_long(single_cat, category, response, 
                     data = filter(scored_diff, category %in% c("house", "utilities", "food")))
 ```
@@ -301,7 +302,7 @@ time_group_cat_long(single_cat, category, response,
 
 ### All
 
-```{r}
+```{r mh-followup-18}
 plot = scored %>%
   filter(!is.na(num_hardship)) %>%
   group_by(CaregiverID) %>%
@@ -331,19 +332,19 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/ethnicity
 
-```{r}
+```{r mh-followup-19}
 policy_cont(race_ethnic, num_hardship)
 ```
 
 ### Race by income
 
-```{r}
+```{r mh-followup-20}
 policy_cont(race_poverty, num_hardship)
 ```
 
 ### Single
 
-```{r}
+```{r mh-followup-21}
 policy_cont(single_cat, num_hardship)
 ```
 
@@ -351,7 +352,7 @@ policy_cont(single_cat, num_hardship)
 
 ### All
 
-```{r}
+```{r mh-followup-22}
 plot = scored %>%
   filter(Week > 0) %>%
   filter(!is.na(num_hardship)) %>%
@@ -382,18 +383,18 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/ethnicity
 
-```{r}
+```{r mh-followup-23}
 time_policy_cont(race_ethnic, num_hardship)
 ```
 
 ### Race by income
 
-```{r}
+```{r mh-followup-24}
 time_policy_cont(race_poverty, num_hardship)
 ```
 
 ### Single
 
-```{r}
+```{r mh-followup-25}
 time_policy_cont(single_cat, num_hardship)
 ```

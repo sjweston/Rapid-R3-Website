@@ -18,6 +18,7 @@ prob_threshold = .1
 ```{r -open-childcare-2 }
 library(here)
 library(stm)
+library(tidyverse)
 library(tidytext)
 library(furrr)
 library(ggpubr)
@@ -27,7 +28,10 @@ library(LDAvis)
 library(tidystm)
 library(ggrepel)
 library(plotly)
+library(zoo)
+library(wordcloud)
 conflict_prefer("summarize", "dplyr")
+conflict_prefer("filter", "dplyr")
 
 source(here("Functions/summarySE.R"))
 source(here("Functions/raincloud.R"))
@@ -42,6 +46,114 @@ source(here("Functions/pomp.R"))
 conflict_prefer("map", "purrr")
 
 ```
+
+# Non-parental childcare over time
+
+
+_This week, have you used any non-parental care for your child(ren) under the age of 5?_
+
+Response options: Yes, No, Unsure
+
+```{r}
+plotdata = scored %>%
+  filter(Week == case_when(
+    Week < 17 ~ Week,
+    Week %% 2 == 0 ~ NA_real_,
+    TRUE ~ Week
+  )) %>%
+  filter(!is.na(Week)) %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  group_by(Week) %>%
+  summarise(
+    Date = min(Date, na.rm=T),
+    n = n(),
+    nonparental = sum(cc2_nonparental)
+  ) %>%
+  mutate(percent = nonparental/n*100) %>%
+  mutate(
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")))  %>%
+  mutate(Date = case_when(
+      Week == 0 ~ Date[2]-14,
+      TRUE ~ Date))
+
+plotdata = data.frame(
+  Date = seq(from = min(plotdata$Date), 
+             to = max(plotdata$Date), by = 7)) %>%
+  full_join(plotdata) %>%
+  arrange(Date) %>%
+  mutate(day_diff = rollapplyr(Date, diff, partial = T, width = 2)) %>%
+  filter(day_diff == 7 |!is.na(percent)) %>%
+  mutate(rolling_avg = rollapplyr(percent, FUN = mean, na.rm=T, partial = T, width = 3)) %>%
+  filter(!is.na(label))
+
+
+plotdata %>%
+  ggplot(aes(x = Date, y = rolling_avg)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = plotdata$Date, labels = plotdata$label) +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers using non-parental childcare",
+       subtitle = "Values represent 3-week rolling averages") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave(file = here("figure/1013_nonparental_childcare_rolling_average.pdf"))  
+  
+```
+
+```{r}
+plotdata = scored %>%
+  filter(!is.na(poverty_cat)) %>%
+  filter(Week == case_when(
+    Week < 17 ~ Week,
+    Week %% 2 == 0 ~ NA_real_,
+    TRUE ~ Week
+  )) %>%
+  filter(!is.na(Week)) %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  group_by(Week, poverty_cat) %>%
+  summarise(
+    Date = min(Date, na.rm=T),
+    n = n(),
+    nonparental = sum(cc2_nonparental)
+  ) %>%
+  mutate(percent = nonparental/n*100) %>%
+  mutate(
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")))  %>%
+  mutate(Date = case_when(
+      Date == as.Date("2020-04-28") ~ as.Date("2020-04-27"),
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date))
+
+plotdata = data.frame(
+  Date = seq(from = min(plotdata$Date, na.rm=T), 
+             to = plotdata$Date[34], by = 7)) %>%
+  full_join(plotdata) %>%
+  arrange(poverty_cat, Date) %>%
+  group_by(poverty_cat) %>%
+  mutate(day_diff = rollapplyr(Date, diff, partial = T, width = 2)) %>%
+  filter(day_diff == 7 |!is.na(percent)) %>%
+  mutate(rolling_avg = rollapplyr(percent, FUN = mean, na.rm=T, partial = T, width = 3)) %>%
+  filter(!is.na(label))
+
+
+plotdata %>%
+  ggplot(aes(x = Date, y = rolling_avg, color = poverty_cat)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = plotdata$Date, labels = plotdata$label) +
+  labs(x = NULL, y = NULL, color = NULL,
+       title = "Percent of caregivers using non-parental childcare",
+       subtitle = "Values represent 3-week rolling averages") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+ggsave(file = here("figure/1013_nonparental_childcare_rolling_average_income.pdf"))  
+```
+
 
 ```{r -open-childcare-4 }
 open_ended = scored %>%
@@ -187,7 +299,7 @@ save(many_models, k_result, file = here("../../Data Management R3/R Data/openchi
 ```
 
 ```{r -open-childcare-8}
-load(here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
+load(file = here("../../Data Management R3/R Data/openchild1_many_models.Rdata"))
 
 ```
 
@@ -302,6 +414,17 @@ gamma_terms %>%
   theme_pubr()
 ```
 
+
+```{r}
+td_beta1 %>% 
+  filter(topic %in% c(12, 18, 26, 6, 9)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(topic, desc(beta)) %>%
+  group_by(topic) %>%
+  top_n(20) %>% 
+  write.csv(file = here("figure data/1013_challenge_words.csv"), row.names = F)
+```
+
 ## Identify topics {.tabset}
 
 ### All
@@ -309,7 +432,7 @@ gamma_terms %>%
 ### 1
 
 ```{r -open-childcare-16 }
-texts = open_ended1$response[-out1$docs.removed]
+texts = open_ended1$response
 labelTopics(topics_child, topics = 1, n = 5)
 findThoughts(topics_child, texts, topics = 1, n = 5)
 ```
@@ -345,8 +468,19 @@ findThoughts(topics_child, texts, topics = 5, n = 5)
 ### 6
 
 ```{r -open-childcare-21 }
+
+tx = 6
 labelTopics(topics_child, topics = 6, n = 5)
 findThoughts(topics_child, texts, topics = 6, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_challenge_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
 ```
 
 ### 7
@@ -369,6 +503,15 @@ findThoughts(topics_child, texts, topics = 8, n = 5)
 tx = 9
 labelTopics(topics_child, topics = tx, n = 5)
 findThoughts(topics_child, texts, topics = tx, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_challenge_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
 ```
 
 ### 10
@@ -393,6 +536,15 @@ findThoughts(topics_child, texts, topics = tx, n = 5)
 tx = 12
 labelTopics(topics_child, topics = tx, n = 5)
 findThoughts(topics_child, texts, topics = tx, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_challenge_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
 ```
 
 ### 13
@@ -441,6 +593,15 @@ findThoughts(topics_child, texts, topics = tx, n = 5)
 tx = 18
 labelTopics(topics_child, topics = tx, n = 5)
 findThoughts(topics_child, texts, topics = tx, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_challenge_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
 ```
 
 ### 19
@@ -505,6 +666,15 @@ findThoughts(topics_child, texts, topics = tx, n = 5)
 tx = 26
 labelTopics(topics_child, topics = tx, n = 5)
 findThoughts(topics_child, texts, topics = tx, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_challenge_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
 ```
 
 ### 27
@@ -574,7 +744,7 @@ topic_freq = td_gamma %>%
 ```{r -open-childcare-47 }
 predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic*mental_health + poverty150*mental_health + s(Week), 
                                stmobj = topics_child, 
-                               metadata = out1$meta, 
+                               metadata = open_ended1, 
                                uncertainty = "Global")
 ```
 
@@ -582,6 +752,7 @@ predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic*mental_healt
 race_effect = extract.estimateEffect(predict_topics, covariate = "race_ethnic")
 poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150")
 mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
+time_effect = extract.estimateEffect(predict_topics, covariate = "Week")
 ```
 
 ### Mental health{.tabset}
@@ -594,7 +765,7 @@ document_classification_1 = td_gamma %>%
          topic = paste0("topic_", topic)) %>%
   spread(topic, gamma)
 
-document_classification_1 = cbind(document_classification_1, out1$meta) 
+document_classification_1 = cbind(document_classification_1, open_ended1) 
 plot = document_classification_1 %>%
   gather("topic_name", "includes", contains("topic_")) %>%
   mutate(topic_name = str_remove(topic_name, "topic_")) %>%
@@ -627,7 +798,7 @@ document_classification_1 = td_gamma %>%
          topic = paste0("topic_", topic)) %>%
   spread(topic, gamma)
 
-document_classification_1 = cbind(document_classification_1, out1$meta) 
+document_classification_1 = cbind(document_classification_1, open_ended1) 
 plot = document_classification_1 %>%
   gather("topic_name", "includes", contains("topic_")) %>%
   mutate(topic_name = str_remove(topic_name, "topic_")) %>%
@@ -664,7 +835,7 @@ document_classification_1 = td_gamma %>%
          topic = paste0("topic_", topic)) %>%
   spread(topic, gamma)
 
-document_classification_1 = cbind(document_classification_1, out1$meta) 
+document_classification_1 = cbind(document_classification_1, open_ended1) 
 plot = document_classification_1 %>%
   gather("topic_name", "includes", contains("topic_")) %>%
   mutate(topic_name = str_remove(topic_name, "topic_")) %>%
@@ -744,6 +915,24 @@ full_join(poverty_plot_data, mental_plot_data) %>%
   scale_y_continuous("Mental health problems", breaks = NULL) +
   theme_pubclean() +
   theme(axis.text.x = element_text(size = 18, color = "Black"))
+```
+
+### Over time
+
+```{r}
+scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date, na.rm=T)) %>%
+  rename(covariate.value = Week) %>%
+  right_join(time_effect) %>%
+  filter(topic %in% c(9, 6, 26, 18, 12)) %>%
+  ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
+  geom_line() +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Week", y = NULL, color = "Topic", 
+       title = "Estimated prevelance of topic by week") +
+  theme_pubr()
+ggsave(here("figure/10_13_open_child/challenge_by_time.pdf"))
 ```
 
 
@@ -849,7 +1038,7 @@ save(many_models, k_result, file = here("../../Data Management R3/R Data/openchi
 ```
 
 ```{r -open-childcare-54 }
-load(here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
+load(file = here("../../Data Management R3/R Data/openchild2_many_models.Rdata"))
 ```
 
 ```{r -open-childcare-55 }
@@ -978,6 +1167,8 @@ gamma_terms %>%
   theme_pubr()
 ```
 
+
+
 ## Identify topics {.tabset}
 
 ### All
@@ -1003,8 +1194,21 @@ findThoughts(topics_child2, texts, topics = 2, n = 5)
 ### 3
 
 ```{r -open-childcare-64 }
+
+tx = 3
+
 labelTopics(topics_child2, topics = 3, n = 5)
 findThoughts(topics_child2, texts, topics = 3, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_help_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
+
 ```
 
 ### 4
@@ -1031,15 +1235,36 @@ findThoughts(topics_child2, texts, topics = 6, n = 5)
 ### 7
 
 ```{r -open-childcare-68 }
+tx = 7
 labelTopics(topics_child2, topics = 7, n = 5)
 findThoughts(topics_child2, texts, topics = 7, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_help_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
 ```
 
 ### 8
 
 ```{r -open-childcare-69 }
+
+tx = 8
 labelTopics(topics_child2, topics = 8, n = 5)
 findThoughts(topics_child2, texts, topics = 8, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_help_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
 ```
 
 ### 9
@@ -1072,6 +1297,16 @@ findThoughts(topics_child2, texts, topics = tx, n = 5)
 tx = 12
 labelTopics(topics_child2, topics = tx, n = 5)
 findThoughts(topics_child2, texts, topics = tx, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_help_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
+
 ```
 
 ### 13
@@ -1080,6 +1315,16 @@ findThoughts(topics_child2, texts, topics = tx, n = 5)
 tx = 13
 labelTopics(topics_child2, topics = tx, n = 5)
 findThoughts(topics_child2, texts, topics = tx, n = 5)
+
+pdf(file = here(paste0("figure/10_13_open_child/wordcloud_help_", tx, ".pdf")))
+
+td_beta1 %>% 
+  filter(topic == as.character(tx)) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(desc(beta)) %>%
+  with(wordcloud(term, beta, random.order = FALSE, max.words = 50))
+dev.off()
+
 ```
 
 <!-- ### 14 -->
@@ -1311,6 +1556,7 @@ predict_topics<-estimateEffect(formula = 1:num_topics2 ~ race_ethnic + poverty15
 race_effect = extract.estimateEffect(predict_topics, covariate = "race_ethnic")
 poverty_effect = extract.estimateEffect(predict_topics, covariate = "poverty150")
 mental_effect = extract.estimateEffect(predict_topics, covariate = "mental_health")
+time_effect = extract.estimateEffect(predict_topics, covariate = "Week")
 ```
 
 ### Mental health{.tabset}
@@ -1475,3 +1721,19 @@ full_join(poverty_plot_data, mental_plot_data) %>%
 ```
 
 
+### Over time
+
+```{r}
+scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date, na.rm=T)) %>%
+  rename(covariate.value = Week) %>%
+  right_join(time_effect) %>%
+  filter(topic %in% c(8, 3, 13, 12, 7)) %>%
+  ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
+  geom_line() +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Week", y = NULL, color = "Topic", 
+       title = "Estimated prevelance of topic by week") +
+  theme_pubr()
+ggsave(here("figure/10_13_open_child/helping_by_time.pdf"))

@@ -1626,5 +1626,10 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     TRUE ~ NA_real_
   )
   
+  newdata$flu_child_pre = ifelse(data$HEALTH.017.a == 1, 1, 0)
+  newdata$flu_child_intention = 6-data$HEALTH.017.b
+  
+  newdata$flu_child = ifelse(data$HEALTH.017.b == 1, 1, 0)
+  
   return(newdata)
 }

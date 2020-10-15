@@ -201,7 +201,7 @@ policy_cont = function(policy, variable, data = scored){
                fill = {{policy}},
                text = paste0(
                  "Count: ", n,
-                 "\n Mean: ", round(mean)))) +
+                 "\n Mean: ", round(mean, 2)))) +
     geom_bar(stat = "identity", position = position_dodge(1)) +
     geom_errorbar(aes(ymin = mean-moe, ymax = mean + moe),
                   position = position_dodge(1),
@@ -238,7 +238,7 @@ cont_group = function(policy, variable, group, data = scored){
                fill = {{policy}},
                text = paste0(
                  "Count: ", n,
-                 "\n Mean: ", round(mean)))) +
+                 "\n Mean: ", round(mean,2)))) +
     geom_bar(stat = "identity", position = position_dodge(1)) +
     geom_errorbar(aes(ymin = mean-moe, ymax = mean + moe),
                   position = position_dodge(1),
