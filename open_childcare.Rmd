@@ -925,7 +925,7 @@ scored %>%
   summarize(Date = min(Date, na.rm=T)) %>%
   rename(covariate.value = Week) %>%
   right_join(time_effect) %>%
-  filter(topic %in% c(9, 6, 26, 18, 12)) %>%
+  filter(topic %in% c(9, 3, 13, 12, 2)) %>%
   ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
   geom_line() +
   scale_y_continuous(breaks = NULL) +
