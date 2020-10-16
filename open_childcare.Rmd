@@ -98,8 +98,7 @@ plotdata %>%
        subtitle = "Values represent 3-week rolling averages") +
   theme_pubclean() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-ggsave(file = here("figure/1013_nonparental_childcare_rolling_average.pdf"))  
-  
+ggsave(file = here("figure/1013_nonparental_childcare_rolling_average.pdf"))
 ```
 
 ```{r}
@@ -153,6 +152,39 @@ plotdata %>%
   
 ggsave(file = here("figure/1013_nonparental_childcare_rolling_average_income.pdf"))  
 ```
+
+```{r}
+library(lme4)
+test_mlm = scored %>%
+  filter(Week > 0 ) %>%
+  glmer(cc2_nonparental ~ Week*poverty_cat + (1 + Week | CaregiverID), 
+        data = ., family = "binomial")
+
+test_lm = scored %>%
+  filter(Week > 0 ) %>%
+  glm(cc2_nonparental ~ Week*poverty_cat, 
+        data = ., family = "binomial")
+
+
+library(sjPlot)
+
+plot_model(test_lm, type = "pred", terms = c("Week", "poverty_cat")) +
+  scale_y_continuous(breaks = c(0, .1, .2, .3, .4, .5, .6),
+                     labels = paste0(c(0, 10,20,30,40,50, 60), "%"),
+                     limits = c(0, .7)) +
+  labs(x = "Week", y = NULL, title = "Predicted probability of using non-parental childcare", color = NULL) +
+  theme_pubr()
+ggsave(here("figure/1015_non-parentalcare_lm.pdf"))
+
+plot_model(test_mlm, type = "pred", terms = c("Week", "poverty_cat")) +
+  scale_y_continuous(breaks = c(0, .1, .2, .3, .4, .5, .6),
+                     labels = paste0(c(0, 10,20,30,40,50, 60), "%"),
+                     limits = c(0, .7)) +
+  labs(x = "Week", y = NULL, title = "Predicted probability of using non-parental childcare", color = NULL) +
+  theme_pubr()
+ggsave(here("figure/1015_non-parentalcare_lmer.pdf"))
+```
+
 
 
 ```{r -open-childcare-4 }
@@ -742,7 +774,7 @@ topic_freq = td_gamma %>%
 
 
 ```{r -open-childcare-47 }
-predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic*mental_health + poverty150*mental_health + s(Week), 
+predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic*mental_health + poverty150*mental_health + s(Week, df = 6), 
                                stmobj = topics_child, 
                                metadata = open_ended1, 
                                uncertainty = "Global")
@@ -933,6 +965,24 @@ scored %>%
        title = "Estimated prevelance of topic by week") +
   theme_pubr()
 ggsave(here("figure/10_13_open_child/challenge_by_time.pdf"))
+```
+
+```{r, eval = F}
+scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date, na.rm=T)) %>%
+  rename(covariate.value = Week) %>%
+  right_join(time_effect) %>%
+  filter(topic %in% c(9, 12)) %>%
+  mutate(topic = factor(topic, levels = c(9, 12),
+                        labels = c("Inadequate resources", "Lack of structure"))) %>%
+  ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
+  geom_line() +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Week", y = NULL, color = "Topic", 
+       title = "Estimated prevelance of topic by week") +
+  theme_pubr()
+
 ```
 
 
@@ -1546,7 +1596,7 @@ topic_freq = td_gamma %>%
 
 
 ```{r -open-childcare-89 }
-predict_topics<-estimateEffect(formula = 1:num_topics2 ~ race_ethnic + poverty150 + mental_health + s(Week), 
+predict_topics<-estimateEffect(formula = 1:num_topics2 ~ race_ethnic + poverty150 + mental_health + s(Week, df = 4), 
                                stmobj = topics_child2, 
                                metadata = out2$meta, 
                                uncertainty = "Global")
@@ -1737,3 +1787,23 @@ scored %>%
        title = "Estimated prevelance of topic by week") +
   theme_pubr()
 ggsave(here("figure/10_13_open_child/helping_by_time.pdf"))
+
+
+
+```{r}
+scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date, na.rm=T)) %>%
+  rename(covariate.value = Week) %>%
+  right_join(time_effect) %>%
+  filter(topic %in% c(8, 3)) %>%
+  mutate(topic = factor(topic, levels =c(8,3), 
+                        labels = c("Socially-distanced visits",
+                                   "Short-term childcare"))) %>%
+  ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
+  geom_line() +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Week", y = NULL, color = "Topic", 
+       title = "Estimated prevelance of topic by week") +
+  theme_pubr()
+```
