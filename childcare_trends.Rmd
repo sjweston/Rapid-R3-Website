@@ -1,0 +1,320 @@
+---
+title: "Childcare follow-up"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r hardship-cares-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r hardship-cares-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r hardship-cares-3 }
+source(here("Scripts/score data.R")) 
+scored = scored %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week,
+    Week %% 2 == 0 ~ NA_real_,
+    TRUE ~ Week
+  )) %>%
+  filter(!is.na(Week))
+```
+
+```{r hardship-cares-4 }
+source(here("Functions/core_funs.R"))
+```
+
+# Non-parental childcare
+
+```{r}
+plot = scored %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n(),
+            percent = sum(cc2_nonparental)/n) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = 1,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1)
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .3) +
+  geom_line() +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+# Non-parental childcare by type{.tabset}
+
+## All caregivers
+
+```{r}
+plot = scored %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  select(-cc2_expected_change) %>%
+  gather(variable, value, starts_with("cc2_")) %>%
+  mutate(variable = str_remove(variable, "cc2_")) %>%
+  group_by(Week, variable) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n(),
+            percent = sum(value)/n) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")
+    ),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = variable,
+             color = variable,
+             fill = variable,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1),
+               "\nDate: ", label
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .2) +
+  geom_line() +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## By income
+
+```{r}
+plot = scored %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  filter(!is.na(poverty_cat)) %>%
+  select(-cc2_expected_change) %>%
+  gather(variable, value, starts_with("cc2_")) %>%
+  mutate(variable = str_remove(variable, "cc2_")) %>%
+  group_by(Week, variable, poverty_cat) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n(),
+            percent = sum(value)/n) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")
+    ),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = variable,
+             color = variable,
+             fill = variable,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1),
+               "\nDate: ", label
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .2) +
+  geom_line() +
+  facet_wrap(~poverty_cat) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## By child age
+
+```{r}
+plot = scored %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  filter(!is.na(poverty_cat)) %>%
+  select(-cc2_expected_change) %>%
+  gather(variable, value, starts_with("cc2_")) %>%
+  gather(childage, child_value, starts_with("child_age")) %>%
+  mutate(variable = str_remove(variable, "cc2_"),
+         childage = ifelse(childage == "child_age03", 
+                           "Age 0-3",
+                           "Age 4-5")) %>%
+  filter(child_value == 1) %>%
+  group_by(Week, variable, childage) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n(),
+            percent = sum(value)/n) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")
+    ),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = variable,
+             color = variable,
+             fill = variable,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1),
+               "\nDate: ", label
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .2) +
+  geom_line() +
+  facet_wrap(~childage) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+# Using more than one type{.tabset}
+
+## All caregivers
+
+```{r}
+scored = scored %>%
+  rowwise() %>%
+  mutate(num_care = sum(cc2_centerbased, cc2_unpaid, cc2_paid, cc2_homebased, na.rm=T)) %>%
+  ungroup() 
+
+plot = scored %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  group_by(Week,num_care) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n()) %>%
+  group_by(Week) %>%
+  mutate(percent = n/sum(n),
+         n = sum(n)) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")),
+    num_care = as.factor(num_care),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = num_care,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1),
+               "\nDate: ", label
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe, fill = num_care), alpha = .2) +
+  geom_line(aes(color = num_care)) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## By income
+
+```{r}
+plot = scored %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  filter(!is.na(poverty_cat)) %>%
+  group_by(Week,num_care, poverty_cat) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n()) %>%
+  group_by(Week, poverty_cat) %>%
+  mutate(percent = n/sum(n),
+         n = sum(n)) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")),
+    num_care = as.factor(num_care),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = num_care, fill = num_care, color = num_care,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1),
+               "\nDate: ", label
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .2) +
+  geom_line() +
+  facet_wrap(~poverty_cat) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## By child age
+
+```{r}
+plot = scored %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  gather(childage, child_value, starts_with("child_age")) %>%
+  mutate(childage = ifelse(childage == "child_age03", 
+                           "Age 0-3",
+                           "Age 4-5")) %>%
+  filter(child_value == 1) %>%
+  group_by(Week,num_care, childage) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n()) %>%
+  group_by(Week, childage) %>%
+  mutate(percent = n/sum(n),
+         n = sum(n)) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")),
+    num_care = as.factor(num_care),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = num_care, fill = num_care, color = num_care,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1),
+               "\nDate: ", label
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .2) +
+  geom_line() +
+  facet_wrap(~childage) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+

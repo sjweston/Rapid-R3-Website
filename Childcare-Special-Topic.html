@@ -469,32 +469,31 @@ div.tocify {
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="0prelim_april27.html">April 27</a>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="disability.html">Children with disabilities</a>
+      <a href="0prelim_april27.html">Sheltering in place</a>
     </li>
     <li>
-      <a href="single.html">Single parents</a>
-    </li>
-    <li>
-      <a href="poverty.html">Low-income households</a>
-    </li>
-    <li>
-      <a href="access_by_race.html">Race/Ethnicity</a>
-    </li>
-    <li>
-      <a href="0prelim_may22.html">May 22</a>
-    </li>
-    <li>
-      <a href="0prelim_may29.html">May 29</a>
-    </li>
-    <li>
-      <a href="inequality.html">racial_inequality</a>
-    </li>
-    <li>
-      <a href="canary.html">Canary</a>
+      <a href="canary.html">Family Conflict</a>
     </li>
     <li class="dropdown-submenu">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
@@ -528,17 +527,17 @@ div.tocify {
       <a href="open_ended.html">Open-ended responses</a>
     </li>
     <li>
-      <a href="social_support2.html">Additional hardship and support</a>
-    </li>
-    <li>
-      <a href="hardship_cares.html">Hardship trends post CARES</a>
-    </li>
-    <li>
       <a href="school_childcare.html">School reopening</a>
     </li>
     <li class="dropdown-submenu">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
       <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
         <li>
           <a href="usda.html">Food insecurity and hardship</a>
         </li>
@@ -576,6 +575,15 @@ div.tocify {
         </li>
         <li>
           <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
         </li>
       </ul>
     </li>
@@ -693,10 +701,10 @@ div.tocify {
 <h3>Breakdown by Race</h3>
 <p>Before COVID-19, there were 54.72% of Black caregivers, 49.73% of White caregivers, and 47.70% of Latinx caregivers reporting using out-of-home childcare. The differences across racial/ethnic groups were not statistically significant.</p>
 <p><img src="Childcare-Special-Topic_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<pre><code>## Number of cases in table: 1279 
+<pre><code>## Number of cases in table: 1280 
 ## Number of factors: 2 
 ## Test for independence of all factors:
-##  Chisq = 1.4499, df = 2, p-value = 0.4843</code></pre>
+##  Chisq = 1.4483, df = 2, p-value = 0.4847</code></pre>
 </div>
 <div id="breakdown-by-income" class="section level3">
 <h3>Breakdown by Income</h3>
@@ -753,10 +761,10 @@ div.tocify {
 <h3>Breakdown by Race</h3>
 <p>There were 25.47% of Black caregivers, 13.58% of White caregivers, and 13.81% of Latinx caregivers reporting currently looking for childcare. The differences across racial/ethnic groups were statistically significant.</p>
 <p><img src="Childcare-Special-Topic_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
-<pre><code>## Number of cases in table: 1278 
+<pre><code>## Number of cases in table: 1279 
 ## Number of factors: 2 
 ## Test for independence of all factors:
-##  Chisq = 10.883, df = 2, p-value = 0.004333</code></pre>
+##  Chisq = 10.914, df = 2, p-value = 0.004267</code></pre>
 </div>
 <div id="breakdown-by-income-1" class="section level3">
 <h3>Breakdown by Income</h3>
@@ -952,19 +960,18 @@ div.tocify {
 <div id="comparison-across-raceethnicity-groups" class="section level3">
 <h3>Comparison Across Race/Ethnicity Groups</h3>
 <p>The average satisfaction about government’s actions to support childcare in Black, Latinx, and White caregivers were 2.21, 2.02, and 2.08, respectively (with higher score indicating reduced satisfaction). ANOVA suggested that the differences across the three groups were not statistically significant.</p>
-<pre><code>## # A tibble: 4 x 2
+<pre><code>## # A tibble: 3 x 2
 ##   race_ethnic post_gov_mn
 ##   &lt;chr&gt;             &lt;dbl&gt;
 ## 1 Black              2.21
 ## 2 Latinx             2.02
-## 3 White              2.08
-## 4 &lt;NA&gt;               1</code></pre>
+## 3 White              2.08</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Response: post_gov
 ##               Df  Sum Sq Mean Sq F value Pr(&gt;F)
-## race_ethnic    2    2.55  1.2761  0.9937 0.3705
-## Residuals   1273 1634.77  1.2842</code></pre>
+## race_ethnic    2    2.55  1.2767  0.9942 0.3703
+## Residuals   1274 1635.93  1.2841</code></pre>
 <pre><code>## 
 ##  Pairwise comparisons using t tests with pooled SD 
 ## 

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Childcare follow-up</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="0prelim_april27.html">Sheltering in place</a>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texax</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Childcare follow-up</h1>
+
+</div>
+
+
+<div id="non-parental-childcare" class="section level1 tabset">
+<h1 class="tabset">Non-parental childcare</h1>
+<div id="all" class="section level2">
+<h2>All</h2>
+<div id="htmlwidget-7a4d7aa9c73a9b6d32b8" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7a4d7aa9c73a9b6d32b8">{"x":{"data":[{"x":[18365,18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18379,18365,18365],"y":[53.3836152293277,16.2220757213019,17.7703155701923,21.057244831446,25.2524607955009,27.8260336477237,31.406511070167,30.5551856616319,17.4029018157302,32.2835398490965,36.0261697617536,38.4698686931675,38.8655382914829,43.1187146678102,40.7036481590757,45.036043435767,47.0596229501802,47.0596229501802,53.47628273042,51.2453635994089,46.371181772897,49.2650637693807,44.6787655059855,44.3397431367771,41.9431788972502,38.0378212095046,25.0628516089273,36.375507407675,37.0241458641396,33.6025377808478,30.7090776660376,27.641070635629,24.687784988467,23.0160195167933,56.0234125891203,53.3836152293277],"text":["N: 5464<br />Percent: 54.7","N: 525<br />Percent: 19.6","N: 537<br />Percent: 21.2","N: 653<br />Percent: 24.3","N: 1040<br />Percent: 28","N: 980<br />Percent: 30.7","N: 1096<br />Percent: 34.2","N: 1010<br />Percent: 33.5","N: 438<br />Percent: 21.2","N: 1058<br />Percent: 35.2","N: 1044<br />Percent: 39","N: 1082<br />Percent: 41.4","N: 1106<br />Percent: 41.8","N: 1011<br />Percent: 46.2","N: 1176<br />Percent: 43.5","N: 995<br />Percent: 48.1","N: 933<br />Percent: 50.3","N: 933<br />Percent: 50.3","N: 933<br />Percent: 50.3","N: 995<br />Percent: 48.1","N: 1176<br />Percent: 43.5","N: 1011<br />Percent: 46.2","N: 1106<br />Percent: 41.8","N: 1082<br />Percent: 41.4","N: 1044<br />Percent: 39","N: 1058<br />Percent: 35.2","N: 438<br />Percent: 21.2","N: 1010<br />Percent: 33.5","N: 1096<br />Percent: 34.2","N: 980<br />Percent: 30.7","N: 1040<br />Percent: 28","N: 653<br />Percent: 24.3","N: 537<br />Percent: 21.2","N: 525<br />Percent: 19.6","N: 5464<br />Percent: 54.7","N: 5464<br />Percent: 54.7"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(51,51,51,0.3)","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[54.703513909224,19.6190476190476,21.2290502793296,24.3491577335375,27.9807692307692,30.7142857142857,34.2153284671533,33.4653465346535,21.2328767123288,35.1606805293006,38.9846743295019,41.4048059149723,41.7721518987342,46.1918892185954,43.5374149659864,48.1407035175879,50.2679528403001],"text":["N: 5464<br />Percent: 54.7","N: 525<br />Percent: 19.6","N: 537<br />Percent: 21.2","N: 653<br />Percent: 24.3","N: 1040<br />Percent: 28","N: 980<br />Percent: 30.7","N: 1096<br />Percent: 34.2","N: 1010<br />Percent: 33.5","N: 438<br />Percent: 21.2","N: 1058<br />Percent: 35.2","N: 1044<br />Percent: 39","N: 1082<br />Percent: 41.4","N: 1106<br />Percent: 41.8","N: 1011<br />Percent: 46.2","N: 1176<br />Percent: 43.5","N: 995<br />Percent: 48.1","N: 933<br />Percent: 50.3"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18356.95,18534.05],"tickmode":"array","ticktext":["May","Jun","Jul","Aug","Sep"],"tickvals":[18383,18414,18444,18475,18506],"categoryorder":"array","categoryarray":["May","Jun","Jul","Aug","Sep"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[14.232008877911,58.0134794325112],"tickmode":"array","ticktext":["20","30","40","50"],"tickvals":[20,30,40,50],"categoryorder":"array","categoryarray":["20","30","40","50"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f3540d0661":{"ymin":{},"ymax":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f3231df563":{"x":{},"y":{},"text":{}}},"cur_data":"a9f3540d0661","visdat":{"a9f3540d0661":["function (y) ","x"],"a9f3231df563":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="raceethnicity" class="section level2">
+<h2>Race/ethnicity</h2>
+<div id="htmlwidget-f7860fa9a87f8979df08" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f7860fa9a87f8979df08">{"x":{"data":[{"x":[18365,18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18380,18365,18365],"y":[54.7947692051449,9.27105873993352,2.25255804522689,6.99669747587927,14.7741533548462,18.8933392485091,12.2033778940854,17.1771505627938,13.6329508334257,22.4854026259292,20.1717861983213,29.3856985315081,27.1553941690861,32.689320308307,37.0444469804964,36.6244571150845,36.9950747465929,57.5104197589015,54.7548532297431,55.6828257467763,53.0249654059787,44.7744303923175,47.4000157542062,37.2356212090861,36.8694360837483,30.8114936110187,33.7662456636213,31.9142691647381,40.8081532888044,32.4168578811089,34.179773112356,35.8426800500112,37.7877647894782,63.8718974615218,54.7947692051449],"text":["N: 450<br />Percent: 59.3","N: 34<br />Percent: 23.5","N: 21<br />Percent: 19","N: 34<br />Percent: 20.6","N: 89<br />Percent: 23.6","N: 67<br />Percent: 29.9","N: 68<br />Percent: 22.1","N: 106<br />Percent: 25.5","N: 90<br />Percent: 22.2","N: 155<br />Percent: 29.7","N: 108<br />Percent: 28.7","N: 112<br />Percent: 38.4","N: 114<br />Percent: 36","N: 91<br />Percent: 42.9","N: 110<br />Percent: 46.4","N: 116<br />Percent: 45.7","N: 91<br />Percent: 47.3","N: 91<br />Percent: 47.3","N: 116<br />Percent: 45.7","N: 110<br />Percent: 46.4","N: 91<br />Percent: 42.9","N: 114<br />Percent: 36","N: 112<br />Percent: 38.4","N: 108<br />Percent: 28.7","N: 155<br />Percent: 29.7","N: 90<br />Percent: 22.2","N: 106<br />Percent: 25.5","N: 68<br />Percent: 22.1","N: 67<br />Percent: 29.9","N: 89<br />Percent: 23.6","N: 34<br />Percent: 20.6","N: 21<br />Percent: 19","N: 34<br />Percent: 23.5","N: 450<br />Percent: 59.3","N: 450<br />Percent: 59.3"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"(Black,1)","legendgroup":"(Black,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18380,18365,18365],"y":[46.0585928819656,14.1469316355218,12.2857114755269,18.6167225038041,14.0229213192969,14.6519654734666,23.6192979068495,16.060156979421,9.40530639968726,24.3326041220385,24.5423325998884,24.9301275983997,24.1574528250028,27.5895414177459,23.0975164158008,30.71995924695,29.1552949272507,44.8173078124753,46.7448294854444,35.9698410971526,41.7746204319651,37.4641687966189,37.7564395657794,37.2223732824645,37.0535344918229,20.408358196586,28.7883278690639,36.184623661778,26.4591456376445,24.6563239637219,36.7024264323661,30.2142885244731,31.8300798587311,52.2464918637971,46.0585928819656],"text":["N: 1003<br />Percent: 49.2","N: 87<br />Percent: 23","N: 80<br />Percent: 21.2","N: 94<br />Percent: 27.7","N: 212<br />Percent: 19.3","N: 180<br />Percent: 20.6","N: 204<br />Percent: 29.9","N: 165<br />Percent: 22.4","N: 161<br />Percent: 14.9","N: 202<br />Percent: 30.7","N: 204<br />Percent: 30.9","N: 201<br />Percent: 31.3","N: 185<br />Percent: 30.8","N: 173<br />Percent: 34.7","N: 193<br />Percent: 29.5","N: 142<br />Percent: 38.7","N: 146<br />Percent: 37","N: 146<br />Percent: 37","N: 142<br />Percent: 38.7","N: 193<br />Percent: 29.5","N: 173<br />Percent: 34.7","N: 185<br />Percent: 30.8","N: 201<br />Percent: 31.3","N: 204<br />Percent: 30.9","N: 202<br />Percent: 30.7","N: 161<br />Percent: 14.9","N: 165<br />Percent: 22.4","N: 204<br />Percent: 29.9","N: 180<br />Percent: 20.6","N: 212<br />Percent: 19.3","N: 94<br />Percent: 27.7","N: 80<br />Percent: 21.2","N: 87<br />Percent: 23","N: 1003<br />Percent: 49.2","N: 1003<br />Percent: 49.2"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,186,56,0.2)","hoveron":"points","name":"(Latinx,1)","legendgroup":"(Latinx,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18379,18365,18365],"y":[54.0344257116064,14.7728429557725,17.4851111927414,20.3866031931881,27.653616806009,29.8763260950927,33.0033350679652,33.5946308853977,19.9004416679688,34.1237915978722,39.1755576504356,40.961026244348,41.7255895294693,45.6784778395018,42.9696139778467,46.7954008057869,49.8170785079425,49.8170785079425,57.2332812042877,54.0198165855174,49.5847961023366,52.8489652662546,48.5969911156919,47.9856577608535,46.3435680326245,41.3047798306992,32.5059754443307,40.5596316315171,39.5694804660154,36.6993901395594,34.3220259544781,27.704999860247,25.1754392659742,22.3558699155146,57.1099273175634,54.0344257116064],"text":["N: 4011<br />Percent: 55.6","N: 404<br />Percent: 18.6","N: 436<br />Percent: 21.3","N: 524<br />Percent: 24","N: 739<br />Percent: 31","N: 733<br />Percent: 33.3","N: 824<br />Percent: 36.3","N: 739<br />Percent: 37.1","N: 187<br />Percent: 26.2","N: 700<br />Percent: 37.7","N: 732<br />Percent: 42.8","N: 769<br />Percent: 44.5","N: 806<br />Percent: 45.2","N: 747<br />Percent: 49.3","N: 873<br />Percent: 46.3","N: 736<br />Percent: 50.4","N: 695<br />Percent: 53.5","N: 695<br />Percent: 53.5","N: 695<br />Percent: 53.5","N: 736<br />Percent: 50.4","N: 873<br />Percent: 46.3","N: 747<br />Percent: 49.3","N: 806<br />Percent: 45.2","N: 769<br />Percent: 44.5","N: 732<br />Percent: 42.8","N: 700<br />Percent: 37.7","N: 187<br />Percent: 26.2","N: 739<br />Percent: 37.1","N: 824<br />Percent: 36.3","N: 733<br />Percent: 33.3","N: 739<br />Percent: 31","N: 524<br />Percent: 24","N: 436<br />Percent: 21.3","N: 404<br />Percent: 18.6","N: 4011<br />Percent: 55.6","N: 4011<br />Percent: 55.6"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(97,156,255,0.2)","hoveron":"points","name":"(White,1)","legendgroup":"(White,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[59.3333333333333,23.5294117647059,19.047619047619,20.5882352941176,23.5955056179775,29.8507462686567,22.0588235294118,25.4716981132075,22.2222222222222,29.6774193548387,28.7037037037037,38.3928571428571,35.9649122807018,42.8571428571429,46.3636363636364,45.6896551724138,47.2527472527472],"text":["N: 450<br />Percent: 59.3","N: 34<br />Percent: 23.5","N: 21<br />Percent: 19","N: 34<br />Percent: 20.6","N: 89<br />Percent: 23.6","N: 67<br />Percent: 29.9","N: 68<br />Percent: 22.1","N: 106<br />Percent: 25.5","N: 90<br />Percent: 22.2","N: 155<br />Percent: 29.7","N: 108<br />Percent: 28.7","N: 112<br />Percent: 38.4","N: 114<br />Percent: 36","N: 91<br />Percent: 42.9","N: 110<br />Percent: 46.4","N: 116<br />Percent: 45.7","N: 91<br />Percent: 47.3"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"(Black,1)","legendgroup":"(Black,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[49.1525423728814,22.9885057471264,21.25,27.6595744680851,19.3396226415094,20.5555555555556,29.9019607843137,22.4242424242424,14.9068322981366,30.6930693069307,30.8823529411765,31.3432835820896,30.8108108108108,34.6820809248555,29.5336787564767,38.7323943661972,36.986301369863],"text":["N: 1003<br />Percent: 49.2","N: 87<br />Percent: 23","N: 80<br />Percent: 21.2","N: 94<br />Percent: 27.7","N: 212<br />Percent: 19.3","N: 180<br />Percent: 20.6","N: 204<br />Percent: 29.9","N: 165<br />Percent: 22.4","N: 161<br />Percent: 14.9","N: 202<br />Percent: 30.7","N: 204<br />Percent: 30.9","N: 201<br />Percent: 31.3","N: 185<br />Percent: 30.8","N: 173<br />Percent: 34.7","N: 193<br />Percent: 29.5","N: 142<br />Percent: 38.7","N: 146<br />Percent: 37"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,186,56,1)","dash":"solid"},"hoveron":"points","name":"(Latinx,1)","legendgroup":"(Latinx,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[55.5721765145849,18.5643564356436,21.3302752293578,24.0458015267176,30.9878213802436,33.2878581173261,36.2864077669903,37.0771312584574,26.2032085561497,37.7142857142857,42.7595628415301,44.4733420026008,45.1612903225806,49.2637215528782,46.2772050400916,50.4076086956522,53.5251798561151],"text":["N: 4011<br />Percent: 55.6","N: 404<br />Percent: 18.6","N: 436<br />Percent: 21.3","N: 524<br />Percent: 24","N: 739<br />Percent: 31","N: 733<br />Percent: 33.3","N: 824<br />Percent: 36.3","N: 739<br />Percent: 37.1","N: 187<br />Percent: 26.2","N: 700<br />Percent: 37.7","N: 732<br />Percent: 42.8","N: 769<br />Percent: 44.5","N: 806<br />Percent: 45.2","N: 747<br />Percent: 49.3","N: 873<br />Percent: 46.3","N: 736<br />Percent: 50.4","N: 695<br />Percent: 53.5"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(97,156,255,1)","dash":"solid"},"hoveron":"points","name":"(White,1)","legendgroup":"(White,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18356.95,18534.05],"tickmode":"array","ticktext":["May","Jun","Jul","Aug","Sep"],"tickvals":[18383,18414,18444,18475,18506],"categoryorder":"array","categoryarray":["May","Jun","Jul","Aug","Sep"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.828408925587858,66.9528644323365],"tickmode":"array","ticktext":["0","20","40","60"],"tickvals":[0,20,40,60],"categoryorder":"array","categoryarray":["0","20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":0.905511811023622},"annotations":[{"text":"race_ethnic","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f31648ef73":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f3e607273":{"colour":{},"x":{},"y":{},"text":{}}},"cur_data":"a9f31648ef73","visdat":{"a9f31648ef73":["function (y) ","x"],"a9f3e607273":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="income" class="section level2">
+<h2>Income</h2>
+<div id="htmlwidget-7ea939e5ef8d5e0e695b" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7ea939e5ef8d5e0e695b">{"x":{"data":[{"x":[18365,18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18379,18365,18365],"y":[60.4362134908829,16.1912301629331,19.6904420553961,23.9834973736288,28.5080140414905,31.3485282623884,36.9478640342949,33.8806185093117,19.8768528015139,36.9752873792196,40.1154214099153,42.655897609047,42.5079996561625,46.751327476488,45.3802515889979,50.3450184239966,51.4680255310067,58.8471607154116,57.5568889329517,52.0616088761184,53.7601814749186,49.187906776586,49.6127969410164,47.186165891672,44.4836791861299,31.2244687843892,41.4358371868909,44.2660087980751,38.9129096461084,35.755308842522,32.6750982680177,28.8302680037755,24.8963831301183,63.7873889935891,60.4362134908829],"text":["N: 3220<br />Percent: 62.1","N: 331<br />Percent: 20.5","N: 338<br />Percent: 24.3","N: 413<br />Percent: 28.3","N: 638<br />Percent: 32.1","N: 612<br />Percent: 35.1","N: 692<br />Percent: 40.6","N: 632<br />Percent: 37.7","N: 227<br />Percent: 25.6","N: 658<br />Percent: 40.7","N: 756<br />Percent: 43.7","N: 789<br />Percent: 46.1","N: 855<br />Percent: 45.8","N: 782<br />Percent: 50.3","N: 860<br />Percent: 48.7","N: 734<br />Percent: 54","N: 698<br />Percent: 55.2","N: 698<br />Percent: 55.2","N: 734<br />Percent: 54","N: 860<br />Percent: 48.7","N: 782<br />Percent: 50.3","N: 855<br />Percent: 45.8","N: 789<br />Percent: 46.1","N: 756<br />Percent: 43.7","N: 658<br />Percent: 40.7","N: 227<br />Percent: 25.6","N: 632<br />Percent: 37.7","N: 692<br />Percent: 40.6","N: 612<br />Percent: 35.1","N: 638<br />Percent: 32.1","N: 413<br />Percent: 28.3","N: 338<br />Percent: 24.3","N: 331<br />Percent: 20.5","N: 3220<br />Percent: 62.1","N: 3220<br />Percent: 62.1"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"(High Income,1)","legendgroup":"(High Income,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18380,18365,18365],"y":[40.9682907490137,11.9415400292318,7.36648719759541,9.75944193918646,14.1044252345216,15.8787966583668,15.5341829478871,20.6560729849108,10.4523517273357,18.6854246089577,21.7281674671316,24.6613145768479,23.8302510060721,26.9596442421942,25.0763272765639,26.7110421815376,30.440733245448,30.440733245448,43.0105941881803,38.3491987823178,35.5297333294967,39.4039921214422,35.8982557812582,35.7160439137181,32.407170878733,29.1577126459443,21.5003109945578,31.8862998964451,25.5948493101774,26.9783461987761,24.460597187003,21.8952343198063,20.4112905801824,26.3193295359856,45.7801755086551,40.9682907490137],"text":["N: 1630<br />Percent: 43.4","N: 115<br />Percent: 19.1","N: 108<br />Percent: 13.9","N: 139<br />Percent: 15.8","N: 223<br />Percent: 19.3","N: 210<br />Percent: 21.4","N: 248<br />Percent: 20.6","N: 236<br />Percent: 26.3","N: 169<br />Percent: 16","N: 255<br />Percent: 23.9","N: 266<br />Percent: 27.1","N: 265<br />Percent: 30.2","N: 221<br />Percent: 29.9","N: 220<br />Percent: 33.2","N: 297<br />Percent: 30.3","N: 249<br />Percent: 32.5","N: 226<br />Percent: 36.7","N: 226<br />Percent: 36.7","N: 226<br />Percent: 36.7","N: 249<br />Percent: 32.5","N: 297<br />Percent: 30.3","N: 220<br />Percent: 33.2","N: 221<br />Percent: 29.9","N: 265<br />Percent: 30.2","N: 266<br />Percent: 27.1","N: 255<br />Percent: 23.9","N: 169<br />Percent: 16","N: 236<br />Percent: 26.3","N: 248<br />Percent: 20.6","N: 210<br />Percent: 21.4","N: 223<br />Percent: 19.3","N: 139<br />Percent: 15.8","N: 108<br />Percent: 13.9","N: 115<br />Percent: 19.1","N: 1630<br />Percent: 43.4","N: 1630<br />Percent: 43.4"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,191,196,0.2)","hoveron":"points","name":"(Low Income,1)","legendgroup":"(Low Income,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[62.111801242236,20.5438066465257,24.2603550295858,28.3292978208232,32.1316614420063,35.1307189542484,40.606936416185,37.6582278481013,25.5506607929515,40.7294832826748,43.6507936507937,46.1343472750317,45.8479532163743,50.2557544757033,48.7209302325581,53.9509536784741,55.1575931232092],"text":["N: 3220<br />Percent: 62.1","N: 331<br />Percent: 20.5","N: 338<br />Percent: 24.3","N: 413<br />Percent: 28.3","N: 638<br />Percent: 32.1","N: 612<br />Percent: 35.1","N: 692<br />Percent: 40.6","N: 632<br />Percent: 37.7","N: 227<br />Percent: 25.6","N: 658<br />Percent: 40.7","N: 756<br />Percent: 43.7","N: 789<br />Percent: 46.1","N: 855<br />Percent: 45.8","N: 782<br />Percent: 50.3","N: 860<br />Percent: 48.7","N: 734<br />Percent: 54","N: 698<br />Percent: 55.2"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"(High Income,1)","legendgroup":"(High Income,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18365,18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[43.3742331288344,19.1304347826087,13.8888888888889,15.8273381294964,19.2825112107623,21.4285714285714,20.5645161290323,26.271186440678,15.9763313609467,23.921568627451,27.0676691729323,30.188679245283,29.8642533936652,33.1818181818182,30.3030303030303,32.5301204819277,36.7256637168142],"text":["N: 1630<br />Percent: 43.4","N: 115<br />Percent: 19.1","N: 108<br />Percent: 13.9","N: 139<br />Percent: 15.8","N: 223<br />Percent: 19.3","N: 210<br />Percent: 21.4","N: 248<br />Percent: 20.6","N: 236<br />Percent: 26.3","N: 169<br />Percent: 16","N: 255<br />Percent: 23.9","N: 266<br />Percent: 27.1","N: 265<br />Percent: 30.2","N: 221<br />Percent: 29.9","N: 220<br />Percent: 33.2","N: 297<br />Percent: 30.3","N: 249<br />Percent: 32.5","N: 226<br />Percent: 36.7"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"(Low Income,1)","legendgroup":"(Low Income,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18356.95,18534.05],"tickmode":"array","ticktext":["May","Jun","Jul","Aug","Sep"],"tickvals":[18383,18414,18444,18475,18506],"categoryorder":"array","categoryarray":["May","Jun","Jul","Aug","Sep"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[4.54544210779573,66.6084340833888],"tickmode":"array","ticktext":["20","40","60"],"tickvals":[20,40,60],"categoryorder":"array","categoryarray":["20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":0.905511811023622},"annotations":[{"text":"poverty_cat","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f33a7625bb":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f322a735f9":{"colour":{},"x":{},"y":{},"text":{}}},"cur_data":"a9f33a7625bb","visdat":{"a9f33a7625bb":["function (y) ","x"],"a9f322a735f9":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="employed" class="section level2">
+<h2>Employed</h2>
+<div id="htmlwidget-9f78a0d1d81c13d94c72" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9f78a0d1d81c13d94c72">{"x":{"data":[{"x":[18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18379,18379],"y":[17.0166261958198,18.7694000471355,22.7595267054063,27.8410581004095,29.9219072827275,34.6479471538653,33.8096362958893,20.225661951907,37.0314909192009,40.3480656569545,42.3589622861671,42.5227790270958,46.7246304624072,46.2452932945685,49.6428409737471,52.2909847050147,59.3801028281418,56.4996651687591,52.76023156731,53.6499013727988,49.0327765284597,48.9905186826911,47.0770840436443,43.6870719550506,29.774338048093,40.427237940985,41.0277285218104,36.4147263806389,34.0194070158696,29.8720522419621,26.2832315318119,24.3479793478903,17.0166261958198],"text":["N: 469<br />Percent: 20.7","N: 475<br />Percent: 22.5","N: 589<br />Percent: 26.3","N: 860<br />Percent: 30.9","N: 808<br />Percent: 33.2","N: 888<br />Percent: 37.8","N: 819<br />Percent: 37.1","N: 316<br />Percent: 25","N: 835<br />Percent: 40.4","N: 835<br />Percent: 43.7","N: 867<br />Percent: 45.7","N: 900<br />Percent: 45.8","N: 801<br />Percent: 50.2","N: 905<br />Percent: 49.5","N: 814<br />Percent: 53.1","N: 754<br />Percent: 55.8","N: 754<br />Percent: 55.8","N: 814<br />Percent: 53.1","N: 905<br />Percent: 49.5","N: 801<br />Percent: 50.2","N: 900<br />Percent: 45.8","N: 867<br />Percent: 45.7","N: 835<br />Percent: 43.7","N: 835<br />Percent: 40.4","N: 316<br />Percent: 25","N: 819<br />Percent: 37.1","N: 888<br />Percent: 37.8","N: 808<br />Percent: 33.2","N: 860<br />Percent: 30.9","N: 589<br />Percent: 26.3","N: 475<br />Percent: 22.5","N: 469<br />Percent: 20.7","N: 469<br />Percent: 20.7"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"(Employed,1)","legendgroup":"(Employed,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18526,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18393,18386,18380,18380],"y":[2.61335984127589,3.47693433798642,0.327754072791067,8.94057804998653,12.5864995339738,13.5135208242875,11.9816010255308,5.81963357221936,10.9207450741855,14.8112856344406,18.5526821320664,17.8927560968092,24.3730080494555,18.5594184936312,19.1835135698797,20.4467309908094,20.4467309908094,33.4858532788535,31.9275975412314,28.6730538310921,36.8710110893004,29.6319963784384,30.0454487090551,25.768424510487,20.4693894549625,17.1311860999118,22.7552410797323,24.1676385960023,24.3182623707881,19.1493095904629,12.3706586256216,19.4738853341447,18.8152115872955,2.61335984127589],"text":["N: 56<br />Percent: 10.7","N: 61<br />Percent: 11.5","N: 63<br />Percent: 6.3","N: 178<br />Percent: 14","N: 168<br />Percent: 18.5","N: 207<br />Percent: 18.8","N: 190<br />Percent: 17.4","N: 122<br />Percent: 11.5","N: 223<br />Percent: 15.7","N: 207<br />Percent: 20.3","N: 214<br />Percent: 24.3","N: 202<br />Percent: 23.8","N: 209<br />Percent: 30.6","N: 271<br />Percent: 23.6","N: 180<br />Percent: 25.6","N: 178<br />Percent: 27","N: 178<br />Percent: 27","N: 178<br />Percent: 27","N: 180<br />Percent: 25.6","N: 271<br />Percent: 23.6","N: 209<br />Percent: 30.6","N: 202<br />Percent: 23.8","N: 214<br />Percent: 24.3","N: 207<br />Percent: 20.3","N: 223<br />Percent: 15.7","N: 122<br />Percent: 11.5","N: 190<br />Percent: 17.4","N: 207<br />Percent: 18.8","N: 168<br />Percent: 18.5","N: 178<br />Percent: 14","N: 63<br />Percent: 6.3","N: 61<br />Percent: 11.5","N: 56<br />Percent: 10.7","N: 56<br />Percent: 10.7"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,191,196,0.2)","hoveron":"points","name":"(Unemployed,1)","legendgroup":"(Unemployed,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18379,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[20.682302771855,22.5263157894737,26.3157894736842,30.9302325581395,33.1683168316832,37.8378378378378,37.1184371184371,25,40.3592814371258,43.7125748502994,45.6747404844291,45.7777777777778,50.187265917603,49.5027624309392,53.0712530712531,55.8355437665782],"text":["N: 469<br />Percent: 20.7","N: 475<br />Percent: 22.5","N: 589<br />Percent: 26.3","N: 860<br />Percent: 30.9","N: 808<br />Percent: 33.2","N: 888<br />Percent: 37.8","N: 819<br />Percent: 37.1","N: 316<br />Percent: 25","N: 835<br />Percent: 40.4","N: 835<br />Percent: 43.7","N: 867<br />Percent: 45.7","N: 900<br />Percent: 45.8","N: 801<br />Percent: 50.2","N: 905<br />Percent: 49.5","N: 814<br />Percent: 53.1","N: 754<br />Percent: 55.8"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"(Employed,1)","legendgroup":"(Employed,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18380,18386,18393,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526],"y":[10.7142857142857,11.4754098360656,6.34920634920635,14.0449438202247,18.452380952381,18.8405797101449,17.3684210526316,11.4754098360656,15.695067264574,20.2898550724638,24.2990654205607,23.7623762376238,30.622009569378,23.6162361623616,25.5555555555556,26.9662921348315],"text":["N: 56<br />Percent: 10.7","N: 61<br />Percent: 11.5","N: 63<br />Percent: 6.3","N: 178<br />Percent: 14","N: 168<br />Percent: 18.5","N: 207<br />Percent: 18.8","N: 190<br />Percent: 17.4","N: 122<br />Percent: 11.5","N: 223<br />Percent: 15.7","N: 207<br />Percent: 20.3","N: 214<br />Percent: 24.3","N: 202<br />Percent: 23.8","N: 209<br />Percent: 30.6","N: 271<br />Percent: 23.6","N: 180<br />Percent: 25.6","N: 178<br />Percent: 27"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"(Unemployed,1)","legendgroup":"(Unemployed,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18371.65,18533.35],"tickmode":"array","ticktext":["May","Jun","Jul","Aug","Sep"],"tickvals":[18383,18414,18444,18475,18506],"categoryorder":"array","categoryarray":["May","Jun","Jul","Aug","Sep"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-2.62486336497647,62.3327202659094],"tickmode":"array","ticktext":["0","20","40","60"],"tickvals":[0,20,40,60],"categoryorder":"array","categoryarray":["0","20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":0.905511811023622},"annotations":[{"text":"unemployed","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f32b9db1cf":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f37e04a367":{"colour":{},"x":{},"y":{},"text":{}}},"cur_data":"a9f32b9db1cf","visdat":{"a9f32b9db1cf":["function (y) ","x"],"a9f37e04a367":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="center-based-childcare" class="section level1 tabset">
+<h1 class="tabset">Center-based childcare</h1>
+<div id="all-1" class="section level2">
+<h2>All</h2>
+<div id="htmlwidget-6423ffa4fa63ab6f1c0b" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6423ffa4fa63ab6f1c0b">{"x":{"data":[{"x":[18358,18365,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18365,18358,18358],"y":[0,9.16994620931074,0,0,0,2.2710476292777,2.98375414755737,0,0,6.68266352095629,7.64696171131681,7.65611467469479,7.15382062240392,1.41208214384251,8.11497908785164,10.9743406136864,11.1118664930163,10.2674432151839,13.0972859525441,12.6863805045915,17.7062395217942,19.9308431967285,0,0,0,25.2995962459296,22.695770528457,16.7353882028914,17.5351251146496,14.1228006872551,15.1358229709394,15.0543675202849,11.7150492407603,3.09167098376383,10.6679615558139,11.10526966046,11.3132829370012,10.0481057098129,0,0,6.19055777904813,5.55018142100163,0,0,0,10.5448537353106,0,0],"text":["N: 547<br />Percent: 0","N: 7223<br />Percent: 9.9","N: 660<br />Percent: 0","N: 600<br />Percent: 0","N: 528<br />Percent: 0","N: 537<br />Percent: 3.9","N: 654<br />Percent: 4.6","N: 795<br />Percent: 0","N: 899<br />Percent: 0","N: 1040<br />Percent: 8.4","N: 981<br />Percent: 9.5","N: 1098<br />Percent: 9.4","N: 1010<br />Percent: 8.9","N: 1199<br />Percent: 2.3","N: 1059<br />Percent: 9.9","N: 1045<br />Percent: 13","N: 1082<br />Percent: 13.1","N: 1107<br />Percent: 12.2","N: 1012<br />Percent: 15.3","N: 1176<br />Percent: 14.7","N: 995<br />Percent: 20.2","N: 933<br />Percent: 22.6","N: 1049<br />Percent: 0","N: 1049<br />Percent: 0","N: 1049<br />Percent: 0","N: 933<br />Percent: 22.6","N: 995<br />Percent: 20.2","N: 1176<br />Percent: 14.7","N: 1012<br />Percent: 15.3","N: 1107<br />Percent: 12.2","N: 1082<br />Percent: 13.1","N: 1045<br />Percent: 13","N: 1059<br />Percent: 9.9","N: 1199<br />Percent: 2.3","N: 1010<br />Percent: 8.9","N: 1098<br />Percent: 9.4","N: 981<br />Percent: 9.5","N: 1040<br />Percent: 8.4","N: 899<br />Percent: 0","N: 795<br />Percent: 0","N: 654<br />Percent: 4.6","N: 537<br />Percent: 3.9","N: 528<br />Percent: 0","N: 600<br />Percent: 0","N: 660<br />Percent: 0","N: 7223<br />Percent: 9.9","N: 547<br />Percent: 0","N: 547<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(51,51,51,0.3)","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,9.85739997231067,0,0,0,3.91061452513966,4.58715596330275,0,0,8.36538461538461,9.48012232415902,9.38069216757741,8.91089108910891,2.25187656380317,9.91501416430595,13.0143540669856,13.1238447319778,12.1951219512195,15.3162055335968,14.7108843537415,20.2010050251256,22.615219721329,0],"text":["N: 547<br />Percent: 0","N: 7223<br />Percent: 9.9","N: 660<br />Percent: 0","N: 600<br />Percent: 0","N: 528<br />Percent: 0","N: 537<br />Percent: 3.9","N: 654<br />Percent: 4.6","N: 795<br />Percent: 0","N: 899<br />Percent: 0","N: 1040<br />Percent: 8.4","N: 981<br />Percent: 9.5","N: 1098<br />Percent: 9.4","N: 1010<br />Percent: 8.9","N: 1199<br />Percent: 2.3","N: 1059<br />Percent: 9.9","N: 1045<br />Percent: 13","N: 1082<br />Percent: 13.1","N: 1107<br />Percent: 12.2","N: 1012<br />Percent: 15.3","N: 1176<br />Percent: 14.7","N: 995<br />Percent: 20.2","N: 933<br />Percent: 22.6","N: 1049<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.85,18550.15],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1.26497981229648,26.564576058226],"tickmode":"array","ticktext":["0","5","10","15","20","25"],"tickvals":[0,5,10,15,20,25],"categoryorder":"array","categoryarray":["0","5","10","15","20","25"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f33504048e":{"ymin":{},"ymax":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f31ac721d3":{"x":{},"y":{},"text":{}}},"cur_data":"a9f33504048e","visdat":{"a9f33504048e":["function (y) ","x"],"a9f31ac721d3":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="raceethnicity-1" class="section level2">
+<h2>Race/ethnicity</h2>
+<div id="htmlwidget-ac9ecb4f5a5ac94dd277" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ac9ecb4f5a5ac94dd277">{"x":{"data":[{"x":[18358,18365,18366,18372,18380,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18380,18372,18366,18365,18358,18358],"y":[0,7.34891093463398,0,0,0,-4.34649591894821,-2.02675827951335,0,0,0.833927565538073,0.289766763868086,-1.3904924377288,1.87592139144197,1.45641101741041,4.98918509037349,7.29412509678708,7.80497358730642,9.82538616456897,7.97145556220688,10.2085019975969,13.3179387201636,8.8601568436692,0,0,24.1068761233638,28.061371624664,24.3369525478577,22.7977752070239,23.5079471687644,20.7664549841221,20.2288106830294,14.2415841403957,8.99135017661944,11.3316257783694,4.33166890831704,11.4749391184849,10.4020274906417,0,0,13.7914641618663,13.8703054427577,0,0,0,11.8584061385368,0,0],"text":["N: 58<br />Percent: 0","N: 656<br />Percent: 9.6","N: 66<br />Percent: 0","N: 58<br />Percent: 0","N: 34<br />Percent: 0","N: 21<br />Percent: 4.8","N: 34<br />Percent: 5.9","N: 37<br />Percent: 0","N: 68<br />Percent: 0","N: 89<br />Percent: 5.6","N: 68<br />Percent: 5.9","N: 68<br />Percent: 1.5","N: 106<br />Percent: 6.6","N: 134<br />Percent: 5.2","N: 156<br />Percent: 9.6","N: 109<br />Percent: 13.8","N: 112<br />Percent: 14.3","N: 114<br />Percent: 16.7","N: 91<br />Percent: 15.4","N: 110<br />Percent: 17.3","N: 116<br />Percent: 20.7","N: 91<br />Percent: 16.5","N: 105<br />Percent: 0","N: 105<br />Percent: 0","N: 91<br />Percent: 16.5","N: 116<br />Percent: 20.7","N: 110<br />Percent: 17.3","N: 91<br />Percent: 15.4","N: 114<br />Percent: 16.7","N: 112<br />Percent: 14.3","N: 109<br />Percent: 13.8","N: 156<br />Percent: 9.6","N: 134<br />Percent: 5.2","N: 106<br />Percent: 6.6","N: 68<br />Percent: 1.5","N: 68<br />Percent: 5.9","N: 89<br />Percent: 5.6","N: 68<br />Percent: 0","N: 37<br />Percent: 0","N: 34<br />Percent: 5.9","N: 21<br />Percent: 4.8","N: 34<br />Percent: 0","N: 58<br />Percent: 0","N: 66<br />Percent: 0","N: 656<br />Percent: 9.6","N: 58<br />Percent: 0","N: 58<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"(Black,1)","legendgroup":"(Black,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18380,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18380,18372,18366,18365,18358,18358],"y":[0,7.56226739830285,0,0,0,-0.92123881072339,-0.361923046075694,0,0,3.99134540117733,3.44060797563205,4.90628513935027,3.31025265338387,0.163324979533892,3.05163389407085,3.39336695169707,3.82969753404642,3.73534823103867,4.90181068784287,4.80975514989687,8.9499016342348,12.1954480471316,0,0,24.7908533227315,20.6275631544976,12.806825160984,13.4889939098583,11.3184152098216,11.0956756002819,10.3321232443814,9.81965323464203,2.36832059008636,11.2352018920707,12.6546904704058,11.0038364688124,11.1029942214642,0,0,6.74490176947995,5.92123881072339,0,0,0,10.7039864716662,0,0],"text":["N: 81<br />Percent: 0","N: 1292<br />Percent: 9.1","N: 93<br />Percent: 0","N: 73<br />Percent: 0","N: 88<br />Percent: 0","N: 80<br />Percent: 2.5","N: 94<br />Percent: 3.2","N: 135<br />Percent: 0","N: 165<br />Percent: 0","N: 212<br />Percent: 7.5","N: 180<br />Percent: 7.2","N: 205<br />Percent: 8.8","N: 165<br />Percent: 7.3","N: 395<br />Percent: 1.3","N: 202<br />Percent: 6.4","N: 204<br />Percent: 6.9","N: 201<br />Percent: 7.5","N: 186<br />Percent: 7.5","N: 174<br />Percent: 9.2","N: 193<br />Percent: 8.8","N: 142<br />Percent: 14.8","N: 146<br />Percent: 18.5","N: 165<br />Percent: 0","N: 165<br />Percent: 0","N: 146<br />Percent: 18.5","N: 142<br />Percent: 14.8","N: 193<br />Percent: 8.8","N: 174<br />Percent: 9.2","N: 186<br />Percent: 7.5","N: 201<br />Percent: 7.5","N: 204<br />Percent: 6.9","N: 202<br />Percent: 6.4","N: 395<br />Percent: 1.3","N: 165<br />Percent: 7.3","N: 205<br />Percent: 8.8","N: 180<br />Percent: 7.2","N: 212<br />Percent: 7.5","N: 165<br />Percent: 0","N: 135<br />Percent: 0","N: 94<br />Percent: 3.2","N: 80<br />Percent: 2.5","N: 88<br />Percent: 0","N: 73<br />Percent: 0","N: 93<br />Percent: 0","N: 1292<br />Percent: 9.1","N: 81<br />Percent: 0","N: 81<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,186,56,0.2)","hoveron":"points","name":"(Latinx,1)","legendgroup":"(Latinx,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18365,18358,18358],"y":[0,9.26496708538195,0,0,0,2.2609828495136,2.94022462573417,0,0,6.87477097174471,8.16141400537423,8.11822589675842,7.48283279101751,1.11856836638895,8.68208024297648,12.0581854512655,11.9503908900171,10.3597843782761,14.0567428624942,13.2801427512684,18.2429771816025,21.1271019723129,0,0,0,27.5059915528669,24.1483271662236,18.1058824491897,19.4104592794067,14.9503893189944,16.9182697081623,17.1767872263301,13.3179197570235,3.35904357390955,11.7323228246794,12.2454104668779,12.5752844939436,10.9872046710158,0,0,6.58358489807536,5.99589788443135,0,0,0,10.8906601683664,0,0],"text":["N: 408<br />Percent: 0","N: 5269<br />Percent: 10.1","N: 501<br />Percent: 0","N: 468<br />Percent: 0","N: 406<br />Percent: 0","N: 436<br />Percent: 4.1","N: 525<br />Percent: 4.8","N: 623<br />Percent: 0","N: 666<br />Percent: 0","N: 739<br />Percent: 8.9","N: 733<br />Percent: 10.4","N: 825<br />Percent: 10.2","N: 739<br />Percent: 9.6","N: 670<br />Percent: 2.2","N: 700<br />Percent: 11","N: 732<br />Percent: 14.6","N: 769<br />Percent: 14.4","N: 806<br />Percent: 12.7","N: 747<br />Percent: 16.7","N: 873<br />Percent: 15.7","N: 736<br />Percent: 21.2","N: 695<br />Percent: 24.3","N: 775<br />Percent: 0","N: 775<br />Percent: 0","N: 775<br />Percent: 0","N: 695<br />Percent: 24.3","N: 736<br />Percent: 21.2","N: 873<br />Percent: 15.7","N: 747<br />Percent: 16.7","N: 806<br />Percent: 12.7","N: 769<br />Percent: 14.4","N: 732<br />Percent: 14.6","N: 700<br />Percent: 11","N: 670<br />Percent: 2.2","N: 739<br />Percent: 9.6","N: 825<br />Percent: 10.2","N: 733<br />Percent: 10.4","N: 739<br />Percent: 8.9","N: 666<br />Percent: 0","N: 623<br />Percent: 0","N: 525<br />Percent: 4.8","N: 436<br />Percent: 4.1","N: 406<br />Percent: 0","N: 468<br />Percent: 0","N: 501<br />Percent: 0","N: 5269<br />Percent: 10.1","N: 408<br />Percent: 0","N: 408<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(97,156,255,0.2)","hoveron":"points","name":"(White,1)","legendgroup":"(White,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18380,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,9.60365853658537,0,0,0,4.76190476190476,5.88235294117647,0,0,5.61797752808989,5.88235294117647,1.47058823529412,6.60377358490566,5.22388059701492,9.61538461538462,13.7614678899083,14.2857142857143,16.6666666666667,15.3846153846154,17.2727272727273,20.6896551724138,16.4835164835165,0],"text":["N: 58<br />Percent: 0","N: 656<br />Percent: 9.6","N: 66<br />Percent: 0","N: 58<br />Percent: 0","N: 34<br />Percent: 0","N: 21<br />Percent: 4.8","N: 34<br />Percent: 5.9","N: 37<br />Percent: 0","N: 68<br />Percent: 0","N: 89<br />Percent: 5.6","N: 68<br />Percent: 5.9","N: 68<br />Percent: 1.5","N: 106<br />Percent: 6.6","N: 134<br />Percent: 5.2","N: 156<br />Percent: 9.6","N: 109<br />Percent: 13.8","N: 112<br />Percent: 14.3","N: 114<br />Percent: 16.7","N: 91<br />Percent: 15.4","N: 110<br />Percent: 17.3","N: 116<br />Percent: 20.7","N: 91<br />Percent: 16.5","N: 105<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"(Black,1)","legendgroup":"(Black,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18380,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,9.13312693498452,0,0,0,2.5,3.19148936170213,0,0,7.54716981132075,7.22222222222222,8.78048780487805,7.27272727272727,1.26582278481013,6.43564356435644,6.86274509803922,7.46268656716418,7.52688172043011,9.19540229885057,8.80829015544041,14.7887323943662,18.4931506849315,0],"text":["N: 81<br />Percent: 0","N: 1292<br />Percent: 9.1","N: 93<br />Percent: 0","N: 73<br />Percent: 0","N: 88<br />Percent: 0","N: 80<br />Percent: 2.5","N: 94<br />Percent: 3.2","N: 135<br />Percent: 0","N: 165<br />Percent: 0","N: 212<br />Percent: 7.5","N: 180<br />Percent: 7.2","N: 205<br />Percent: 8.8","N: 165<br />Percent: 7.3","N: 395<br />Percent: 1.3","N: 202<br />Percent: 6.4","N: 204<br />Percent: 6.9","N: 201<br />Percent: 7.5","N: 186<br />Percent: 7.5","N: 174<br />Percent: 9.2","N: 193<br />Percent: 8.8","N: 142<br />Percent: 14.8","N: 146<br />Percent: 18.5","N: 165<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,186,56,1)","dash":"solid"},"hoveron":"points","name":"(Latinx,1)","legendgroup":"(Latinx,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,10.0778136268742,0,0,0,4.12844036697248,4.76190476190476,0,0,8.93098782138024,10.3683492496589,10.1818181818182,9.60757780784844,2.23880597014925,11,14.6174863387978,14.4343302990897,12.6550868486352,16.7336010709505,15.6930126002291,21.195652173913,24.3165467625899,0],"text":["N: 408<br />Percent: 0","N: 5269<br />Percent: 10.1","N: 501<br />Percent: 0","N: 468<br />Percent: 0","N: 406<br />Percent: 0","N: 436<br />Percent: 4.1","N: 525<br />Percent: 4.8","N: 623<br />Percent: 0","N: 666<br />Percent: 0","N: 739<br />Percent: 8.9","N: 733<br />Percent: 10.4","N: 825<br />Percent: 10.2","N: 739<br />Percent: 9.6","N: 670<br />Percent: 2.2","N: 700<br />Percent: 11","N: 732<br />Percent: 14.6","N: 769<br />Percent: 14.4","N: 806<br />Percent: 12.7","N: 747<br />Percent: 16.7","N: 873<br />Percent: 15.7","N: 736<br />Percent: 21.2","N: 695<br />Percent: 24.3","N: 775<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(97,156,255,1)","dash":"solid"},"hoveron":"points","name":"(White,1)","legendgroup":"(White,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.85,18550.15],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-5.96688929612882,29.6817650018446],"tickmode":"array","ticktext":["0","10","20"],"tickvals":[0,10,20],"categoryorder":"array","categoryarray":["0","10","20"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":0.905511811023622},"annotations":[{"text":"race_ethnic","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f35f432bd":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f3632f1958":{"colour":{},"x":{},"y":{},"text":{}}},"cur_data":"a9f35f432bd","visdat":{"a9f35f432bd":["function (y) ","x"],"a9f3632f1958":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="income-1" class="section level2">
+<h2>Income</h2>
+<div id="htmlwidget-3da0733c88c500f7a4d4" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3da0733c88c500f7a4d4">{"x":{"data":[{"x":[18358,18365,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18365,18358,18358],"y":[0,9.20997534004094,0,0,0,3.16572700284489,3.34903561593762,0,0,6.99967978356225,9.06409525800585,9.83755076577281,7.4910572833228,0.943782349912816,9.93831961217592,12.7575655592069,12.3490888975002,11.6928777272163,14.7154958934857,14.5770163616689,20.4989302387092,22.2678452164241,0,0,28.7350201130887,26.6400343389475,19.6090301499591,20.0226905688387,16.3445054503538,17.3087057793058,17.8897263826689,14.9856925458788,2.97778627753816,12.1291958812342,14.7289232226665,14.1385191210791,11.4956180220804,0,0,7.76207549517349,8.07687654745096,0,0,0,11.0323625074288,0,0],"text":["N: 285<br />Percent: 0","N: 4209<br />Percent: 10.1","N: 393<br />Percent: 0","N: 368<br />Percent: 0","N: 333<br />Percent: 0","N: 338<br />Percent: 5.6","N: 414<br />Percent: 5.6","N: 529<br />Percent: 0","N: 572<br />Percent: 0","N: 638<br />Percent: 9.2","N: 612<br />Percent: 11.6","N: 692<br />Percent: 12.3","N: 632<br />Percent: 9.8","N: 714<br />Percent: 2","N: 658<br />Percent: 12.5","N: 757<br />Percent: 15.3","N: 789<br />Percent: 14.8","N: 856<br />Percent: 14","N: 783<br />Percent: 17.4","N: 860<br />Percent: 17.1","N: 734<br />Percent: 23.6","N: 698<br />Percent: 25.5","N: 742<br />Percent: 0","N: 742<br />Percent: 0","N: 698<br />Percent: 25.5","N: 734<br />Percent: 23.6","N: 860<br />Percent: 17.1","N: 783<br />Percent: 17.4","N: 856<br />Percent: 14","N: 789<br />Percent: 14.8","N: 757<br />Percent: 15.3","N: 658<br />Percent: 12.5","N: 714<br />Percent: 2","N: 632<br />Percent: 9.8","N: 692<br />Percent: 12.3","N: 612<br />Percent: 11.6","N: 638<br />Percent: 9.2","N: 572<br />Percent: 0","N: 529<br />Percent: 0","N: 414<br />Percent: 5.6","N: 338<br />Percent: 5.6","N: 333<br />Percent: 0","N: 368<br />Percent: 0","N: 393<br />Percent: 0","N: 4209<br />Percent: 10.1","N: 285<br />Percent: 0","N: 285<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"(High Income,1)","legendgroup":"(High Income,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18380,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18380,18372,18366,18365,18358,18358],"y":[0,7.80620662201451,0,0,0,-0.690808602604964,0.501333875570261,0,0,3.09429904708199,2.93111928958187,1.01828139669663,3.57221468284893,1.1521631682576,2.38862879170538,4.34984129449884,5.60117931820915,2.78014429121701,4.92445840848722,5.25977216020665,6.98134547712876,9.61392176814491,0,0,0,18.7046623026516,14.705401510823,11.5752446748102,12.3482688642401,8.98456159113594,12.5120282289607,10.6877526904636,7.76762120829462,4.76499659505601,9.98710735104937,5.38171860330337,9.44983309137051,9.46175476457721,0,0,6.69291072874629,4.39451230630867,0,0,0,10.2707164549086,0,0],"text":["N: 155<br />Percent: 0","N: 2080<br />Percent: 9","N: 175<br />Percent: 0","N: 153<br />Percent: 0","N: 115<br />Percent: 0","N: 108<br />Percent: 1.9","N: 139<br />Percent: 3.6","N: 160<br />Percent: 0","N: 190<br />Percent: 0","N: 223<br />Percent: 6.3","N: 210<br />Percent: 6.2","N: 250<br />Percent: 3.2","N: 236<br />Percent: 6.8","N: 338<br />Percent: 3","N: 256<br />Percent: 5.1","N: 266<br />Percent: 7.5","N: 265<br />Percent: 9.1","N: 221<br />Percent: 5.9","N: 220<br />Percent: 8.6","N: 297<br />Percent: 8.4","N: 249<br />Percent: 10.8","N: 226<br />Percent: 14.2","N: 298<br />Percent: 0","N: 298<br />Percent: 0","N: 298<br />Percent: 0","N: 226<br />Percent: 14.2","N: 249<br />Percent: 10.8","N: 297<br />Percent: 8.4","N: 220<br />Percent: 8.6","N: 221<br />Percent: 5.9","N: 265<br />Percent: 9.1","N: 266<br />Percent: 7.5","N: 256<br />Percent: 5.1","N: 338<br />Percent: 3","N: 236<br />Percent: 6.8","N: 250<br />Percent: 3.2","N: 210<br />Percent: 6.2","N: 223<br />Percent: 6.3","N: 190<br />Percent: 0","N: 160<br />Percent: 0","N: 139<br />Percent: 3.6","N: 108<br />Percent: 1.9","N: 115<br />Percent: 0","N: 153<br />Percent: 0","N: 175<br />Percent: 0","N: 2080<br />Percent: 9","N: 155<br />Percent: 0","N: 155<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,191,196,0.2)","hoveron":"points","name":"(Low Income,1)","legendgroup":"(Low Income,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,10.1211689237349,0,0,0,5.62130177514793,5.55555555555556,0,0,9.24764890282132,11.6013071895425,12.2832369942197,9.81012658227848,1.96078431372549,12.4620060790274,15.3236459709379,14.828897338403,14.018691588785,17.3690932311622,17.093023255814,23.5694822888283,25.5014326647564,0],"text":["N: 285<br />Percent: 0","N: 4209<br />Percent: 10.1","N: 393<br />Percent: 0","N: 368<br />Percent: 0","N: 333<br />Percent: 0","N: 338<br />Percent: 5.6","N: 414<br />Percent: 5.6","N: 529<br />Percent: 0","N: 572<br />Percent: 0","N: 638<br />Percent: 9.2","N: 612<br />Percent: 11.6","N: 692<br />Percent: 12.3","N: 632<br />Percent: 9.8","N: 714<br />Percent: 2","N: 658<br />Percent: 12.5","N: 757<br />Percent: 15.3","N: 789<br />Percent: 14.8","N: 856<br />Percent: 14","N: 783<br />Percent: 17.4","N: 860<br />Percent: 17.1","N: 734<br />Percent: 23.6","N: 698<br />Percent: 25.5","N: 742<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"(High Income,1)","legendgroup":"(High Income,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18365,18366,18372,18380,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,9.03846153846154,0,0,0,1.85185185185185,3.59712230215827,0,0,6.2780269058296,6.19047619047619,3.2,6.77966101694915,2.9585798816568,5.078125,7.5187969924812,9.05660377358491,5.88235294117647,8.63636363636364,8.41750841750842,10.8433734939759,14.1592920353982,0],"text":["N: 155<br />Percent: 0","N: 2080<br />Percent: 9","N: 175<br />Percent: 0","N: 153<br />Percent: 0","N: 115<br />Percent: 0","N: 108<br />Percent: 1.9","N: 139<br />Percent: 3.6","N: 160<br />Percent: 0","N: 190<br />Percent: 0","N: 223<br />Percent: 6.3","N: 210<br />Percent: 6.2","N: 250<br />Percent: 3.2","N: 236<br />Percent: 6.8","N: 338<br />Percent: 3","N: 256<br />Percent: 5.1","N: 266<br />Percent: 7.5","N: 265<br />Percent: 9.1","N: 221<br />Percent: 5.9","N: 220<br />Percent: 8.6","N: 297<br />Percent: 8.4","N: 249<br />Percent: 10.8","N: 226<br />Percent: 14.2","N: 298<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"(Low Income,1)","legendgroup":"(Low Income,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.85,18550.15],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-2.16210003838965,30.2063115488734],"tickmode":"array","ticktext":["0","10","20","30"],"tickvals":[0,10,20,30],"categoryorder":"array","categoryarray":["0","10","20","30"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":0.905511811023622},"annotations":[{"text":"poverty_cat","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f377b85260":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f366285a07":{"colour":{},"x":{},"y":{},"text":{}}},"cur_data":"a9f377b85260","visdat":{"a9f377b85260":["function (y) ","x"],"a9f366285a07":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="employed-1" class="section level2">
+<h2>Employed</h2>
+<div id="htmlwidget-4516cd807e065f7cd3ab" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4516cd807e065f7cd3ab">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18407,18401,18393,18386,18379,18372,18366,18358,18358],"y":[0,0,0,0,2.57240886506321,3.31205617102032,0,0,7.57195233485277,8.4042795143246,9.18204467267193,8.17856342055685,1.61709733673673,9.76191051048828,13.2056513056926,12.94141378382,11.8366217244967,15.1812818982277,14.3599996311406,19.4964319376945,22.2272203211998,0,0,28.435909652275,25.2210127797502,19.2311605898539,20.4795659820715,16.3856004977255,17.7390937132964,18.1340616129677,14.1615344655883,3.6571642666388,12.3342570922637,13.3404778498506,12.6353244460714,11.4978151070077,0,0,6.85743535440341,6.26969639809468,0,0,0,0,0],"text":["N: 487<br />Percent: 0","N: 580<br />Percent: 0","N: 546<br />Percent: 0","N: 472<br />Percent: 0","N: 475<br />Percent: 4.4","N: 590<br />Percent: 5.1","N: 708<br />Percent: 0","N: 795<br />Percent: 0","N: 860<br />Percent: 9.5","N: 808<br />Percent: 10.5","N: 888<br />Percent: 11.3","N: 819<br />Percent: 10.3","N: 948<br />Percent: 2.6","N: 836<br />Percent: 12","N: 836<br />Percent: 15.7","N: 867<br />Percent: 15.3","N: 900<br />Percent: 14.1","N: 802<br />Percent: 17.8","N: 905<br />Percent: 16.8","N: 814<br />Percent: 22.4","N: 754<br />Percent: 25.3","N: 828<br />Percent: 0","N: 828<br />Percent: 0","N: 754<br />Percent: 25.3","N: 814<br />Percent: 22.4","N: 905<br />Percent: 16.8","N: 802<br />Percent: 17.8","N: 900<br />Percent: 14.1","N: 867<br />Percent: 15.3","N: 836<br />Percent: 15.7","N: 836<br />Percent: 12","N: 948<br />Percent: 2.6","N: 819<br />Percent: 10.3","N: 888<br />Percent: 11.3","N: 808<br />Percent: 10.5","N: 860<br />Percent: 9.5","N: 795<br />Percent: 0","N: 708<br />Percent: 0","N: 590<br />Percent: 5.1","N: 475<br />Percent: 4.4","N: 472<br />Percent: 0","N: 546<br />Percent: 0","N: 580<br />Percent: 0","N: 487<br />Percent: 0","N: 487<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(248,118,109,0.2)","hoveron":"points","name":"(Employed,1)","legendgroup":"(Employed,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18380,18386,18393,18401,18408,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18541,18541,18526,18513,18499,18485,18470,18463,18456,18449,18442,18435,18428,18421,18414,18408,18401,18393,18386,18380,18372,18366,18358,18358],"y":[0,0,0,0,0,0,0,0,0.381629151838287,1.13778624020518,-0.177208986858035,0.355451707487036,-0.305503685345458,0.298976968126763,0.323942702180032,1.51634249584409,0.938187152917092,2.58763631299882,4.56574657715831,6.06668530745833,6.59647182668108,0,0,0,15.8754382856785,15.0444258036528,10.9324084043915,8.89561727551792,5.95836457122084,6.89487245742694,4.5069751722161,4.18532796460866,1.9119293881567,4.90770618724981,3.04802238398722,7.14623742843388,5.2363483762516,0,0,0,0,0,0,0,0,0],"text":["N: 59<br />Percent: 0","N: 79<br />Percent: 0","N: 53<br />Percent: 0","N: 56<br />Percent: 0","N: 61<br />Percent: 0","N: 63<br />Percent: 0","N: 86<br />Percent: 0","N: 104<br />Percent: 0","N: 178<br />Percent: 2.8","N: 169<br />Percent: 4.1","N: 209<br />Percent: 1.4","N: 190<br />Percent: 2.6","N: 249<br />Percent: 0.8","N: 223<br />Percent: 2.2","N: 207<br />Percent: 2.4","N: 214<br />Percent: 4.2","N: 203<br />Percent: 3.4","N: 209<br />Percent: 5.7","N: 271<br />Percent: 7.7","N: 180<br />Percent: 10.6","N: 178<br />Percent: 11.2","N: 221<br />Percent: 0","N: 221<br />Percent: 0","N: 221<br />Percent: 0","N: 178<br />Percent: 11.2","N: 180<br />Percent: 10.6","N: 271<br />Percent: 7.7","N: 209<br />Percent: 5.7","N: 203<br />Percent: 3.4","N: 214<br />Percent: 4.2","N: 207<br />Percent: 2.4","N: 223<br />Percent: 2.2","N: 249<br />Percent: 0.8","N: 190<br />Percent: 2.6","N: 209<br />Percent: 1.4","N: 169<br />Percent: 4.1","N: 178<br />Percent: 2.8","N: 104<br />Percent: 0","N: 86<br />Percent: 0","N: 63<br />Percent: 0","N: 61<br />Percent: 0","N: 56<br />Percent: 0","N: 53<br />Percent: 0","N: 79<br />Percent: 0","N: 59<br />Percent: 0","N: 59<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"transparent","dash":"solid"},"fill":"toself","fillcolor":"rgba(0,191,196,0.2)","hoveron":"points","name":"(Unemployed,1)","legendgroup":"(Unemployed,1)","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,0,0,0,4.42105263157895,5.08474576271187,0,0,9.53488372093023,10.519801980198,11.2612612612613,10.2564102564103,2.63713080168776,11.9617224880383,15.6698564593301,15.3402537485582,14.1111111111111,17.8304239401496,16.7955801104972,22.3587223587224,25.3315649867374,0],"text":["N: 487<br />Percent: 0","N: 580<br />Percent: 0","N: 546<br />Percent: 0","N: 472<br />Percent: 0","N: 475<br />Percent: 4.4","N: 590<br />Percent: 5.1","N: 708<br />Percent: 0","N: 795<br />Percent: 0","N: 860<br />Percent: 9.5","N: 808<br />Percent: 10.5","N: 888<br />Percent: 11.3","N: 819<br />Percent: 10.3","N: 948<br />Percent: 2.6","N: 836<br />Percent: 12","N: 836<br />Percent: 15.7","N: 867<br />Percent: 15.3","N: 900<br />Percent: 14.1","N: 802<br />Percent: 17.8","N: 905<br />Percent: 16.8","N: 814<br />Percent: 22.4","N: 754<br />Percent: 25.3","N: 828<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"hoveron":"points","name":"(Employed,1)","legendgroup":"(Employed,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[18358,18366,18372,18380,18386,18393,18401,18408,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541],"y":[0,0,0,0,0,0,0,0,2.80898876404494,4.14201183431953,1.43540669856459,2.63157894736842,0.803212851405622,2.24215246636771,2.41545893719807,4.20560747663551,3.44827586206897,5.74162679425837,7.74907749077491,10.5555555555556,11.2359550561798,0],"text":["N: 59<br />Percent: 0","N: 79<br />Percent: 0","N: 53<br />Percent: 0","N: 56<br />Percent: 0","N: 61<br />Percent: 0","N: 63<br />Percent: 0","N: 86<br />Percent: 0","N: 104<br />Percent: 0","N: 178<br />Percent: 2.8","N: 169<br />Percent: 4.1","N: 209<br />Percent: 1.4","N: 190<br />Percent: 2.6","N: 249<br />Percent: 0.8","N: 223<br />Percent: 2.2","N: 207<br />Percent: 2.4","N: 214<br />Percent: 4.2","N: 203<br />Percent: 3.4","N: 209<br />Percent: 5.7","N: 271<br />Percent: 7.7","N: 180<br />Percent: 10.6","N: 178<br />Percent: 11.2","N: 221<br />Percent: 0"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"hoveron":"points","name":"(Unemployed,1)","legendgroup":"(Unemployed,1)","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":43.8356164383562,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.85,18550.15],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"Date","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-1.74257435222648,29.872980319156],"tickmode":"array","ticktext":["0","10","20"],"tickvals":[0,10,20],"categoryorder":"array","categoryarray":["0","10","20"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":0.905511811023622},"annotations":[{"text":"unemployed","x":1.02,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"left","yanchor":"bottom","legendTitle":true}],"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"a9f369cd64a":{"ymin":{},"ymax":{},"fill":{},"x":{},"y":{},"text":{},"type":"scatter"},"a9f322b897aa":{"colour":{},"x":{},"y":{},"text":{}}},"cur_data":"a9f369cd64a","visdat":{"a9f369cd64a":["function (y) ","x"],"a9f322b897aa":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

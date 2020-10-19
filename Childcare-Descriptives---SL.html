@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Sihong" />
+
+
+<title>Childcare Variables Descriptives</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="0prelim_april27.html">Sheltering in place</a>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texax</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Childcare Variables Descriptives</h1>
+<h4 class="author">Sihong</h4>
+<h4 class="date">10/2/2020</h4>
+
+</div>
+
+
+<div id="methods-families-chose-for-childcare" class="section level1">
+<h1>Methods Families Chose for Childcare</h1>
+<div id="percentage-of-non-parental-childcare" class="section level2 tabset">
+<h2 class="tabset">Percentage of Non-Parental Childcare</h2>
+<p>*Note. 1. Data of weeks 17 &amp; 18, 19 &amp; 20, 21 &amp; 22, and 23 &amp; 24 were merged to increase sample size and reduce the fluctuation 2. Data on this question were not collected on weeks 1, 2, 3, 7, 8.</p>
+<div id="total-responses" class="section level3">
+<h3>Total Responses</h3>
+<p>Results showed that before COVID-19, 55.54% of caregivers uses some type of non-parental childcare. This rate dropped to 21.61% right after COVID-19 (May of 2020, selected caregivers’ earliest responses during Week 4, 5, 6) and then increased back to 38.84% for current respondents (i.e., caregivers’ latest responses that are later than Week 6). All three bars were statistically different from each other.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="by-income" class="section level3">
+<h3>by Income</h3>
+<ul>
+<li>Findings description: Results showed that for both low- and high-income families, the percentage of using nonparental childcare dropped from pre- to right after COVID19, and then increased overtime recently. during all three time-points, high-income families used more nonparental childcare than low-income families.<br />
+</li>
+<li>Statistical test results:
+<ul>
+<li>During all three different time-points, the differences across high- and low-income groups were statistically significant.<br />
+</li>
+<li>For both groups, the differences between any two time-points were also all statistically significant.</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-income" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Income</h4>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+</div>
+<div id="by-raceethnicity" class="section level3">
+<h3>by Race/Ethnicity</h3>
+<ul>
+<li>Findings description: Results showed that for White, Black, and Latinx families, the percentage of using nonparental childcare dropped from pre- to right after COVID19, and then increased overtime recently. during all three time-points, latinx families used the lest nonparental childcare compared to Black and White families.<br />
+</li>
+<li>Statistical test results:<br />
+
+<ul>
+<li>Pre-COVID: significant differences between White &amp; Latinx, and Black &amp; Latinx families<br />
+</li>
+<li>Right after COVID: no significant differences across three race/ethnicity groups<br />
+</li>
+<li>Current: significant differences between Latinx &amp; White families, marginally significant differences between Black &amp; White families, no significant difference between Black &amp; Latinx families<br />
+</li>
+<li>Changes from pre- to right after COVID: significant decreases for all three race/ethnicity groups<br />
+</li>
+<li>Changes from pre-COVID to current: significant decreases for all three race/ethnicity groups<br />
+</li>
+<li>Changes from right-after COVID to current: significant increases only among White families</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-raceethnicity" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Race/Ethnicity</h4>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+</div>
+<div id="by-raceethnicity-and-income" class="section level3">
+<h3>by Race/Ethnicity and Income</h3>
+<ul>
+<li>Findings description: Results showed that<br />
+
+<ul>
+<li>For low-income and high-income White, Black, and Latinx families, the percentage of using nonparental childcare dropped from pre- to right after COVID19, and then increased overtime recently.<br />
+</li>
+<li>For all three race/ethnicity groups, high-income families used more nonparental childcare than kow-income families.<br />
+</li>
+</ul></li>
+<li>Statistical test results:<br />
+
+<ul>
+<li>Pre-COVID: Among high-income families, significant difference between White &amp; Latinx families; Among low-income families, significant differences between Black &amp; Latinx families; When comparing income levels, significant differences by poverty level among White and Latinx families<br />
+</li>
+<li>Right after COVID: no statistically significant differences across race/ethnicity groups; no statistically significant differences across different poverty-level groups<br />
+</li>
+<li>Current: Among high-income families, significant differences between Latinx &amp; White families; Among low-income families, no significant differences by race/ethnicity; When comparing income levels, significant differences by poverty level only among Latinx families<br />
+</li>
+<li>Changes from pre- to right after COVID: among both high- and low-income families, significant decreases for all three race/ethnicity groups<br />
+</li>
+<li>Changes from pre-COVID to current: among both high- and low-income families, significant decreases for all three race/ethnicity groups<br />
+</li>
+<li>Changes from right-after COVID to current: among high-income families, significant increases in nonparental childcare use only among White families; among low-income families, marginally significant increases in nonparental childcare use only among White families.</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid---breakdown-by-raceethnicity-income" class="section level4">
+<h4>Changes from Pre- to Right after COVID - Breakdown by Race/Ethnicity &amp; Income</h4>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="changes-from-pre-covid-to-current---breakdown-by-raceethnicity-income" class="section level4">
+<h4>Changes from Pre-COVID to Current - Breakdown by Race/Ethnicity &amp; Income</h4>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+</div>
+<div id="by-single-parent-status" class="section level3">
+<h3>by Single Parent Status</h3>
+<ul>
+<li>Findings description: Results showed that for both single-parent and non-single-parent families, the percentage of using nonparental childcare dropped from pre- to right after COVID19, and then increased overtime recently. During all three time-points, single-parent families used more nonparental childcare compared to non-single families.<br />
+</li>
+<li>Statistical test results:<br />
+
+<ul>
+<li>Significant differences in the percentage of using nonparental childcare during pre-covid, but no statistically significant differences right after COVID or currently<br />
+</li>
+<li>For both single-parent and non-single-parent families, the differences between any two timepoints were statistically significant.</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-single-parent-status" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Single Parent Status</h4>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+</div>
+<div id="by-child-disability-status" class="section level3">
+<h3>by Child Disability Status</h3>
+<ul>
+<li>Findings description: Results showed that for families of children with disability, the percentage of using nonparental childcare dropped from pre- to right after COVID19, and then kept dropping overtime; For families of children without disability, the percentage of using nonparental childcare dropped from pre- to right after COVID19, and then increased recently.<br />
+</li>
+<li>Statistical test results:<br />
+
+<ul>
+<li>Pre-COVID, there was no significant differences in caregivers’ using nonparental childcare<br />
+</li>
+<li>Right after COVID, families of children with disability used significantly more nonparental childcare compared to families of children without disability<br />
+</li>
+<li>Currently, families of children with disability used significantly less nonparental childcare compared to families of children without disability<br />
+</li>
+<li>For families of children with disability, the decrease of using nonparental childcare across three timepoints were all statistically significant<br />
+</li>
+<li>For families of children without disability, the decreases from pre- to right after covid, from pre-covid to current, and increases from right after covid to current were all statistically significant.</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-child-disability-status" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Child Disability Status</h4>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+</div>
+<div id="by-caregivers-employment-status" class="section level3">
+<h3>by Caregivers’ Employment Status</h3>
+<ul>
+<li>Findings description: Results showed that for families of employed and unemployed caregivers, the percentage of using nonparental childcare dropped from pre- to right after COVID19, and then increased overtime recently. During all three time-points, employed caregivers used more nonparental childcare compared to unemployed caregivers<br />
+</li>
+<li>Statistical test results:<br />
+
+<ul>
+<li>Significant differences in the percentage of using nonparental childcare at all three timepoints<br />
+</li>
+<li>For both employed and unemployed caregivers, the differences between any two timepoints were statistically significant.</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-caregivers-employment-status" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Caregivers’ Employment Status</h4>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+</div>
+</div>
+<div id="by-material-hardship-status" class="section level3">
+<h3>by Material Hardship Status</h3>
+<p>*Note. No data assessing pre-COVID material hardship. Thus, data below present the usage of non-parental childcare breakdown by material hardship status only during right after COVID and current situations.</p>
+<ul>
+<li>Findings description:<br />
+
+<ul>
+<li>No statistically significant differences in the percentage of using nonparental childcare by material hardship status right after COVID<br />
+</li>
+<li>At the current timepoint, families not experiencing any material hardship reported significantly more usage of nonparental childcare compared to families who are experiences material hardship<br />
+</li>
+<li>For both families with or without material hardship, the percentage of using nonparental childcare significantly increased from right after covid to current situations.</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+</div>
+</div>
+<div id="map-out-changes-of-percentage-of-non-parental-childcare-over-time" class="section level2 tabset">
+<h2 class="tabset">Map Out Changes of Percentage of Non-Parental Childcare Over Time</h2>
+<ul>
+<li>Overall, families’ use of non-parental childcare first decreased after COVID-19, then slowly increased over time.</li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<div id="breakdown-by-income" class="section level3">
+<h3>Breakdown by Income</h3>
+<ul>
+<li>Results showed that high-income families reported more non-parental childcare use compared to low-income families; the trend of changes was similar across these two groups.</li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="by-raceethnicity-1" class="section level3">
+<h3>by Race/Ethnicity</h3>
+<ul>
+<li>White families reported using more nonparental childcare compared to Black and Latinx families. Black and White families showed more steady increases of using nonparental childcare from Week 9, while Latnix families’ changes were less obvious.</li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+</div>
+<div id="by-income-and-raceethnicity" class="section level3">
+<h3>by Income and Race/Ethnicity</h3>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+</div>
+<div id="single-parent-status" class="section level3">
+<h3>Single Parent Status</h3>
+<ul>
+<li>Single-parent families reported more non-parental childcare use compared to non-single-parent families; the trend of changes was similar across these two groups.</li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+</div>
+<div id="child-disability-status" class="section level3">
+<h3>Child Disability Status</h3>
+<ul>
+<li>Families of children without disability showed steady increases in using nonparental childcare from Week 4; However, for families with children with disability, the overall trend of using nonparental childcare was decreasing until Week 10 and then remained the same after (small sample size for families of children with disability).</li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+</div>
+<div id="caregivers-employment-status" class="section level3">
+<h3>Caregivers’ Employment Status</h3>
+<ul>
+<li>Caregivers who were employed reported using more non-parental childcare compared to caregivers who were unemployed during COVID-19. Additionally, the percentage of nonparental childcare use among employed caregivers has almost returned back to pre-COVID level, but the percentage of nonparental childcare use among unemployed caregivers is still lower than pre-COVID level.</li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+</div>
+<div id="material-hardship-status" class="section level3">
+<h3>Material Hardship Status</h3>
+<p>*Note that figure below starts from Week 4 because of lack of material hardship data for baseline.</p>
+<ul>
+<li>Families experiencing material hardship used less nonparental childcare compared to families without mateiral hardship; the trend of increasing from week 4 to current was similar across two groups.</li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+</div>
+</div>
+<div id="types-of-childcare-caregivers-used" class="section level2 tabset">
+<h2 class="tabset">Types of Childcare Caregivers Used</h2>
+<p>*Data based on weeks 5-6, and 9-25. Figures below present the percentage of different childcare methods among all caregivers.</p>
+<p>*Note:<br />
+c_unpaid = Using unpaid care by a relative, friend, or neighbor (&gt;5+ hours per week)<br />
+c_paid = Using paid care by a relative, friend, or neighbor (&gt;5+ hours per week)<br />
+c_center = Using paid or unpaid center-based care, such as pre-school, day care, etc. but not include kindergarten<br />
+c_home = Using paid care from a home-based child care provider (&gt;5+ hours per week).<br />
+</p>
+<div id="total-responses-1" class="section level3">
+<h3>Total Responses</h3>
+<ul>
+<li>Statistical test results:<br />
+
+<ul>
+<li>Changes from pre- to right after COVID: significant decreases in center-based childcare ; no statistically signficant changes for home-based, paid, and unpaid childcare<br />
+</li>
+<li>Changes from pre-COVID to current: significant increases in all four types of childcare<br />
+</li>
+<li>Changes from right-after COVID to current: significant increases in all four types of childcare.</li>
+</ul></li>
+</ul>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current</h4>
+<p>*Note. Figure below indicates changes in the percentage of using different childcare types from pre-COVID to right after COVID (weeks 4-6) and to current situation. negative values indicate decreases, while positive values suggest increases.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+</div>
+<div id="grid-of-pre-covid-current-childcare-choice-shifts" class="section level4">
+<h4>Grid of Pre-COVID &amp; Current Childcare Choice Shifts</h4>
+<p>This figure presents the shift of childcare types from pre-COVID to current (i.e., caregivers’ most recent responses). Each facet indicates the childcare type caregivers used before COVID-19. In each facet, the bars reflect caregivers’ current childcare type. For example, for caregivers using center-based childcare before COVID, there were 14.98% of them still using center-based childcare currently, 2.14% using home-based, 2.71% using paid, and 8.70% using unpaid childcare. Facet e reflect caregivers who reported not using any of the four types of childcare before COVID.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+</div>
+</div>
+<div id="raceethnicity" class="section level3">
+<h3>Race/Ethnicity</h3>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-raceethnicity-1" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Race/Ethnicity</h4>
+<p>*Note. Figure below indicates changes in the percentage of using different childcare types from pre-COVID to right after COVID (weeks 4-6) and to current situation. negative values indicate decreases, while positive values suggest increases.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+</div>
+</div>
+<div id="income" class="section level3">
+<h3>Income</h3>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-income-1" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Income</h4>
+<p>*Note. Figure below indicates changes in the percentage of using different childcare types from pre-COVID to right after COVID (weeks 4-6) and to current situation. negative values indicate decreases, while positive values suggest increases.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+</div>
+</div>
+<div id="income-and-raceethnicity" class="section level3">
+<h3>Income and Race/Ethnicity</h3>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-45-1.png" width="672" /><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-45-2.png" width="672" /><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-45-3.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-raceethnicity-abd-income" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Race/Ethnicity abd Income</h4>
+<p>*Note. Figure below indicates changes in the percentage of using different childcare types from pre-COVID to right after COVID (weeks 4-6) and to current situation. negative values indicate decreases, while positive values suggest increases.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-46-1.png" width="672" /><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-46-2.png" width="672" /></p>
+</div>
+</div>
+<div id="single-parent-status-1" class="section level3">
+<h3>Single Parent Status</h3>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-single-parent-status-1" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Single Parent Status</h4>
+<p>*Note. Figure below indicates changes in the percentage of using different childcare types from pre-COVID to right after COVID (weeks 4-6) and to current situation. negative values indicate decreases, while positive values suggest increases.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-49-1.png" width="672" /></p>
+</div>
+</div>
+<div id="child-disability-status-1" class="section level3">
+<h3>Child Disability Status</h3>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-50-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-child-disability-status-1" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Child Disability Status</h4>
+<p>*Note. Figure below indicates changes in the percentage of using different childcare types from pre-COVID to right after COVID (weeks 4-6) and to current situation. negative values indicate decreases, while positive values suggest increases.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-52-1.png" width="672" /></p>
+</div>
+</div>
+<div id="caregivers-employment-status-1" class="section level3">
+<h3>Caregivers’ Employment Status</h3>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-53-1.png" width="672" /></p>
+<div id="changes-from-pre--to-right-after-covid-current---breakdown-by-caregivers-employment-status-1" class="section level4">
+<h4>Changes from Pre- to Right after COVID &amp; Current - Breakdown by Caregivers’ Employment Status</h4>
+<p>*Note. Figure below indicates changes in the percentage of using different childcare types from pre-COVID to right after COVID (weeks 4-6) and to current situation. negative values indicate decreases, while positive values suggest increases.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-55-1.png" width="672" /></p>
+</div>
+</div>
+<div id="material-hardship-status-1" class="section level3">
+<h3>Material Hardship Status</h3>
+<p>*Note. Material hardship data were only obtained for right after COVID and current situations. Thus, the figures below did not present pre-COVID situations. <img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-56-1.png" width="672" /></p>
+</div>
+</div>
+<div id="except-for-parents-who-are-taking-childcare-responsibilites" class="section level2">
+<h2>Except for parents, who are taking childcare responsibilites?</h2>
+<p>*Data based on weeks 1-4, so the “post-covid” results mainly reflect families’ choices of chidcare right after covid.</p>
+<div id="total-responses-2" class="section level3">
+<h3>Total Responses</h3>
+<p>Caregivers reported large increases in using childcare by other parents, some increases in using siblings, and decreases in using other relatives and center-based childcare such as child care centers, head start program, nursery, family day care, and after-school programs. The percentage of grandparents and child self-care remain the same.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="hours-of-using-family-vs.-non-family-non-parental-child-care" class="section level1 tabset">
+<h1 class="tabset">Hours of Using Family vs. Non-Family Non-Parental Child Care</h1>
+<p>*Data based on data from week 1 to 4.<br />
+</p>
+<div id="mean-of-family-non-family-childcare-hours---total-responses" class="section level2">
+<h2>Mean of Family &amp; Non-family Childcare Hours - Total Responses</h2>
+<p>From pre- to post-COVID, family-based non-parental childcare significantly increased, and non-family-based non-parental childcare significantly decreased.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
+</div>
+<div id="raceethnicity-1" class="section level2">
+<h2>Race/Ethnicity</h2>
+<p>The trend of changes across three race/ethnic groups was the same. Black families reported more hours of using family- and non-family-based childcare before COVID, and more hours of using family-based childcare after COVID.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+</div>
+<div id="income-1" class="section level2">
+<h2>Income</h2>
+<p>The trend of changes for low- and high-income families was generally similar. low-income familes reported using fewer hours of nonfamily-based childcare before COVID19 compared to high-income families.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+</div>
+<div id="income-raceethnicity" class="section level2">
+<h2>Income &amp; Race/Ethnicity</h2>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<p>*Note. f_pre = family child care - pre-COVID19; n_pre = non-family child care - pre-COVID19; f_post = family child care - post-COVID19; n_post = family child care - post-COVID19.</p>
+</div>
+<div id="single-parental-status" class="section level2">
+<h2>Single Parental Status</h2>
+<p>Single parents reported using more hours of family- and non-family-based childcare before COVID, compared to non single parents. However, after COVID, these differences were diminished.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+</div>
+<div id="child-disability-status-2" class="section level2">
+<h2>Child Disability Status</h2>
+<p>Families with children with disability used slightly fewer hours of nonparental childcare (both family and nonfamily based) compared to families of children without disability, during both pre- and post-COVID.</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+</div>
+</div>
+<div id="who-parents-are-expecting-to-provide-childcare" class="section level1">
+<h1>Who Parents Are Expecting to Provide Childcare?</h1>
+<p>*Based on Data Collected from Weeks 7 &amp; 8</p>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-68-1.png" width="672" /> *Note. center = childcare center; rl_myhome = relatives at the caregivers’ home; rl_theirhome = relatives at their home; pf_myhome = professional child provider at the caregivers’ home; pf_theirhome = professional childcare provider in their home; parents = the child’s parents/legal gardians.</p>
+<div id="the-relationship-between-child-and-childcare-provider---among-all-respondents-of-week-7-8" class="section level2">
+<h2>The Relationship Between Child and Childcare Provider - Among All Respondents of Week 7 &amp; 8</h2>
+<p><img src="Childcare-Descriptives---SL_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

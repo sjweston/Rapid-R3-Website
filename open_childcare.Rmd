@@ -102,6 +102,18 @@ ggsave(file = here("figure/1013_nonparental_childcare_rolling_average.pdf"))
 ```
 
 ```{r}
+scored %>%
+  group_by(Week) %>%
+  filter(!is.na(cc2_centerbased)) %>%
+  summarize(n = n(),
+            percent = 100*sum(cc2_centerbased)/n) %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_line() +
+  geom_point()
+```
+
+
+```{r}
 plotdata = scored %>%
   filter(!is.na(poverty_cat)) %>%
   filter(Week == case_when(
@@ -957,7 +969,7 @@ scored %>%
   summarize(Date = min(Date, na.rm=T)) %>%
   rename(covariate.value = Week) %>%
   right_join(time_effect) %>%
-  filter(topic %in% c(9, 3, 13, 12, 2)) %>%
+  filter(topic %in% c(26:30)) %>%
   ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
   geom_line() +
   scale_y_continuous(breaks = NULL) +
