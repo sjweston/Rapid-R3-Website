@@ -111,6 +111,7 @@ scored = scored %>%
                       "hawaii", "other_race", "latinx", "age",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability", "employment_change",
+                      "child_age03", "child_age45", "num_children_age03", "num_children_age45", "num_children_age612", 
                       "current_income", "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   arrange(desc(Week)) %>%

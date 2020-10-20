@@ -252,6 +252,14 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     
   }
   
+  newdata$num_children_age03 = as.numeric(data$DEMO.004.a.2)
+  newdata$num_children_age45 = as.numeric(data$DEMO.004.b.2)
+  newdata$num_children_age612 = as.numeric(data$DEMO.004.c.2) + as.numeric(data$DEMO.004.d.2)
+  
+  newdata = newdata %>%
+    mutate(child_age03 = ifelse(num_children_age03>0, 1, 0),
+           child_age45 = ifelse(num_children_age45>0, 1, 0))
+  
   if(contains_items("POLICY.016", data)){
     data = combine.cat(x = data, 
                        cols = find_items("POLICY.016_", data), 
