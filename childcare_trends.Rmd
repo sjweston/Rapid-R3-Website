@@ -38,7 +38,9 @@ scored = scored %>%
 source(here("Functions/core_funs.R"))
 ```
 
-# Non-parental childcare
+# Non-parental childcare{.tabset}
+
+## All
 
 ```{r}
 plot = scored %>%
@@ -66,6 +68,95 @@ plot = scored %>%
 
 ggplotly(plot, tooltip = "text")
 ```
+
+## Income by employment
+
+```{r}
+plot = scored %>%
+  filter(!is.na(poverty_cat)) %>%
+  filter(!is.na(unemployed)) %>%
+  filter(!is.na(cc2_nonparental)) %>%
+  mutate(unemployed  = factor(unemployed, 
+                              labels = c("Employed", "Unemployed"))) %>%
+  group_by(Week, poverty_cat, unemployed) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n(),
+            percent = sum(cc2_nonparental)/n) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             color = unemployed,
+             fill = unemployed,
+             group = 1, 
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1)
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .2) +
+  geom_line() +
+  labs(x = NULL, color = NULL, fill = NULL, y = "Percent",
+       title = "Caregivers using nonparental childcare")+ 
+  facet_wrap(~poverty_cat) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Non-responders{.tabset}
+
+```{r}
+scored = scored %>%
+  mutate(non_response = case_when(
+    is.na(cc2_nonparental) ~ NA_character_,
+    cc2_nonparental == 0 ~ NA_character_,
+    cc2_unpaid == 1 ~ "Responded",
+    cc2_paid == 1 ~ "Responded",
+    cc2_homebased == 1 ~ "Responded",
+    cc2_centerbased == 1 ~ "Responded",
+    TRUE ~ "Non-responder"
+  ))
+```
+
+### By Week
+
+```{r}
+scored %>%
+  filter(!is.na(non_response)) %>%
+  group_by(Week, non_response) %>%
+  summarize(n = n()) %>%
+  group_by(Week) %>%
+  mutate(total = sum(n)) %>%
+  mutate(percent = n/total*100) %>%
+  filter(non_response == "Non-responder") %>%
+  ggplot(aes(x = Week, y = percent)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Week", y = NULL, title = "Percent of caregivers skipping \nnon-parental childcare question")
+```
+
+## Characteristics
+
+```{r}
+scored %>%
+  filter(!is.na(non_response)) %>%
+  gather(variable, value, race_ethnic, poverty_cat, unemployed, single_cat, region) %>%
+  group_by(variable, value, non_response) %>%
+  summarize(n = n()) %>%
+  group_by(variable, non_response) %>%
+  mutate(percent = n/sum(n)*100) %>%
+  ggplot(aes(x = value, y = percent, fill = non_response)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~variable, scales = "free") +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+```
+
+
 
 # Non-parental childcare by type{.tabset}
 

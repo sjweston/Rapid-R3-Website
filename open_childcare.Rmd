@@ -467,6 +467,15 @@ td_beta1 %>%
   group_by(topic) %>%
   top_n(20) %>% 
   write.csv(file = here("figure data/1013_challenge_words.csv"), row.names = F)
+
+
+td_beta1 %>% 
+  filter(topic == 4) %>%
+  filter(!grepl("-", term)) %>%
+  arrange(topic, desc(beta)) %>%
+  group_by(topic) %>%
+  top_n(20) %>% 
+  write.csv(file = here("figure data/1020_challenge_exposure_covid.csv"), row.names = F)
 ```
 
 ## Identify topics {.tabset}
@@ -788,7 +797,7 @@ topic_freq = td_gamma %>%
 ```{r -open-childcare-47 }
 predict_topics<-estimateEffect(formula = 1:num_topics ~ race_ethnic*mental_health + poverty150*mental_health + s(Week, df = 6), 
                                stmobj = topics_child, 
-                               metadata = open_ended1, 
+                               metadata = out1$meta, 
                                uncertainty = "Global")
 ```
 
@@ -809,7 +818,7 @@ document_classification_1 = td_gamma %>%
          topic = paste0("topic_", topic)) %>%
   spread(topic, gamma)
 
-document_classification_1 = cbind(document_classification_1, open_ended1) 
+document_classification_1 = cbind(document_classification_1, out1$meta) 
 plot = document_classification_1 %>%
   gather("topic_name", "includes", contains("topic_")) %>%
   mutate(topic_name = str_remove(topic_name, "topic_")) %>%
@@ -969,14 +978,14 @@ scored %>%
   summarize(Date = min(Date, na.rm=T)) %>%
   rename(covariate.value = Week) %>%
   right_join(time_effect) %>%
-  filter(topic %in% c(26:30)) %>%
+  filter(topic %in% c(4, 9, 14, 15, 18, 19, 28)) %>%
   ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
   geom_line() +
   scale_y_continuous(breaks = NULL) +
   labs(x = "Week", y = NULL, color = "Topic", 
        title = "Estimated prevelance of topic by week") +
   theme_pubr()
-ggsave(here("figure/10_13_open_child/challenge_by_time.pdf"))
+#ggsave(here("figure/10_13_open_child/challenge_by_time.pdf"))
 ```
 
 ```{r, eval = F}
@@ -996,6 +1005,39 @@ scored %>%
   theme_pubr()
 
 ```
+
+### Over time -- topic 4
+
+```{r}
+plotdata = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name, Week) %>%
+  filter(topic_name == "4") %>%
+  summarize(
+    Date = min(Date, na.rm=T),
+    n = n(),
+    percent = 100*sum(includes)/n) 
+
+  plot = plotdata %>% 
+    ggplot(aes(x = Date,  
+             y = percent,
+             group = 1,
+             text = paste0(
+               "\nWeek: ", Week,
+               "\nPercent: ", round(percent, 1),
+               "\nN: ", n
+             ))) +
+  geom_point() +
+  geom_line() +
+  labs(x = NULL, y = "Percent", title = "More caregivers are expressing concern about exposure to COVID through child care") +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+
+write.csv(plotdata, file = here("figure data/1020_prevalence_covid_time.csv"))
+```
+
 
 
 # Question 2
@@ -1791,7 +1833,7 @@ scored %>%
   summarize(Date = min(Date, na.rm=T)) %>%
   rename(covariate.value = Week) %>%
   right_join(time_effect) %>%
-  filter(topic %in% c(8, 3, 13, 12, 7)) %>%
+  #filter(topic %in% c(8, 3, 13, 12, 7)) %>%
   ggplot(aes(x = Date, y = estimate, color = as.factor(topic))) +
   geom_line() +
   scale_y_continuous(breaks = NULL) +
@@ -1799,7 +1841,7 @@ scored %>%
        title = "Estimated prevelance of topic by week") +
   theme_pubr()
 ggsave(here("figure/10_13_open_child/helping_by_time.pdf"))
-
+```
 
 
 ```{r}
