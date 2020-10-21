@@ -21,7 +21,7 @@ source(here("Scripts/demo groups.R"))
 source(here("Functions/pomp.R"))
 source(here("Functions/fpl.R"))
 
-load(here("../../Data Management R3/R Data/scored.Rdata"))
+#load(here("../../Data Management R3/R Data/scored.Rdata"))
 
 
 if(!scored_in_environ){
