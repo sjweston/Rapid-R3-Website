@@ -293,7 +293,11 @@ ggplotly(plot, tooltip = "text")
 ```{r}
 scored = scored %>%
   rowwise() %>%
-  mutate(num_care = sum(cc2_centerbased, cc2_unpaid, cc2_paid, cc2_homebased, na.rm=T)) %>%
+  mutate(num_care = sum(cc2_centerbased, cc2_unpaid, cc2_paid, cc2_homebased, na.rm=T),
+         num_care = case_when(
+           is.na(cc2_centerbased) & is.na(cc2_unpaid) & is.na(cc2_paid) & is.na(cc2_homebased) ~ NA_real_,
+           TRUE ~ num_care
+         )) %>%
   ungroup() 
 
 plot = scored %>%
