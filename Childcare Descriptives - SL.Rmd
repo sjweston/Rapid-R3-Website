@@ -888,14 +888,18 @@ ggplot (data = cc_week_sp, aes (x = Week, y = ccnp_pct, color = mhardship)) +
 ```{r, echo=FALSE, message = FALSE}
 cc_np_pre = ccare %>%
   filter (Week == 0) %>%
-  gather("variable", value, "cc2_centerbased", "cc2_unpaid", "cc2_paid","cc2_homebased") %>%
-  group_by(variable) %>%
-  filter(!is.na(value)) %>%
-  summarise(n = n(), 
-            Percent = sum(value)/n) %>%
+  summarise (n = n(), 
+             c_unpaid = sum(cc2_unpaid, na.rm = TRUE)/n,
+             c_paid = sum(cc2_paid, na.rm = TRUE)/n,
+             c_center = sum(cc2_centerbased, na.rm = TRUE)/n,
+             c_home = sum(cc2_homebased, na.rm = TRUE)/n) %>%
+  pivot_longer(cols = c("c_unpaid","c_paid", "c_center", "c_home"), 
+               names_to = "ChildCareMethod", 
+               values_to = "Percent" ) %>%
   mutate(moe = map2_dbl(Percent, n, moe.p),
          time = "a.pre-covid") %>%
   mutate_at(vars(Percent, moe), ~100*.x)
+
 
 cc_np_after <- ccare %>%
   filter (Week >= 4 & Week <=6 ) %>%

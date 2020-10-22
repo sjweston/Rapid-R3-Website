@@ -238,13 +238,18 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   }
   
   if(contains_items("POLICY.009", data)){
-    newdata$cc2_nonparental_pre = ifelse(data$POLICY.009.a == 1, 1, 0)
-    newdata$cc2_nonparental = ifelse(data$POLICY.009.b == 1, 1, 0)
+    newdata$cc2_nonparental_pre = case_when(
+      data$POLICY.009.a == 1 ~ 1, 
+      data$POLICY.009.a == 2 ~ 0,
+      data$POLICY.009.a == 3 ~ NA_real_,
+      TRUE ~ NA_real_)
     
-    # newdata$cc2_nonparental_pre = case_when(
-    #   data$POLICY.009.a == 1 ~ 1, 
-    #   )
-    newdata$cc2_nonparental = ifelse(data$POLICY.009.b == 1, 1, 0)
+    newdata$cc2_nonparental = case_when(
+      data$POLICY.009.b == 1 ~ 1, 
+      data$POLICY.009.b == 2 ~ 0,
+      data$POLICY.009.b == 3 ~ NA_real_,
+      TRUE ~ NA_real_)
+    
   }
   if(contains_items("POLICY.010", data)){
     newdata$cc2_expected_change = case_when(
@@ -263,11 +268,58 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                        id = "CaregiverID",
                        newvar.name = "POLICY.015_cat")
     data$POLICY.015_cat[data$POLICY.009.a != 1] = "0"
-    newdata$cc2_centerbased_pre = ifelse(grepl("1",data$POLICY.015_cat), 1, 0)
-    newdata$cc2_unpaid_pre = ifelse(grepl("2",data$POLICY.015_cat), 1, 0)
-    newdata$cc2_paid_pre = ifelse(grepl("3",data$POLICY.015_cat), 1, 0)
-    newdata$cc2_homebased_pre = ifelse(grepl("4",data$POLICY.015_cat), 1, 0)
     
+    newdata$cc2_centerbased_pre = case_when(
+      is.na(newdata$cc2_nonparental_pre) ~ NA_real_,
+      newdata$cc2_nonparental_pre == 0 ~ 0,
+      data$POLICY.015_1 == 1 ~ 1,
+      data$POLICY.015.2_1 == 1 ~ 1,
+      TRUE ~ 0)
+    
+    newdata$cc2_unpaid_pre = case_when(
+      is.na(newdata$cc2_nonparental_pre) ~ NA_real_,
+      newdata$cc2_nonparental_pre == 0 ~ 0,
+      data$POLICY.015_2 == 1 ~ 1,
+      data$POLICY.015.2_2 == 1 ~ 1,
+      TRUE ~ 0)
+    
+    newdata$cc2_paid_pre = case_when(
+      is.na(newdata$cc2_nonparental_pre) ~ NA_real_,
+      newdata$cc2_nonparental_pre == 0 ~ 0,
+      data$POLICY.015_3 == 1 ~ 1,
+      data$POLICY.015.2_3 == 1 ~ 1,
+      TRUE ~ 0)
+    
+    newdata$cc2_homebased_pre = case_when(
+      is.na(newdata$cc2_nonparental_pre) ~ NA_real_,
+      newdata$cc2_nonparental_pre == 0 ~ 0,
+      data$POLICY.015_4 == 1 ~ 1,
+      data$POLICY.015.2_4 == 1 ~ 1,
+      TRUE ~ 0)
+    
+    newdata$cc2_centerbased = case_when(
+      is.na(newdata$cc2_nonparental) ~ NA_real_,
+      newdata$cc2_nonparental == 0 ~ 0,
+      data$POLICY.016_1 == 1 ~ 1,
+      TRUE ~ 0)
+    
+    newdata$cc2_unpaid = case_when(
+      is.na(newdata$cc2_nonparental) ~ NA_real_,
+      newdata$cc2_nonparental == 0 ~ 0,
+      data$POLICY.016_2 == 1 ~ 1,
+      TRUE ~ 0)
+    
+    newdata$cc2_paid = case_when(
+      is.na(newdata$cc2_nonparental) ~ NA_real_,
+      newdata$cc2_nonparental == 0 ~ 0,
+      data$POLICY.016_3 == 1 ~ 1,
+      TRUE ~ 0)
+    
+    newdata$cc2_homebased = case_when(
+      is.na(newdata$cc2_nonparental) ~ NA_real_,
+      newdata$cc2_nonparental == 0 ~ 0,
+      data$POLICY.016_4 == 1 ~ 1,
+      TRUE ~ 0)
     
   }
   
