@@ -49,8 +49,7 @@ scored = scored %>%
       race_cat == "White/Caucasian" ~ "White",
       !is.na(race_cat) ~ "Non-white",
       TRUE ~ NA_character_),
-    poverty150 = factor(poverty150, levels = c(0,1), 
-                        labels = c("High Income", "Low Income")),
+    poverty150 = poverty_cat,
     conflictSource = factor(conflictSource, 
                             labels = c("Being confident that my family has health insurance",
                                        "Not being so socially isolated",
@@ -226,16 +225,16 @@ test$ttest
 ```
 
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r canary-16}
-test = change_group(scored_prepost, poverty150, conflict_total)
-test$plot
-```
+<!-- ```{r canary-16} -->
+<!-- test = change_group(scored_prepost, poverty150, conflict_total) -->
+<!-- test$plot -->
+<!-- ``` -->
 
-```{r canary-17, results = 'asis'}
-test$ttest
-```
+<!-- ```{r canary-17, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
 
 # Spousal Conflict
 
@@ -305,16 +304,16 @@ test$plot
 test$ttest
 ```
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r canary-28}
-test = change_group(scored_prepost, poverty150, conflict_parent)
-test$plot
-```
+<!-- ```{r canary-28} -->
+<!-- test = change_group(scored_prepost, poverty150, conflict_parent) -->
+<!-- test$plot -->
+<!-- ``` -->
 
-```{r canary-29, results = 'asis'}
-test$ttest
-```
+<!-- ```{r canary-29, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
 
 # Child-parent Conflict
 
@@ -354,16 +353,16 @@ test$pairwise
 ```
 
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r canary-34}
-test = pre_post_group(scored, poverty150, conflict_child)
-test$plot
-```
+<!-- ```{r canary-34} -->
+<!-- test = pre_post_group(scored, poverty150, conflict_child) -->
+<!-- test$plot -->
+<!-- ``` -->
 
-```{r canary-35, results = 'asis'}
-test$pairwise
-```
+<!-- ```{r canary-35, results = 'asis'} -->
+<!-- test$pairwise -->
+<!-- ``` -->
 
 ## Change{.tabset}
 
@@ -391,16 +390,16 @@ test$ttest
 
 
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r canary-40}
-test = change_group(scored_prepost, poverty150, conflict_child)
-test$plot
-```
+<!-- ```{r canary-40} -->
+<!-- test = change_group(scored_prepost, poverty150, conflict_child) -->
+<!-- test$plot -->
+<!-- ``` -->
 
-```{r canary-41, results = 'asis'}
-test$ttest
-```
+<!-- ```{r canary-41, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
 
 # Cohesiveness
 
@@ -437,16 +436,16 @@ test$pairwise
 ```
 
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r canary-46}
-test = pre_post_group(scored, poverty150, cohesive)
-test$plot
-```
+<!-- ```{r canary-46} -->
+<!-- test = pre_post_group(scored, poverty150, cohesive) -->
+<!-- test$plot -->
+<!-- ``` -->
 
-```{r canary-47, results = 'asis'}
-test$pairwise
-```
+<!-- ```{r canary-47, results = 'asis'} -->
+<!-- test$pairwise -->
+<!-- ``` -->
 
 ## Change{.tabset}
 
@@ -473,16 +472,16 @@ test$ttest
 ```
 
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r canary-52}
-test = change_group(scored_prepost, poverty150, cohesive)
-test$plot
-```
+<!-- ```{r canary-52} -->
+<!-- test = change_group(scored_prepost, poverty150, cohesive) -->
+<!-- test$plot -->
+<!-- ``` -->
 
-```{r canary-53, results = 'asis'}
-test$ttest
-```
+<!-- ```{r canary-53, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
 
 # Source of conflict
 
@@ -543,32 +542,32 @@ scored %>%
 ```
 
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r, out.width="100%"}
-scored %>%
-  filter(!is.na(conflictSource) & !is.na(poverty150)) %>%
-  group_by(conflictSource, poverty150) %>%
-  summarize(Count = n()) %>%
-  ungroup() %>%
-  group_by(poverty150)%>%
-  mutate(Percent = 100*Count/sum(Count),
-         N = sum(Count)) %>%
-  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
-  ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, y = Percent + 5), color = "black", size = 3) +
-  geom_text(aes(label = paste0(round(Percent),
-                              "\n(", round(MOE,1), ")")), 
-            color = "white", y = 1.5, size = 3) +
-  labs(x = "",
-       y = "Percent",
-       title = "By Income") +
-  coord_flip() +
-  facet_wrap(~poverty150) +
-  theme_pubclean() +
-  theme(plot.title.position = "plot")
-```
+<!-- ```{r, out.width="100%"} -->
+<!-- scored %>% -->
+<!--   filter(!is.na(conflictSource) & !is.na(poverty150)) %>% -->
+<!--   group_by(conflictSource, poverty150) %>% -->
+<!--   summarize(Count = n()) %>% -->
+<!--   ungroup() %>% -->
+<!--   group_by(poverty150)%>% -->
+<!--   mutate(Percent = 100*Count/sum(Count), -->
+<!--          N = sum(Count)) %>% -->
+<!--   mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>% -->
+<!--   ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) + -->
+<!--   geom_bar(stat = "identity") + -->
+<!--   geom_text(aes(label = Count, y = Percent + 5), color = "black", size = 3) + -->
+<!--   geom_text(aes(label = paste0(round(Percent), -->
+<!--                               "\n(", round(MOE,1), ")")),  -->
+<!--             color = "white", y = 1.5, size = 3) + -->
+<!--   labs(x = "", -->
+<!--        y = "Percent", -->
+<!--        title = "By Income") + -->
+<!--   coord_flip() + -->
+<!--   facet_wrap(~poverty150) + -->
+<!--   theme_pubclean() + -->
+<!--   theme(plot.title.position = "plot") -->
+<!-- ``` -->
 
 ## Aggregated{.tabset}
 
@@ -648,29 +647,29 @@ scored %>%
 ```
 
 
-### Poverty line
+<!-- ### Poverty line -->
 
-```{r, out.width="100%"}
-scored %>%
-  filter(!is.na(conflictSource_agg) & !is.na(poverty150)) %>%
-  group_by(conflictSource_agg, poverty150) %>%
-  summarize(Count = n()) %>%
-  ungroup() %>%
-  group_by(poverty150)%>%
-  mutate(Percent = 100*Count/sum(Count),
-         N = sum(Count)) %>%
-  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
-  ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = Count, y = Percent + 10), color = "black", size = 3) +
-  geom_text(aes(label = paste0(round(Percent),
-                              "\n(", round(MOE,1), ")")), 
-            color = "white", y = 5, size = 3) +
-  labs(x = "",
-       y = "Percent",
-       title = "Overall sample") +
-  coord_flip() +
-  facet_wrap(~poverty150) +
-  theme_pubclean() +
-  theme(plot.title.position = "plot")
-```
+<!-- ```{r, out.width="100%"} -->
+<!-- scored %>% -->
+<!--   filter(!is.na(conflictSource_agg) & !is.na(poverty150)) %>% -->
+<!--   group_by(conflictSource_agg, poverty150) %>% -->
+<!--   summarize(Count = n()) %>% -->
+<!--   ungroup() %>% -->
+<!--   group_by(poverty150)%>% -->
+<!--   mutate(Percent = 100*Count/sum(Count), -->
+<!--          N = sum(Count)) %>% -->
+<!--   mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>% -->
+<!--   ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) + -->
+<!--   geom_bar(stat = "identity") + -->
+<!--   geom_text(aes(label = Count, y = Percent + 10), color = "black", size = 3) + -->
+<!--   geom_text(aes(label = paste0(round(Percent), -->
+<!--                               "\n(", round(MOE,1), ")")),  -->
+<!--             color = "white", y = 5, size = 3) + -->
+<!--   labs(x = "", -->
+<!--        y = "Percent", -->
+<!--        title = "Overall sample") + -->
+<!--   coord_flip() + -->
+<!--   facet_wrap(~poverty150) + -->
+<!--   theme_pubclean() + -->
+<!--   theme(plot.title.position = "plot") -->
+<!-- ``` -->

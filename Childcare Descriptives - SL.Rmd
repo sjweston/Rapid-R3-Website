@@ -138,8 +138,9 @@ pairwise.prop.test(x = cc_np$n, n = cc_np$count, p.adjust.method = "holm")
   
 ```{r, echo=FALSE, message = FALSE}
 cc_np_pre <- ccare %>%
-  filter (Week == 0 & cc2_nonparental != "NA") %>%
-  count (poverty_cat, cc2_nonparental)%>%
+  filter (Week == 0 & !is.na(cc2_nonparental)) %>%
+  group_by (poverty_cat, cc2_nonparental) %>%
+  summarize(n = n()) %>%
   group_by (poverty_cat)%>%
   mutate (prop = prop.table(n),         
             moe = map2_dbl(prop, n, moe.p))%>%
@@ -195,7 +196,7 @@ pairwise.prop.test(x = cc_np$n, n = cc_np$count, p.adjust.method = "holm")
 #### Changes from Pre- to Right after COVID & Current - Breakdown by Income
  
 ```{r, echo=FALSE, message = FALSE}
-cc_np_cg_12 = cbind(cc_np_pre,cc_np_after)%>%
+cc_np_cg_12 = cbind(cc_np_pre,cc_np_after) %>%
   mutate (cc_np_cg = prop...9-prop...4)%>%
   select(poverty_cat...1, cc_np_cg, cc2_nonparental...2)%>%
   mutate (cc2_nonparental...2 = "a.Change_to_Right_After_COVID")

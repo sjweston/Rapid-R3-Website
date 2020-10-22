@@ -140,11 +140,13 @@ table = BefAft %>%
 
 #build groupings
 
-first.row = sapply(binary_demos, first_instance, string = table$Demo)
-last.row = sapply(binary_demos, last_instance, string = table$Demo)
+demo_groups = binary_demos %in% unique(table$Demo)
+
+first.row = sapply(binary_demos[demo_groups], first_instance, string = table$Demo)
+last.row = sapply(binary_demos[demo_groups], last_instance, string = table$Demo)
 
 each_string = paste0("group_rows(group_label = \" ", 
-                     binary_labels, 
+                     binary_labels[demo_groups], 
                      "\" , start_row = ", 
                      first.row, 
                      ", end_row = ", 

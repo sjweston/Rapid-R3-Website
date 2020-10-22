@@ -78,6 +78,20 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   newdata$language = data$UserLanguage
   
+  newdata$edu = case_when(
+    data$DEMO.014 == 9 ~ NA_real_,
+    !is.na(data$DEMO.014) ~ data$DEMO.014,
+    TRUE ~ NA_real_)
+  newdata$edu_cat = factor(newdata$edu, 
+                           labels = c("Less than high school",
+                                      "Some high school",
+                                      "High school diploma or equivalency (GED)",
+                                      "Some college",
+                                      "Associate degree",
+                                      "Bachelor's degree",
+                                      "Master's degree",
+                                      "Doctorate or professional"))
+  
   
   if(contains_items("POLICY.001_[1-7]$", data)){
     data = combine.cat(x = data, 
@@ -225,6 +239,11 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   if(contains_items("POLICY.009", data)){
     newdata$cc2_nonparental_pre = ifelse(data$POLICY.009.a == 1, 1, 0)
+    newdata$cc2_nonparental = ifelse(data$POLICY.009.b == 1, 1, 0)
+    
+    # newdata$cc2_nonparental_pre = case_when(
+    #   data$POLICY.009.a == 1 ~ 1, 
+    #   )
     newdata$cc2_nonparental = ifelse(data$POLICY.009.b == 1, 1, 0)
   }
   if(contains_items("POLICY.010", data)){

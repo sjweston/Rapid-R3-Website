@@ -487,7 +487,7 @@ td_beta1 %>%
 ### 1
 
 ```{r -open-childcare-16 }
-texts = open_ended1$response
+texts = open_ended1$response[-out1$docs.removed]
 labelTopics(topics_child, topics = 1, n = 5)
 findThoughts(topics_child, texts, topics = 1, n = 5)
 ```
@@ -853,7 +853,7 @@ document_classification_1 = td_gamma %>%
          topic = paste0("topic_", topic)) %>%
   spread(topic, gamma)
 
-document_classification_1 = cbind(document_classification_1, open_ended1) 
+document_classification_1 = cbind(document_classification_1, out1$meta) 
 plot = document_classification_1 %>%
   gather("topic_name", "includes", contains("topic_")) %>%
   mutate(topic_name = str_remove(topic_name, "topic_")) %>%
@@ -890,7 +890,7 @@ document_classification_1 = td_gamma %>%
          topic = paste0("topic_", topic)) %>%
   spread(topic, gamma)
 
-document_classification_1 = cbind(document_classification_1, open_ended1) 
+document_classification_1 = cbind(document_classification_1, out1$meta) 
 plot = document_classification_1 %>%
   gather("topic_name", "includes", contains("topic_")) %>%
   mutate(topic_name = str_remove(topic_name, "topic_")) %>%

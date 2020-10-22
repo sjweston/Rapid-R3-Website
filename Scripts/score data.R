@@ -92,6 +92,36 @@ if(!(contains_items("FPL\\.", master))){
   scored$poverty200 = scored$poverty200s
 }
 
+# baseline week -----------------------------------------------------------
+
+pre_pandemic = scored %>%
+  select(CaregiverID, Week, contains("_pre")) %>%
+  group_by(CaregiverID) %>% 
+  mutate_at(vars(-CaregiverID, -Week), select_first) %>% 
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  mutate(Week = 0) 
+
+names(pre_pandemic) = gsub("_pre", "_current", names(pre_pandemic))
+names(pre_pandemic) = gsub("_current$", "", names(pre_pandemic))
+scored = scored %>%
+  select(-contains("_pre")) %>%
+  full_join(pre_pandemic)
+
+# new baseline week
+
+baseline = scored %>%
+  filter(Week != 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  select(CaregiverID, Week) %>%
+  ungroup() %>%
+  rename(BaselineWeek = Week)
+
+scored = scored %>%
+  select(-BaselineWeek) %>%
+  full_join(baseline)
+
 # repeat ------------------------------------------------
 
 scored = scored %>%
@@ -108,18 +138,19 @@ scored = scored %>%
   arrange(Week) %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
-                      "hawaii", "other_race", "latinx", "age",
+                      "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
-                      "single", "disability", "employment_change",
+                      "single", "disability", "employment_change", 
                       "child_age03", "child_age45", "num_children_age03", "num_children_age45", "num_children_age612", 
                       "current_income", "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   arrange(desc(Week)) %>%
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
-                      "hawaii", "other_race", "latinx", "age",
+                      "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
-                      "single", "disability",  "employment_change"), 
+                      "single", "disability",  "employment_change", 
+                      "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   ungroup()
 
@@ -151,39 +182,6 @@ scored = scored %>%
 #       FPL == 4 ~ 1, 
 #       !is.na(FPL) ~ 0),
 #     )
-
-# baseline week -----------------------------------------------------------
-
-pre_pandemic = scored %>%
-  select(CaregiverID, Week, BaselineWeek, all_of(demos), race_cat, 
-         contains("poverty"), gender, income, household_size, num_children_raw, state, 
-         gender, zip, state, region, contains("_pre")) %>%
-  select(-working_current) %>%
-  group_by(CaregiverID) %>% 
-  mutate_at(vars(-CaregiverID, -Week, -BaselineWeek), select_first) %>% 
-  filter(Week == min(Week)) %>%
-  ungroup() %>%
-  mutate(Week = 0) 
-
-names(pre_pandemic) = gsub("_pre", "_current", names(pre_pandemic))
-names(pre_pandemic) = gsub("_current$", "", names(pre_pandemic))
-scored = scored %>%
-  select(-contains("_pre")) %>%
-  full_join(pre_pandemic)
-
-# new baseline week
-
-baseline = scored %>%
-  filter(Week != 0) %>%
-  group_by(CaregiverID) %>%
-  filter(Week == min(Week)) %>%
-  select(CaregiverID, Week) %>%
-  ungroup() %>%
-  rename(BaselineWeek = Week)
-
-scored = scored %>%
-  select(-BaselineWeek) %>%
-  full_join(baseline)
 
 
 # days sheltering in place ------------------------------------------------

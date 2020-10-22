@@ -48,7 +48,7 @@ all_weeks = scored %>%
   mutate(title  = paste0("Week ", Week, " (", start, " - ", stop, ") Summary"))
 
 for (week_sub in 1:nrow(all_weeks)) {
-  rmarkdown::render("weekly_report.Rmd", 
+  rmarkdown::render("_weekly_report.Rmd", 
                     params = list(subset = all_weeks$Week[week_sub],
                                   title = all_weeks$title[week_sub]),
                     output_file=paste0("week",week_sub, "_report.html"))
