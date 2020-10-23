@@ -12,6 +12,8 @@ library(jsonlite)
 library(readr)
 library(zoo) # for rolling averages and sums!
 
+load(here("../../Data Management R3/R Data/scored.Rdata"))
+
 scored_in_environ = length(which(grepl("scored", ls()))) > 0
 
 # source functions --------------------------------------------------------
@@ -20,8 +22,6 @@ source(here("Functions/score_report.R"))
 source(here("Scripts/demo groups.R"))
 source(here("Functions/pomp.R"))
 source(here("Functions/fpl.R"))
-
-#load(here("../../Data Management R3/R Data/scored.Rdata"))
 
 
 if(!scored_in_environ){

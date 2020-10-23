@@ -1040,6 +1040,30 @@ ggplotly(plot, tooltip = "text")
 write.csv(plotdata, file = here("figure data/1020_prevalence_covid_time.csv"))
 ```
 
+## COVID concerns by anxiety per week
+
+```{r}
+plotdata = document_classification_1 %>%
+  gather("topic_name", "includes", contains("topic_")) %>%
+  mutate(topic_name = str_remove(topic_name, "topic_")) %>%
+  group_by(topic_name, Week) %>%
+  filter(topic_name == "4") %>%
+  summarize(
+    Date = min(Date, na.rm=T),
+    n = n(),
+    percent = 100*sum(includes)/n,
+    anxiety = mean(anxiety, na.rm=T)) %>%
+  ungroup() %>%
+  mutate(percent_z = scale(percent)[,1]) %>%
+  mutate(anxiety_z = scale(anxiety)[,1])
+
+plotdata %>%
+  ggplot(aes(x = Week)) +
+  geom_line(aes(y = percent_z, color = "Percent of responses including COVID exposure")) +
+  geom_line(aes(y = anxiety_z, color = "Average level of anxiety")) +
+  labs(x = NULL, y = "z-Score") +
+  theme_pubr()
+```
 
 
 # Question 2
