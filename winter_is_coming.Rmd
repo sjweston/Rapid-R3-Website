@@ -1,0 +1,370 @@
+---
+title: "Childcare follow-up"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r hardship-cares-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+library(here)
+library(tidyverse)
+library(ggpubr)
+```
+
+# NYT heatmap{.tabset}
+
+```{r}
+pop_est = read.csv(here("data/co-est2019-alldata.csv"), stringsAsFactors = F)
+pop_est = pop_est %>%
+  group_by(STNAME) %>%
+  summarize(population = sum(POPESTIMATE2019)) %>%
+  rename(state = STNAME)
+
+copyNYTcolors = c("#F2DF91", "#F9C467", "#FFA83E", "#FF8B24", 
+                  "#FD6A0B", "#F04F09", "#E13107", "#CE0A05")
+
+
+github.location = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
+nyt_data = read_csv(url(github.location))
+nyt_data = nyt_data %>%
+  group_by(state) %>%
+  arrange(date) %>%
+  mutate(new_cases = ifelse(row_number() == 1, cases, 
+                            cases - lag(cases, default = cases[1])),
+         sinceMar1 = as.numeric(date-as.Date("2020-03-01")),
+         period_weeks = floor(sinceMar1/7),
+         period_2weeks = floor(sinceMar1/17)) %>%
+  filter(new_cases >= 0) %>%
+  filter(date >= "2020-03-01") %>%
+  filter(date < "2020-10-24") %>%
+  group_by(state, period_weeks) %>%
+  summarize(new_cases = sum(new_cases)) %>%
+  full_join(pop_est) %>%
+  filter(!is.na(population)) %>%
+  filter(new_cases > 0) %>%
+  ungroup() %>%
+  mutate(cases = map2_dbl(new_cases, population, ~.x/.y*100000)) 
+```
+
+## Heat relative to sample
+
+```{r, fig.height=10}
+plot_data = nyt_data %>%
+  mutate(case_factor = as.numeric(cut_number(cases, 8))) %>%
+  ungroup() %>%
+  mutate(case_factor = factor(case_factor))
+
+plot_data = plot_data %>%
+  group_by(state) %>%
+  filter(period_weeks == max(period_weeks)) %>%
+  select(state, cases) %>%
+  rename(most_recent = cases) %>%
+  full_join(plot_data) 
+
+plot_data %>%
+  ggplot(aes(x = period_weeks, y = reorder(state, most_recent), fill = case_factor)) +
+  geom_tile(color = "#F7F2DE") + 
+  scale_fill_manual(values = c(copyNYTcolors)) +
+  labs(x = NULL, y = NULL, fill = "Cases per 100,000 over past week") +
+  guides(fill = F) +
+  cowplot::theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+## Heat relative to week
+
+```{r, fig.height=10}
+plot_data = nyt_data %>%
+  group_by(period_weeks) %>%
+  mutate(case_factor = as.numeric(cut_number(cases, 8))) %>%
+  ungroup() %>%
+  mutate(case_factor = factor(case_factor))
+
+plot_data = plot_data %>%
+  group_by(state) %>%
+  filter(period_weeks == max(period_weeks)) %>%
+  select(state, cases) %>%
+  rename(most_recent = cases) %>%
+  full_join(plot_data) 
+
+plot_data %>%
+  ggplot(aes(x = period_weeks, y = reorder(state, most_recent), fill = case_factor)) +
+  geom_tile(color = "#F7F2DE") + 
+  scale_fill_manual(values = c(copyNYTcolors)) +
+  labs(x = NULL, y = NULL, fill = "Cases per 100,000 over past week") +
+  guides(fill = F) +
+  cowplot::theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+# State groups{.tabset}
+
+Based on NYT groups (October 24, 2020):
+
+## Where new cases are higher and staying high
+
+* North Dakota
+* South Dakota
+* Wisconsin
+* Montana
+* Idaho
+* Wyoming
+* Utah
+* Nebraska
+* Iowa
+* Tennessee
+* Illinois
+* Alaska
+* Oklahoma
+* Rhode Island
+* Arkansas
+* New Mexico
+* Indiana
+* Missouri
+* Minnesota
+* Kentucky
+* Kansas
+* Alabama
+* Mississippi
+* Nevada
+* Michigan
+* Colorado
+* Texas
+* North Carolina
+* Ohio
+* South Carolina
+* Florida
+* Georgia
+* West Virginia
+
+## Where new cases are lower and going up
+
+* New Jersey
+* Massachusetts
+* Pennsylvania
+* Connecticut
+* Arizona
+* California
+* Washington
+* New Hampshire
+* Vermont
+
+## Where new cases are lower and staying low
+
+* Louisiana
+* Delaware
+* Virginia
+* Maryland
+* Oregon
+* New York
+* Washington D.C.
+* Hawaii
+* Maine
+
+```{r}
+source(here("Scripts/score data.R"))
+scored = scored %>%
+  mutate(covid_groups = case_when(
+    state %in% c("LA", "DE", "MD", "OR", "NY", "DC", "HI", "ME") ~ "Low, stable",
+    state %in% c("NJ", "MA", "PA", "CT", "AZ", "CA", "WA", "NH", "VT") ~ "Low, rising",
+    !is.na(state) ~ "High, stable",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(covid_groups))
+
+scored = scored %>%
+  filter(Week != 0) %>%
+  filter(!is.nan(child_mental) & !is.nan(mental_health)) %>%
+  mutate(wellbeing = 100-mental_health,
+         child_wellbeing = 100-child_mental) %>%
+  #group_by(CaregiverID) %>%
+  #mutate_at(vars(mental_health, child_mental, anxiety, depress, stress, lonely, fear, fussy), ~.x-mean(.x)) %>%
+  #ungroup() %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week,
+    Week %% 2 == 0 ~ NA_real_,
+    TRUE ~ Week
+  )) %>%
+  filter(!is.na(Week)) %>%
+  rowwise() %>%
+  mutate(family_wellbeing = mean(wellbeing, child_wellbeing, na.rm=T)) %>%
+  ungroup()
+
+date_labels = scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date)) %>%
+  mutate(label = case_when(
+    Week == 0 ~ "Pre-pandemic",
+    TRUE ~ format(Date,"%b %d")
+  ))
+```
+
+# Well-being{.tabset}
+
+## Caregiver well-being
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Child well-being
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Family well-being
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+# Caregiver specific{.tabset}
+
+## Anxiety
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Depression
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Stress
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Loneliness
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+# Child Specific
+
+## Externalizing
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+## Internalizing
+
+```{r}
+scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+
+
+

@@ -38,6 +38,22 @@ scored = scored %>%
 source(here("Functions/core_funs.R"))
 ```
 
+# Representativeness disclaimer
+
+```{r policy-state-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted. 
+
 # Non-parental childcare{.tabset}
 
 ## All
@@ -55,7 +71,11 @@ plot = scored %>%
       Week == 0 ~ as.Date("2020-04-13"),
       TRUE ~ Date),
     moe = map2_dbl(percent, n, moe.p)) %>%
-  mutate_at(vars(percent, moe), ~100*.x) %>%
+  mutate_at(vars(percent, moe), ~100*.x) 
+
+write.csv(plot, file = here("figure data/1023_rates_childcare_time.csv"), row.names = F)
+
+plot = plot %>%
   ggplot(aes(x = Date, 
              y = percent,
              group = 1,
@@ -236,7 +256,12 @@ plot = scored %>%
       TRUE ~ format(Date, "%B %d")
     ),
     moe = map2_dbl(percent, n, moe.p)) %>%
-  mutate_at(vars(percent, moe), ~100*.x) %>%
+  mutate_at(vars(percent, moe), ~100*.x) 
+
+write.csv(plot, file = here("figure data/1023_rates_childcare_types_center_other.csv"), row.names = F)
+
+
+plot = plot %>%
   ggplot(aes(x = Date, 
              y = percent,
              group = variable,
@@ -266,7 +291,7 @@ plot = scored %>%
     cc2_unpaid == 0 ~ 0,
     TRUE ~ NA_real_
   )) %>%
-  gather(variable, value, cc2_centerbased, cc2_homebased, cc2_ffn) %>%
+  gather(variable, value, cc2_homebased, cc2_ffn) %>%
   mutate(variable = str_remove(variable, "cc2_")) %>%
   filter(Week != 13) %>%
   filter(Week != 4 | variable == "cc2_nonparental") %>%
@@ -283,7 +308,11 @@ plot = scored %>%
       TRUE ~ format(Date, "%B %d")
     ),
     moe = map2_dbl(percent, n, moe.p)) %>%
-  mutate_at(vars(percent, moe), ~100*.x) %>%
+  mutate_at(vars(percent, moe), ~100*.x) 
+
+write.csv(plot, file = here("figure data/1023_rates_childcare_types_home_ffn.csv"), row.names = F)
+
+plot = plot %>%
   ggplot(aes(x = Date, 
              y = percent,
              group = variable,
