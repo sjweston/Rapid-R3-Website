@@ -183,9 +183,9 @@ scored = scored %>%
   filter(!is.nan(child_mental) & !is.nan(mental_health)) %>%
   mutate(wellbeing = 100-mental_health,
          child_wellbeing = 100-child_mental) %>%
-  #group_by(CaregiverID) %>%
-  #mutate_at(vars(mental_health, child_mental, anxiety, depress, stress, lonely, fear, fussy), ~.x-mean(.x)) %>%
-  #ungroup() %>%
+  group_by(CaregiverID) %>%
+  mutate_at(vars(mental_health, child_mental, wellbeing, child_wellbeing, anxiety, depress, stress, lonely, fear, fussy), ~.x-mean(.x)) %>%
+  ungroup() %>%
   mutate(Week = case_when(
     Week < 17 ~ Week,
     Week %% 2 == 0 ~ NA_real_,
