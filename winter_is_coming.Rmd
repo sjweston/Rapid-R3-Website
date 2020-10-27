@@ -105,9 +105,10 @@ plot_data %>%
 
 # State groups{.tabset}
 
+## Group definitions{.tabset}
 Based on NYT groups (October 24, 2020):
 
-## Where new cases are higher and staying high
+### Where new cases are higher and staying high
 
 * North Dakota
 * South Dakota
@@ -143,7 +144,7 @@ Based on NYT groups (October 24, 2020):
 * Georgia
 * West Virginia
 
-## Where new cases are lower and going up
+### Where new cases are lower and going up
 
 * New Jersey
 * Massachusetts
@@ -155,7 +156,7 @@ Based on NYT groups (October 24, 2020):
 * New Hampshire
 * Vermont
 
-## Where new cases are lower and staying low
+### Where new cases are lower and staying low
 
 * Louisiana
 * Delaware
@@ -205,9 +206,9 @@ date_labels = scored %>%
   ))
 ```
 
-# Well-being{.tabset}
+## Well-being{.tabset}
 
-## Caregiver well-being
+### Caregiver well-being
 
 ```{r}
 scored %>%
@@ -224,7 +225,7 @@ scored %>%
 
 ```
 
-## Child well-being
+### Child well-being
 
 ```{r}
 scored %>%
@@ -241,7 +242,7 @@ scored %>%
 
 ```
 
-## Family well-being
+### Family well-being
 
 ```{r}
 scored %>%
@@ -258,9 +259,9 @@ scored %>%
 
 ```
 
-# Caregiver specific{.tabset}
+## Caregiver specific{.tabset}
 
-## Anxiety
+### Anxiety
 
 ```{r}
 scored %>%
@@ -277,7 +278,7 @@ scored %>%
 
 ```
 
-## Depression
+### Depression
 
 ```{r}
 scored %>%
@@ -294,7 +295,7 @@ scored %>%
 
 ```
 
-## Stress
+### Stress
 
 ```{r}
 scored %>%
@@ -311,7 +312,7 @@ scored %>%
 
 ```
 
-## Loneliness
+### Loneliness
 
 ```{r}
 scored %>%
@@ -328,9 +329,9 @@ scored %>%
 
 ```
 
-# Child Specific
+## Child Specific
 
-## Externalizing
+### Externalizing
 
 ```{r}
 scored %>%
@@ -347,7 +348,7 @@ scored %>%
 
 ```
 
-## Internalizing
+### Internalizing
 
 ```{r}
 scored %>%
@@ -364,6 +365,28 @@ scored %>%
 
 ```
 
+# Urban/rural
+
+```{r}
+county_crosswalk = read.csv(here("data/uszips.csv"), stringsAsFactors = F)
+county_crosswalk = county_crosswalk %>%
+  select(zip, county_fips) %>%
+  rename(fips = county_fips)
+metro_area = readxl::read_xlsx(here("data/metro_area_2020.xlsx"),
+                               skip = 2, col_names = T)
+metro_area = metro_area %>%
+  mutate(fips = as.numeric(paste0(`FIPS State Code`, `FIPS County Code`))) %>%
+  select(fips, `Central/Outlying County`) %>%
+  full_join(county_crosswalk) %>%
+  mutate(area = case_when(
+    !is.na(`Central/Outlying County`) ~ `Central/Outlying County`,
+    TRUE ~ "Rural")) %>%
+  rename(zipcode = zip) %>%
+  select(zipcode, area)
+
+scored = scored %>%
+  left_join(metro_area)
+```
 
 
 
