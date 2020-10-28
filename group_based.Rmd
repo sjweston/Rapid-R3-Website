@@ -7,8 +7,9 @@ params:
   subset: "black_cat"
   title: "my title!"
   grp.name: "Test"
-  
+title: "`r params$title`"
 ---
+
 
 
 ```{r usda-1, echo = F}
@@ -17,6 +18,10 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       fig.width=10)
 options(knitr.kable.NA = '')
+library(lme4)
+library(broom.mixed)
+library(sjPlot)
+library(ggpubr)
 ```
 
 ```{r}
@@ -25,6 +30,14 @@ source(here("Functions/core_funs.R"))
 scored$group = scored[,params$subset]
 scored = mutate(scored, 
                 group_f = ifelse(group == 1, params$grp.name, "Everyone else"))
+
+# score discrimination questions
+concernvars = names(scored)[grepl("^riserconcern", names(scored))]
+scored$composite_concern = rowMeans(scored[,concernvars], na.rm=T)
+
+discrimvars = names(scored)[grepl("^discrim", names(scored))]
+scored$discrimination = rowMeans(scored[,discrimvars], na.rm=T)
+
 ```
 
 # Participation
@@ -43,7 +56,9 @@ scored = scored %>%
     Week %% 2 == 0 ~ NA_real_,
     TRUE ~ Week
   )) %>%
-  filter(!is.na(Week))
+  filter(!is.na(Week)) %>%
+  mutate(wellbeing = 100-mental_health,
+         child_wellbeing = 100-child_mental)
 ```
 
 Since the beginning of the survey, `r prettyNum(n_groups, big.mark = ",")` `r str_remove(params$grp.name, " caregivers")` caregivers have participated in RAPID. 
@@ -183,5 +198,142 @@ percent_by_week(cc2_nonparental, group_f)
 ```
 
 
+# Discrimination{.tabset}
+
+## Concerns for children (average)
+
+```{r}
+average_by_group(composite_concern, group_f, 
+                 "Concerns for children (RISER)", last_assessment)
+```
+
+## Concerns for children (over time)
+
+```{r}
+average_by_week(composite_concern, group_f, "Concerns for children (RISER)")
+```
+
+## Caregiver well-being
+
+```{r}
+model.wb.concern = lmer(wellbeing ~ group_f*composite_concern + (1|CaregiverID),
+                        data = scored)
+model.wb.concern.sig = broom.mixed::tidy(model.wb.concern)
+
+model.wb.concern.sig = model.wb.concern.sig %>%
+  filter(grepl(":",term))
+
+model.wb.concern.sig = ifelse(abs(model.wb.concern.sig$statistic[[1]]) > 1.96, 
+                              paste("The relationship between well-being and concerns for children is significantly different for", params$grp.name, "caregivers"),
+                              paste("The relationship between well-being and concerns for children is NOT significantly different for", params$grp.name, "caregivers"))
+```
+
+`r model.wb.concern.sig`
+
+```{r}
+plot_model(model.wb.concern, 
+           type = "pred", 
+           terms = c("composite_concern", "group_f"),
+           axis.title = c("Concerns for children", 
+                          "Caregiver well-being"),
+           legend.title = "Group") +
+  theme_pubr()
+```
+
+## Child well-being
+
+```{r}
+model.cwb.concern = lmer(child_wellbeing ~ group_f*composite_concern + (1|CaregiverID),
+                        data = scored)
+model.cwb.concern.sig = broom.mixed::tidy(model.cwb.concern)
+
+model.cwb.concern.sig = model.cwb.concern.sig %>%
+  filter(grepl(":",term))
+
+model.cwb.concern.sig = ifelse(abs(model.cwb.concern.sig$statistic[[1]]) > 1.96, 
+                              paste("The relationship between child well-being and concerns for children is significantly different for", params$grp.name, "caregivers"),
+                              paste("The relationship between child well-being and concerns for children is NOT significantly different for", params$grp.name, "caregivers"))
+```
+
+`r model.cwb.concern.sig`
+
+```{r}
+plot_model(model.cwb.concern, 
+           type = "pred", 
+           terms = c("composite_concern", "group_f"),
+           axis.title = c("Concerns for children", 
+                          "Child well-being"),
+           legend.title = "Group") +
+  theme_pubr()
+```
+
+
+## Discrimination (average)
+
+```{r}
+average_by_group(discrimination, group_f, 
+                 "Concerns for children (RISER)", last_assessment)
+```
+
+## Discrimination (over time)
+
+```{r}
+average_by_week(discrimination, group_f, "Concerns for children (RISER)")
+```
+
+## Caregiver well-being
+
+```{r}
+model.wb.discrim = lmer(wellbeing ~ group_f*discrimination + (1|CaregiverID),
+                        data = scored)
+model.wb.discrim.sig = broom.mixed::tidy(model.wb.discrim)
+
+model.wb.discrim.sig = model.wb.discrim.sig %>%
+  filter(grepl(":",term))
+
+model.wb.discrim.sig = ifelse(abs(model.wb.discrim.sig$statistic[[1]]) > 1.96, 
+                              paste("The relationship between well-being and discrimination for children is significantly different for", params$grp.name, "caregivers"),
+                              paste("The relationship between well-being and discrimination for children is NOT significantly different for", params$grp.name, "caregivers"))
+```
+
+`r model.wb.discrim.sig`
+
+```{r}
+plot_model(model.wb.discrim, 
+           type = "pred", 
+           terms = c("discrimination", "group_f"),
+           axis.title = c("Experiences of discrimination", 
+                          "Caregiver well-being"),
+           legend.title = "Group") +
+  theme_pubr()
+```
+
+
+## Child well-being
+
+```{r}
+model.cwb.discrim = lmer(child_wellbeing ~ group_f*discrimination + (1|CaregiverID),
+                        data = scored)
+model.cwb.discrim.sig = broom.mixed::tidy(model.cwb.discrim)
+
+model.cwb.discrim.sig = model.cwb.discrim.sig %>%
+  filter(grepl(":",term))
+
+model.cwb.discrim.sig = ifelse(abs(model.cwb.discrim.sig$statistic[[1]]) > 1.96, 
+                              paste("The relationship between child well-being and discrimination for children is significantly different for", params$grp.name, "caregivers"),
+                              paste("The relationship between child well-being and discrimination for children is NOT significantly different for", params$grp.name, "caregivers"))
+```
+
+`r model.cwb.discrim.sig`
+
+```{r}
+plot_model(model.cwb.discrim, 
+           type = "pred", 
+           terms = c("discrimination", "group_f"),
+           axis.title = c("Experiences of discrimination", 
+                          "Child well-being"),
+           legend.title = "Group") +
+  theme_pubr()
+```
 
 
