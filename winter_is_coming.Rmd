@@ -15,6 +15,7 @@ options(knitr.kable.NA = '')
 library(here)
 library(tidyverse)
 library(ggpubr)
+library(plotly)
 ```
 
 # NYT heatmap{.tabset}
@@ -184,8 +185,8 @@ scored = scored %>%
   filter(!is.nan(child_mental) & !is.nan(mental_health)) %>%
   mutate(wellbeing = 100-mental_health,
          child_wellbeing = 100-child_mental) %>%
-  group_by(CaregiverID) %>%
-  mutate_at(vars(mental_health, child_mental, wellbeing, child_wellbeing, anxiety, depress, stress, lonely, fear, fussy), ~.x-mean(.x)) %>%
+  # group_by(CaregiverID) %>%
+  # mutate_at(vars(mental_health, child_mental, wellbeing, child_wellbeing, anxiety, depress, stress, lonely, fear, fussy), ~.x-mean(.x)) %>%
   ungroup() %>%
   mutate(Week = case_when(
     Week < 17 ~ Week,
@@ -197,7 +198,7 @@ scored = scored %>%
   mutate(family_wellbeing = mean(wellbeing, child_wellbeing, na.rm=T)) %>%
   ungroup()
 
-date_labels = scored %>%
+date_labels = plot = scored %>%
   group_by(Week) %>%
   summarize(Date = min(Date)) %>%
   mutate(label = case_when(
@@ -211,7 +212,7 @@ date_labels = scored %>%
 ### Caregiver well-being
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(wellbeing, na.rm=T)) %>%
@@ -223,12 +224,13 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 ### Child well-being
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(child_wellbeing, na.rm=T)) %>%
@@ -240,12 +242,13 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 ### Family well-being
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(family_wellbeing, na.rm=T)) %>%
@@ -257,6 +260,7 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 ## Caregiver specific{.tabset}
@@ -264,7 +268,7 @@ scored %>%
 ### Anxiety
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(anxiety, na.rm=T)) %>%
@@ -276,12 +280,13 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 ### Depression
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(depress, na.rm=T)) %>%
@@ -293,12 +298,13 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 ### Stress
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(stress, na.rm=T)) %>%
@@ -310,12 +316,13 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 ### Loneliness
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(lonely, na.rm=T)) %>%
@@ -327,14 +334,15 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
-## Child Specific
+## Child Specific{.tabset}
 
 ### Externalizing
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(fussy, na.rm=T)) %>%
@@ -346,12 +354,13 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 ### Internalizing
 
 ```{r}
-scored %>%
+plot = scored %>%
   group_by(covid_groups, Week) %>%
   summarize(
     out = mean(fear, na.rm=T)) %>%
@@ -363,6 +372,7 @@ scored %>%
   theme_pubr() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplotly(plot)
 ```
 
 # Urban/rural
@@ -381,13 +391,537 @@ metro_area = metro_area %>%
   mutate(area = case_when(
     !is.na(`Central/Outlying County`) ~ `Central/Outlying County`,
     TRUE ~ "Rural")) %>%
-  rename(zipcode = zip) %>%
-  select(zipcode, area)
+  select(zip, area) %>%
+  mutate(zip = map_chr(zip, as.character))
 
 scored = scored %>%
   left_join(metro_area)
 ```
 
 
+## Well-being{.tabset}
 
+### Caregiver well-being
 
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Child well-being
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Family well-being
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Depression
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Stress
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Loneliness
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Internalizing
+
+```{r}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+#State groups by urban/rural
+
+## Well-being{.tabset}
+
+### Caregiver well-being
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups,area, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  facet_wrap(~area) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Child well-being
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Family well-being
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Depression
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Stress
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Loneliness
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Internalizing
+
+```{r}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+# Previous groups
+
+```{r}
+scored = scored %>%
+   mutate(states_groups = case_when(
+    state %in% c("TX", "FL", "AZ") ~ "TX/FL/AZ",
+    state %in% c("ID", "WY", "MN") ~ "ID/WY/MN",
+    state %in% c("NY", "NJ") ~ "NY/NJ",
+    state == "CA" ~ "CA",
+    TRUE ~ NA_character_)) 
+```
+
+## Well-being{.tabset}
+
+### Caregiver well-being
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Child well-being
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Family well-being
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Depression
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Stress
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Loneliness
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+### Internalizing
+
+```{r}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```

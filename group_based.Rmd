@@ -1,0 +1,136 @@
+---
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+params: 
+  subset: "black_cat"
+  title: "my title!"
+  grp.name: "Test"
+  
+---
+
+
+```{r usda-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=10)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+source(here("Scripts/score data.R"))
+source(here("Functions/core_funs.R"))
+scored$group = scored[,params$subset]
+scored = mutate(scored, 
+                group_f = ifelse(group == 1, params$grp.name, "Everyone else"))
+```
+
+# Participation
+
+```{r}
+last_assessment = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+n_groups = table(last_assessment$group_f)
+n_groups = n_groups[params$grp.name]
+
+scored = scored %>%
+   mutate(Week = case_when(
+    Week < 17 ~ Week,
+    Week %% 2 == 0 ~ NA_real_,
+    TRUE ~ Week
+  )) %>%
+  filter(!is.na(Week))
+```
+
+Since the beginning of the survey, `r prettyNum(n_groups, big.mark = ",")` `r str_remove(params$grp.name, " caregivers")` caregivers have participated in RAPID. 
+
+```{r}
+count_by_week(group, params$grp.name)
+```
+
+# Demographics{.tabset}
+
+## Age
+
+```{r}
+dist_cat(age, data = filter(scored, group == 1))
+```
+
+## Income
+
+Income is presented in thousands of dollars per year.
+
+```{r}
+dist_cat(income.cat, data = filter(scored, group == 1))
+```
+
+## Poverty
+
+```{r}
+dist_cat(poverty_cat, data = filter(scored, group == 1))
+```
+
+## Race
+
+```{r}
+dist_cat(race_ethnic, data = filter(scored, group == 1))
+```
+
+## Ethnicity
+
+```{r}
+dist_cat(latinx_cat, data = filter(scored, group == 1))
+```
+
+# Well-being{.tabset} 
+## Caregiver{.tabset}
+
+### On average
+
+```{r}
+average_by_group(mental_health, group_f, "mental health problems", last_assessment)
+```
+
+### Over time
+
+```{r}
+average_by_week(mental_health, group_f, "mental health problems")
+```
+
+
+## Child{.tabset}
+
+### On average
+
+```{r}
+average_by_group(child_mental, group_f, "child mental health problems", last_assessment)
+```
+
+### Over time
+
+```{r}
+average_by_week(child_mental, group_f, "child mental health problems")
+```
+
+# Material hardship{.tabset}
+
+## Overall
+
+```{r}
+percent_by_group(material_hardship, group_f, last_assessment)
+```
+
+## By Week
+
+```{r}
+percent_by_week(material_hardship, group_f)
+```
+
+
+
+
+

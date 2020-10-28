@@ -1,0 +1,33 @@
+---
+title: "Create group-based pages"
+output: html_document
+---
+
+```{r 00-weekly-reports-1}
+library(here)
+library(tidyverse)
+library(ggpubr)
+library(plotly)
+source(here("Scripts/score data.R"))
+```
+
+```{r 00-weekly-reports-2}
+groups.df = tribble(
+  ~group, ~variable, ~title, ~grp.name,
+  "black", "black", "Analysis of Black/African American households", "Black",
+    "single", "single", "Analysis of single caregiver households", "Single"
+
+)
+
+```
+
+
+```{r 00-weekly-reports-4}
+for (subgroup in 1:nrow(groups.df)) {
+  rmarkdown::render("group_based.Rmd", 
+                    params = list(subset = groups.df$variable[subgroup],
+                                  title = groups.df$title[subgroup],
+                                  grp.name = groups.df$grp.name[subgroup]),
+                    output_file=paste0("group_",groups.df$group[subgroup], "_report.html"))
+}
+```

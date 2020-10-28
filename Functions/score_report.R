@@ -820,7 +820,16 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   }
   
     newdata$income = data$allyearlyCurrent
-    newdata$income.cat = cut(newdata$income, breaks =  quantile(newdata$income, probs = c(0, .25, .5, .75, 1), na.rm=T))
+    newdata$income.cat = case_when(
+      newdata$income < 20000 ~ "< 20k",
+      newdata$income < 40000 ~ "20k-40k",
+      newdata$income < 60000 ~ "40k-60k",
+      newdata$income < 80000 ~ "60k-80k",
+      newdata$income < 100000 ~ "80k-100k",
+      newdata$income < 150000 ~ "100k-150k",
+      newdata$income < 200000 ~ "150k-200k",
+      !is.na(newdata$income) ~ "200k+",
+      TRUE ~ NA_character_)
     newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
   
   
