@@ -15,6 +15,7 @@ source(here("Scripts/score data.R"))
 groups.df = tribble(
   ~group, ~variable, ~title, ~grp.name,
   "black", "black", "Analysis of Black/African American households", "Black",
+  "latinx", "latinx", "Analysis of Hispanic/Latinx households", "Latinx",
     "single", "single", "Analysis of single caregiver households", "Single"
 
 )
@@ -28,6 +29,7 @@ for (subgroup in 1:nrow(groups.df)) {
                     params = list(subset = groups.df$variable[subgroup],
                                   title = groups.df$title[subgroup],
                                   grp.name = groups.df$grp.name[subgroup]),
-                    output_file=paste0("group_",groups.df$group[subgroup], "_report.html"))
+                    output_file=paste0("group_",groups.df$group[subgroup], 
+                                       "_report.html"))
 }
 ```

@@ -124,12 +124,63 @@ average_by_week(child_mental, group_f, "child mental health problems")
 percent_by_group(material_hardship, group_f, last_assessment)
 ```
 
+## Types of hardship
+
+```{r}
+plot = scored %>%
+  dplyr::filter(!is.na(group_f)) %>%
+  dplyr::filter(!is.na(material_hardship)) %>%
+  group_by(CaregiverID) %>%
+  dplyr::filter(Week == max(Week)) %>%
+  ungroup() %>%
+  select(group_f, starts_with("diff_pay")) %>%
+  gather(category, response, starts_with("diff_pay")) %>%
+  mutate(category = str_remove(category, "diff_pay_")) %>%
+  dplyr::filter(!is.na(response)) %>%
+  group_by(group_f, category) %>%
+  summarize(
+    n = n(),
+    percent = mean(response)) %>%
+  mutate(moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(
+    x = reorder(category, desc(percent)), 
+    y = percent, 
+    fill = percent,
+    text = paste0(round(percent,1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .2) +
+  coord_flip() +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Percent of households having difficulty paying for:") +
+  facet_wrap(~group_f, ncol = 2) +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+
 ## By Week
 
 ```{r}
 percent_by_week(material_hardship, group_f)
 ```
 
+
+# Childcare
+
+## On average
+
+```{r}
+percent_by_group(cc2_nonparental, group_f, last_assessment)
+```
+
+## By week
+
+```{r}
+percent_by_week(cc2_nonparental, group_f)
+```
 
 
 

@@ -12,7 +12,7 @@ library(jsonlite)
 library(readr)
 library(zoo) # for rolling averages and sums!
 
-#load(here("../../Data Management R3/R Data/scored.Rdata"))
+load(here("../../Data Management R3/R Data/scored.Rdata"))
 
 scored_in_environ = length(which(grepl("scored", ls()))) > 0
 
