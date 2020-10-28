@@ -830,6 +830,9 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       newdata$income < 200000 ~ "150k-200k",
       !is.na(newdata$income) ~ "200k+",
       TRUE ~ NA_character_)
+    newdata$income = factor(newdata$income, 
+                            levels = c("< 20k","20k-40k","40k-60k","60k-80k",
+                              "80k-100k","100k-150k","150k-200k","200k+"))
     newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
   
   

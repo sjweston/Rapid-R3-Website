@@ -65,25 +65,25 @@ dist_cat(age, data = filter(scored, group == 1))
 Income is presented in thousands of dollars per year.
 
 ```{r}
-dist_cat(income.cat, data = filter(scored, group == 1))
+dist_cat_group(income.cat, group_f, scored)
 ```
 
 ## Poverty
 
 ```{r}
-dist_cat(poverty_cat, data = filter(scored, group == 1))
+dist_cat_group(poverty_cat, group_f, scored)
 ```
 
 ## Race
 
 ```{r}
-dist_cat(race_ethnic, data = filter(scored, group == 1))
+dist_cat_group(race_cat, group_f, scored)
 ```
 
 ## Ethnicity
 
 ```{r}
-dist_cat(latinx_cat, data = filter(scored, group == 1))
+dist_cat_group(latinx_cat, group_f, scored)
 ```
 
 # Well-being{.tabset} 
