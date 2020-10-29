@@ -59,7 +59,8 @@ scored = scored %>%
   )) %>%
   filter(!is.na(Week)) %>%
   mutate(wellbeing = 100-mental_health,
-         child_wellbeing = 100-child_mental)
+         child_wellbeing = 100-child_mental,
+         unemployed_cat = ifelse(unemployed == 1, "Unemployed", "Employed"))
 ```
 
 Since the beginning of the survey, `r prettyNum(n_groups, big.mark = ",")` `r str_remove(params$grp.name, " caregivers")` caregivers have participated in RAPID. 
@@ -88,6 +89,18 @@ dist_cat_group(income.cat, group_f, scored)
 
 ```{r}
 dist_cat_group(poverty_cat, group_f, scored)
+```
+
+## Employment
+
+```{r}
+dist_cat_group(unemployed_cat, group_f, scored)
+```
+
+## Employment change
+
+```{r}
+dist_cat_group(employment_change, group_f, scored)
 ```
 
 ## Race
