@@ -192,6 +192,52 @@ percent_by_week(material_hardship, group_f)
 percent_by_group(cc2_nonparental, group_f, last_assessment)
 ```
 
+## Type of childcare
+
+```{r}
+plot = scored %>%
+  select(Week, Date, group_f, starts_with("cc2_")) %>%
+  dplyr::filter(Week != 13) %>%
+  dplyr::filter(Week != 27) %>%
+  dplyr::filter(Week != 29) %>%
+  dplyr::filter(!is.na(group_f)) %>%
+  dplyr::filter(!is.na(cc2_nonparental)) %>%
+  select(-cc2_expected_change) %>%
+  gather(variable, value, starts_with("cc2_")) %>%
+  mutate(variable = str_remove(variable, "cc2_")) %>%
+  dplyr::filter(Week != 4 | variable == "cc2_nonparental") %>%
+  group_by(Week, variable, group_f) %>%
+  summarize(Date = min(Date,na.rm=T),
+            n = n(),
+            percent = sum(value)/n) %>%
+  mutate(
+    Date = case_when(
+      Week == 0 ~ as.Date("2020-04-13"),
+      TRUE ~ Date),
+    label = case_when(
+      Week == 0 ~ "Pre-pandemic",
+      TRUE ~ format(Date, "%B %d")
+    ),
+    moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = percent,
+             group = variable,
+             fill = variable,
+             text = paste0(
+               "N: ", n,
+               "\nPercent: ", round(percent,1),
+               "\nDate: ", label
+             ))) +
+  geom_ribbon(aes(ymin = percent-moe, ymax = percent + moe), alpha = .2) +
+  geom_line() +
+  facet_wrap(~group_f, ncol = 1) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+
 ## By week
 
 ```{r}
