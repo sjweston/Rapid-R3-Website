@@ -122,7 +122,8 @@ dist_cat_group(single_cat, group_f, scored)
 ```
 
 # Well-being{.tabset} 
-## Caregiver{.tabset}
+
+## Caregiver well-being{.tabset}
 
 ### On average
 
@@ -136,6 +137,64 @@ average_by_group(mental_health, group_f, "mental health problems", last_assessme
 average_by_week(mental_health, group_f, "mental health problems")
 ```
 
+## Anxiety{.tabset}
+
+### On average
+
+```{r}
+average_by_group(anxiety, group_f, "mental health problems", last_assessment)
+```
+
+### Over time
+
+```{r}
+average_by_week(anxiety, group_f, "mental health problems")
+```
+
+
+## Depression{.tabset}
+
+### On average
+
+```{r}
+average_by_group(depress, group_f, "mental health problems", last_assessment)
+```
+
+### Over time
+
+```{r}
+average_by_week(depress, group_f, "mental health problems")
+```
+
+
+## Stress{.tabset}
+
+### On average
+
+```{r}
+average_by_group(stress, group_f, "mental health problems", last_assessment)
+```
+
+### Over time
+
+```{r}
+average_by_week(stress, group_f, "mental health problems")
+```
+
+
+## Loneliness{.tabset}
+
+### On average
+
+```{r}
+average_by_group(lonely, group_f, "mental health problems", last_assessment)
+```
+
+### Over time
+
+```{r}
+average_by_week(lonely, group_f, "mental health problems")
+```
 
 ## Child{.tabset}
 
@@ -308,6 +367,11 @@ percent_by_week(cc2_nonparental, group_f)
 ## Concerns for children (average)
 
 ```{r}
+dist_cont_group(composite_concern, group_f)
+```
+
+
+```{r}
 average_by_group(composite_concern, group_f, 
                  "Concerns for children (RISER)", last_assessment)
 ```
@@ -374,6 +438,11 @@ plot_model(model.cwb.concern,
 
 
 ## Discrimination (average)
+
+```{r}
+dist_cont_group(discrimination, group_f)
+```
+
 
 ```{r}
 average_by_group(discrimination, group_f, 
