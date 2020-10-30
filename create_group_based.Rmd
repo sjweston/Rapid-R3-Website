@@ -25,7 +25,7 @@ groups.df = tribble(
 
 ```{r 00-weekly-reports-4}
 for (subgroup in 1:nrow(groups.df)) {
-  rmarkdown::render("group_based.Rmd", 
+  rmarkdown::render("_group_based.Rmd", 
                     params = list(subset = groups.df$variable[subgroup],
                                   title = groups.df$title[subgroup],
                                   grp.name = groups.df$grp.name[subgroup]),

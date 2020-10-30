@@ -1182,11 +1182,11 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$fear_current_lots = ifelse(data$CBCL.002.b > 1, 1, 0)
     newdata$fear = data$CBCL.002.b
   }
-  if(contains_items("CBCL.002.a", data)){
-    newdata$fear_pre = data$CBCL.002.a
-    newdata$fear_pre_some = ifelse(data$CBCL.002.a > 0, 1, 0)
-    newdata$fear_pre_lots = ifelse(data$CBCL.002.a > 1, 1, 0)
-    fear_difference = data$CBCL.002.a-data$CBCL.002.a
+  if(contains_items("CBCL.001.b", data)){
+    newdata$fear_pre = data$CBCL.001.b
+    newdata$fear_pre_some = ifelse(data$CBCL.001.b > 0, 1, 0)
+    newdata$fear_pre_lots = ifelse(data$CBCL.001.b > 1, 1, 0)
+    fear_difference = data$CBCL.002.b-data$CBCL.001.b
     newdata$fear_more = ifelse(fear_difference > 0, 1, 0)
   }
   
