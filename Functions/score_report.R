@@ -1179,7 +1179,6 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   if(contains_items("CBCL.002.b", data)){
     newdata$fear_current_some = ifelse(data$CBCL.002.b > 0, 1, 0)
-    newdata$fear_current_lots = ifelse(data$CBCL.002.b > 1, 1, 0)
     newdata$fear = data$CBCL.002.b
   }
   if(contains_items("CBCL.001.b", data)){
@@ -1219,32 +1218,47 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     
     data = data %>%
       mutate(
+        
         work_status = case_when(
-          grepl("1", JOB.008_cat) ~ "Employed",
-          grepl("2", JOB.008_cat) ~ "Employed",
-          grepl("3", JOB.008_cat) ~ "Unemployed",
-          grepl("4", JOB.008_cat) ~ "Unemployed",
-          grepl("5", JOB.008_cat) ~ "Employed",
-          JOB.008.2 == 1 ~ "Employed",
-          JOB.008.2 %in% c(2,3) ~ "Unemployed",
-          TRUE ~ NA_character_),
+          JOB.008_1 == 1 ~ "Employed",   # working full time
+          JOB.008_2 == 1 ~ "Employed",   # working part time
+          JOB.008_3 == 1 ~ "Unemployed", # unemployed, looking for work
+          JOB.008_4 == 1 ~ "Unemployed", # unemployed, not looking
+          JOB.008_5 == 1 ~ "Unemployed", # temporarily furloughed
+          JOB.008_6 == 1 ~ "Employed",   # hours reduced
+          JOB.008_7 == 1 ~ "Other", # keeping house/raising children
+          JOB.008_7 == 1 ~ "Other", # retired
+          JOB.008_9 == 1 ~ "Other", # student
+          JOB.008_10 == 1 ~ "Other", # other
+          JOB.008.2 == 1 ~ "Employed", # working full time
+          JOB.008.2 == 2 ~ "Unemployed", # unemployed or laid off
+          JOB.008.2 == 3 ~ "Unemployed", # Temporarily out of work or furloughed
+          JOB.008.2 == 4 ~ "Other", # Other
+          TRUE ~ NA_character_
+        ),
         work_status_pre = case_when(
-          grepl("1", JOB.010_cat) ~ "Employed",
-          grepl("2", JOB.010_cat) ~ "Employed",
-          grepl("3", JOB.010_cat) ~ "Unemployed",
-          grepl("4", JOB.010_cat) ~ "Unemployed",
-          grepl("5", JOB.010_cat) ~ "Employed",
-          TRUE ~ NA_character_),
-        employment_change = case_when(
-          work_status == "Employed" & work_status_pre == "Employed" ~ "Stable Employed",
-          work_status == "Employed" & work_status_pre == "Unemployed" ~ "Became Unemployed",
-          work_status == "Unemployed" & work_status_pre == "Employed" ~ "Became Employed",
-          work_status == "Unemployed" & work_status_pre == "Unemployed" ~ "Stable Unemployed",
+          JOB.010_1 == 1 ~ "Employed",   # working full time
+          JOB.010_2 == 1 ~ "Employed",   # working part time
+          JOB.010_3 == 1 ~ "Unemployed", # unemployed, looking for work
+          JOB.010_4 == 1 ~ "Unemployed", # unemployed, not looking
+          JOB.010_5 == 1 ~ "Unemployed", # temporarily furloughed
+          JOB.010_6 == 1 ~ "Employed",   # hours reduced
+          JOB.010_7 == 1 ~ "Other", # keeping house/raising children
+          JOB.010_7 == 1 ~ "Other", # retired
+          JOB.010_9 == 1 ~ "Other", # student
+          JOB.010_10 == 1 ~ "Other", # other
+          JOB.010 == 1 ~ "Employed", # working full time
+          JOB.010 == 2 ~ "Unemployed", # unemployed or laid off
+          JOB.010 == 3 ~ "Unemployed", # Temporarily out of work or furloughed
+          JOB.010 == 4 ~ "Other", # Other
+          JOB.010.2 == 1 ~ "Employed", # working full time
+          JOB.010.2 == 2 ~ "Unemployed", # unemployed or laid off
+          JOB.010.2 == 3 ~ "Unemployed", # Temporarily out of work or furloughed
+          JOB.010.2 == 4 ~ "Other", # Other
           TRUE ~ NA_character_))
     
     newdata$work_status = data$work_status
     newdata$work_status_pre = data$work_status_pre
-    newdata$employment_change = data$employment_change
     
     data = data %>%
       mutate(unemployed = case_when(

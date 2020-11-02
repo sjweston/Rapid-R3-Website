@@ -140,7 +140,7 @@ scored = scored %>%
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
-                      "single", "disability", "employment_change", 
+                      "single", "disability", "work_status", 
                       "child_age03", "child_age45", "num_children_age03", "num_children_age45", "num_children_age612", 
                       "current_income", "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
@@ -149,10 +149,33 @@ scored = scored %>%
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
-                      "single", "disability",  "employment_change", 
+                      "single", "disability",  "work_status", 
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
             na.locf0) %>% # carry these variables down through NA's
   ungroup()
+
+
+# employment change -------------------------------------------------------
+
+# isolate work status pre
+
+scored = scored %>%
+  filter(Week == 0) %>%
+  select(CaregiverID, work_status) %>%
+  rename(work_status_pre = work_status) %>%
+  full_join(scored)
+
+scored = scored %>%
+  mutate(
+    employment_change = case_when(
+      (work_status_pre == "Employed" & work_status == "Unemployed") ~ "Became Unemployed",
+      (work_status_pre == "Unemployed" & work_status == "Employed") ~ "Became Employed",
+      (work_status_pre == "Employed" & work_status == "Other") ~ "Became Unemployed",
+      (work_status_pre == "Other" & work_status == "Employed") ~ "Became Employed",
+      (work_status_pre == "Employed" & work_status == "Employed") ~ "Stable Employed",
+      (work_status_pre == "Unemployed" & work_status == "Unemployed") ~ "Stable Unemployed",
+      (work_status_pre == "Other" & work_status == "Other") ~ "Stable Other",
+      TRUE ~ NA_character_))
 
 
 # # federal poverty level ---------------------------------------------------
