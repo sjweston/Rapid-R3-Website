@@ -38,8 +38,23 @@ scored$composite_concern = rowMeans(scored[,concernvars], na.rm=T)
 
 discrimvars = names(scored)[grepl("^discrim", names(scored))]
 scored$discrimination = rowMeans(scored[,discrimvars], na.rm=T)
-
 ```
+
+```{r}
+scored = scored %>%
+  mutate(lonely_challenge = case_when(
+    OPEN.001 == "" ~ NA_real_,
+    str_detect(OPEN.001, "lonely") ~ 1,
+    str_detect(OPEN.001, "lone") ~ 1,
+    str_detect(OPEN.001, "lonesome") ~ 1,
+    str_detect(OPEN.001, "alone") ~ 1,
+    str_detect(OPEN.001, "isol") ~ 1,
+    str_detect(OPEN.001, "solita") ~ 1,
+    str_detect(OPEN.001, "abando") ~ 1,
+    TRUE ~ 0
+  ))
+```
+
 
 # Participation
 
@@ -196,6 +211,32 @@ average_by_group(lonely, group_f, "mental health problems", last_assessment)
 average_by_week(lonely, group_f, "mental health problems")
 ```
 
+```{r}
+is.single <- params$subset == "single"
+
+if(is.single){
+  single_header = print("### Text-based (average)")
+}else{single_header = ""}
+```
+
+`r single_header`
+
+```{r, eval = is.single}
+percent_by_group(lonely_challenge, group_f, last_assessment)
+```
+
+```{r}
+if(is.single){
+  single_header = print("### Text-based (Over time)")
+}else{single_header = ""}
+```
+
+`r single_header`
+
+```{r, eval = is.single}
+percent_by_week(lonely_challenge, group_f)
+```
+
 ## Child{.tabset}
 
 ### On average
@@ -254,8 +295,29 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r}
-
+```{r, results = 'asis'}
+scored %>%
+  dplyr::filter(!is.na(group_f)) %>%
+  dplyr::filter(!is.na(material_hardship)) %>%
+  group_by(CaregiverID) %>%
+  dplyr::filter(Week == max(Week)) %>%
+  ungroup() %>%
+  select(group_f, starts_with("diff_pay")) %>%
+  gather(category, response, starts_with("diff_pay")) %>%
+  mutate(category = str_remove(category, "diff_pay_")) %>%
+  dplyr::filter(!is.na(response)) %>%
+  group_by(category) %>%
+  nest() %>%
+  mutate(ttest = map(data, ~t.test(response~group_f, data = .x))) %>%
+  mutate(ttest = map(ttest, broom::tidy)) %>%
+  select(category, ttest) %>%
+  unnest(cols = c(ttest)) %>%
+  select(category, estimate, statistic, p.value, parameter) %>%
+  rename(difference = estimate, 
+         df = parameter) %>%
+  mutate(p.value = p.adjust(p.value, method = "holm"),
+         p.value = papaja::printp(p.value)) %>%
+  kable(., caption = "t-tests comparing hardship across groups. p-values adjusted for multiple comparisons using a Holm correction.")
 ```
 
 
