@@ -143,6 +143,48 @@ composite_grps = function(variable, groups, data = scored){
 
 ggplotly(plot, tooltip = "text")
 }
+
+composite_grps_avg = function(variable, groups, data = scored){
+  
+  plot = data %>%
+    filter(!is.na({{variable}})) %>%
+    dplyr::filter(!is.na({{groups}})) %>%
+    mutate(
+      time = case_when(
+        Week == 0 ~ "Pre-pandemic",
+        TRUE ~ "During pandemic"),
+      time = factor(time, levels = c(
+        "Pre-pandemic",
+      "During pandemic"))
+      ) %>%
+  group_by(CaregiverID, {{groups}}, time) %>%
+  summarize(variable = mean({{variable}}, na.rm=T)) %>%
+  group_by(time, {{groups}}) %>%
+  summarize(m = mean(variable),
+            sd = sd(variable),
+            n=n()) %>%
+  mutate(se = sqrt(sd/n),
+         moe = se*qt(p = .975, df = n-1)) %>%
+  ggplot(aes(x = time,
+             y = m,
+             group = {{groups}},
+             fill = {{groups}},
+             text = paste0(
+               "\nGroup: ", {{groups}},
+               "\nCount: ", n,
+               "\nMean: ", round(m,2),
+               "\nLower 95% CI: ", round(m-moe,2),
+               "\nLower 95% CI: ", round(m+moe,2)))) +
+    geom_bar(stat = "identity", 
+             position = position_dodge(1)) +
+    geom_errorbar(aes(ymin = m-moe, ymax = m+moe),
+                width = .5,
+                position = position_dodge(1)) +
+  labs(x = NULL, title = "Average concern for children", y = NULL, fill = NULL) +
+  theme_pubr()
+  
+  ggplotly(plot, tooltip = "text")
+}
 ```
 
 
@@ -178,7 +220,7 @@ ggplotly(plot, tooltip = "text")
 }
 ```
 
-```{r riser1-8}
+```{r riser1-8 }
 change_grps = function(variable, groups, data = scored){
   
   plot = data %>%
@@ -216,7 +258,7 @@ ggplotly(plot, tooltip = "text")
 ```
 
 
-```{r riser1-9}
+```{r riser1-9 }
 change_grps_simple = function(variable, groups, data = scored){
   
   data %>%
@@ -242,9 +284,71 @@ change_grps_simple = function(variable, groups, data = scored){
 
 This composite was created by treating the 9 "concerns for children" variables as continuous and averageing responses across those items. The resulting index is a measure that ranges from 0 (Never concerned) to 3 (Concerned most of the time).
 
-### All
+### Pre vs during pandemic{.tabset}
+
+#### All
 
 ```{r riser1-10 }
+plot = scored %>%
+  filter(!is.na(composite_concern)) %>%
+  mutate(time = case_when(
+    Week == 0 ~ "Pre-pandemic",
+    TRUE ~ "During pandemic"
+  ),
+  time = factor(time, levels = c(
+    "Pre-pandemic",
+    "During pandemic"
+  ))) %>%
+  group_by(CaregiverID, time) %>%
+  summarize(composite_concern = mean(composite_concern, na.rm=T)) %>%
+  group_by(time) %>%
+  summarize(m = mean(composite_concern),
+            sd = sd(composite_concern),
+            n=n()) %>%
+  mutate(se = sqrt(sd/n),
+         moe = se*qt(p = .975, df = n-1)) %>%
+  ggplot(aes(x = time, 
+             y = m,
+             fill = m,
+             text = paste0(
+               "\nCount: ", n,
+               "\nMean: ", round(m,2),
+               "\nLower 95% CI: ", round(m-moe,2),
+               "\nLower 95% CI: ", round(m+moe,2)),
+             group = 1)) +
+  geom_bar(stat = "identity", alpha = .5) +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .3) +
+  guides(fill = F) +
+  labs(x = NULL, title = "Average Concern for children", y = NULL) +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+#### Black
+
+```{r riser1-11 }
+composite_grps_avg(composite_concern, black)
+```
+
+#### Race/Ethnicity
+
+```{r riser1-12 }
+composite_grps_avg(composite_concern, race_ethnic)
+```
+
+
+#### Black + Income
+
+```{r riser1-13 }
+composite_grps_avg(composite_concern, blackIncome)
+```
+
+### Over time{.tabset}
+
+#### All
+
+```{r riser1-14 }
 plot = scored %>%
   filter(!is.na(composite_concern)) %>%
   group_by(Date) %>%
@@ -274,22 +378,22 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-### Black
+#### Black
 
-```{r riser1-11 }
+```{r riser1-15 }
 composite_grps(composite_concern, black)
 ```
 
-### Race/Ethnicity
+#### Race/Ethnicity
 
-```{r riser1-11b }
+```{r riser1-16 }
 composite_grps(composite_concern, race_ethnic)
 ```
 
 
-### Black + Income
+#### Black + Income
 
-```{r riser1-12 }
+```{r riser1-17 }
 composite_grps(composite_concern, blackIncome)
 ```
 
@@ -299,7 +403,7 @@ We consider responses of "never" and "rarely" to be not endorsing an item (coded
 
 ### All
 
-```{r}
+```{r riser1-18}
 plot = scored %>%
   gather(item, response, starts_with("riserconcern_")) %>%
   filter(!is.na(response)) %>%
@@ -337,7 +441,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-19}
 plot = scored %>%
   gather(item, response, starts_with("riserconcern_")) %>%
   filter(!is.na(response)) %>%
@@ -376,7 +480,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-20}
 plot = scored %>%
   gather(item, response, starts_with("riserconcern_")) %>%
   filter(!is.na(response)) %>%
@@ -416,7 +520,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black + Income
 
-```{r}
+```{r riser1-21}
 plot = scored %>%
   gather(item, response, starts_with("riserconcern_")) %>%
   filter(!is.na(response)) %>%
@@ -457,7 +561,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-13}
+```{r riser1-22 }
 plot = scored %>%
   filter(!is.na(riserconcern_1)) %>%
   group_by(Date, riserconcern_1) %>%
@@ -482,7 +586,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-23}
 plot = scored %>%
   filter(!is.na(riserconcern_1)) %>%
   filter(!is.na(black)) %>%
@@ -509,7 +613,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnic
 
-```{r}
+```{r riser1-24}
 plot = scored %>%
   filter(!is.na(riserconcern_1)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -538,7 +642,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-25}
 plot = scored %>%
   filter(!is.na(riserconcern_1)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -567,7 +671,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-18}
+```{r riser1-26 }
 plot = scored %>%
   filter(!is.na(riserconcern_2)) %>%
   group_by(Date, riserconcern_2) %>%
@@ -592,7 +696,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-27}
 plot = scored %>%
   filter(!is.na(riserconcern_2)) %>%
   filter(!is.na(black)) %>%
@@ -619,7 +723,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-28}
 plot = scored %>%
   filter(!is.na(riserconcern_2)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -648,7 +752,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-29}
 plot = scored %>%
   filter(!is.na(riserconcern_2)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -678,7 +782,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-23}
+```{r riser1-30 }
 plot = scored %>%
   filter(!is.na(riserconcern_3)) %>%
   group_by(Date, riserconcern_3) %>%
@@ -703,7 +807,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-31}
 plot = scored %>%
   filter(!is.na(riserconcern_3)) %>%
   filter(!is.na(black)) %>%
@@ -730,7 +834,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-32}
 plot = scored %>%
   filter(!is.na(riserconcern_3)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -759,7 +863,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-33}
 plot = scored %>%
   filter(!is.na(riserconcern_3)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -789,7 +893,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-28}
+```{r riser1-34 }
 plot = scored %>%
   filter(!is.na(riserconcern_4)) %>%
   group_by(Date, riserconcern_4) %>%
@@ -814,7 +918,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-35}
 plot = scored %>%
   filter(!is.na(riserconcern_4)) %>%
   filter(!is.na(black)) %>%
@@ -841,7 +945,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-36}
 plot = scored %>%
   filter(!is.na(riserconcern_4)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -870,7 +974,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-37}
 plot = scored %>%
   filter(!is.na(riserconcern_4)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -901,7 +1005,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-33}
+```{r riser1-38 }
 plot = scored %>%
   filter(!is.na(riserconcern_5)) %>%
   group_by(Date, riserconcern_5) %>%
@@ -926,7 +1030,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-39}
 plot = scored %>%
   filter(!is.na(riserconcern_5)) %>%
   filter(!is.na(black)) %>%
@@ -953,7 +1057,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-40}
 plot = scored %>%
   filter(!is.na(riserconcern_5)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -982,7 +1086,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-41}
 plot = scored %>%
   filter(!is.na(riserconcern_5)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -1013,7 +1117,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-38}
+```{r riser1-42 }
 plot = scored %>%
   filter(!is.na(riserconcern_6)) %>%
   group_by(Date, riserconcern_6) %>%
@@ -1038,7 +1142,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-43}
 plot = scored %>%
   filter(!is.na(riserconcern_6)) %>%
   filter(!is.na(black)) %>%
@@ -1065,7 +1169,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-44}
 plot = scored %>%
   filter(!is.na(riserconcern_6)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -1093,7 +1197,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-45}
 plot = scored %>%
   filter(!is.na(riserconcern_6)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -1124,7 +1228,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-43}
+```{r riser1-46 }
 plot = scored %>%
   filter(!is.na(riserconcern_7)) %>%
   group_by(Date, riserconcern_7) %>%
@@ -1149,7 +1253,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-47}
 plot = scored %>%
   filter(!is.na(riserconcern_7)) %>%
   filter(!is.na(black)) %>%
@@ -1176,7 +1280,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-48}
 plot = scored %>%
   filter(!is.na(riserconcern_7)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -1203,7 +1307,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-49}
 plot = scored %>%
   filter(!is.na(riserconcern_7)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -1234,7 +1338,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-48}
+```{r riser1-50 }
 plot = scored %>%
   filter(!is.na(riserconcern_8)) %>%
   group_by(Date, riserconcern_8) %>%
@@ -1259,7 +1363,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-51}
 plot = scored %>%
   filter(!is.na(riserconcern_8)) %>%
   filter(!is.na(black)) %>%
@@ -1286,7 +1390,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-52}
 plot = scored %>%
   filter(!is.na(riserconcern_8)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -1315,7 +1419,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-53}
 plot = scored %>%
   filter(!is.na(riserconcern_8)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -1346,7 +1450,7 @@ ggplotly(plot, tooltip = "text")
 
 ### All
 
-```{r riser1-53}
+```{r riser1-54 }
 plot = scored %>%
   filter(!is.na(riserconcern_9)) %>%
   group_by(Date, riserconcern_9) %>%
@@ -1371,7 +1475,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r}
+```{r riser1-55}
 plot = scored %>%
   filter(!is.na(riserconcern_9)) %>%
   filter(!is.na(black)) %>%
@@ -1398,7 +1502,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r}
+```{r riser1-56}
 plot = scored %>%
   filter(!is.na(riserconcern_9)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -1427,7 +1531,7 @@ ggplotly(plot, tooltip = "text")
 ### Black + Income
 
 
-```{r}
+```{r riser1-57}
 plot = scored %>%
   filter(!is.na(riserconcern_9)) %>%
   filter(!is.na(blackIncome)) %>%
@@ -1458,9 +1562,73 @@ ggplotly(plot, tooltip = "text")
 
 This composite was created by treating the 12 discrimination variables as continuous and averageing responses across those items. The resulting index is a measure that ranges from 0 (Endorsed no discrimination items) to 1 (Endorsed all discrimination items).
 
-### All
+### Pre and during pandemic{.tabset}
+
+#### All
 
 ```{r riser1-58 }
+
+plot = scored %>%
+  filter(!is.na(discrimination)) %>%
+  mutate(time = case_when(
+    Week == 0 ~ "Pre-pandemic",
+    TRUE ~ "During pandemic"
+  ),
+  time = factor(time, levels = c(
+    "Pre-pandemic",
+    "During pandemic"
+  ))) %>%
+  group_by(CaregiverID, time) %>%
+  summarize(discrimination = mean(discrimination, na.rm=T)) %>%
+  group_by(time) %>%
+  summarize(m = mean(discrimination),
+            sd = sd(discrimination),
+            n=n()) %>%
+  mutate(se = sqrt(sd/n),
+         moe = se*qt(p = .975, df = n-1)) %>%
+  ggplot(aes(x = time, 
+             y = m,
+             fill = m,
+             text = paste0(
+               "\nCount: ", n,
+               "\nMean: ", round(m,2),
+               "\nLower 95% CI: ", round(m-moe,2),
+               "\nLower 95% CI: ", round(m+moe,2)),
+             group = 1)) +
+  geom_bar(stat = "identity", alpha = .5) +
+  geom_errorbar(aes(ymin = m-moe, ymax = m+moe), width = .3) +
+  guides(fill = F) +
+  labs(x = NULL, title = "Average discrimination", y = NULL) +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+
+
+```
+
+#### Black
+
+```{r riser1-59 }
+composite_grps_avg(discrimination, black)
+```
+
+#### Race/Ethnicity
+
+```{r riser1-60 }
+composite_grps_avg(discrimination, race_ethnic)
+```
+
+#### Black + Income
+
+```{r riser1-61 }
+composite_grps_avg(discrimination, blackIncome)
+```
+
+### Over time{.tabset}
+
+#### All
+
+```{r riser1-62 }
 plot = scored %>%
   filter(!is.na(discrimination)) %>%
   group_by(Date) %>%
@@ -1488,21 +1656,21 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-### Black
+#### Black
 
-```{r riser1-59 }
+```{r riser1-63 }
 composite_grps(discrimination, black)
 ```
 
-### Race/Ethnicity
+#### Race/Ethnicity
 
-```{r riser1-59b }
+```{r riser1-64 }
 composite_grps(discrimination, race_ethnic)
 ```
 
-### Black + Income
+#### Black + Income
 
-```{r riser1-60 }
+```{r riser1-65 }
 composite_grps(discrimination, blackIncome)
 ```
 
@@ -1510,7 +1678,7 @@ composite_grps(discrimination, blackIncome)
 
 ### All
 
-```{r riser1-61}
+```{r riser1-66 }
 plot = scored %>%
   ungroup() %>%
   select(Date, starts_with("discrim_")) %>%
@@ -1558,7 +1726,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Black
 
-```{r riser1-62, fig.height=8}
+```{r riser1-67, fig.height=8}
 plot = scored %>%
   filter(!is.na(black)) %>%
   ungroup() %>%
@@ -1609,7 +1777,7 @@ ggplotly(plot, tooltip = "text")
 
 ### Race/Ethnicity
 
-```{r riser1-62b, fig.height=8}
+```{r riser1-68, fig.height=8}
 plot = scored %>%
   filter(!is.na(race_ethnic)) %>%
   ungroup() %>%
@@ -1659,7 +1827,7 @@ ggplotly(plot, tooltip = "text")
 ```
 ### Black + Income
 
-```{r riser1-63, fig.height=8}
+```{r riser1-69, fig.height=8}
 plot = scored %>%
   filter(!is.na(blackIncome)) %>%
   ungroup() %>%

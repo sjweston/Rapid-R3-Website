@@ -365,3 +365,20 @@ percent_by_week = function(variable, group, label, data = scored){
     theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
   ggplotly(plot, tooltip = "text")
 }
+
+dist_cont_group = function(variable, group, data = scored){
+  plot = data %>%
+    filter(!is.na({{variable}})) %>%
+    filter(!is.na({{group}})) %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    ggplot(aes(x = {{variable}}, 
+               fill = {{group}})) +
+    geom_histogram(bins = 50) +
+    guides(fill = F) +
+    labs(x = NULL, y = NULL) +
+    facet_wrap(vars({{group}}), scales = "free") +
+    theme_pubr()+
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+  ggplotly(plot, tooltip = "text")
+}
