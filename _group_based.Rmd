@@ -4,9 +4,9 @@ output:
     toc: TRUE
     toc_float: TRUE
 params: 
-  subset: "black_cat"
-  title: "my title!"
-  grp.name: "Test"
+  subset: "poverty150"
+  title: "Analysis of households below 1.5 x Federal Poverty Level"
+  grp.name: "Low Income"
 title: "`r params$title`"
 ---
 
@@ -22,12 +22,16 @@ library(lme4)
 library(broom.mixed)
 library(sjPlot)
 library(ggpubr)
+library(plotly)
 library(here)
+
+is.poverty <- (params$subset == "poverty150")
 ```
 
-```{r}
+```{r -group-based-1}
 source(here("Scripts/score data.R"))
 source(here("Functions/core_funs.R"))
+
 scored$group = scored[,params$subset]
 scored = mutate(scored, 
                 group_f = ifelse(group == 1, params$grp.name, "Everyone else"))
@@ -40,7 +44,9 @@ discrimvars = names(scored)[grepl("^discrim", names(scored))]
 scored$discrimination = rowMeans(scored[,discrimvars], na.rm=T)
 ```
 
-```{r}
+```{r -group-based-2}
+#identify open-ended responses that discuss loneliness
+
 scored = scored %>%
   mutate(lonely_challenge = case_when(
     OPEN.001 == "" ~ NA_real_,
@@ -56,9 +62,42 @@ scored = scored %>%
 ```
 
 
+```{r -group-based-3}
+wb_vars = c("mental_health", "child_mental",
+            "anxiety", "depress", "stress", "lonely",
+            "fussy", "fear")
+
+# calculate each person's deviation from their pre-pandemic score
+
+prepan = scored %>%
+  filter(Week == 0) %>%
+  select(CaregiverID, all_of(wb_vars)) %>%
+  rename_at(all_of(wb_vars), ~paste0(.x, "_pre"))
+
+scored = full_join(scored, prepan)
+
+new_scores = scored %>%
+  select(CaregiverID, Week, all_of(c(wb_vars, paste0(wb_vars, "_pre")))) %>%
+  gather(variable, value, -CaregiverID, -Week) %>%
+  mutate(time = ifelse(str_detect(variable, "_pre"), "pre", "post")) %>%
+  mutate(variable = str_remove(variable, "_pre")) %>%
+  spread(time, value) %>%
+  mutate(value = map2_dbl(post, pre, ~.x-.y)) %>%
+  select(-post, -pre) %>%
+  spread(variable, value) 
+
+scored = scored %>%
+  select(-all_of(c(wb_vars, paste0(wb_vars, "_pre")))) %>%
+  full_join(new_scores) %>%
+  mutate(wellbeing = 100-mental_health,
+         child_wellbeing = 100-child_mental,
+         unemployed_cat = ifelse(unemployed == 1, "Unemployed", "Employed"))
+```
+
+
 # Participation
 
-```{r}
+```{r -group-based-4}
 last_assessment = scored %>%
   group_by(CaregiverID) %>%
   filter(Week == max(Week)) %>%
@@ -72,15 +111,12 @@ scored = scored %>%
     Week %% 2 == 0 ~ NA_real_,
     TRUE ~ Week
   )) %>%
-  filter(!is.na(Week)) %>%
-  mutate(wellbeing = 100-mental_health,
-         child_wellbeing = 100-child_mental,
-         unemployed_cat = ifelse(unemployed == 1, "Unemployed", "Employed"))
+  filter(!is.na(Week)) 
 ```
 
 Since the beginning of the survey, `r prettyNum(n_groups, big.mark = ",")` `r str_remove(params$grp.name, " caregivers")` caregivers have participated in RAPID. 
 
-```{r}
+```{r -group-based-5}
 count_by_week(group, params$grp.name)
 ```
 
@@ -88,7 +124,7 @@ count_by_week(group, params$grp.name)
 
 ## Age
 
-```{r}
+```{r -group-based-6}
 dist_cat(age, data = filter(scored, group == 1))
 ```
 
@@ -96,122 +132,229 @@ dist_cat(age, data = filter(scored, group == 1))
 
 Income is presented in thousands of dollars per year.
 
-```{r}
+```{r -group-based-7}
 dist_cat_group(income.cat, group_f, scored)
+```
+
+```{r -group-based-8, results = 'asis'}
+dist_cat_group_sig(income.cat, group_f, scored)
 ```
 
 ## Poverty
 
-```{r}
+```{r -group-based-9}
 dist_cat_group(poverty_cat, group_f, scored)
+```
+
+```{r -group-based-10, results = 'asis', eval = !is.poverty}
+dist_cat_group_sig(poverty_cat, group_f, scored)
 ```
 
 ## Employment
 
-```{r}
+```{r -group-based-11}
 dist_cat_group(work_status, group_f, scored)
 ```
 
 ## Employment change
 
-```{r}
+```{r -group-based-12}
 dist_cat_group(employment_change, group_f, scored)
 ```
 
+```{r -group-based-13, results = 'asis'}
+dist_cat_group_sig(employment_change, group_f, scored)
+```
 ## Race
 
-```{r}
+```{r -group-based-14}
 dist_cat_group(race_cat, group_f, scored)
+```
+
+```{r -group-based-15, results = 'asis', eval = FALSE}
+dist_cat_group_sig(race_cat, group_f, scored)
 ```
 
 ## Ethnicity
 
-```{r}
+```{r -group-based-16}
 dist_cat_group(latinx_cat, group_f, scored)
+```
+
+```{r -group-based-17, results = 'asis', eval = (params$subset != "latinx")}
+dist_cat_group_sig(latinx_cat, group_f, scored)
 ```
 
 ## Single parent households
 
-```{r}
+```{r -group-based-18}
 dist_cat_group(single_cat, group_f, scored)
 ```
 
-# Well-being{.tabset} 
+```{r -group-based-19, results = 'asis', eval = (params$subset != "single")}
+dist_cat_group_sig(single_cat, group_f, scored)
+```
 
-## Caregiver well-being{.tabset}
+
+# Mental health{.tabset} 
+
+## Caregiver {.tabset}
+
+Values represent the difference between a caregiver's response for the past week and their "baseline" or retrospective report of this variable pre-pandemic.
 
 ### On average
 
-```{r}
+```{r -group-based-20}
 average_by_group(mental_health, group_f, "mental health problems", last_assessment)
 ```
 
 ### Over time
 
-```{r}
+```{r -group-based-21}
 average_by_week(mental_health, group_f, "mental health problems")
+```
+
+
+### Correlates of{.tabset}
+
+#### Test 
+
+```{r -group-based-22}
+correlates = c("material_hardship", "work_status", "single", "age")
+
+correlates = correlates[correlates != params$subset]
+
+if(!(params$subset %in% c("black", "latinx"))){
+  correlates = c(correlates, "race_ethnic")
+}
+if(params$subset != "poverty150"){
+  correlates = c(correlates, "income.cat", "poverty_cat")
+}
+
+test_data = last_assessment %>%
+  filter(!is.na(group_f)) %>%
+  filter(group_f != "Everyone else") %>%
+  select(mental_health, all_of(correlates)) 
+
+test.df = data.frame(correlates = correlates)
+test.df = test.df %>%
+  mutate(model = map(correlates, ~lm(as.formula(paste("mental_health~", .x)), 
+                                     data = test_data))) %>%
+  mutate(model_int = map(correlates, ~lm(as.formula(paste0("mental_health~", .x, "*group_f")), 
+                                     data = last_assessment))) %>%
+  mutate(summary = map(model, anova)) %>%
+  mutate(summary_int = map(model_int, car::Anova, type = "III")) %>%
+  mutate(p.value = map(summary, "Pr(>F)"),
+         p.value = map_dbl(p.value, 1),
+         p.value = map_dbl(p.value, p.adjust, method = "holm"),
+         sig = map(p.value, ~ifelse(.x < .05, 1, 0)),
+         p.value = map_chr(p.value, papaja::printp)) %>%
+    mutate(p.value_int = map(summary_int, "Pr(>F)"),
+         p.value_int = map_dbl(p.value_int, 3),
+         p.value_int = map_dbl(p.value_int, p.adjust, method = "holm"),
+         sig_int = map(p.value_int, ~ifelse(.x < .05, 1, 0)),
+         p.value_int = map_chr(p.value_int, papaja::printp)) 
+```
+
+```{r -group-based-23, results = 'asis'}
+test.df %>%
+  select(correlates, p.value, p.value_int) %>%
+  kable(., col.names = c("Variable", "Within group", "Difference between group and sample"),
+        caption = paste("Significance of linear model using variable to predict mental health within", params$grp.name, "caregivers")) %>%
+  kable_styling(full_width = T)
+```
+
+#### Figures (within sample)
+
+```{r -group-based-24}
+test_within = test.df %>%
+  filter(sig == 1)
+if(nrow(test_within) > 0){
+  lapply(test_within$model, FUN = plot_model, type = "pred")}
+```
+
+#### Figures (between sample)
+
+```{r -group-based-25}
+test_within = test.df %>%
+  filter(sig_int == 1)
+
+if(nrow(test_within) > 0){
+  lapply(test_within$model_int, FUN = plot_model, type = "int")}
 ```
 
 ## Anxiety{.tabset}
 
+Values represent the difference between a caregiver's response for the past week and their "baseline" or retrospective report of this variable pre-pandemic.
+
+
 ### On average
 
-```{r}
+```{r -group-based-26}
 average_by_group(anxiety, group_f, "mental health problems", last_assessment)
 ```
 
 ### Over time
 
-```{r}
+```{r -group-based-27}
 average_by_week(anxiety, group_f, "mental health problems")
 ```
 
 
 ## Depression{.tabset}
 
+Values represent the difference between a caregiver's response for the past week and their "baseline" or retrospective report of this variable pre-pandemic.
+
+
 ### On average
 
-```{r}
+```{r -group-based-28}
 average_by_group(depress, group_f, "mental health problems", last_assessment)
 ```
 
 ### Over time
 
-```{r}
+```{r -group-based-29}
 average_by_week(depress, group_f, "mental health problems")
 ```
 
 
 ## Stress{.tabset}
 
+Values represent the difference between a caregiver's response for the past week and their "baseline" or retrospective report of this variable pre-pandemic.
+
+
 ### On average
 
-```{r}
+```{r -group-based-30}
 average_by_group(stress, group_f, "mental health problems", last_assessment)
 ```
 
 ### Over time
 
-```{r}
+```{r -group-based-31}
 average_by_week(stress, group_f, "mental health problems")
 ```
 
 
 ## Loneliness{.tabset}
 
+Values represent the difference between a caregiver's response for the past week and their "baseline" or retrospective report of this variable pre-pandemic.
+
+
 ### On average
 
-```{r}
+```{r -group-based-32}
 average_by_group(lonely, group_f, "mental health problems", last_assessment)
 ```
 
 ### Over time
 
-```{r}
+```{r -group-based-33}
 average_by_week(lonely, group_f, "mental health problems")
 ```
 
-```{r}
+```{r -group-based-34}
 is.single <- params$subset == "single"
 
 if(is.single){
@@ -221,11 +364,11 @@ if(is.single){
 
 `r single_header`
 
-```{r, eval = is.single}
+```{r -group-based-35, eval = is.single}
 percent_by_group(lonely_challenge, group_f, last_assessment)
 ```
 
-```{r}
+```{r -group-based-36}
 if(is.single){
   single_header = print("### Text-based (Over time)")
 }else{single_header = ""}
@@ -233,35 +376,41 @@ if(is.single){
 
 `r single_header`
 
-```{r, eval = is.single}
+```{r -group-based-37, eval = is.single}
 percent_by_week(lonely_challenge, group_f)
 ```
 
 ## Child{.tabset}
 
+Values represent the difference between a caregiver's response for the past week and their "baseline" or retrospective report of this variable pre-pandemic.
+
+
 ### On average
 
-```{r}
+```{r -group-based-38}
 average_by_group(child_mental, group_f, "child mental health problems", last_assessment)
 ```
 
 ### Over time
 
-```{r}
+```{r -group-based-39}
 average_by_week(child_mental, group_f, "child mental health problems")
 ```
 
+
 # Material hardship{.tabset}
+
+
 
 ## Overall
 
-```{r}
+```{r -group-based-40}
 percent_by_group(material_hardship, group_f, last_assessment)
 ```
 
 ## Types of hardship
 
-```{r}
+```{r -group-based-41}
 plot = scored %>%
   dplyr::filter(!is.na(group_f)) %>%
   dplyr::filter(!is.na(material_hardship)) %>%
@@ -295,7 +444,7 @@ plot = scored %>%
 ggplotly(plot, tooltip = "text")
 ```
 
-```{r, results = 'asis'}
+```{r -group-based-42, results = 'asis'}
 scored %>%
   dplyr::filter(!is.na(group_f)) %>%
   dplyr::filter(!is.na(material_hardship)) %>%
@@ -317,14 +466,15 @@ scored %>%
          df = parameter) %>%
   mutate(p.value = p.adjust(p.value, method = "holm"),
          p.value = papaja::printp(p.value)) %>%
-  kable(., caption = "t-tests comparing hardship across groups. p-values adjusted for multiple comparisons using a Holm correction.")
+  kable(., caption = "t-tests comparing hardship across groups. p-values adjusted for multiple comparisons using a Holm correction.") %>%
+  kable_styling(full_width = T)
 ```
 
 
 
 ## By Week
 
-```{r}
+```{r -group-based-43}
 percent_by_week(material_hardship, group_f)
 ```
 
@@ -333,13 +483,13 @@ percent_by_week(material_hardship, group_f)
 
 ## On average
 
-```{r}
+```{r -group-based-44}
 percent_by_group(cc2_nonparental, group_f, last_assessment)
 ```
 
 ## Type of childcare (average)
 
-```{r}
+```{r -group-based-45}
 plot = scored %>%
   select(CaregiverID, Week, Date, group_f, starts_with("cc2_")) %>%
   dplyr::filter(Week != 13) %>%
@@ -378,7 +528,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Type of childcare (over time)
 
-```{r}
+```{r -group-based-46}
 plot = scored %>%
   select(Week, Date, group_f, starts_with("cc2_")) %>%
   dplyr::filter(Week != 13) %>%
@@ -424,7 +574,7 @@ ggplotly(plot, tooltip = "text")
 
 ## By week
 
-```{r}
+```{r -group-based-47}
 percent_by_week(cc2_nonparental, group_f)
 ```
 
@@ -433,25 +583,25 @@ percent_by_week(cc2_nonparental, group_f)
 
 ## Concerns for children (average)
 
-```{r}
+```{r -group-based-48}
 dist_cont_group(composite_concern, group_f)
 ```
 
 
-```{r}
+```{r -group-based-49}
 average_by_group(composite_concern, group_f, 
                  "Concerns for children (RISER)", last_assessment)
 ```
 
 ## Concerns for children (over time)
 
-```{r}
+```{r -group-based-50}
 average_by_week(composite_concern, group_f, "Concerns for children (RISER)")
 ```
 
 ## Caregiver well-being
 
-```{r}
+```{r -group-based-51}
 model.wb.concern = lmer(wellbeing ~ group_f*composite_concern + (1|CaregiverID),
                         data = scored)
 model.wb.concern.sig = broom.mixed::tidy(model.wb.concern)
@@ -466,7 +616,7 @@ model.wb.concern.sig = ifelse(abs(model.wb.concern.sig$statistic[[1]]) > 1.96,
 
 `r model.wb.concern.sig`
 
-```{r}
+```{r -group-based-52}
 plot_model(model.wb.concern, 
            type = "pred", 
            terms = c("composite_concern", "group_f"),
@@ -478,7 +628,7 @@ plot_model(model.wb.concern,
 
 ## Child well-being
 
-```{r}
+```{r -group-based-53}
 model.cwb.concern = lmer(child_wellbeing ~ group_f*composite_concern + (1|CaregiverID),
                         data = scored)
 model.cwb.concern.sig = broom.mixed::tidy(model.cwb.concern)
@@ -493,7 +643,7 @@ model.cwb.concern.sig = ifelse(abs(model.cwb.concern.sig$statistic[[1]]) > 1.96,
 
 `r model.cwb.concern.sig`
 
-```{r}
+```{r -group-based-54}
 plot_model(model.cwb.concern, 
            type = "pred", 
            terms = c("composite_concern", "group_f"),
@@ -506,25 +656,25 @@ plot_model(model.cwb.concern,
 
 ## Discrimination (average)
 
-```{r}
+```{r -group-based-55}
 dist_cont_group(discrimination, group_f)
 ```
 
 
-```{r}
+```{r -group-based-56}
 average_by_group(discrimination, group_f, 
                  "Concerns for children (RISER)", last_assessment)
 ```
 
 ## Discrimination (over time)
 
-```{r}
+```{r -group-based-57}
 average_by_week(discrimination, group_f, "Concerns for children (RISER)")
 ```
 
 ## Caregiver well-being
 
-```{r}
+```{r -group-based-58}
 model.wb.discrim = lmer(wellbeing ~ group_f*discrimination + (1|CaregiverID),
                         data = scored)
 model.wb.discrim.sig = broom.mixed::tidy(model.wb.discrim)
@@ -539,7 +689,7 @@ model.wb.discrim.sig = ifelse(abs(model.wb.discrim.sig$statistic[[1]]) > 1.96,
 
 `r model.wb.discrim.sig`
 
-```{r}
+```{r -group-based-59}
 plot_model(model.wb.discrim, 
            type = "pred", 
            terms = c("discrimination", "group_f"),
@@ -552,7 +702,7 @@ plot_model(model.wb.discrim,
 
 ## Child well-being
 
-```{r}
+```{r -group-based-60}
 model.cwb.discrim = lmer(child_wellbeing ~ group_f*discrimination + (1|CaregiverID),
                         data = scored)
 model.cwb.discrim.sig = broom.mixed::tidy(model.cwb.discrim)
@@ -567,7 +717,7 @@ model.cwb.discrim.sig = ifelse(abs(model.cwb.discrim.sig$statistic[[1]]) > 1.96,
 
 `r model.cwb.discrim.sig`
 
-```{r}
+```{r -group-based-61}
 plot_model(model.cwb.discrim, 
            type = "pred", 
            terms = c("discrimination", "group_f"),

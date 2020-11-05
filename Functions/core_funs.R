@@ -55,6 +55,38 @@ dist_cat_group = function(variable, group, data = scored){
   ggplotly(plot, tooltip = "text")
 }
 
+dist_cat_group_sig = function(variable, group, data = scored){
+  data %>%
+    filter(!is.na({{variable}})) %>%
+    filter(!is.na({{group}})) %>%
+    group_by(CaregiverID) %>%
+    filter(Week == max(Week)) %>%
+    ungroup() %>%
+    group_by({{variable}}, {{group}}) %>%
+    summarize(count = n()) %>%
+    group_by({{group}}) %>%
+    mutate(n = sum(count)) %>%
+    ungroup()  %>%
+    mutate(group = map_dbl({{group}}, ~ifelse(.x == "Everyone else", 0, 1))) %>%
+    select({{variable}}, group, count, n)  %>%
+    gather(stat, value, count, n) %>%
+    unite(stat, stat, group, sep = "_")  %>%
+    spread(stat, value) %>%
+    filter(!is.na(count_0)) %>%
+    filter(!is.na(count_1)) %>%
+    mutate(proptest = pmap(.l = list(count_0, count_1, n_0, n_1),
+                           function(first, second, third, fourth) prop.test(x = c(first, second), n = c(third, fourth))))  %>%
+    mutate(proptest = map(proptest, broom::tidy))  %>%
+    select({{variable}}, proptest) %>%
+    unnest(cols = c(proptest)) %>%
+    mutate(p.value = p.adjust(p.value, method = "holm"),
+           p.value = papaja::printp(p.value)) %>%
+    select({{variable}}, statistic, p.value) %>%
+    kable(digits = 2,
+          caption = "p-values adjusted for multiple comparisons using a Holm correction") %>%
+    kable_styling(full_width = T)
+}
+
 dist_cat_group2 = function(variable, group1, group2, order = FALSE, data = scored){
   plot = data %>%
     filter(!is.na({{variable}})) %>%

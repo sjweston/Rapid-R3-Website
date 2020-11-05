@@ -819,7 +819,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$lone_increase = ifelse(lone_change > 0, 1, 0)
   }
   
-    newdata$income = data$allyearlyCurrent
+    newdata$income = data$allyearly2019
     newdata$income.cat = case_when(
       newdata$income < 20000 ~ "< 20k",
       newdata$income < 40000 ~ "20k-40k",
@@ -1304,7 +1304,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     data = data %>%
       mutate(single = case_when(
         DEMO.002 %in% c(3,4,5,7,8) ~ 1,
-        DEMO.011 %in% c(2,4) ~ 1, 
+        DEMO.011 %in% c(2,3) ~ 1, 
         !is.na(DEMO.002) ~ 0,
         !is.na(DEMO.011) ~ 0,
         TRUE ~ NA_real_))

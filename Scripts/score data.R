@@ -336,7 +336,7 @@ scored = scored %>%
   mutate(
     black_cat = factor(black, labels = c("non-Black", "Black")),
     latinx_cat = factor(latinx, labels = c("non-Latinx", "Latinx")),
-    poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
+    poverty_cat = factor(poverty150, labels = c("Above 1.5 x FPL", "Below 1.5 x FPL")),
     single_cat = factor(single, labels = c("Dual parent", "Single parent")),
     disability_cat = factor(disability, labels = c("No disability", "Child with disability")),
     race_ethnic = case_when(
