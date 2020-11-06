@@ -823,7 +823,8 @@ Mod.Med_group <- mediation::mediate(mod.med_apath, mod.med_bpath,
                          mediator="mental_health")
 
 tidy(Mod.Med_group) %>%
-  kable(., caption = "mediation model within group")
+  kable(., caption = "mediation model within group", digits = 3) %>%
+  kable_styling(full_width = T)
 ```
 
 
@@ -847,9 +848,9 @@ test.model
 
 ```{r}
 if(is.single){
-  single_header = print("### Correlations
+  single_header = "### Correlations
 
-**Within `r params$grp.name` caregivers**")
+**Within `r params$grp.name` caregivers**"
 }else{single_header = ""}
 ```
 
