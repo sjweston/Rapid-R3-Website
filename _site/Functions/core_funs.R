@@ -258,6 +258,21 @@ average_by_group = function(variable, group, label, data = scored){
   ggplotly(plot)
 }
 
+average_by_group_sig = function(variable, group, data = scored){
+  
+  data = data %>%
+    rename(variable = {{variable}})
+  
+  test = t.test(variable ~ group_f, data = data)
+  
+  table = broom::tidy(test) %>%
+    mutate(p.value = papaja::printp(p.value)) %>%
+    kable(., digits = 2) %>%
+    kable_styling(full_width = T)
+  
+  return(table)
+}
+
 average_by_group2 = function(variable, group1, group2, label, data = scored){
   plot = data %>%
     filter(!is.na({{group1}}) & !is.na({{group2}}) & !is.na({{variable}})) %>%
