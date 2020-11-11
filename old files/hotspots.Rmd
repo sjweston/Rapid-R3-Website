@@ -1,0 +1,273 @@
+---
+title: "covid Hotspots"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(ggpubr)
+```
+
+```{r}
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+```
+
+```{r}
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
+  rowwise() %>%
+  mutate(mental_health = mean(c(anxiety, depress, stress, lonely), na.rm=T),
+         child_mental = mean(c(fussy, fear), na.rm=T)) %>%
+  ungroup()
+```
+
+
+# Our data{.tabset}
+
+Case and death counts are pulled from the [_NY Times_](https://github.com/nytimes/covid-19-data). We match these data (listed by county) to our particpants' zipcodes using FIPS codes from the US Census. _NYT_ provides daily total cumulative case and death counts. From these, we calculate several statistics:
+
+## Total cases
+
+This is provided by _NYT_.
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = total_cases, fill = as.factor(Week))) +
+  geom_density(alpha = .3) +
+  guides(fill = F) +
+  scale_x_log10("Total cases (log transformed)")+
+  facet_wrap(~Week) +
+  theme_pubr()
+```
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = Week, y = total_cases, color = region)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Total cases")+
+  theme_pubr()
+```
+
+
+## New cases (2-week)
+
+The number of new cases is the number cases on a given day minus the number of cases the prior day. For any day, we sum the prior two weeks of new cases. This number represents the _2-week rolling average of new cases_. 
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = new_cases_twoweeks, fill = as.factor(Week))) +
+  geom_density(alpha = .3) +
+  guides(fill = F) +
+  scale_x_log10("New cases (rolling 2-week) (log transformed)")+
+  facet_wrap(~Week) +
+  theme_pubr()
+```
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = Week, y = new_cases_twoweeks, color = region)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "New cases (rolling 2-week)")+
+  theme_pubr()
+```
+
+## New cases (2-week) per 1000
+
+
+The number of new cases is the number cases on a given day minus the number of cases the prior day. For any day, we sum the prior two weeks of new cases, divide by the population of that zipcode, and multiply by 1000. This number represents the _2-week rolling average of new cases, per 1000 people_, which accounts for population density.
+
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = new_cases_per1000, fill = as.factor(Week))) +
+  geom_density(alpha = .3) +
+  guides(fill = F) +
+  scale_x_log10("New cases per 1000 (rolling 2-week) (log transformed)")+
+  facet_wrap(~Week) +
+  theme_pubr()
+```
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = Week, y = new_cases_per1000, color = region)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "New cases per 1000 (rolling 2-week)")+
+  theme_pubr()
+```
+
+## Growth (one-week)
+
+For growth, we sum the number of new cases in the past seven days (ending on the survey date) and divide by the total number of cases one week before. We multiply this number by 100 to yield a percent, specifically, _the amount of growth in cases over the past week_.
+
+
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = growth_cases_oneweek, fill = as.factor(Week))) +
+  geom_density(alpha = .3) +
+  guides(fill = F) +
+  scale_x_log10("New cases per 1000 (rolling 2-week) (log transformed)")+
+  facet_wrap(~Week) +
+  theme_pubr()
+```
+
+```{r, fig.width=10}
+scored %>%
+  filter(Week != 0) %>%
+  ggplot(aes(x = Week, y = growth_cases_oneweek, color = region)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Growth in cases (one week)")+
+  theme_pubr()
+```
+
+# Hotspots{.tabset}
+
+Hotspots are zipcodes that have more than 5 new cases per 1000 in any of Weeks 15, 16, or 17.
+
+```{r}
+#identify hotspots 
+hotspot1 = scored %>%
+  mutate(hotspot_new = ifelse(new_cases_per1000 > 5, 1, 0)) %>%
+  filter(Week > 14) %>%
+  group_by(zip) %>%
+  summarize(hotspot_new = max(hotspot_new, na.rm=T)) %>%
+  ungroup() %>%
+  left_join(scored) %>%
+  filter(!is.infinite(hotspot_new)) %>%
+  mutate(hotspot_new = factor(hotspot_new, levels = c(1,0), labels = c("Hotspot", "Not hotspot")))
+```
+
+## New cases
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = new_cases_per1000, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "New cases per 1000 (rolling 2-week)")+
+  theme_pubr()
+```
+
+## Caregiver mental health
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = mental_health, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Caregiver mental health", color = NULL)+
+  theme_pubr()
+```
+
+##  Anxiety
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = anxiety, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Caregiver Anxiety", color = NULL)+
+  theme_pubr()
+```
+
+## Depression
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = depress, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Caregiver depression", color = NULL)+
+  theme_pubr()
+```
+
+## Stress
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = stress, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Caregiver stress", color = NULL)+
+  theme_pubr()
+```
+
+## Loneliness
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = lonely, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Caregiver loneliness", color = NULL)+
+  theme_pubr()
+```
+
+## Child mental health
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = child_mental, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Child mental health", color = NULL)+
+  theme_pubr()
+```
+
+## Externalizing
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = fussy, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Child externalizing", color = NULL)+
+  theme_pubr()
+```
+
+
+## Internalizing
+
+```{r}
+hotspot1 %>%
+  ggplot(aes(x = Week, y = fear, color = hotspot_new)) +
+  stat_summary(fun.y = mean, geom = "point") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", alpha = .3) +
+  labs(y = "Child internalizing", color = NULL)+
+  theme_pubr()
+```

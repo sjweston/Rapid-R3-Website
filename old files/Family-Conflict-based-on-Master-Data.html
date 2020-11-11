@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Family Conflict based on Master File</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="0prelim_april27.html">Sheltering in place</a>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict (summer)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="winter_is_coming.html">Covid cases rising</a>
+    </li>
+    <li>
+      <a href="Family-Conflict-based-on-Master-Data.html">Family conflict (fall)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texas</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Groups
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="group_single_report.html">Single caregivers</a>
+    </li>
+    <li>
+      <a href="group_latinx_report.html">Latinx caregivers</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Family Conflict based on Master File</h1>
+
+</div>
+
+
+<p>Note: Becasue data of weeks 9 &amp; 11 were collected during June and had no significant differences, analyses below combined family conflict data of both weeks.</p>
+<div id="comparisons-using-percentage-of-caregivers-who-reported-increased-family-conflict-levels-compared-to-pre-covid" class="section level1">
+<h1>Comparisons Using Percentage of Caregivers Who Reported Increased Family Conflict Levels Compared to Pre-COVID</h1>
+<div id="total-family-conflict-increased-percentage" class="section level2">
+<h2>Total Family Conflict Increased Percentage</h2>
+<div id="overall" class="section level3">
+<h3>Overall</h3>
+<ul>
+<li>Results indicate that 59.32% of caregivers during June, 61.55% of caregivers during July, and 56.99% caregivers during Octorber reported increased family conflict levels, compared to pre-COVID.<br />
+</li>
+<li>The percentage of caregivers who reported increased family conflict compared to pre-COVID remained stable at all three time-points.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="income-level" class="section level3">
+<h3>Income Level</h3>
+<ul>
+<li>At all three time-points, the percentage of increased family conflict did not significantly differ between low- and high-income families<br />
+</li>
+<li>For both low- and high-income families, the percentage of increased family conflict did not change significantly over time.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="material-hardship-level" class="section level3">
+<h3>Material Hardship Level</h3>
+<ul>
+<li>During June and July, the percentage of increased family conflict did not significantly differ between low- and high-income families. However, at the most recent time-point (October), families with material hardship reported significantly more increases in family conflict (60.48%) compared to families without material hardship (53.54%)<br />
+</li>
+<li>For families with material hardship, the percentage of increased family conflict did not change significantly over time. However, for families without material hardship, the percentage of increased family conflict remained stable at June and July, and then marginally significantly decreased at October.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="raceethnicity" class="section level3">
+<h3>Race/Ethnicity</h3>
+<ul>
+<li>During June and July, the percentage of increased family conflict did not significantly differ by race/ethnicity. However, at the most recent time-point (October), significantly fewer Black families reported increases in family conflict (40.37%) compared to White (59.52%) and Latinx (56.49%) families<br />
+</li>
+<li>For White and Latinx, the percentage of increased family conflict did not change significantly over time; For Black families, the percentage of increased family conflict remained stable at June and July, and then marginally significantly decreased at October.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<div id="spousal-conflict-increased-percentage" class="section level2">
+<h2>Spousal Conflict Increased Percentage</h2>
+<div id="overall-1" class="section level3">
+<h3>Overall</h3>
+<ul>
+<li>Results indicate that 29.85% of caregivers during June, 31.77% of caregivers during July, and 26.74% caregivers during Octorber reported increased spousal conflict levels, compared to pre-COVID.<br />
+</li>
+<li>The percentage of caregivers who reported increased family conflict compared to pre-COVID remained stable at June and July, and decreased in October (marginally significant).</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="income-level-1" class="section level3">
+<h3>Income Level</h3>
+<ul>
+<li>At all three time-points, the percentage of increased spousal conflict did not significantly differ between low- and high-income families<br />
+</li>
+<li>For both low- and high-income families, the percentage of increased spousal conflict did not change significantly over time.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="material-hardship-level-1" class="section level3">
+<h3>Material Hardship Level</h3>
+<ul>
+<li>At all three months, tfamilies with material hardship reported significantly more increases in spousal conflict compared to families without material hardship<br />
+</li>
+<li>For both groups, the percentage of increased spousal conflict did not change significantly over time. .</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+<div id="raceethnicity-1" class="section level3">
+<h3>Race/Ethnicity</h3>
+<ul>
+<li>At all three months, the percentage of increased family conflict did not significantly differ by race/ethnicity.<br />
+</li>
+<li>For all race/ethnicity groups, the percentage of increased family conflict did not change significantly over time.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+</div>
+<div id="parent-child-conflict-increased-percentage" class="section level2">
+<h2>Parent-Child Conflict Increased Percentage</h2>
+<div id="overall-2" class="section level3">
+<h3>Overall</h3>
+<ul>
+<li>Results indicate that 56.46% of caregivers during June, 59.11% of caregivers during July, and 53.82% caregivers during Octorber reported increased parent-child conflict levels, compared to pre-COVID.<br />
+</li>
+<li>The percentage of caregivers who reported increased parent-child conflict compared to pre-COVID remained stable at June and July, and decreased in October (marginally significant).</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+</div>
+<div id="income-level-2" class="section level3">
+<h3>Income Level</h3>
+<ul>
+<li>At all three time-points, the percentage of increased parent-child conflict did not significantly differ between low- and high-income families<br />
+</li>
+<li>For both low- and high-income families, the percentage of increased parent-child conflict did not change significantly over time.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+</div>
+<div id="material-hardship-level-2" class="section level3">
+<h3>Material Hardship Level</h3>
+<ul>
+<li>During June and July, the percentage of reported increased parent-child conflict levels did not change significantly by families’ material hardship status; However, families with material hardship reported significantly more increases in parent-child conflict than pre-COVID compared to families without material hardship<br />
+</li>
+<li>For families with material hardship, the percentage of increased parent-child conflict did not change significantly over time; For families without material hardship, the percentage of increased parent-child conflict remained stable during June and July, and then decreased in October (marginally significant)</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+</div>
+<div id="raceethnicity-2" class="section level3">
+<h3>Race/Ethnicity</h3>
+<ul>
+<li>During June, Black families reported significantly lower percentage of increased parent-child conflict compared to Latinx and White families; During July, the percentage of increased parent-child conflict did not change significantly by race/ethnicity groups; During October, Black families reported significantly lower percentage of increased parent-child conflict compared to White families.<br />
+</li>
+<li>For Latinx and White families, the percentage of increased parent-child conflict did not change significantly over time; For Black families, the percentage of increased parent-child conflict did not change significantly in June and July, and then decreased significantly in October.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="sources-for-conflicts" class="section level1">
+<h1>Sources for Conflicts</h1>
+<div id="detailed-categories" class="section level2">
+<h2>Detailed Categories</h2>
+<ul>
+<li>At all three timepoints, majority caregivers reported that sources that can help them decrease family conflict the most were emotional measures, followed by financial measures. Only small amount of caregivers that childcare support could help decrese family conflict.<br />
+1 - Being confident that my family has health insurance<br />
+2 - Not being so socially isolated<br />
+3 - Having lower levels of worry and stress<br />
+4 - Knowing we can pay for food<br />
+5 - Knowing we can pay my rent/mortgage/housing expenses<br />
+6 - Knowing we can pay my rent/mortgage/housing expenses<br />
+7 - Being able to meet my child’s social and emotional needs<br />
+8 - Knowing we have access to childcare<br />
+</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="aggregated-to-financial-emotional" class="section level2">
+<h2>Aggregated to Financial &amp; Emotional</h2>
+<div id="overall-3" class="section level3">
+<h3>Overall</h3>
+<ul>
+<li>At all three timepoints, majority caregivers reported that sources that can help them decrease family conflict the most were emotional measures, followed by financial measures. Only small amount of caregivers that childcare support could help decrese family conflict. There were no statistically significant differences across different timepoints.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<ul>
+<li>Note. For below sub-group analyses, the source of childcare was removed due to small percentage. Thus, the analsyes focused on emotional and financial conflict sources.<br />
+</li>
+</ul>
+</div>
+<div id="income-level-3" class="section level3">
+<h3>Income Level</h3>
+<ul>
+<li>At all time-points, low-income families reported significantly more financial conflict sources and fewer emotional sources compared to high-income families;<br />
+</li>
+<li>For high-income families, the sources of conflict remained stable over the thee time-points. For low-income families, the sources of conflict remained stable at June and July; then in October, emotional conflict sources percentage decreased while financial conflict sources increased (marginally significant) .</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+</div>
+<div id="material-hardship" class="section level3">
+<h3>Material Hardship</h3>
+<ul>
+<li>For families with material hardship, the sources for conflicts remained stable at June and July; then in October, emotional conflict sources decreased and financial conflict sources increased (marginally significant). For families without material hardship, the conflict source percentages remained stable over time<br />
+</li>
+<li>All all time-points, families with material hardship reported significantly higher levels of financial conflict and lower levels of emotional conflict compared to families without material conflict.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+</div>
+<div id="raceethnicity-3" class="section level3">
+<h3>Race/Ethnicity</h3>
+<ul>
+<li>For families of all three race/ethnicity groups, conflict sources did not significantly change over timed<br />
+</li>
+<li>In June and October, White families reported significantly higher levels of emotional conflict and lower levels of financial conflict compared to Black and Latinx families.<br />
+</li>
+<li>In July, White families reported marginally significant higher levels of emotional conflict compared to Black families; White families also reported significantly lower levels of financial conflict compared to Latinx and Black families.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+<div id="family-cohesion" class="section level1">
+<h1>Family Cohesion</h1>
+<div id="overall-4" class="section level2">
+<h2>Overall</h2>
+<ul>
+<li>Families remained very high levels of cohesion throughout the pandemic<br />
+</li>
+<li>No statistically significant change in family cohesion levels from pre-COVID to June<br />
+</li>
+<li>Family cohesion levels increased slightly and marginally significantly from June to July; the increases from June to October were small in magnitude but statistically significant. <img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-38-1.png" width="672" /></li>
+</ul>
+</div>
+<div id="income-levels" class="section level2">
+<h2>Income Levels</h2>
+<ul>
+<li>No significant differences in family cohesion levels between low- and high-income families<br />
+</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-40-1.png" width="672" /></p>
+</div>
+<div id="material-hardship-1" class="section level2">
+<h2>Material Hardship</h2>
+<ul>
+<li>During pre-COVID and June, families with material hardship reported significantly lower levels of family cohesion compared to families without material hardship<br />
+</li>
+<li>In July and October, family cohesion levels did not change significantly by their material hardship status</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
+</div>
+<div id="raceethnicity-4" class="section level2">
+<h2>Race/Ethnicity</h2>
+<ul>
+<li>Pre-COVID, White families reported significant higher levels of family cohesion compared to Black and Latinx families<br />
+</li>
+<li>During June, White families reported marginally significant higher levels of family cohesion compared to Black families, and significant higher levels of family cohesion than Latinx families<br />
+</li>
+<li>During July, White families reported significant higher levels of family cohesion compared to Black and Latinx families; Latinx families also reported significant higher levels of family cohesion than Black families<br />
+</li>
+<li>During October, White and Latinx families reproted significant higher levels of family cohesion than Black families.</li>
+</ul>
+<p><img src="Family-Conflict-based-on-Master-Data_files/figure-html/unnamed-chunk-44-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

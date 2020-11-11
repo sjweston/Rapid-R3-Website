@@ -1,0 +1,903 @@
+---
+title: "Policy-relevant questions"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r policy-state-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+#re-run all the machine learning models?
+rerun = FALSE
+dontrerun = !rerun
+```
+
+```{r policy-state-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+library(emmeans)
+```
+
+```{r policy-state-3 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r policy-state-4 }
+source(here("Functions/pomp.R"))
+```
+
+```{r policy-state-5 }
+#pomp scoring
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
+  rowwise() %>%
+  #well-being composite
+  mutate(wellbeing = mean(c(anxiety, depress, stress, lonely), na.rm=T),
+         wellbeing = 100-wellbeing) %>%
+  ungroup() %>%
+  mutate(employ_inc1 = case_when(
+    unemployed == 0 & poverty150 == 0 ~ "Employed, High Income",
+    unemployed == 0 & poverty150 == 1 ~ "Employed, Low Income",
+    unemployed == 1 & poverty150 == 0 ~ "Unemployed, High Income",
+    unemployed == 1 & poverty150 == 1 ~ "Unemployed, Low Income")) %>%
+  mutate(region_south = ifelse(region == "South", "South", "Everywhere else"),
+         region_west = ifelse(region == "West", "West", "Everywhere else"),
+         region_northeast = ifelse(region == "Northeast", "Northeast", "Everywhere else"),
+         region_midwest = ifelse(region == "Midwest", "Midwest", "Everywhere else")) %>%
+  mutate(black_inc = case_when(
+    black == 0 & poverty150 == 0 ~ "Non-states_death_restrictions, High Income",
+    black == 0 & poverty150 == 1 ~ "Non-states_death_restrictions, Low Income",
+    black == 1 & poverty150 == 0 ~ "Black, High Income",
+    black == 1 & poverty150 == 1 ~ "Black, Low Income"),
+    latinx_inc = case_when(
+    latinx == 0 & poverty150 == 0 ~ "Non-Latinx, High Income",
+    latinx == 0 & poverty150 == 1 ~ "Non-Latinx, Low Income",
+    latinx == 1 & poverty150 == 0 ~ "Latinx, High Income",
+    latinx == 1 & poverty150 == 1 ~ "Latinx, Low Income"),
+    south_inc = case_when(
+    region_south == "Everywhere else" & poverty150 == 0 ~ "Not-South, High Income",
+    region_south == "Everywhere else" & poverty150 == 1 ~ "Not-South, Low Income",
+    region_south == "South" & poverty150 == 0 ~ "South, High Income",
+    region_south == "South" & poverty150 == 1 ~ "South, Low Income"))
+```
+
+```{r policy-state-6}
+scored = scored %>%
+  mutate(
+   states_reopening_status = case_when(
+     Date < "2020-06-25" ~ NA_character_,
+     Week == 0 ~ NA_character_,
+      state %in% c("CA", "AZ", "CO", "TX", "FL", "DE") ~ "New restrictions imposed",
+      state %in% c("WA", "ID", "NV", "NM", "AR", "LA", 
+                   "MS", "AL", "NC", "NJ", "MI") ~ "Paused",
+      state %in% c("OR", "UT", "MT", "WY", "NE", "MN", 
+                   "IL", "IN", "OH", "KY", "TN", "GA",
+                   "WV", "VA", "PA", "NY", "ME", "VT",
+                   "NH", "MA", "RI", "CT", "MD", "DC") ~ "Proceeding with reopening",
+      state %in% c("ND", "SD", "KS", "OK", "WI", "IA",
+                   "MO", "SC") ~ "Reopened",
+    TRUE ~ NA_character_) ) %>%
+  mutate(
+    states_death_restrictions = case_when(
+      Date < "2020-06-25" ~ NA_character_,
+      Week == 0 ~ NA_character_,
+      state %in% c("ND", "AR", "SC", "NE", "AL", 
+                   "OH", "LA","NV", "FL", "MS", "IN") ~ "Few restrictions, high risk",
+      state %in% c("RI", "PA", "IL", "MN","DC", 
+                   "AZ", "MA", "VA", "NC", "MD", "NM", 
+                   "NJ", "CA") ~ "Many restrictions, high risk",
+      state %in% c("SD", "WI", "OK", "UT", "WY", 
+                   "IA", "MO", "KS", "ID", "MT", "TN", 
+                   "GA", "KY", "AK") ~ "Few restrictions, low risk",
+      state %in% c("MI", "CT", "WV","OR", "VT", "WA", 
+                   "DE", "NY", "ME", "HI", "CO") ~ "Many restrictions, low risk",
+    TRUE ~ NA_character_)) %>%
+  mutate(states_groups = case_when(
+    state %in% c("TX", "FL", "AZ") ~ "TX/FL/AZ",
+    state %in% c("ID", "WY", "MN") ~ "ID/WY/MN",
+    state %in% c("NY", "NJ") ~ "NY/NJ",
+    state == "CA" ~ "CA",
+    TRUE ~ NA_character_
+  ))
+```
+
+# Categorization of states
+
+**Reopening status** comes from data posted by the [Kaiser Family Foundation](https://www.kff.org/coronavirus-covid-19/issue-brief/state-data-and-policy-actions-to-address-coronavirus/), collected on July 07, 2020.
+
+**Risk and restriction** categorizations come from [Wallethub.com](https://wallethub.com/edu/states-coronavirus-restrictions/73818/). Again, data were collected on July 07, 2020.
+
+For all analyses, we only use responses collected after Memorial Day.
+
+
+# Representativeness disclaimer
+
+```{r policy-state-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+```{r policy-state-8 }
+source(here("Functions/policy_fun.R"))
+```
+
+# Well-being
+
+## Caregiver Well-Being{.tabset}
+
+### By reopening status
+
+```{r}
+bycont_plot(scored, states_reopening_status, wellbeing)
+```
+
+```{r}
+bcont_table(scored, states_reopening_status, wellbeing)
+```
+
+### By restriction and risk
+
+```{r}
+bycont_plot(scored, states_death_restrictions, wellbeing)
+```
+
+```{r}
+bcont_table(scored, states_death_restrictions, wellbeing)
+```
+
+### By groups over time
+
+```{r}
+region_co_plot(scored, wellbeing, states_groups)
+```
+
+
+
+
+## Child Externalizing{.tabset}
+
+### By reopening status
+
+```{r}
+bycont_plot(scored, states_reopening_status, fussy)
+```
+
+```{r}
+bcont_table(scored, states_reopening_status, fussy)
+```
+
+### By restriction and risk
+
+```{r}
+bycont_plot(scored, states_death_restrictions, fussy)
+```
+
+```{r}
+bcont_table(scored, states_death_restrictions, fussy)
+```
+
+### By groups over time
+
+```{r}
+region_co_plot(scored, fussy, states_groups)
+```
+
+
+## Child Internalizing{.tabset}
+
+### By reopening status
+
+```{r}
+bycont_plot(scored, states_reopening_status, fear)
+```
+
+```{r}
+bcont_table(scored, states_reopening_status, fear)
+```
+
+
+### By restriction and risk
+
+```{r}
+bycont_plot(scored, states_death_restrictions, fear)
+```
+
+```{r}
+bcont_table(scored, states_death_restrictions, fear)
+```
+
+### By groups over time
+
+```{r}
+region_co_plot(scored, fear, states_groups)
+```
+
+
+
+# Economic Stability
+
+## Receiving public benefits{.tabset}
+
+```{r policy-state-9 }
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(!is.na(public_benefits)) %>%
+  filter(Week == max(Week)) %>%
+  group_by(public_benefits) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**Are you receiving any sort of public or employment benefits? ex. Federal cash assistance programs such as the Temporary Assistance for Needy Families (TANF), Social Security Income (SSI). OR, Federal-in kind benefit programs such as Medicaid, Food Stamps and Housing.**
+
+Options:
+
+  - Yes $(N = `r pb.table[pb.table$public_benefits == "Yes","N"]`)$
+  - No $(N = `r pb.table[pb.table$public_benefits == "No","N"]`)$
+  - Didn't Qualify $(N = `r pb.table[pb.table$public_benefits == "Didn't Qualify","N"]`)$
+  - Intend to apply $(N = `r pb.table[pb.table$public_benefits == "Intend to apply","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+
+### By reopening status
+
+```{r policy-state-10 }
+bygroup_plot(scored, public_benefits, states_reopening_status)
+```
+
+```{r policy-state-11 }
+bygroup_ttest(scored, public_benefits, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-12 }
+bygroup_plot(scored, public_benefits, states_death_restrictions)
+```
+
+```{r policy-state-13 }
+bygroup_ttest(scored, public_benefits, states_death_restrictions)
+```
+
+## Which public benefits{.tabset}
+
+```{r policy-state-14 }
+pb_cat.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  summarize_at(vars(contains("pb_")), .funs = list(sum), na.rm=T)
+```
+
+
+**What types of benefits are you receiving? [Select all that apply.]**
+
+Options:
+
+  - Health/Medical $(N = `r pb_cat.table$pb_health`)$ 
+  - Food $(N = `r pb_cat.table$pb_food`)$ 
+  - Income (not icluding federal stimulus checks) $(N = `r pb_cat.table$pb_income`)$ 
+  - Disability (not military) $(N = `r pb_cat.table$pb_disability`)$
+  - Military Pension $(N = `r pb_cat.table$pb_military.pension`)$
+  - Military Disability $(N = `r pb_cat.table$pb_military.disabiltiy`)$
+  - Military Medical Care $(N = `r pb_cat.table$pb_military.medical`)$
+  - Military (any benefit, including pension, disability, etc) $(N = `r pb_cat.table$pb_military`)$
+  - Housing Subsidy $(N = `r pb_cat.table$pb_housing`)$
+  - Child Care Subsidy $(N = `r pb_cat.table$pb_childcare`)$
+  - Other $(N = `r pb_cat.table$pb_other`)$
+
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+```{r policy-state-15 }
+pb_vars = find_items("pb_", scored)
+pb_labels = pb_vars %>%
+  gsub("pb_", "", .) %>%
+  gsub("\\.", " ", .) %>%
+  stringr::str_to_sentence()
+```
+
+### By reopening status
+
+```{r policy-state-16 }
+bygroup_c_plot(scored, pb_vars, pb_labels, states_reopening_status)
+```
+
+```{r policy-state-17 }
+bygroup_c_ttest(scored, pb_vars, pb_labels, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-18 }
+bygroup_c_plot(scored, pb_vars, pb_labels, states_death_restrictions)
+```
+
+```{r policy-state-19 }
+bygroup_c_ttest(scored, pb_vars, pb_labels, states_death_restrictions)
+```
+
+## Receiving federal stimulus check{.tabset}
+
+```{r policy-state-20 }
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(federal_stim)) %>%
+  group_by(federal_stim) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**Have  you received a federal stimulus check this year? (Also known as an economic impact payment) (Note: Weeks 3-8 separate this into two questions, one that asks whether participants have received a check (Yes, No, Unsure, Other) and another that asks if they expect to receive one, only presented if they respond "No" to the prior question. These were combined for the present analyses.)**
+
+Options:
+
+  - Yes, I have received a federal stimulus check $(N = `r pb.table[pb.table$federal_stim == "Yes","N"]`)$
+  - No, but I expect to receive a federal stimulus check in the near future $(N = `r pb.table[pb.table$federal_stim == "No, expected","N"]`)$
+  - No, and I DO NOT expect to receive a federal stimulus check $(N = `r pb.table[pb.table$federal_stim == "No, not expected","N"]`)$
+  - Unsure if I will receive a federal stimulus check  $(N = `r pb.table[pb.table$federal_stim == "Unsure","N"]`)$
+  - Other  $(N = `r pb.table[pb.table$federal_stim == "Other","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+
+### By reopening status
+
+```{r policy-state-21 }
+bygroup_plot(scored, federal_stim, states_reopening_status)
+```
+
+```{r policy-state-22 }
+bygroup_ttest(scored, federal_stim, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-23 }
+bygroup_plot(scored, federal_stim, states_death_restrictions)
+```
+
+```{r policy-state-24 }
+bygroup_ttest(scored, federal_stim, states_death_restrictions)
+```
+
+
+## Family Income{.tabset}
+
+```{r policy-state-25 }
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(income_change)) %>%
+  group_by(income_change) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**Which  of the following best describes what has happened to your family income during the coronavirus (COVID-19) pandemic? (Note that in weeks 1-6 and 10-12, there were 5 response options, including decreased very much, decreased somewhat, etc). These were collapsed to allow for assessment across all weeks **
+
+Options:
+
+  - Has decreased $(N = `r pb.table[pb.table$income_change == "Decreased","N"]`)$
+  - Has stayed the same $(N = `r pb.table[pb.table$income_change == "Stayed the same","N"]`)$
+  - Has increased $(N = `r pb.table[pb.table$income_change == "Increased","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+
+### By reopening status
+
+```{r policy-state-26 }
+bygroup_plot(scored, income_change, states_reopening_status)
+```
+
+```{r policy-state-27 }
+bygroup_ttest(scored, income_change, states_reopening_status)
+```
+
+
+### By restriction and risk
+
+```{r policy-state-28 }
+bygroup_plot(scored, income_change, states_death_restrictions)
+```
+
+```{r policy-state-29 }
+bygroup_ttest(scored, income_change, states_death_restrictions)
+```
+
+## Family Financial Status{.tabset}
+
+```{r policy-state-30 }
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(financial_status)) %>%
+  group_by(financial_status) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**Which  of the following best describes your family financially at this time?**
+
+Options:
+
+  - No problems $(N = `r pb.table[pb.table$financial_status == "None","N"]`)$
+  - Minor problems $(N = `r pb.table[pb.table$financial_status == "Minor","N"]`)$
+  - Major problems $(N = `r pb.table[pb.table$financial_status == "Major","N"]`)$
+  - Extreme problems $(N = `r pb.table[pb.table$financial_status == "Extreme","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+```{r policy-state-31}
+scored$financial_status_num = case_when(
+  scored$financial_status %in% c("None", "Minor") ~ 0, 
+  scored$financial_status %in% c("Major", "Extreme") ~ 1, 
+  TRUE ~ NA_real_
+)
+```
+
+
+### By reopening status
+
+```{r policy-state-32 }
+bygroup_plot(scored, financial_status, states_reopening_status)
+```
+
+```{r policy-state-33 }
+bygroup_ttest(scored, financial_status, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-34 }
+bygroup_plot(scored, financial_status, states_death_restrictions)
+```
+
+```{r policy-state-35 }
+bygroup_ttest(scored, financial_status, states_death_restrictions)
+```
+
+
+# Physical Health
+
+## Well-baby/Well-child Checkup{.tabset}
+
+```{r policy-state-36 }
+scored = scored %>%
+  mutate(missed_wellbaby = factor(missed_wellbaby, levels = c(0, 1), labels = c("No", "Yes")))
+
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(missed_wellbaby)) %>%
+  group_by(missed_wellbaby) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**Have you missed a well-baby/well-child checkup since the coronavirus (COVID-19) pandemic began?**
+
+Options:
+
+  - No $(N = `r pb.table[pb.table$missed_wellbaby == "No","N"]`)$
+  - Yes $(N = `r pb.table[pb.table$missed_wellbaby == "Yes","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+
+### By reopening status
+
+```{r policy-state-37 }
+bygroup_plot(scored, missed_wellbaby, states_reopening_status)
+```
+
+```{r policy-state-38 }
+bygroup_ttest(scored, missed_wellbaby, states_reopening_status)
+```
+
+
+### By restriction and risk
+
+```{r policy-state-39 }
+bygroup_plot(scored, missed_wellbaby, states_death_restrictions)
+```
+
+```{r policy-state-40 }
+bygroup_ttest(scored, missed_wellbaby, states_death_restrictions)
+```
+
+
+## Missed vaccine{.tabset}
+
+```{r policy-state-41 }
+scored = scored %>%
+  mutate(missed_vaccine = case_when(
+    miss_vaccine.1 == 1 ~ "Yes",
+    miss_vaccine.2 == 1 ~ "Yes",
+    miss_vaccine.3 == 1 ~ "Yes",
+    miss_vaccine.4 == 1 ~ "Yes",
+    miss_vaccine.5 == 1 ~ "Yes",
+    !is.na(miss_vaccine.1) ~ "No",
+    !is.na(miss_vaccine.2) ~ "No",
+    !is.na(miss_vaccine.3) ~ "No",
+    !is.na(miss_vaccine.4) ~ "No",
+    !is.na(miss_vaccine.5) ~ "No",
+    missed_wellbaby == 0 ~ "No",
+    TRUE ~ NA_character_
+  ))
+
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(missed_vaccine)) %>%
+  group_by(missed_vaccine) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**[If yes missed well-baby] [asked for up to five children] Did they miss a scheduled vaccine at this visit?**
+
+Options:
+
+  - No $(N = `r pb.table[pb.table$missed_vaccine == "No","N"]`)$
+  - Yes $(N = `r pb.table[pb.table$missed_vaccine == "Yes","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+
+### By reopening status
+
+```{r policy-state-42 }
+bygroup_plot(scored, missed_vaccine, states_reopening_status)
+```
+
+```{r policy-state-43 }
+bygroup_ttest(scored, missed_vaccine, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-44 }
+bygroup_plot(scored, missed_vaccine, states_death_restrictions)
+```
+
+```{r policy-state-45 }
+bygroup_ttest(scored, missed_vaccine, states_death_restrictions)
+```
+
+
+**What prevented you from going to a well-baby checkup? [Select all that apply.]**
+
+Options:
+
+  - Cost $(N = `r pb_cat.table$missed_wb_cost`)$ 
+  - Unable to get time away from work $(N = `r pb_cat.table$missed_wb_time.away.from.work`)$ 
+  - Inability to find childcare $(N = `r pb_cat.table$missed_wb_inability.find.childcare`)$ 
+  - Concern over exposure to coronavirus (COVID-19) $(N = `r pb_cat.table$missed_wb_concern.for.covid`)$ 
+  - Caring for family members $(N = `r pb_cat.table$missed_wb_caring.for.family`)$ 
+  - Vaccine hesitancy $(N = `r pb_cat.table$missed_wb_vaccine.hesitancy`)$ 
+  - Other, please describe $(N = `r pb_cat.table$missed_wb_other`)$ 
+
+
+
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+```{r policy-state-46 }
+pb_vars = find_items("missed_wb", scored)
+pb_labels = pb_vars %>%
+  gsub("missed_wb_", "", .) %>%
+  gsub("\\.", " ", .) %>%
+  stringr::str_to_sentence()
+```
+
+### By reopening status
+
+```{r policy-state-47 }
+bygroup_c_plot(scored, pb_vars, pb_labels,  states_reopening_status)
+```
+
+```{r policy-state-48 }
+bygroup_c_ttest(scored, pb_vars, pb_labels, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-49 }
+bygroup_c_plot(scored, pb_vars, pb_labels, states_death_restrictions)
+```
+
+```{r policy-state-50 }
+bygroup_c_ttest(scored, pb_vars, pb_labels, states_death_restrictions)
+```
+
+# Basic Needs
+
+## Free food (currently){.tabset}
+
+```{r policy-state-51 }
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(free_food_cat)) %>%
+  group_by(free_food_cat) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**Do  you currently have access to free food for your household? Examples of free food include food pantries and programs, SNAP etc.**
+
+Options:
+
+  - Yes $(N = `r pb.table[pb.table$free_food_cat == "Yes","N"]`)$
+  - No, but I know where/how I can access free food resources $(N = `r pb.table[pb.table$free_food_cat == "No, know how","N"]`)$
+  - No, I am not eligible for free food resources $(N = `r pb.table[pb.table$free_food_cat == "No, not eligible","N"]`)$
+  - Unsure $(N = `r pb.table[pb.table$free_food_cat == "Unsure","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+
+### By reopening status
+
+```{r policy-state-52 }
+bygroup_plot(scored, free_food_cat, states_reopening_status)
+```
+
+```{r policy-state-53 }
+bygroup_ttest(scored, free_food_cat, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-54 }
+bygroup_plot(scored, free_food_cat, states_death_restrictions)
+```
+```{r policy-state-55 }
+bygroup_ttest(scored, free_food_cat, states_death_restrictions)
+```
+
+## Free Lunch (during-COVID){.tabset}
+
+```{r policy-state-56 }
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(free_lunch_now_cat)) %>%
+  group_by(free_lunch_now_cat) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**Prior to coronavirus (COVID-19), did you get free or reduced lunches for your child(ren)?**
+
+Options:
+
+- Yes, my child(ren) received free or reduced lunches $(N = `r pb.table[pb.table$free_lunch_now_cat == "Yes","N"]`)$
+- No, free or reduced lunches were not available for my children $(N = `r pb.table[pb.table$free_lunch_now_cat == "No, not available","N"]`)$
+- No, my child did not receive free or reduced lunches, but they were available $(N = `r pb.table[pb.table$free_lunch_now_cat == "No, but available","N"]`)$
+- No, free or reduced lunches were not available for my children $(N = `r pb.table[pb.table$free_lunch_now_cat == "Yes","N"]`)$
+- No, but I had planned on getting free or reduced lunches for my children soon $(N = `r pb.table[pb.table$free_lunch_now_cat == "No, planned","N"]`)$
+- No, I didn't know how to access this resource $(N = `r pb.table[pb.table$free_lunch_now_cat == "No, didn't know how","N"]`)$
+- Not applicable $(N = `r pb.table[pb.table$free_lunch_now_cat == "N/A","N"]`)$
+
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+### By reopening status
+
+```{r policy-state-57 }
+bygroup_plot(scored, free_lunch_now_cat, states_reopening_status)
+```
+
+```{r policy-state-58 }
+bygroup_ttest(scored, free_lunch_now_cat, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-59 }
+bygroup_plot(scored, free_lunch_now_cat, states_death_restrictions)
+```
+
+
+```{r policy-state-60 }
+bygroup_ttest(scored, free_lunch_now_cat, states_death_restrictions)
+```
+
+
+## Paying for basics{.tabset}
+
+```{r policy-state-61 }
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(difficulty_basics_cat)) %>%
+  group_by(difficulty_basics_cat) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+
+**In the past month, how hard has it been for you to pay for the very basics like food, housing, medical care, and heating?**
+
+Options:
+
+- Very hard $(N = `r pb.table[pb.table$difficulty_basics_cat == "Very hard","N"]`)$
+- Hard $(N = `r pb.table[pb.table$difficulty_basics_cat == "Hard","N"]`)$
+- Somewhat hard $(N = `r pb.table[pb.table$difficulty_basics_cat == "Somewaht hard","N"]`)$
+- Not very hard $(N = `r pb.table[pb.table$difficulty_basics_cat == "Not very hard","N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+
+### By reopening status
+
+```{r policy-state-62 }
+bygroup_plot(scored, difficulty_basics_cat, states_reopening_status)
+```
+
+```{r policy-state-63 }
+bygroup_ttest(scored, difficulty_basics_cat, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-64 }
+bygroup_plot(scored, difficulty_basics_cat, states_death_restrictions)
+```
+
+```{r policy-state-65 }
+bygroup_ttest(scored, difficulty_basics_cat, states_death_restrictions)
+```
+
+## Which needs{.tabset}
+
+```{r policy-state-66 }
+pb_cat.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  summarize_at(vars(contains("diff_pay_")), .funs = list(sum), na.rm=T)
+```
+
+
+**Which of these needs have been hard to pay for in the past month? [Select all that apply.]**
+
+Options:
+
+  - Food $(N = `r pb_cat.table$diff_pay_food`)$ 
+  - Housing $(N = `r pb_cat.table$diff_pay_house`)$ 
+  - Utilities (electric, water, trash) $(N = `r pb_cat.table$diff_pay_ultilities`)$ 
+  - Healthcare $(N = `r pb_cat.table$diff_pay_healthcare`)$ 
+  - Social $(N = `r pb_cat.table$diff_pay_social`)$ 
+  - Emotional $(N = `r pb_cat.table$diff_pay_emotional`)$ 
+  - Childcare $(N = `r pb_cat.table$diff_pay_childcare`)$ 
+  - Other $(N = `r pb_cat.table$diff_pay_other`)$ 
+
+
+
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+```{r policy-state-67 }
+pb_vars = find_items("diff_pay_", scored)
+pb_labels = pb_vars %>%
+  gsub("diff_pay_", "", .) %>%
+  stringr::str_to_sentence()
+```
+
+### By reopening status
+
+```{r policy-state-68 }
+bygroup_c_plot(scored, pb_vars, pb_labels, states_reopening_status)
+```
+
+```{r policy-state-69 }
+bygroup_c_ttest(scored, pb_vars, pb_labels, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-70 }
+bygroup_c_plot(scored, pb_vars, pb_labels, states_death_restrictions)
+```
+
+```{r policy-state-71 }
+bygroup_c_ttest(scored, pb_vars, pb_labels, states_death_restrictions)
+```
+
+
+## Material hardship{.tabset}
+
+```{r policy-state-72 }
+scored = scored %>%
+  rowwise() %>%
+  mutate(material_hardship = sum(c_across(starts_with("diff_pay")), na.rm=T))
+
+pb.table = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(material_hardship)) %>%
+  group_by(material_hardship) %>%
+  summarize(N = n()) %>%
+  as.data.frame()
+```
+
+**This variables was calculated by adding up the number of needs selected for the following question: Which of these needs have been hard to pay for in the past month? [Select all that apply.]**
+
+  - 0 $(N = `r pb.table[pb.table$material_hardship == 0,"N"]`)$
+  - 1 $(N = `r pb.table[pb.table$material_hardship == 1,"N"]`)$
+  - 2 $(N = `r pb.table[pb.table$material_hardship == 2,"N"]`)$
+  - 3 $(N = `r pb.table[pb.table$material_hardship == 3,"N"]`)$
+  - 4 $(N = `r pb.table[pb.table$material_hardship == 4,"N"]`)$
+  - 5 $(N = `r pb.table[pb.table$material_hardship == 5,"N"]`)$
+  - 6 $(N = `r pb.table[pb.table$material_hardship == 6,"N"]`)$
+  - 7 $(N = `r pb.table[pb.table$material_hardship == 7,"N"]`)$
+  - 8 $(N = `r pb.table[pb.table$material_hardship == 8,"N"]`)$
+  
+_Sample sizes are based on caregiver response at the most recent week of participation._
+
+For these analyses, we censor responses at 1 (creating a 1+ category).
+
+```{r policy-state-73 }
+scored = scored %>%
+  mutate(material_hardship = case_when(
+    material_hardship >= 1 ~ "1+",
+    !is.na(material_hardship) ~ as.character(material_hardship),
+    TRUE ~ NA_character_
+  ))
+
+scored$material_hardship_num = case_when(
+  scored$material_hardship == "0" ~ 0,
+  scored$material_hardship == "1+" ~ 1,
+  TRUE ~ NA_real_
+)
+```
+
+### By reopening status
+
+```{r policy-state-74 }
+bygroup_plot(scored, material_hardship, states_reopening_status)
+```
+
+```{r policy-state-75 }
+bygroup_ttest(scored, material_hardship, states_reopening_status)
+```
+
+### By restriction and risk
+
+```{r policy-state-76 }
+bygroup_plot(scored, material_hardship, states_death_restrictions)
+```
+
+```{r policy-state-77 }
+bygroup_ttest(scored, material_hardship, states_death_restrictions)
+```

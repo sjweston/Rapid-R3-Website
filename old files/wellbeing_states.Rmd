@@ -1,0 +1,787 @@
+---
+title: "Trajectories by states"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r wellbeing-states-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r wellbeing-states-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+library(lme4)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+library(emmeans)
+library(gganimate)
+library(stm)
+library(splines)
+```
+
+```{r wellbeing-states-3 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r wellbeing-states-4 }
+source(here("Functions/pomp.R"))
+source(here("Functions/spline_state level.R"))
+source(here("Functions/splines.R"))
+```
+
+```{r wellbeing-states-5 }
+replace_state = function(x){
+  if(x == "District of Columbia"){
+    "DC"
+  } else{
+    state.abb[grep(x, state.name, )][1]
+  }
+}
+```
+
+
+```{r wellbeing-states-6 }
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, stress, lonely, fussy, fear), pomp) %>%
+  rowwise() %>%
+  mutate(mental_health = mean(c(anxiety, depress, stress, lonely), na.rm=T)) %>%
+  ungroup()
+```
+
+```{r wellbeing-states-7, eval = F}
+github.location = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
+nyt_data = read_csv(url(github.location))
+nyt_data = nyt_data %>%
+  group_by(state) %>%
+  arrange(date) %>%
+  filter(!(state %in% c("Guam", "Northern Mariana Islands", "Puerto Rico", "Virgin Islands")),
+         date >= "2020-04-06") %>%
+  mutate(state_newcases = cases - lag(cases, default = cases[1]),
+         state_newdeaths = deaths - lag(deaths, default = deaths[1]),
+         state = map_chr(state, replace_state)) %>%
+  mutate(Week = (date - as.Date("2020-04-07")),
+         Week = as.numeric(floor(Week/7)+1)) %>%
+  group_by(state, Week) %>%
+  summarize_at(vars(contains("cases"), contains("deaths")), sum)
+
+scored = scored %>%
+  left_join(nyt_data)
+```
+
+```{r wellbeing-states-8 }
+scored = scored %>%
+  mutate(states_groups = case_when(
+    state %in% c("TX", "FL", "AZ") ~ "TX/FL/AZ",
+    state %in% c("ID", "WY", "MN") ~ "ID/WY/MN",
+    state %in% c("NY", "NJ") ~ "NY/NJ",
+    state == "CA" ~ "CA",
+    TRUE ~ NA_character_)) %>%
+  mutate(states_groups = as.factor(states_groups),
+         states_groups = relevel(states_groups, ref = "NY/NJ")) %>%
+   rowwise() %>%
+  mutate(material_hardship = sum(c_across(starts_with("diff_pay")), na.rm=T),
+         mh_d = ifelse(material_hardship >0 , 1, 0)) %>%
+  ungroup() 
+  
+```
+
+# Representativeness disclaimer
+
+```{r policy-state-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+# Splines at Week 3
+
+## By group{.tabset}
+
+### Caregiver mental health
+
+```{r wellbeing-states-9 }
+sp_week3 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 3)
+
+sp_week3$plot
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_caregiver_spline3.csv"))
+```
+
+```{r wellbeing-states-10, results = 'asis'}
+sp_week3$summary
+```
+
+### Anxiety
+
+```{r wellbeing-states-11 }
+sp_week3 = splines.groups(scored, outcome = anxiety, group = states_groups, point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-12, results = 'asis'}
+sp_week3$summary
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_anxiety_spline3.csv"))
+
+```
+
+### Depression
+
+```{r wellbeing-states-13 }
+sp_week3 = splines.groups(scored, outcome = depress, group = states_groups, point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-14, results = 'asis'}
+sp_week3$summary
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_depress_spline3.csv"))
+
+```
+
+### Stress
+
+```{r wellbeing-states-15 }
+sp_week3 = splines.groups(scored, outcome = stress, group = states_groups, point = 3)
+
+sp_week3$plot
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_stress_spline3.csv"))
+
+```
+
+```{r wellbeing-states-16, results = 'asis'}
+sp_week3$summary
+```
+
+### Loneliness
+
+```{r wellbeing-states-17 }
+sp_week3 = splines.groups(scored, outcome = lonely, group = states_groups, point = 3)
+
+sp_week3$plot
+
+sp_week3$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_lonely_spline3.csv"))
+
+```
+
+```{r wellbeing-states-18, results = 'asis'}
+sp_week3$summary
+```
+
+### Child externalizing
+
+```{r wellbeing-states-19 }
+sp_week3 = splines.groups(scored, outcome = fussy, group = states_groups, point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-20, results = 'asis'}
+sp_week3$summary
+```
+
+### Child internalizing
+
+```{r wellbeing-states-21 }
+sp_week3 = splines.groups(scored, outcome = fear, group = states_groups, point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-22, results = 'asis'}
+sp_week3$summary
+```
+
+
+
+## Moderated by material hardship{.tabset}
+
+
+### Caregiver mental health
+
+```{r wellbeing-states-23 }
+sp_week3 = splines.moderation(scored, outcome = mental_health, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-24, results = 'asis'}
+sp_week3$summary
+```
+
+### Anxiety
+
+```{r wellbeing-states-25 }
+sp_week3 = splines.moderation(scored, outcome = anxiety, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-26, results = 'asis'}
+sp_week3$summary
+```
+
+### Depression
+
+```{r wellbeing-states-27 }
+sp_week3 = splines.moderation(scored, outcome = depress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-28, results = 'asis'}
+sp_week3$summary
+```
+
+### Stress
+
+```{r wellbeing-states-29 }
+sp_week3 = splines.moderation(scored, outcome = stress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-30, results = 'asis'}
+sp_week3$summary
+```
+
+### Loneliness
+
+```{r wellbeing-states-31 }
+sp_week3 = splines.moderation(scored, outcome = lonely, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-32, results = 'asis'}
+sp_week3$summary
+```
+
+### Child externalizing
+
+```{r wellbeing-states-33 }
+sp_week3 = splines.moderation(scored, outcome = fussy, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-34, results = 'asis'}
+sp_week3$summary
+```
+
+### Child internalizing
+
+```{r wellbeing-states-35 }
+sp_week3 = splines.moderation(scored, outcome = fear, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 3)
+
+sp_week3$plot
+```
+
+```{r wellbeing-states-36, results = 'asis'}
+sp_week3$summary
+```
+
+
+
+# Splines at Week 7
+
+## Overall{.tabset}
+
+### Caregiver mental health
+
+```{r wellbeing-states-37 }
+sp_week7 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-38, results = 'asis'}
+sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_caregiver_spline7.csv"))
+
+```
+
+### Anxiety
+
+```{r wellbeing-states-39 }
+sp_week7 = splines.groups(scored, outcome = anxiety, group = states_groups, point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-40, results = 'asis'}
+sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_anxiety_spline7.csv"))
+```
+
+### Depression
+
+```{r wellbeing-states-41 }
+sp_week7 = splines.groups(scored, outcome = depress, group = states_groups, point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-42, results = 'asis'}
+sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_depress_spline7.csv"))
+```
+
+### Stress
+
+```{r wellbeing-states-43 }
+sp_week7 = splines.groups(scored, outcome = stress, group = states_groups, point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-44, results = 'asis'}
+sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_stress_spline7.csv"))
+```
+
+### Loneliness
+
+```{r wellbeing-states-45 }
+sp_week7 = splines.groups(scored, outcome = lonely, group = states_groups, point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-46, results = 'asis'}
+sp_week7$summary
+
+sp_week7$pdata %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(., file = here("figure data/07232020_lonely_spline7.csv"))
+```
+
+```{r}
+sp_week7$plotdata %>%
+  mutate(dot = round(m,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, dot) %>%
+  write.csv(file = here("figure data/07-24-2020_lonely_dots.csv"))
+```
+
+
+### Child externalizing
+
+```{r wellbeing-states-47 }
+sp_week7 = splines.groups(scored, outcome = fussy, group = states_groups, point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-48, results = 'asis'}
+sp_week7$summary
+```
+
+### Child internalizing
+
+```{r wellbeing-states-49 }
+sp_week7 = splines.groups(scored, outcome = fear, group = states_groups, point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-50, results = 'asis'}
+sp_week7$summary
+```
+
+
+
+
+
+## Moderated by material hardship{.tabset}
+
+### Caregiver mental health
+
+```{r wellbeing-states-51 }
+sp_week7 = splines.moderation(scored, outcome = mental_health, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-52, results = 'asis'}
+sp_week7$summary
+```
+
+### Anxiety
+
+```{r wellbeing-states-53 }
+sp_week7 = splines.moderation(scored, outcome = anxiety, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-54, results = 'asis'}
+sp_week7$summary
+```
+
+### Depression
+
+```{r wellbeing-states-55 }
+sp_week7 = splines.moderation(scored, outcome = depress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-56, results = 'asis'}
+sp_week7$summary
+```
+
+### Stress
+
+```{r wellbeing-states-57 }
+sp_week7 = splines.moderation(scored, outcome = stress, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-58, results = 'asis'}
+sp_week7$summary
+```
+
+### Loneliness
+
+```{r wellbeing-states-59 }
+sp_week7 = splines.moderation(scored, outcome = lonely, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-60, results = 'asis'}
+sp_week7$summary
+```
+
+### Child externalizing
+
+```{r wellbeing-states-61 }
+sp_week7 = splines.moderation(scored, outcome = fussy, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-62, results = 'asis'}
+sp_week7$summary
+```
+
+### Child internalizing
+
+```{r wellbeing-states-63 }
+sp_week7 = splines.moderation(scored, outcome = fear, group = states_groups, m = mh_d, m.labels = c("No Hardship", "1+ Hardship"), point = 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-64, results = 'asis'}
+sp_week7$summary
+```
+
+<!-- # All splines{.tabset} -->
+
+<!-- ## Caregiver mental health -->
+
+<!-- ```{r} -->
+<!-- max.week= max(scored$Week) -->
+
+<!-- spline.df = data.frame( -->
+<!--   spline = c(1:max.week-1) -->
+<!-- ) -->
+<!-- spline.df$data = rep(list(scored), nrow(spline.df)) -->
+
+<!-- spline.df = spline.df %>% -->
+<!--   mutate(mod = map2(data, spline, .f = function(x,y) splines.groups(data = x,  -->
+<!--                                                                           outcome = mental_health,  -->
+<!--                                                                           group = states_groups,  -->
+<!--                                                                           point = y))) %>% -->
+<!--   mutate(mod = map(mod, "plotdata")) %>% -->
+<!--   select(spline, mod) %>% -->
+<!--   unnest(cols = c(mod)) %>% -->
+<!--   mutate(spline = as.integer(spline)) -->
+
+
+<!-- ggplot(spline.df, aes(Week, colour = states_groups)) + -->
+<!--   geom_point(aes(y = mental_health), alpha = 0.5) + -->
+<!--   geom_line(aes(y = pred)) + -->
+<!--   scale_colour_brewer("Groups", palette = "Set2") + -->
+<!--   scale_x_continuous(breaks = c(1:max.week))+ -->
+<!--   facet_grid(states_groups~., scales = "free")+ -->
+<!--   theme_pubclean() + -->
+<!--   # Here comes the gganimate specific bits -->
+<!--   labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') + -->
+<!--   transition_time(spline) + -->
+<!--   ease_aes('linear') -->
+<!-- ``` -->
+
+<!-- ## Child Externalizing -->
+
+<!-- ```{r} -->
+<!-- max.week= max(scored$Week) -->
+
+<!-- spline.df = data.frame( -->
+<!--   spline = c(1:max.week-1) -->
+<!-- ) -->
+<!-- spline.df$data = rep(list(scored), nrow(spline.df)) -->
+
+<!-- spline.df = spline.df %>% -->
+<!--   mutate(mod = map2(data, spline, .f = function(x,y) splines.groups(data = x,  -->
+<!--                                                                           outcome = fussy,  -->
+<!--                                                                           group = states_groups,  -->
+<!--                                                                           point = y))) %>% -->
+<!--   mutate(mod = map(mod, "plotdata")) %>% -->
+<!--   select(spline, mod) %>% -->
+<!--   unnest(cols = c(mod)) %>% -->
+<!--   mutate(spline = as.integer(spline)) -->
+
+
+<!-- ggplot(spline.df, aes(Week, colour = states_groups)) + -->
+<!--   geom_point(aes(y = fussy), alpha = 0.5) + -->
+<!--   geom_line(aes(y = pred)) + -->
+<!--   scale_colour_brewer("Groups", palette = "Set2") + -->
+<!--   scale_x_continuous(breaks = c(1:max.week))+ -->
+<!--   facet_grid(states_groups~., scales = "free")+ -->
+<!--   theme_pubclean() + -->
+<!--   # Here comes the gganimate specific bits -->
+<!--   labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') + -->
+<!--   transition_time(spline) + -->
+<!--   ease_aes('linear') -->
+<!-- ``` -->
+
+<!-- ## Child Internalizing -->
+
+<!-- ```{r} -->
+<!-- max.week= max(scored$Week) -->
+
+<!-- spline.df = data.frame( -->
+<!--   spline = c(1:max.week-1) -->
+<!-- ) -->
+<!-- spline.df$data = rep(list(scored), nrow(spline.df)) -->
+
+<!-- spline.df = spline.df %>% -->
+<!--   mutate(mod = map2(data, spline, .f = function(x,y) splines.groups(data = x,  -->
+<!--                                                                           outcome = fear,  -->
+<!--                                                                           group = states_groups,  -->
+<!--                                                                           point = y))) %>% -->
+<!--   mutate(mod = map(mod, "plotdata")) %>% -->
+<!--   select(spline, mod) %>% -->
+<!--   unnest(cols = c(mod)) %>% -->
+<!--   mutate(spline = as.integer(spline)) -->
+
+
+<!-- ggplot(spline.df, aes(Week, colour = states_groups)) + -->
+<!--   geom_point(aes(y = fear), alpha = 0.5) + -->
+<!--   geom_line(aes(y = pred)) + -->
+<!--   scale_colour_brewer("Groups", palette = "Set2") + -->
+<!--   scale_x_continuous(breaks = c(1:max.week))+ -->
+<!--   facet_grid(states_groups~., scales = "free")+ -->
+<!--   theme_pubclean() + -->
+<!--   # Here comes the gganimate specific bits -->
+<!--   labs(title = 'Spline set at {frame_time}', x = 'Week', y = 'Mental Health') + -->
+<!--   transition_time(spline) + -->
+<!--   ease_aes('linear') -->
+<!-- ``` -->
+
+<!-- # Caregiver Splines at Week 3{.tabset} -->
+
+<!-- ## Caregiver mental health -->
+
+<!-- ```{r} -->
+<!-- sp_week3 = splines.groups(scored, outcome = mental_health, group = states_groups, point = 3) -->
+
+<!-- sp_week3$plot -->
+<!-- ``` -->
+
+<!-- ```{r, results = 'asis'} -->
+<!-- sp_week3$summary -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- master_open = master %>% -->
+<!--   select(CaregiverID, Week, contains("OPEN")) %>% -->
+<!--   filter(!is.na(Week)) %>% -->
+<!--   filter(OPEN.001 != "") -->
+
+<!-- processed <- textProcessor(master_open$OPEN.001, metadata = master_open) -->
+<!-- out <- prepDocuments(processed$documents, processed$vocab, processed$meta) -->
+<!-- docs <- out$documents -->
+<!-- vocab <- out$vocab -->
+<!-- meta <- out$meta -->
+
+<!-- poliblogPrev <- stm(documents = out$documents, vocab = out$vocab, -->
+<!--                     K = 20, prevalence =~ s(Week), data = out$meta,  -->
+<!--                     init.type = "Spectral") -->
+<!-- ``` -->
+
+
+# Two splines
+
+## Overall{.tabset}
+
+### Caregiver mental health
+
+```{r wellbeing-states-65 }
+sp_week7 = splines2.groups(scored, outcome = mental_health, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-66, results = 'asis'}
+sp_week7$summary
+```
+
+```{r}
+sp_week7$pdata %>%
+  mutate(fit = round(fit,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(file = here("figure data/07-24-2020_caregiver-mental-health.csv"))
+```
+
+```{r}
+sp_week7$plotdata %>%
+  mutate(dot = round(m,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, dot) %>%
+  write.csv(file = here("figure data/07-24-2020_caregiver-mental-health_dots.csv"))
+```
+
+### Anxiety
+
+```{r wellbeing-states-67 }
+sp_week7 = splines2.groups(scored, outcome = anxiety, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-68, results = 'asis'}
+sp_week7$summary
+```
+
+### Depression
+
+```{r wellbeing-states-69 }
+sp_week7 = splines2.groups(scored, outcome = depress, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-70, results = 'asis'}
+sp_week7$summary
+```
+
+### Stress
+
+```{r wellbeing-states-71 }
+sp_week7 = splines2.groups(scored, outcome = stress, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-72, results = 'asis'}
+sp_week7$summary
+```
+
+### Loneliness
+
+```{r wellbeing-states-73 }
+sp_week7 = splines2.groups(scored, outcome = lonely, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-74, results = 'asis'}
+sp_week7$summary
+```
+```{r}
+sp_week7$pdata %>%
+  mutate(fit = round(fit,2)) %>%
+  filter(states_groups %in% c("NY/NJ", "TX/FL/AZ")) %>%
+  ungroup() %>%
+  select(Week, states_groups, fit) %>%
+  write.csv(file = here("figure data/07-24-2020_caregiver-loneliness.csv"))
+```
+
+### Child externalizing
+
+```{r wellbeing-states-75 }
+sp_week7 = splines2.groups(scored, outcome = fussy, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-76, results = 'asis'}
+sp_week7$summary
+```
+
+### Child internalizing
+
+```{r wellbeing-states-77 }
+sp_week7 = splines2.groups(scored, outcome = fear, group = states_groups, 3, 7)
+
+sp_week7$plot
+```
+
+```{r wellbeing-states-78, results = 'asis'}
+sp_week7$summary
+```
+
+

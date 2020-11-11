@@ -1,0 +1,400 @@
+---
+title: "Material Hardship follow-up"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+```{r usda-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=10)
+options(knitr.kable.NA = '')
+```
+
+```{r usda-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r mh-followup-1}
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+```
+
+
+```{r usda-3 }
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+source(here("Functions/state_policy_fun.R"))
+cutoffv = 1
+```
+
+Material hardship is assesssed with the following question: 
+_Which needs are hard to pay for? Check all that apply:_
+  - _Food_
+  - _Housing_
+  - _Utilities (electric, water, trash)_
+  - _Healthcare_
+  - _Social_
+  - _Emotional_
+  - _Childcare_
+  - _Other_
+
+# Representativeness disclaimer
+
+```{r usda-14 }
+scored = scored %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week, 
+    (Week %% 2) == 0 ~ NA_real_,
+    TRUE ~ Week)) %>%
+  filter(!is.na(Week)) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date))) %>%
+  ungroup()  %>%
+  #filter(Date < "2020-07-8") %>%
+  mutate(poverty_cat = ifelse(poverty150 == 1, "Below 1.5 x FPL", "Out of poverty"))
+
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+
+# Has hardship{.tabset}
+
+
+Caregivers grouped into two categories: trouble paying for 1+ basic need, or no trouble paying for any.
+
+For these analyses, data collected in even numbered weeks starting in August were merged with data in the previous week -- this was due to a shift to a recruitment strategy that prioritized recruiting underrepresented communities and marginalized caregivers every other week.
+
+## Overall{.tabset}
+
+### All
+
+```{r mh-followup-2}
+plot = scored %>%
+  filter(!is.na(material_hardship)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  group_by(material_hardship) %>%
+  summarize(n = n()) %>%
+  mutate(percent = n/sum(n),
+         moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = material_hardship, 
+             y = percent, 
+             fill = as.factor(material_hardship),
+             text = paste0(round(percent, 1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .3) +
+  scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) +
+  guides(fill = F) +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers experiencing material hardship") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+
+### Race/ethnicity
+
+```{r mh-followup-3}
+policy_binary(race_ethnic, material_hardship)
+```
+
+### Race by income
+
+```{r mh-followup-4}
+policy_binary(race_poverty, material_hardship)
+```
+
+### Single 
+
+```{r mh-followup-5}
+policy_binary(single_cat, material_hardship)
+```
+
+## Over time{.tabset}
+
+### All
+
+```{r mh-followup-6}
+plot = scored %>%
+  filter(Week > 0) %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            hardship = sum(material_hardship)/count) %>%
+  mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+  mutate_at(vars(hardship, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = hardship, 
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)
+             ),
+             group = 1)) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Race/ethnicity
+
+```{r mh-followup-7}
+time_policy_binary(race_ethnic, material_hardship)
+```
+
+### Race by income
+
+```{r mh-followup-8}
+time_binary_group(race_poverty, material_hardship, poverty_cat)
+```
+
+### Single 
+
+```{r mh-followup-9}
+time_policy_binary(single_cat, material_hardship)
+```
+
+
+# Source of hardship{.tabset}
+
+## Overall{.tabset}
+
+### All
+
+```{r mh-followup-10}
+plot = scored %>%
+  gather(category, response, starts_with("diff_pay")) %>%
+  mutate(category = str_remove(category, "diff_pay_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(category) %>%
+  summarize(
+    n = n(),
+    percent = mean(response)) %>%
+  mutate(moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(
+    x = reorder(category, desc(percent)), 
+    y = percent, 
+    fill = percent,
+    text = paste0(round(percent,1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .2) +
+  coord_flip() +
+  labs(x = NULL, y = NULL, fill = NULL, title = "Percent of households having difficulty paying for:") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Race/ethnicty
+
+```{r mh-followup-11}
+scored_diff = scored %>%
+  gather(category, response, starts_with("diff_pay")) %>%
+  mutate(category = str_remove(category, "diff_pay_"))
+
+group_categorical_long(race_ethnic, category, response, scored_diff)
+```
+
+### Race by income
+
+```{r mh-followup-12}
+group_categorical_long(race_poverty, category, response, scored_diff)
+```
+
+### Single
+
+```{r mh-followup-13}
+group_categorical_long(single_cat, category, response, scored_diff)
+```
+
+
+## Over time{.tabset}
+
+### All
+
+```{r mh-followup-14}
+plot = scored_diff %>%
+  gather(category, response, starts_with("diff_pay")) %>%
+  filter(!is.na(response)) %>%
+  group_by(Date, category) %>%
+  summarize(
+    n = n(),
+    percent = 100*mean(response)) %>%
+  ggplot(aes(x = Date, y = percent, 
+             color = category,
+             group = 1,
+             text = paste0(
+               "Count: ", n
+             ))) +
+  geom_point() + 
+  geom_line() +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+
+```
+
+### Race/ethnicity
+
+```{r mh-followup-15}
+time_group_cat_long(race_ethnic, category, response, 
+                    data = filter(scored_diff, category %in% c("house", "utilities", "food")))
+```
+
+
+### Race x income
+
+```{r mh-followup-16}
+time_group_cat_long(race_poverty, category, response, 
+                    data = filter(scored_diff, category %in% c("house", "utilities", "food")))
+```
+
+### Single
+
+```{r mh-followup-17}
+time_group_cat_long(single_cat, category, response, 
+                    data = filter(scored_diff, category %in% c("house", "utilities", "food")))
+```
+
+# Number of hardships
+
+## Overall{.tabset}
+
+### All
+
+```{r mh-followup-18}
+plot = scored %>%
+  filter(!is.na(num_hardship)) %>%
+  group_by(CaregiverID) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup() %>%
+  group_by(num_hardship) %>%
+  summarize(n = n()) %>%
+  mutate(percent = n/sum(n),
+         moe = map2_dbl(percent, n, moe.p)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  ggplot(aes(x = num_hardship, 
+             y = percent, 
+             fill = as.factor(num_hardship),
+             text = paste0(round(percent, 1), "%"))) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(ymin = percent-moe, 
+                    ymax = percent + moe), 
+                width = .3) +
+  #scale_x_continuous(breaks = c(0, 1), labels = c("No", "Yes")) +
+  guides(fill = F) +
+  labs(x = NULL, y = NULL, title = "Percent of caregivers experiencing material hardship") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+
+### Race/ethnicity
+
+```{r mh-followup-19}
+policy_cont(race_ethnic, num_hardship)
+```
+
+### Race by income
+
+```{r mh-followup-20}
+policy_cont(race_poverty, num_hardship)
+```
+
+### Single
+
+```{r mh-followup-21}
+policy_cont(single_cat, num_hardship)
+```
+
+## Over time{.tabset}
+
+### All
+
+```{r mh-followup-22}
+plot = scored %>%
+  filter(Week > 0) %>%
+  filter(!is.na(num_hardship)) %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            hardship = mean(num_hardship), 
+            sd = sd(num_hardship)) %>%
+  mutate(moe = sd/sqrt(count)*qt(.975, count-1)) %>%
+  ggplot(aes(x = Date, 
+             y = hardship, 
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)
+             ),
+             group = 1)) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, title = "Average number of hardships by week") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+### Race/ethnicity
+
+```{r mh-followup-23}
+time_policy_cont(race_ethnic, num_hardship)
+```
+
+### Race by income
+
+```{r mh-followup-24}
+time_policy_cont(race_poverty, num_hardship)
+```
+
+### Single
+
+```{r mh-followup-25}
+time_policy_cont(single_cat, num_hardship)
+```

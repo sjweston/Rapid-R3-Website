@@ -1,0 +1,300 @@
+---
+title: "Trends with data from all weekly surveys to date"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+  
+---
+
+```{r change-over-time-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(haven)
+# require(devtools)
+# install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(zipcode)
+library(ggthemr)
+```
+
+
+```{r score datafile, echo = F, warning = F, message = F}
+# score master --------------------------------------------------------
+
+source(here("Scripts/score data.R"))
+```
+
+```{r change-over-time-2}
+total_weeks = max(scored$Week, na.rm=T)
+```
+
+
+```{r change-over-time-3}
+long_data = scored %>%
+  select(CaregiverID, Week, contains("_pre"), contains("_current")) %>%
+  select(CaregiverID, Week, contains("some"), contains("lots")) %>%
+  gather("key", "value", -CaregiverID, -Week) %>%
+  separate(key, into = c("Variable", "time", "Amount")) %>%
+  mutate(Week = ifelse(time == "pre", 0, Week)) %>%
+  select(-time) %>%
+  group_by(Variable, Week, Amount) %>%
+  filter(!is.na(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100)
+```
+
+# Parent mental health {.tabset}
+
+## Some problems
+```{r change-over-time-4}
+long_data %>%
+  filter(Variable %in% c("anxiety", "depress", "stress", "lonely")) %>%
+  filter(Amount == "some") %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line() +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+  scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+  
+```
+
+## A lot of problems
+```{r change-over-time-5}
+long_data %>%
+  filter(Variable %in% c("anxiety", "depress", "stress", "lonely")) %>%
+  filter(Amount == "lots") %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line() +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+```
+
+# Child mental health {.tabset}
+
+## Some problems
+```{r change-over-time-6}
+long_data%>%
+  filter(Variable %in% c("fear", "fussy")) %>%
+  filter(Amount == "some") %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line() +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+```
+
+
+## A lot of problems
+```{r change-over-time-7}
+long_data%>%
+  filter(Variable %in% c("fear", "fussy")) %>%
+  filter(Amount == "lots") %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line() +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+```
+
+# Family mental health {.tabset}
+
+## Some problems
+```{r change-over-time-8}
+long_data %>%
+  filter(Variable %in% c("anxiety", "depress", "stress", "lonely", "fear", "fussy")) %>%
+  filter(Amount == "some") %>%
+  mutate(Person = ifelse(Variable %in% c("fear", "fussy"), "Child", "Parent")) %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line(aes(linetype = Person)) +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+```
+
+
+## A lot of problems
+```{r change-over-time-9}
+long_data %>%
+  filter(Variable %in% c("anxiety", "depress", "stress", "lonely", "fear", "fussy")) %>%
+  filter(Amount == "lots") %>%
+  mutate(Person = ifelse(Variable %in% c("fear", "fussy"), "Child", "Parent")) %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line(aes(linetype = Person)) +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+```
+
+# Parenting 
+
+```{r change-over-time-10}
+scored %>%
+  select(CaregiverID, Week, contains("handle"), contains("support")) %>%
+  gather("key", "value", -CaregiverID, -Week) %>%
+  separate(key, into = c("Variable", "time")) %>%
+  mutate(Week = ifelse(time == "pre", 0, Week)) %>%
+  select(-time) %>%
+  group_by(Variable, Week) %>%
+  filter(!is.na(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100) %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line() +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+```
+
+# Employment and insurance {.tabset}
+
+## By income
+
+```{r change-over-time-11}
+employment = scored %>%
+  filter(!is.na(poverty_cat)) %>%
+  select(Week, contains("working"), poverty_cat) %>%
+  gather("key", "value", -Week, -poverty_cat) %>%
+  separate(key, into = c("Variable", "time")) %>%
+  mutate(Week = ifelse(time == "pre", 0, Week)) %>%
+  select(-time) %>%
+  group_by(Week, poverty_cat) %>%
+    mutate(value = as.numeric(value)) %>%
+  filter(!is.na(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100) %>%
+  mutate(Variable = "working")
+
+insurance = scored %>%
+  filter(!is.na(poverty_cat)) %>%
+  select(Week, contains("insurance"), poverty_cat) %>%
+  gather("Variable", "value", -Week, -poverty_cat) %>%
+  group_by(Variable, Week, poverty_cat) %>%
+  mutate(value = as.numeric(value)) %>%
+  filter(!is.na(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100) %>%
+  ungroup()%>%
+  mutate(Variable = gsub("^ins", "parent_insurance", Variable))
+
+full_join(employment, insurance) %>%
+  ggplot(aes(x = Week, y = percent, color = Variable)) +
+  geom_point(size = 2) +
+  geom_line(aes(linetype = poverty_cat)) +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100), breaks = seq(0,100,by = 10))+
+  theme_minimal()
+```
+
+
+## By region
+
+```{r change-over-time-12}
+
+employment = scored %>%
+  select(Week, contains("working"), region) %>%
+  gather("key", "value", -Week, -region) %>%
+  separate(key, into = c("Variable", "time")) %>%
+  mutate(Week = ifelse(time == "pre", 0, Week)) %>%
+  select(-time) %>%
+  group_by(Week, region) %>%
+  mutate(value = as.numeric(value)) %>%
+  filter(!is.na(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100) %>%
+  mutate(Variable = "working")
+
+insurance = scored %>%
+  select(Week, contains("insurance"), region) %>%
+  gather("Variable", "value", -Week, -region) %>%
+  group_by(Variable, Week, region) %>%
+  mutate(value = as.numeric(value)) %>%
+  filter(!is.na(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100) %>%
+  ungroup()%>%
+  mutate(Variable = gsub("^ins", "parent_insurance", Variable))
+
+full_join(employment, insurance) %>%
+  filter(!is.na(region)) %>%
+  mutate(category = ifelse(grepl("insur", Variable), "Insurance", "Employment")) %>%
+  ggplot(aes(x = Week, y = percent, color = region)) +
+  geom_point(aes(shape = Variable), size = 2) +
+  geom_line(aes(linetype = Variable)) +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(50,100), breaks = seq(50,100,by = 10))+
+  facet_grid(category~.)+
+  theme_minimal()
+```
+
+## By demo
+
+```{r change-over-time-13}
+
+employment = scored %>%
+  select(Week, contains("working"), disability, essential, single, latinx, black) %>%
+  gather("key", "value", which(grepl("working", names(.)))) %>%
+  gather("demo", "demo_value", disability, essential, single, latinx, black) %>%
+  filter(demo_value == 1) %>%
+  separate(key, into = c("Variable", "time")) %>%
+  mutate(Week = ifelse(time == "pre", 0, Week)) %>%
+  select(-time) %>%
+  group_by(Week, demo) %>%
+  filter(!is.na(value)) %>%
+  mutate(value = as.numeric(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100) %>%
+  mutate(Variable = "working")
+
+insurance = scored %>%
+  select(Week, contains("insurance"), disability, essential, single, latinx, black) %>%
+  gather("Variable", "value", which(grepl("insurance", names(.)))) %>%
+  gather("demo", "demo_value", disability, essential, single, latinx, black) %>%
+  filter(demo_value == 1) %>%
+  group_by(Variable, Week, demo) %>%
+  filter(!is.na(value)) %>%
+  mutate(value = as.numeric(value)) %>%
+  summarize(total = n(),
+            perc = sum(value)/total,
+            percent = perc*100) %>%
+  ungroup()%>%
+  mutate(Variable = gsub("^ins", "parent_insurance", Variable))
+
+full_join(employment, insurance) %>%
+  mutate(demo = factor(demo, 
+                       levels = c("disability", "essential", "single", "latinx", "black"),
+                       labels = c("Caregivers of children with disabilities", "Essential Employees", 
+                                  "Single parents/caregivers", 
+                                  "Latinx parents/caregivers", 
+                                  "African American parents/caregivers"))) %>%
+  ggplot(aes(x = Week, y = percent, color = demo)) +
+  geom_point(aes(shape = Variable), size = 2) +
+  geom_line(aes(linetype = Variable)) +
+  scale_x_continuous(breaks = c(0:total_weeks))+
+  scale_y_continuous(limits = c(50,100), breaks = seq(50,100,by = 10))+
+  facet_grid(Variable~.)+
+  theme_minimal()
+```
+
+

@@ -1,0 +1,1471 @@
+---
+title: "Rising COVID cases in the fall"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r winter-is-coming-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r winter-is-coming-2 }
+library(here)
+library(tidyverse)
+library(ggpubr)
+library(plotly)
+
+by.Date = FALSE
+change_scores = TRUE
+
+by.Season = !by.Date
+```
+
+# NYT heatmap{.tabset}
+
+```{r winter-is-coming-3 }
+pop_est = read.csv(here("data/co-est2019-alldata.csv"), stringsAsFactors = F)
+pop_est = pop_est %>%
+  group_by(STNAME) %>%
+  summarize(population = sum(POPESTIMATE2019)) %>%
+  rename(state = STNAME)
+
+copyNYTcolors = c("#F2DF91", "#F9C467", "#FFA83E", "#FF8B24", 
+                  "#FD6A0B", "#F04F09", "#E13107", "#CE0A05")
+
+
+github.location = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
+nyt_data = read_csv(url(github.location))
+nyt_data = nyt_data %>%
+  group_by(state) %>%
+  arrange(date) %>%
+  mutate(new_cases = ifelse(row_number() == 1, cases, 
+                            cases - lag(cases, default = cases[1])),
+         sinceMar1 = as.numeric(date-as.Date("2020-03-01")),
+         period_weeks = floor(sinceMar1/7),
+         period_2weeks = floor(sinceMar1/17)) %>%
+  filter(new_cases >= 0) %>%
+  filter(date >= "2020-03-01") %>%
+  filter(date < "2020-10-24") %>%
+  group_by(state, period_weeks) %>%
+  summarize(new_cases = sum(new_cases)) %>%
+  full_join(pop_est) %>%
+  filter(!is.na(population)) %>%
+  filter(new_cases > 0) %>%
+  ungroup() %>%
+  mutate(cases = map2_dbl(new_cases, population, ~.x/.y*100000)) 
+```
+
+## Heat relative to sample
+
+```{r winter-is-coming-4, fig.height=10}
+plot_data = nyt_data %>%
+  mutate(case_factor = as.numeric(cut_number(cases, 8))) %>%
+  ungroup() %>%
+  mutate(case_factor = factor(case_factor))
+
+plot_data = plot_data %>%
+  group_by(state) %>%
+  filter(period_weeks == max(period_weeks)) %>%
+  select(state, cases) %>%
+  rename(most_recent = cases) %>%
+  full_join(plot_data) 
+
+plot_data %>%
+  ggplot(aes(x = period_weeks, y = reorder(state, most_recent), fill = case_factor)) +
+  geom_tile(color = "#F7F2DE") + 
+  scale_fill_manual(values = c(copyNYTcolors)) +
+  labs(x = NULL, y = NULL, fill = "Cases per 100,000 over past week") +
+  guides(fill = F) +
+  cowplot::theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+## Heat relative to week
+
+```{r winter-is-coming-5, fig.height=10}
+plot_data = nyt_data %>%
+  group_by(period_weeks) %>%
+  mutate(case_factor = as.numeric(cut_number(cases, 8))) %>%
+  ungroup() %>%
+  mutate(case_factor = factor(case_factor))
+
+plot_data = plot_data %>%
+  group_by(state) %>%
+  filter(period_weeks == max(period_weeks)) %>%
+  select(state, cases) %>%
+  rename(most_recent = cases) %>%
+  full_join(plot_data) 
+
+plot_data %>%
+  ggplot(aes(x = period_weeks, y = reorder(state, most_recent), fill = case_factor)) +
+  geom_tile(color = "#F7F2DE") + 
+  scale_fill_manual(values = c(copyNYTcolors)) +
+  labs(x = NULL, y = NULL, fill = "Cases per 100,000 over past week") +
+  guides(fill = F) +
+  cowplot::theme_cowplot() +
+  theme(legend.position = "top")
+```
+
+# State groups{.tabset}
+
+## Group definitions{.tabset}
+Based on NYT groups (October 24, 2020):
+
+### Where new cases are higher and staying high
+
+* North Dakota
+* South Dakota
+* Wisconsin
+* Montana
+* Idaho
+* Wyoming
+* Utah
+* Nebraska
+* Iowa
+* Tennessee
+* Illinois
+* Alaska
+* Oklahoma
+* Rhode Island
+* Arkansas
+* New Mexico
+* Indiana
+* Missouri
+* Minnesota
+* Kentucky
+* Kansas
+* Alabama
+* Mississippi
+* Nevada
+* Michigan
+* Colorado
+* Texas
+* North Carolina
+* Ohio
+* South Carolina
+* Florida
+* Georgia
+* West Virginia
+
+### Where new cases are lower and going up
+
+* New Jersey
+* Massachusetts
+* Pennsylvania
+* Connecticut
+* Arizona
+* California
+* Washington
+* New Hampshire
+* Vermont
+
+### Where new cases are lower and staying low
+
+* Louisiana
+* Delaware
+* Virginia
+* Maryland
+* Oregon
+* New York
+* Washington D.C.
+* Hawaii
+* Maine
+
+```{r winter-is-coming-6 }
+source(here("Scripts/score data.R"))
+scored = scored %>%
+  mutate(covid_groups = case_when(
+    state %in% c("LA", "DE", "MD", "OR", "NY", "DC", "HI", "ME") ~ "Low, stable",
+    state %in% c("NJ", "MA", "PA", "CT", "AZ", "CA", "WA", "NH", "VT") ~ "Low, rising",
+    !is.na(state) ~ "High, stable",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(covid_groups))
+
+scored = scored %>%
+  filter(!is.nan(child_mental) & !is.nan(mental_health)) %>%
+  mutate(wellbeing = 100-mental_health,
+         child_wellbeing = 100-child_mental) 
+```
+
+```{r winter-is-coming-7, eval = change_scores}
+wb_vars = c("mental_health", "child_mental",
+            "anxiety", "depress", "stress", "lonely",
+            "fussy", "fear", "wellbeing", "child_wellbeing")
+
+# calculate each person's deviation from their pre-pandemic score
+
+prepan = scored %>%
+  filter(Week == 0) %>%
+  select(CaregiverID, all_of(wb_vars)) %>%
+  rename_at(all_of(wb_vars), ~paste0(.x, "_pre"))
+
+scored = full_join(scored, prepan)
+
+new_scores = scored %>%
+  select(CaregiverID, Week, all_of(c(wb_vars, paste0(wb_vars, "_pre")))) %>%
+  gather(variable, value, -CaregiverID, -Week) %>%
+  mutate(time = ifelse(str_detect(variable, "_pre"), "pre", "post")) %>%
+  mutate(variable = str_remove(variable, "_pre")) %>%
+  spread(time, value) %>%
+  mutate(value = map2_dbl(post, pre, ~.x-.y)) %>%
+  select(-post, -pre) %>%
+  spread(variable, value) 
+
+scored = scored %>%
+  select(-all_of(c(wb_vars, paste0(wb_vars, "_pre")))) %>%
+  full_join(new_scores) 
+
+```
+
+```{r winter-is-coming-8}
+scored = scored %>%
+  filter(Week != 0) %>%
+  # group_by(CaregiverID) %>%
+  # mutate_at(vars(mental_health, child_mental, wellbeing, child_wellbeing, anxiety, depress, stress, lonely, fear, fussy), ~.x-mean(.x)) %>%
+  ungroup() %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week,
+    Week %% 2 == 0 ~ NA_real_,
+    TRUE ~ Week
+  )) %>%
+  filter(!is.na(Week)) %>%
+  rowwise() %>%
+  mutate(family_wellbeing = mean(wellbeing, child_wellbeing, na.rm=T)) %>%
+  ungroup() %>%
+  mutate(season = case_when(
+    Date <= as.Date("2020-05-31") ~ "Spring",
+    Date >= as.Date("2020-08-31") ~ "Fall",
+    TRUE ~ "Summer"
+  ),
+  season = factor(season, levels = c("Spring", "Summer", "Fall")))
+
+date_labels = plot = scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date)) %>%
+  mutate(label = case_when(
+    Week == 0 ~ "Pre-pandemic",
+    TRUE ~ format(Date,"%b %d")
+  ))
+```
+
+## Well-being{.tabset}
+
+### Caregiver well-being
+
+```{r winter-is-coming-9, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-10 }
+by_season = function(variable, groups, label, data = scored){
+  
+  plot = data %>%
+  filter(!is.na({{variable}})) %>%
+    filter(!is.na({{groups}})) %>%
+  group_by(season, CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  group_by({{groups}}, season) %>%
+  summarize(
+    out = mean({{variable}}),
+    moe = sd({{variable}})/sqrt(n())*1.96) %>%
+  ggplot(aes(x = season, y = out, fill = {{groups}})) +
+  geom_errorbar(aes(ymin = out-moe, ymax = out +moe), 
+                position = position_dodge(.5)) +
+  geom_point(position = position_dodge(.5), size = 2) +  
+  labs(x = NULL, y = NULL, title = paste("Average", label), color = NULL) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot = ggplotly(plot)
+return(plot)
+}
+
+by_season2 = function(variable, group1, group2, label, data = scored){
+  
+  plot = data %>%
+  filter(!is.na({{variable}})) %>%
+    filter(!is.na({{group1}})) %>%
+    filter(!is.na({{group2}})) %>%
+  group_by(season, CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  group_by({{group1}}, {{group2}}, season) %>%
+  summarize(
+    out = mean({{variable}}),
+    moe = sd({{variable}})/sqrt(n())*1.96) %>%
+  ggplot(aes(x = season, y = out, fill = {{group1}})) +
+  geom_errorbar(aes(ymin = out-moe, ymax = out +moe), 
+                position = position_dodge(.5)) +
+  geom_point(position = position_dodge(.5), size = 2) +  
+  labs(x = NULL, y = NULL, title = paste("Average", label), color = NULL) +
+  theme_pubr() +
+    facet_wrap(facets = vars({{group2}})) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot = ggplotly(plot)
+return(plot)
+}
+```
+
+```{r winter-is-coming-11, eval = by.Season}
+
+by_season(wellbeing, covid_groups, "Caregiver wellbeing")
+```
+
+### Child well-being
+
+```{r winter-is-coming-12, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-13, eval = by.Season}
+by_season(child_wellbeing, covid_groups, "Child wellbeing")
+```
+
+### Family well-being
+
+```{r winter-is-coming-14, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+
+```{r winter-is-coming-15, eval = by.Season}
+by_season(family_wellbeing, covid_groups, "family wellbeing")
+```
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r winter-is-coming-16, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+
+```{r winter-is-coming-17, eval = by.Season}
+by_season(anxiety, covid_groups, "Caregiver anxiety")
+```
+
+### Depression
+
+```{r winter-is-coming-18, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-19, eval = by.Season}
+by_season(depress, covid_groups, "Caregiver depression")
+```
+
+### Stress
+
+```{r winter-is-coming-20, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-21, eval = by.Season}
+by_season(stress, covid_groups, "Caregiver stress")
+```
+
+### Loneliness
+
+```{r winter-is-coming-22, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-23, eval = by.Season}
+by_season(lonely, covid_groups, "Caregiver loneliness")
+```
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r winter-is-coming-24, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-25, eval = by.Season}
+by_season(fussy, covid_groups, "child fussy")
+```
+
+### Internalizing
+
+```{r winter-is-coming-26, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-27, eval = by.Season}
+by_season(fear, covid_groups, "child fear")
+```
+
+# Urban/rural
+
+```{r winter-is-coming-28 }
+county_crosswalk = read.csv(here("data/uszips.csv"), stringsAsFactors = F)
+county_crosswalk = county_crosswalk %>%
+  select(zip, county_fips) %>%
+  rename(fips = county_fips)
+metro_area = readxl::read_xlsx(here("data/metro_area_2020.xlsx"),
+                               skip = 2, col_names = T)
+metro_area = metro_area %>%
+  mutate(fips = as.numeric(paste0(`FIPS State Code`, `FIPS County Code`))) %>%
+  select(fips, `Central/Outlying County`) %>%
+  full_join(county_crosswalk) %>%
+  mutate(area = case_when(
+    !is.na(`Central/Outlying County`) ~ `Central/Outlying County`,
+    TRUE ~ "Rural")) %>%
+  select(zip, area) %>%
+  mutate(zip = map_chr(zip, as.character))
+
+scored = scored %>%
+  left_join(metro_area)
+```
+
+
+## Well-being{.tabset}
+
+### Caregiver well-being
+
+```{r winter-is-coming-29, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-30, eval = by.Season}
+by_season(wellbeing, area, "Caregiver wellbeing")
+```
+
+### Child well-being
+
+```{r winter-is-coming-31, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-32, eval = by.Season}
+by_season(child_wellbeing, area, "Child wellbeing")
+```
+
+
+### Family well-being
+
+```{r winter-is-coming-33, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-34, eval = by.Season}
+by_season(family_wellbeing, area, "Family wellbeing")
+```
+
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r winter-is-coming-35, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-36, eval = by.Season}
+by_season(anxiety, area, "Caregiver anxiety")
+```
+
+
+### Depression
+
+```{r winter-is-coming-37, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-38, eval = by.Season}
+by_season(depress, area, "Caregiver depression")
+```
+
+
+### Stress
+
+```{r winter-is-coming-39, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-40, eval = by.Season}
+by_season(stress, area, "Caregiver stress")
+```
+
+
+### Loneliness
+
+```{r winter-is-coming-41, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-42, eval = by.Season}
+by_season(lonely, area, "Caregiver loneliness")
+```
+
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r winter-is-coming-43, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-44, eval = by.Season}
+by_season(fussy, area, "Child fussy")
+```
+
+
+### Internalizing
+
+```{r winter-is-coming-45, eval = by.Date}
+plot = scored %>%
+  group_by(area, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = area)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-46, eval = by.Season}
+by_season(fear, area, "Child fear")
+```
+
+
+# State groups by urban/rural
+
+## Well-being{.tabset}
+
+### Caregiver well-being
+
+```{r winter-is-coming-47, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups,area, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  facet_wrap(~area) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+
+```{r winter-is-coming-48, eval = by.Season}
+by_season2(wellbeing, area, covid_groups, "Caregiver wellbeing")
+```
+
+
+
+### Child well-being
+
+```{r winter-is-coming-49, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-50, eval = by.Season}
+by_season2(child_wellbeing, area, covid_groups, "Child wellbeing")
+```
+
+
+### Family well-being
+
+```{r winter-is-coming-51, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-52, eval = by.Season}
+by_season2(family_wellbeing, area, covid_groups, "Family wellbeing")
+```
+
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r winter-is-coming-53, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-54, eval = by.Season}
+by_season2(anxiety, area, covid_groups, "Caregiver anxiety")
+```
+
+
+### Depression
+
+```{r winter-is-coming-55, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-56, eval = by.Season}
+by_season2(depress, area, covid_groups, "Caregiver depression")
+```
+
+
+### Stress
+
+```{r winter-is-coming-57, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-58, eval = by.Season}
+by_season2(stress, area, covid_groups, "Caregiver stress")
+```
+
+
+### Loneliness
+
+```{r winter-is-coming-59, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-60, eval = by.Season}
+by_season2(lonely, area, covid_groups, "Caregiver loneliness")
+```
+
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r winter-is-coming-61, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-62, eval = by.Season}
+by_season2(fussy, area, covid_groups, "Child fussy")
+```
+
+
+### Internalizing
+
+```{r winter-is-coming-63, eval = by.Date}
+plot = scored %>%
+  group_by(covid_groups, area, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = covid_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  facet_wrap(~area) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-64, eval = by.Season}
+by_season2(fear, area, covid_groups, "Child fear")
+```
+
+
+# Previous groups
+
+```{r winter-is-coming-65 }
+scored = scored %>%
+   mutate(states_groups = case_when(
+    state %in% c("TX", "FL", "AZ") ~ "TX/FL/AZ",
+    state %in% c("ID", "WY", "MN") ~ "ID/WY/MN",
+    state %in% c("NY", "NJ") ~ "NY/NJ",
+    state == "CA" ~ "CA",
+    TRUE ~ NA_character_)) 
+```
+
+## Well-being{.tabset}
+
+### Caregiver well-being
+
+```{r winter-is-coming-66, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-67, eval = by.Season}
+by_season(wellbeing, states_groups, "Caregiver wellbeing")
+```
+
+
+### Child well-being
+
+```{r winter-is-coming-68, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-69, eval = by.Season}
+by_season(child_wellbeing, states_groups, "Child wellbeing")
+```
+
+
+### Family well-being
+
+```{r winter-is-coming-70, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-71, eval = by.Season}
+by_season(family_wellbeing, states_groups, "Family wellbeing")
+```
+
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r winter-is-coming-72, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-73, eval = by.Season}
+by_season(anxiety, states_groups, "Caregiver anxiety")
+```
+
+
+### Depression
+
+```{r winter-is-coming-74, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-75, eval = by.Season}
+by_season(depress, states_groups, "Caregiver depression")
+```
+
+
+### Stress
+
+```{r winter-is-coming-76, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-77, eval = by.Season}
+by_season(stress, states_groups, "Caregiver stress")
+```
+
+
+### Loneliness
+
+```{r winter-is-coming-78, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-79, eval = by.Season}
+by_season(lonely, states_groups, "Caregiver loneliness")
+```
+
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r winter-is-coming-80, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-81, eval = by.Season}
+by_season(fussy, states_groups, "Child fussy")
+```
+
+
+### Internalizing
+
+```{r winter-is-coming-82, eval = by.Date}
+plot = scored %>%
+  group_by(states_groups, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = states_groups)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-83, eval = by.Season}
+by_season(fear, states_groups, "Child fear")
+```
+
+# By 2020 vote
+
+Based on popular vote estimates from AP, November 9, 2020. 
+
+```{r winter-is-coming-84 }
+scored = scored %>%
+  mutate(percent_trump = case_when(
+    state == "AK" ~ 62.2,
+    state == "HI" ~ 63.4,
+    state == "WA" ~ 38.7,
+    state == "OR" ~ 40.6,
+    state == "CA" ~ 33.4,
+    state == "NV" ~ 47.5,
+    state == "ID" ~ 63.9,
+    state == "UT" ~ 58.4,
+    state == "AZ" ~ 49.0,
+    state == "MT" ~ 56.9,
+    state == "WY" ~ 70.4,
+    state == "CO" ~ 42.1,
+    state == "NM" ~ 43.6,
+    state == "ND" ~ 65.5,
+    state == "SD" ~ 61.8,
+    state == "NE" ~ 58.7,
+    state == "KS" ~ 56.5,
+    state == "OK" ~ 65.4,
+    state == "TX" ~ 52.2,
+    state == "MN" ~ 45.4,
+    state == "IA" ~ 53.2,
+    state == "MO" ~ 56.9,
+    state == "AR" ~ 62.6,
+    state == "LA" ~ 58.5,
+    state == "WI" ~ 48.9,
+    state == "IL" ~ 42.3,
+    state == "MI" ~ 47.9,
+    state == "IN" ~ 57.1,
+    state == "OH" ~ 53.4,
+    state == "KY" ~ 62.1,
+    state == "TN" ~ 60.7,
+    state == "MS" ~ 59.7,
+    state == "AL" ~ 62.5,
+    state == "ME" ~ 44.2,
+    state == "NY" ~ 42.9,
+    state == "PA" ~ 49.1,
+    state == "VA" ~ 44.4,
+    state == "WV" ~ 68.7,
+    state == "NC" ~ 50.1,
+    state == "SC" ~ 55.1,
+    state == "GA" ~ 49.3,
+    state == "FL" ~ 51.2,
+    state == "VT" ~ 30.8,
+    state == "NH" ~ 45.6,
+    state == "MA" ~ 32.6,
+    state == "RI" ~ 39.1,
+    state == "CT" ~ 39.7,
+    state == "NJ" ~ 40.7,
+    state == "DE" ~ 39.8,
+    state == "MD" ~ 34.6,
+    state == "DC" ~ 5.2,
+    TRUE ~ NA_real_)) %>%
+  mutate(for_trump = ifelse(percent_trump >50, "Trump", "Biden"))
+```
+
+## Well-being{.tabset}
+
+### Caregiver well-being
+
+```{r winter-is-coming-85, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-86, eval = by.Season}
+by_season(wellbeing, for_trump, "Caregiver wellbeing")
+```
+
+
+### Child well-being
+
+```{r winter-is-coming-87, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(child_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-88, eval = by.Season}
+by_season(child_wellbeing, for_trump, "Child wellbeing")
+```
+
+
+### Family well-being
+
+```{r winter-is-coming-89, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(family_wellbeing, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child well-being", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-90, eval = by.Season}
+by_season(family_wellbeing, for_trump, "Family wellbeing")
+```
+
+
+## Caregiver specific{.tabset}
+
+### Anxiety
+
+```{r winter-is-coming-91, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(anxiety, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver anxiety", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-92, eval = by.Season}
+by_season(anxiety, for_trump, "Caregiver anxiety")
+```
+
+
+### Depression
+
+```{r winter-is-coming-93, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(depress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver depression", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-94, eval = by.Season}
+by_season(depress, for_trump, "Caregiver depression")
+```
+
+
+### Stress
+
+```{r winter-is-coming-95, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(stress, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver stress", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-96, eval = by.Season}
+by_season(stress, for_trump, "Caregiver stress")
+```
+
+
+### Loneliness
+
+```{r winter-is-coming-97, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(lonely, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average caregiver loneliness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-98, eval = by.Season}
+by_season(lonely, for_trump, "Caregiver loneliness")
+```
+
+
+## Child Specific{.tabset}
+
+### Externalizing
+
+```{r winter-is-coming-99, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(fussy, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fussiness", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-100, eval = by.Season}
+by_season(fussy, for_trump, "Child fussy")
+```
+
+
+### Internalizing
+
+```{r winter-is-coming-101, eval = by.Date}
+plot = scored %>%
+  group_by(for_trump, Week) %>%
+  summarize(
+    out = mean(fear, na.rm=T)) %>%
+  ggplot(aes(x = Week, y = out, color = for_trump)) +
+  geom_line() +
+  geom_point() +
+  labs(x = NULL, y = NULL, title = "Average child fear", color = NULL) +
+  scale_x_continuous(breaks = date_labels$Week, labels = date_labels$label) +
+  theme_pubr() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(plot)
+```
+
+```{r winter-is-coming-102, eval = by.Season}
+by_season(fear, for_trump, "Child fear")
+```
+

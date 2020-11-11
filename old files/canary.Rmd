@@ -1,0 +1,675 @@
+---
+title: "Canary in the coal mine"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(ggpubr)
+```
+
+```{r childcare-1}
+source(here("Scripts/score data.R")) 
+
+completedWeek9 = scored %>%
+  filter(Week == 9)
+completedWeek9 = completedWeek9$CaregiverID
+
+scored = scored %>%
+  filter(CaregiverID %in% completedWeek9) %>%
+  filter(Week %in% c(0,9)) %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == 1) %>%
+  ungroup()
+
+# groups
+scored = scored %>%
+  mutate(
+    poc = case_when(
+      race_cat == "White/Caucasian" ~ "White",
+      race_cat == "Asian" ~ NA_character_,
+      !is.na(race_cat) ~ "POC (non Asian)",
+      TRUE ~ NA_character_),
+    pocA = case_when(
+      race_cat == "White/Caucasian" ~ "White",
+      race_cat == "Asian" ~ "POC",
+      !is.na(race_cat) ~ "POC",
+      TRUE ~ NA_character_),
+    whiteO = case_when(
+      race_cat == "White/Caucasian" ~ "White",
+      !is.na(race_cat) ~ "Non-white",
+      TRUE ~ NA_character_),
+    poverty150 = poverty_cat,
+    conflictSource = factor(conflictSource, 
+                            labels = c("Being confident that my family has health insurance",
+                                       "Not being so socially isolated",
+                                       "Having lower levels of worry and stress ",
+                                       "Knowing we can pay for food ",
+                                       "Knowing we can pay my rent/mortgage/housing expenses",
+                                       "Knowing my/our job is secure",
+                                       "Being able to meet my child's social and emotional needs",
+                                       "Knowing we have access to childcare"))) %>%
+  select(CaregiverID, Week, Date, contains("conflict"), contains("cohesive"), black, latinx, poc, pocA, whiteO, poverty150)
+```
+
+```{r canary-1}
+scored_prepost = scored %>%
+  select(-contains("Source"), -Date) %>%
+  gather("key", "value", 
+         contains("conflict"), contains("cohesive")) %>%
+  mutate(Week = ifelse(Week == 0, "pre", "post")) %>%
+  spread(Week, value) %>%
+  mutate(change = post-pre) %>%
+  select(-pre, -post) %>%
+  spread(key, change)
+```
+
+```{r, eval = F}
+did_increase = function(x){
+  x = ifelse(x > 0, 1, 0)
+}
+
+scored_prepost %>%
+  mutate_at(vars(contains("conflict")), did_increase) %>%
+  gather("variable", "value", contains("conflict")) %>%
+  filter(!is.na(value)) %>%
+  group_by(variable) %>%
+  summarize(Percent = 100*sum(value)/n())
+```
+
+# Representativeness disclaimer
+
+```{r curve-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = table(perc$poverty150)
+perc.fpl = 100*perc.fpl/sum(perc.fpl)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl[2])`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+
+# Descriptives
+
+Weeks used in these analyses are `r unique(scored$Week)`.
+
+```{r canary-2, results = 'asis'}
+test = scored %>%
+  select_if(function(col)  is.character(col)| is.factor(col)) %>%
+  select(-CaregiverID) 
+
+apply(test, 2, table) %>%
+  kable(.) %>%
+  kable_styling() %>%
+  scroll_box(width = "100%")
+```
+
+
+```{r canary-3, results = 'asis'}
+scored %>%
+  select_if(is.numeric) %>%
+  psych::describe( fast = T) %>%
+  kable(., caption = "Descriptives of numeric variables", digits = 2) %>%
+  kable_styling(full_width = T)
+```
+
+```{r canary-4}
+scored %>%
+  select_if(is.numeric) %>%
+  cor(., use = "pairwise") %>%
+  corrplot::corrplot(method = "number")
+```
+
+```{r canary-5}
+scored = scored %>%
+  mutate(Week = ifelse(Week == 0, "Pre", "Post"),
+         Week = factor(Week, levels = c("Pre", "Post")))
+```
+
+
+```{r functions}
+source(here("Functions/compare_pre-post.R"))
+```
+
+
+# Total Conflict
+
+Families have many different ways of trying to settle their differences. This is a list of things that might happen when your family has differences. Please mark how many times each of these things happened in the last week. Please also think about a typical week in your family’s like prior to the coronavirus (COVID-19) pandemic, and mark how many times each of these things happened. If one of these things did not occur, then select “This has not happened" for that question. 
+
+- I insulted or swore or shouted or yelled at my partner 
+- I shouted, yelled, or screamed at my child 
+- I criticized or said mean things to my child 
+- I felt like throwing things or slamming doors 
+- My partner insulted or swore or shouted or yelled at me 
+- My partner shouted, yelled, or screamed at my child 
+- My partner criticized my child 
+- My child had a temper tantrum 
+- My child argued with me 
+- My child argued with my partner 
+
+## Pre-post{.tabset}
+
+### Overall
+
+```{r canary-6}
+test = pre_post_overall(scored, conflict_total)
+test$plot
+```
+
+```{r canary-7, results = 'asis'}
+test$pairwise
+```
+
+### POC
+
+```{r canary-8}
+test = pre_post_group(scored, pocA, conflict_total)
+test$plot
+```
+
+```{r canary-9, results = 'asis'}
+test$pairwise
+```
+
+
+### Poverty line
+
+```{r canary-10}
+test = pre_post_group(scored, poverty150, conflict_total)
+test$plot
+```
+
+```{r canary-11, results = 'asis'}
+test$pairwise
+```
+
+## Change{.tabset}
+
+
+### Overall
+
+```{r canary-12}
+test = change_overall(scored_prepost, conflict_total)
+test$plot
+```
+
+```{r canary-13, results = 'asis'}
+test$ttest
+```
+
+### POC
+
+```{r canary-14}
+test = change_group(scored_prepost, pocA, conflict_total)
+test$plot
+```
+
+```{r canary-15, results = 'asis'}
+test$ttest
+```
+
+
+<!-- ### Poverty line -->
+
+<!-- ```{r canary-16} -->
+<!-- test = change_group(scored_prepost, poverty150, conflict_total) -->
+<!-- test$plot -->
+<!-- ``` -->
+
+<!-- ```{r canary-17, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
+
+# Spousal Conflict
+
+Families have many different ways of trying to settle their differences. This is a list of things that might happen when your family has differences. Please mark how many times each of these things happened in the last week. Please also think about a typical week in your family’s like prior to the coronavirus (COVID-19) pandemic, and mark how many times each of these things happened. If one of these things did not occur, then select “This has not happened" for that question. 
+
+- I insulted or swore or shouted or yelled at my partner 
+- My partner insulted or swore or shouted or yelled at me 
+
+## Pre-post{.tabset}
+
+
+### Overall
+
+```{r canary-18}
+test = pre_post_overall(scored, conflict_parent)
+test$plot
+```
+
+```{r canary-19, results = 'asis'}
+test$pairwise
+```
+
+### POC
+
+```{r canary-20}
+test = pre_post_group(scored, pocA, conflict_parent)
+test$plot
+```
+
+```{r canary-21, results = 'asis'}
+test$pairwise
+```
+
+
+### Poverty line
+
+```{r canary-22}
+test = pre_post_group(scored, poverty150, conflict_parent)
+test$plot
+```
+
+```{r canary-23, results = 'asis'}
+test$pairwise
+```
+
+## Change{.tabset}
+
+
+### Overall
+
+```{r canary-24}
+test = change_overall(scored_prepost, conflict_parent)
+test$plot
+```
+
+```{r canary-25, results = 'asis'}
+test$ttest
+```
+### POC
+
+```{r canary-26}
+test = change_group(scored_prepost, pocA, conflict_parent)
+test$plot
+```
+
+```{r canary-27, results = 'asis'}
+test$ttest
+```
+
+<!-- ### Poverty line -->
+
+<!-- ```{r canary-28} -->
+<!-- test = change_group(scored_prepost, poverty150, conflict_parent) -->
+<!-- test$plot -->
+<!-- ``` -->
+
+<!-- ```{r canary-29, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
+
+# Child-parent Conflict
+
+Families have many different ways of trying to settle their differences. This is a list of things that might happen when your family has differences. Please mark how many times each of these things happened in the last week. Please also think about a typical week in your family’s like prior to the coronavirus (COVID-19) pandemic, and mark how many times each of these things happened. If one of these things did not occur, then select “This has not happened" for that question. 
+
+- I shouted, yelled, or screamed at my child 
+- I criticized or said mean things to my child 
+- My partner shouted, yelled, or screamed at my child 
+- My partner criticized my child 
+- My child had a temper tantrum 
+- My child argued with me 
+- My child argued with my partner 
+
+## Pre-post{.tabset}
+
+
+### Overall
+
+```{r canary-30}
+test = pre_post_overall(scored, conflict_child)
+test$plot
+```
+
+```{r canary-31, results = 'asis'}
+test$pairwise
+```
+
+### POC
+
+```{r canary-32}
+test = pre_post_group(scored, pocA, conflict_child)
+test$plot
+```
+
+```{r canary-33, results = 'asis'}
+test$pairwise
+```
+
+
+<!-- ### Poverty line -->
+
+<!-- ```{r canary-34} -->
+<!-- test = pre_post_group(scored, poverty150, conflict_child) -->
+<!-- test$plot -->
+<!-- ``` -->
+
+<!-- ```{r canary-35, results = 'asis'} -->
+<!-- test$pairwise -->
+<!-- ``` -->
+
+## Change{.tabset}
+
+
+### Overall
+
+```{r canary-36}
+test = change_overall(scored_prepost, conflict_child)
+test$plot
+```
+
+```{r canary-37, results = 'asis'}
+test$ttest
+```
+### POC
+
+```{r canary-38}
+test = change_group(scored_prepost, pocA, conflict_child)
+test$plot
+```
+
+```{r canary-39, results = 'asis'}
+test$ttest
+```
+
+
+
+<!-- ### Poverty line -->
+
+<!-- ```{r canary-40} -->
+<!-- test = change_group(scored_prepost, poverty150, conflict_child) -->
+<!-- test$plot -->
+<!-- ``` -->
+
+<!-- ```{r canary-41, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
+
+# Cohesiveness
+
+When you and your child have spent time together, how often did you do the following? 
+
+- I let my child know I really care about them 
+- I was loving and affectionate toward my child 
+- I was supportive and understanding toward my child 
+- I told my child I love them 
+
+## Pre-post{.tabset}
+
+
+### Overall
+
+```{r canary-42}
+test = pre_post_overall(scored, cohesive)
+test$plot
+```
+
+```{r canary-43, results = 'asis'}
+test$pairwise
+```
+
+### POC
+
+```{r canary-44}
+test = pre_post_group(scored, pocA, cohesive)
+test$plot
+```
+
+```{r canary-45, results = 'asis'}
+test$pairwise
+```
+
+
+<!-- ### Poverty line -->
+
+<!-- ```{r canary-46} -->
+<!-- test = pre_post_group(scored, poverty150, cohesive) -->
+<!-- test$plot -->
+<!-- ``` -->
+
+<!-- ```{r canary-47, results = 'asis'} -->
+<!-- test$pairwise -->
+<!-- ``` -->
+
+## Change{.tabset}
+
+
+### Overall
+
+```{r canary-48}
+test = change_overall(scored_prepost, cohesive)
+test$plot
+```
+
+```{r canary-49, results = 'asis'}
+test$ttest
+```
+### POC
+
+```{r canary-50}
+test = change_group(scored_prepost, pocA, cohesive)
+test$plot
+```
+
+```{r canary-51, results = 'asis'}
+test$ttest
+```
+
+
+<!-- ### Poverty line -->
+
+<!-- ```{r canary-52} -->
+<!-- test = change_group(scored_prepost, poverty150, cohesive) -->
+<!-- test$plot -->
+<!-- ``` -->
+
+<!-- ```{r canary-53, results = 'asis'} -->
+<!-- test$ttest -->
+<!-- ``` -->
+
+# Source of conflict
+
+## Separated{.tabset}
+
+Think about the sources of conflict for your family. Which of the following would help decrease conflict the most right now? [Only select one]
+
+### Overall
+
+```{r}
+scored %>%
+  filter(!is.na(conflictSource)) %>%
+  group_by(conflictSource) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) +
+  geom_bar(stat = "identity", alpha = .8) +
+  geom_errorbar(aes(ymin = Percent - MOE, ymax = Percent + MOE), width = .5) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 1) +
+  labs(x = "",
+       y = "Percent",
+       title = "Overall sample") +
+  coord_flip() +
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+### POC
+
+```{r, out.width="100%"}
+scored %>%
+  filter(!is.na(conflictSource) & !is.na(pocA)) %>%
+  group_by(conflictSource, pocA) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  group_by(pocA)%>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, y = Percent + 5), color = "black", size = 3) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 1.5, size = 3) +
+  labs(x = "",
+       y = "Percent",
+       title = "By Ethnicity") +
+  coord_flip() +
+  facet_wrap(~pocA) +
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+
+<!-- ### Poverty line -->
+
+<!-- ```{r, out.width="100%"} -->
+<!-- scored %>% -->
+<!--   filter(!is.na(conflictSource) & !is.na(poverty150)) %>% -->
+<!--   group_by(conflictSource, poverty150) %>% -->
+<!--   summarize(Count = n()) %>% -->
+<!--   ungroup() %>% -->
+<!--   group_by(poverty150)%>% -->
+<!--   mutate(Percent = 100*Count/sum(Count), -->
+<!--          N = sum(Count)) %>% -->
+<!--   mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>% -->
+<!--   ggplot(aes(x = reorder(conflictSource, Percent), y = Percent)) + -->
+<!--   geom_bar(stat = "identity") + -->
+<!--   geom_text(aes(label = Count, y = Percent + 5), color = "black", size = 3) + -->
+<!--   geom_text(aes(label = paste0(round(Percent), -->
+<!--                               "\n(", round(MOE,1), ")")),  -->
+<!--             color = "white", y = 1.5, size = 3) + -->
+<!--   labs(x = "", -->
+<!--        y = "Percent", -->
+<!--        title = "By Income") + -->
+<!--   coord_flip() + -->
+<!--   facet_wrap(~poverty150) + -->
+<!--   theme_pubclean() + -->
+<!--   theme(plot.title.position = "plot") -->
+<!-- ``` -->
+
+## Aggregated{.tabset}
+
+Financial
+- Being confident that my family has health insurance
+- Knowing we can pay for food
+- Knowing we can pay my rent/mortgage/housing expenses
+- Knowing my/our job is secure
+Socio/Emotional
+- Not being so socially isolated
+- Having lower levels of worry and stress
+- Being able to meet my child's social and emotional needs
+
+```{r}
+scored = scored %>%
+  mutate(conflictSource_agg = case_when(
+    conflictSource %in% c("Being confident that my family has health insurance", 
+                          "Knowing we can pay for food", 
+                          "Knowing we can pay my rent/mortgage/housing expenses", 
+                          "Knowing my/our job is secure") ~ "Financial",
+    conflictSource %in% c("Not being so socially isolated", 
+                          "Having lower levels of worry and stress", 
+                          "Being able to meet my child's social and emotional needs") ~ "Socio/Emotional",
+  ))
+```
+
+
+### Overall
+
+```{r}
+scored %>%
+  filter(!is.na(conflictSource_agg)) %>%
+  group_by(conflictSource_agg) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 10) +
+  labs(x = "",
+       y = "Percent",
+       title = "Overall sample") +
+  coord_flip() +
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+### POC
+
+```{r, out.width="100%"}
+scored %>%
+  filter(!is.na(conflictSource_agg) & !is.na(pocA)) %>%
+  group_by(conflictSource_agg, pocA) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  group_by(pocA)%>%
+  mutate(Percent = 100*Count/sum(Count),
+         N = sum(Count)) %>%
+  mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>%
+  ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Count, y = Percent + 10), color = "black", size = 3) +
+  geom_text(aes(label = paste0(round(Percent),
+                              "\n(", round(MOE,1), ")")), 
+            color = "white", y = 5, size = 3) +
+  labs(x = "",
+       y = "Percent",
+       title = "Overall sample") +
+  coord_flip() +
+  facet_wrap(~pocA) +
+  theme_pubclean() +
+  theme(plot.title.position = "plot")
+```
+
+
+<!-- ### Poverty line -->
+
+<!-- ```{r, out.width="100%"} -->
+<!-- scored %>% -->
+<!--   filter(!is.na(conflictSource_agg) & !is.na(poverty150)) %>% -->
+<!--   group_by(conflictSource_agg, poverty150) %>% -->
+<!--   summarize(Count = n()) %>% -->
+<!--   ungroup() %>% -->
+<!--   group_by(poverty150)%>% -->
+<!--   mutate(Percent = 100*Count/sum(Count), -->
+<!--          N = sum(Count)) %>% -->
+<!--   mutate(MOE = pmap_dbl(.l = list(Percent, N), .f = percent_moe)) %>% -->
+<!--   ggplot(aes(x = reorder(conflictSource_agg, Percent), y = Percent)) + -->
+<!--   geom_bar(stat = "identity") + -->
+<!--   geom_text(aes(label = Count, y = Percent + 10), color = "black", size = 3) + -->
+<!--   geom_text(aes(label = paste0(round(Percent), -->
+<!--                               "\n(", round(MOE,1), ")")),  -->
+<!--             color = "white", y = 5, size = 3) + -->
+<!--   labs(x = "", -->
+<!--        y = "Percent", -->
+<!--        title = "Overall sample") + -->
+<!--   coord_flip() + -->
+<!--   facet_wrap(~poverty150) + -->
+<!--   theme_pubclean() + -->
+<!--   theme(plot.title.position = "plot") -->
+<!-- ``` -->

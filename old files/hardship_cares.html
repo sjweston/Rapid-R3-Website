@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Material hardship post CARES</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="0prelim_april27.html">Sheltering in place</a>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict (summer)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="winter_is_coming.html">Covid cases rising</a>
+    </li>
+    <li>
+      <a href="Family-Conflict-based-on-Master-Data.html">Family conflict (fall)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texas</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Groups
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="group_single_report.html">Single caregivers</a>
+    </li>
+    <li>
+      <a href="group_latinx_report.html">Latinx caregivers</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Material hardship post CARES</h1>
+
+</div>
+
+
+<!-- Prep data -->
+<div id="representativeness-disclaimer" class="section level1">
+<h1>Representativeness disclaimer</h1>
+<p>These analyses are based on responses collected from 7427 caregivers between the dates of April 06, 2020 and October 22, 2020. These caregivers represent a range of voices: 9.26% are Black/African American, 18.90% are LatinX, and 29.10% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are <em>not</em> weighted.</p>
+</div>
+<div id="material-hardship" class="section level1">
+<h1>Material hardship</h1>
+<div id="overall" class="section level2">
+<h2>Overall</h2>
+<div id="htmlwidget-658ef4ac6f3772e4f4e1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-658ef4ac6f3772e4f4e1">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[41.8647166361974,41.5781487101669,36.8333333333333,31.6287878787879,26.6294227188082,28.2642089093702,30.9433962264151,32.6256983240223,34.0405014464802,35.4443309499489,33.3333333333333,34.4278606965174,40.6015037593985,38.1628787878788,35.8653846153846,35.899814471243,35.9455958549223,38.4964355152301,38.4562841530055,42.5076452599388,38.3582089552239,37.7646062658764,35.7779980178394],"text":["Week: 2020-04-06<br /> Count: 547<br /> Percent: 42","Week: 2020-04-14<br /> Count: 659<br /> Percent: 42","Week: 2020-04-20<br /> Count: 600<br /> Percent: 37","Week: 2020-04-27<br /> Count: 528<br /> Percent: 32","Week: 2020-05-04<br /> Count: 537<br /> Percent: 27","Week: 2020-05-11<br /> Count: 651<br /> Percent: 28","Week: 2020-05-19<br /> Count: 795<br /> Percent: 31","Week: 2020-05-25<br /> Count: 895<br /> Percent: 33","Week: 2020-06-01<br /> Count: 1037<br /> Percent: 34","Week: 2020-06-08<br /> Count: 979<br /> Percent: 35","Week: 2020-06-15<br /> Count: 1095<br /> Percent: 33","Week: 2020-06-22<br /> Count: 1005<br /> Percent: 34","Week: 2020-06-29<br /> Count: 1197<br /> Percent: 41","Week: 2020-07-06<br /> Count: 1056<br /> Percent: 38","Week: 2020-07-13<br /> Count: 1040<br /> Percent: 36","Week: 2020-07-20<br /> Count: 1078<br /> Percent: 36","Week: 2020-07-27<br /> Count: 1544<br /> Percent: 36","Week: 2020-08-11<br /> Count: 1543<br /> Percent: 38","Week: 2020-08-25<br /> Count: 1464<br /> Percent: 38","Week: 2020-09-08<br /> Count: 1308<br /> Percent: 43","Week: 2020-09-21<br /> Count: 1340<br /> Percent: 38","Week: 2020-10-06<br /> Count: 1181<br /> Percent: 38","Week: 2020-10-20<br /> Count: 1009<br /> Percent: 36"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"frame":null},{"x":[18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474],"y":[25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,25.8355115917517,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954,43.3015563869954],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":47.0236612702366,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of households experiencing at least one material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.15,18564.85],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Week","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[25.8355115917517,43.3015563869954],"tickmode":"array","ticktext":["30","35","40"],"tickvals":[30,35,40],"categoryorder":"array","categoryarray":["30","35","40"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e27dd7754":{"x":{},"y":{},"text":{},"type":"scatter"},"528e3cc5403e":{"x":{},"y":{},"text":{}},"528e39fcc59d":{"xintercept":{}}},"cur_data":"528e27dd7754","visdat":{"528e27dd7754":["function (y) ","x"],"528e3cc5403e":["function (y) ","x"],"528e39fcc59d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="blackafrican-american" class="section level2">
+<h2>Black/African American</h2>
+<div id="htmlwidget-bf7c9e11a0b5352f9707" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-bf7c9e11a0b5352f9707">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[41.0677618069815,39.4915254237288,33.826247689464,30.6288032454361,26.3565891472868,27.1844660194175,30.1188903566711,31.2727272727273,32.4552160168599,34.0635268346112,31.9688109161793,31.4794215795328,38.4180790960452,34.3715239154616,34.5161290322581,34.0932642487047,35.1236749116608,37.9501385041551,37.5661375661376,41.7172593235039,37.1033360455655,37.1482176360225,34.8888888888889],"text":["Group:Not Black<br /> Week:2020-04-06<br /> Count:487<br /> Hardship:41.07","Group:Not Black<br /> Week:2020-04-14<br /> Count:590<br /> Hardship:39.49","Group:Not Black<br /> Week:2020-04-20<br /> Count:541<br /> Hardship:33.83","Group:Not Black<br /> Week:2020-04-27<br /> Count:493<br /> Hardship:30.63","Group:Not Black<br /> Week:2020-05-04<br /> Count:516<br /> Hardship:26.36","Group:Not Black<br /> Week:2020-05-11<br /> Count:618<br /> Hardship:27.18","Group:Not Black<br /> Week:2020-05-19<br /> Count:757<br /> Hardship:30.12","Group:Not Black<br /> Week:2020-05-25<br /> Count:825<br /> Hardship:31.27","Group:Not Black<br /> Week:2020-06-01<br /> Count:949<br /> Hardship:32.46","Group:Not Black<br /> Week:2020-06-08<br /> Count:913<br /> Hardship:34.06","Group:Not Black<br /> Week:2020-06-15<br /> Count:1026<br /> Hardship:31.97","Group:Not Black<br /> Week:2020-06-22<br /> Count:899<br /> Hardship:31.48","Group:Not Black<br /> Week:2020-06-29<br /> Count:1062<br /> Hardship:38.42","Group:Not Black<br /> Week:2020-07-06<br /> Count:899<br /> Hardship:34.37","Group:Not Black<br /> Week:2020-07-13<br /> Count:930<br /> Hardship:34.52","Group:Not Black<br /> Week:2020-07-20<br /> Count:965<br /> Hardship:34.09","Group:Not Black<br /> Week:2020-07-27<br /> Count:1415<br /> Hardship:35.12","Group:Not Black<br /> Week:2020-08-11<br /> Count:1444<br /> Hardship:37.95","Group:Not Black<br /> Week:2020-08-25<br /> Count:1323<br /> Hardship:37.57","Group:Not Black<br /> Week:2020-09-08<br /> Count:1153<br /> Hardship:41.72","Group:Not Black<br /> Week:2020-09-21<br /> Count:1229<br /> Hardship:37.1","Group:Not Black<br /> Week:2020-10-06<br /> Count:1066<br /> Hardship:37.15","Group:Not Black<br /> Week:2020-10-20<br /> Count:900<br /> Hardship:34.89"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"Not Black","legendgroup":"Not Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[46.551724137931,57.5757575757576,65.5172413793103,50.7462686567164,51.1363636363636,54.5454545454545,54.4117647058824,59.0476190476191,57.4626865671642,59.6153846153846,46.7889908256881,50.4504504504505,44.8818897637795,45.8333333333333,47.1014492753623,48.0519480519481,51.8181818181818,42.9824561403509,42.5925925925926],"text":["Group:Black<br /> Week:2020-04-06<br /> Count:58<br /> Hardship:46.55","Group:Black<br /> Week:2020-04-14<br /> Count:66<br /> Hardship:57.58","Group:Black<br /> Week:2020-04-20<br /> Count:58<br /> Hardship:65.52","Group:Black<br /> Week:2020-05-25<br /> Count:67<br /> Hardship:50.75","Group:Black<br /> Week:2020-06-01<br /> Count:88<br /> Hardship:51.14","Group:Black<br /> Week:2020-06-08<br /> Count:66<br /> Hardship:54.55","Group:Black<br /> Week:2020-06-15<br /> Count:68<br /> Hardship:54.41","Group:Black<br /> Week:2020-06-22<br /> Count:105<br /> Hardship:59.05","Group:Black<br /> Week:2020-06-29<br /> Count:134<br /> Hardship:57.46","Group:Black<br /> Week:2020-07-06<br /> Count:156<br /> Hardship:59.62","Group:Black<br /> Week:2020-07-13<br /> Count:109<br /> Hardship:46.79","Group:Black<br /> Week:2020-07-20<br /> Count:111<br /> Hardship:50.45","Group:Black<br /> Week:2020-07-27<br /> Count:127<br /> Hardship:44.88","Group:Black<br /> Week:2020-08-11<br /> Count:96<br /> Hardship:45.83","Group:Black<br /> Week:2020-08-25<br /> Count:138<br /> Hardship:47.1","Group:Black<br /> Week:2020-09-08<br /> Count:154<br /> Hardship:48.05","Group:Black<br /> Week:2020-09-21<br /> Count:110<br /> Hardship:51.82","Group:Black<br /> Week:2020-10-06<br /> Count:114<br /> Hardship:42.98","Group:Black<br /> Week:2020-10-20<br /> Count:108<br /> Hardship:42.59"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"Black","legendgroup":"Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"frame":null},{"x":[18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474],"y":[24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,24.3985565356856,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115,67.4752739909115],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":47.0236612702366,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of households experiencing at least one material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.15,18564.85],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Week","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[24.3985565356856,67.4752739909115],"tickmode":"array","ticktext":["30","40","50","60"],"tickvals":[30,40,50,60],"categoryorder":"array","categoryarray":["30","40","50","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e68227ad8":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"528e2faf3051":{"x":{},"y":{},"colour":{},"text":{}},"528e168d2e4c":{"xintercept":{}}},"cur_data":"528e68227ad8","visdat":{"528e68227ad8":["function (y) ","x"],"528e2faf3051":["function (y) ","x"],"528e168d2e4c":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="latinx" class="section level2">
+<h2>LatinX</h2>
+<p><div id="htmlwidget-6a622da4d710640e566e" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6a622da4d710640e566e">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[38.7527839643653,39.4052044609665,35.0597609561753,29.81220657277,23.9467849223947,27.5862068965517,29.3577981651376,29.5013850415512,31.6176470588235,32.9129886506936,30.9604519774011,31.6486161251504,36.1567635903919,35.3080568720379,31.6486161251504,32.2247706422018,32.7453987730061,34.9922239502333,36.2459546925566,39.9267399267399,35.8839050131926,35.5421686746988,33.1764705882353],"text":["Group:Not LatinX<br /> Week:2020-04-06<br /> Count:449<br /> Hardship:38.75","Group:Not LatinX<br /> Week:2020-04-14<br /> Count:538<br /> Hardship:39.41","Group:Not LatinX<br /> Week:2020-04-20<br /> Count:502<br /> Hardship:35.06","Group:Not LatinX<br /> Week:2020-04-27<br /> Count:426<br /> Hardship:29.81","Group:Not LatinX<br /> Week:2020-05-04<br /> Count:451<br /> Hardship:23.95","Group:Not LatinX<br /> Week:2020-05-11<br /> Count:551<br /> Hardship:27.59","Group:Not LatinX<br /> Week:2020-05-19<br /> Count:654<br /> Hardship:29.36","Group:Not LatinX<br /> Week:2020-05-25<br /> Count:722<br /> Hardship:29.5","Group:Not LatinX<br /> Week:2020-06-01<br /> Count:816<br /> Hardship:31.62","Group:Not LatinX<br /> Week:2020-06-08<br /> Count:793<br /> Hardship:32.91","Group:Not LatinX<br /> Week:2020-06-15<br /> Count:885<br /> Hardship:30.96","Group:Not LatinX<br /> Week:2020-06-22<br /> Count:831<br /> Hardship:31.65","Group:Not LatinX<br /> Week:2020-06-29<br /> Count:791<br /> Hardship:36.16","Group:Not LatinX<br /> Week:2020-07-06<br /> Count:844<br /> Hardship:35.31","Group:Not LatinX<br /> Week:2020-07-13<br /> Count:831<br /> Hardship:31.65","Group:Not LatinX<br /> Week:2020-07-20<br /> Count:872<br /> Hardship:32.22","Group:Not LatinX<br /> Week:2020-07-27<br /> Count:1304<br /> Hardship:32.75","Group:Not LatinX<br /> Week:2020-08-11<br /> Count:1286<br /> Hardship:34.99","Group:Not LatinX<br /> Week:2020-08-25<br /> Count:1236<br /> Hardship:36.25","Group:Not LatinX<br /> Week:2020-09-08<br /> Count:1092<br /> Hardship:39.93","Group:Not LatinX<br /> Week:2020-09-21<br /> Count:1137<br /> Hardship:35.88","Group:Not LatinX<br /> Week:2020-10-06<br /> Count:996<br /> Hardship:35.54","Group:Not LatinX<br /> Week:2020-10-20<br /> Count:850<br /> Hardship:33.18"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"Not LatinX","legendgroup":"Not LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[59.0909090909091,50.9803921568627,48.1012658227848,39.3617021276596,39.7590361445783,32.2916666666667,38.2352941176471,45.3488372093023,43.1818181818182,45.9459459459459,43.5406698564593,47.953216374269,49.2574257425743,50,53.1400966183575,51.4705882352941,53.8135593220339,55.6862745098039,50.6607929515419,56.0747663551402,52.4752475247525,50.5555555555556,49.685534591195],"text":["Group:LatinX<br /> Week:2020-04-06<br /> Count:88<br /> Hardship:59.09","Group:LatinX<br /> Week:2020-04-14<br /> Count:102<br /> Hardship:50.98","Group:LatinX<br /> Week:2020-04-20<br /> Count:79<br /> Hardship:48.1","Group:LatinX<br /> Week:2020-04-27<br /> Count:94<br /> Hardship:39.36","Group:LatinX<br /> Week:2020-05-04<br /> Count:83<br /> Hardship:39.76","Group:LatinX<br /> Week:2020-05-11<br /> Count:96<br /> Hardship:32.29","Group:LatinX<br /> Week:2020-05-19<br /> Count:136<br /> Hardship:38.24","Group:LatinX<br /> Week:2020-05-25<br /> Count:172<br /> Hardship:45.35","Group:LatinX<br /> Week:2020-06-01<br /> Count:220<br /> Hardship:43.18","Group:LatinX<br /> Week:2020-06-08<br /> Count:185<br /> Hardship:45.95","Group:LatinX<br /> Week:2020-06-15<br /> Count:209<br /> Hardship:43.54","Group:LatinX<br /> Week:2020-06-22<br /> Count:171<br /> Hardship:47.95","Group:LatinX<br /> Week:2020-06-29<br /> Count:404<br /> Hardship:49.26","Group:LatinX<br /> Week:2020-07-06<br /> Count:210<br /> Hardship:50","Group:LatinX<br /> Week:2020-07-13<br /> Count:207<br /> Hardship:53.14","Group:LatinX<br /> Week:2020-07-20<br /> Count:204<br /> Hardship:51.47","Group:LatinX<br /> Week:2020-07-27<br /> Count:236<br /> Hardship:53.81","Group:LatinX<br /> Week:2020-08-11<br /> Count:255<br /> Hardship:55.69","Group:LatinX<br /> Week:2020-08-25<br /> Count:227<br /> Hardship:50.66","Group:LatinX<br /> Week:2020-09-08<br /> Count:214<br /> Hardship:56.07","Group:LatinX<br /> Week:2020-09-21<br /> Count:202<br /> Hardship:52.48","Group:LatinX<br /> Week:2020-10-06<br /> Count:180<br /> Hardship:50.56","Group:LatinX<br /> Week:2020-10-20<br /> Count:159<br /> Hardship:49.69"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"LatinX","legendgroup":"LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"frame":null},{"x":[18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474],"y":[22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,22.189578713969,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348,60.8481152993348],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":47.0236612702366,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of households experiencing at least one material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.15,18564.85],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Week","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[22.189578713969,60.8481152993348],"tickmode":"array","ticktext":["30","40","50","60"],"tickvals":[30,40,50,60],"categoryorder":"array","categoryarray":["30","40","50","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e4270faaa":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"528e758d0fa":{"x":{},"y":{},"colour":{},"text":{}},"528e57ffd0da":{"xintercept":{}}},"cur_data":"528e4270faaa","visdat":{"528e4270faaa":["function (y) ","x"],"528e758d0fa":["function (y) ","x"],"528e57ffd0da":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script> ## Single</p>
+<div id="htmlwidget-4a1949d5f4865847a2d9" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4a1949d5f4865847a2d9">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[39.2290249433107,37.7323420074349,32.6653306613226,29.3991416309013,24.1237113402062,26.3605442176871,28.1073446327684,30.2267002518892,31.1617806731813,32.6111744583808,29.8047276464543,31.3416009019166,37.6685934489403,36.0215053763441,33.2615715823466,33.4719334719335,33.6940836940837,36.5124555160142,36.1977186311787,39.3073593073593,34.5347862531433,35.8736059479554,33.6254107338445],"text":["Group:Dual-parent<br /> Week:2020-04-06<br /> Count:441<br /> Hardship:39.23","Group:Dual-parent<br /> Week:2020-04-14<br /> Count:538<br /> Hardship:37.73","Group:Dual-parent<br /> Week:2020-04-20<br /> Count:499<br /> Hardship:32.67","Group:Dual-parent<br /> Week:2020-04-27<br /> Count:466<br /> Hardship:29.4","Group:Dual-parent<br /> Week:2020-05-04<br /> Count:485<br /> Hardship:24.12","Group:Dual-parent<br /> Week:2020-05-11<br /> Count:588<br /> Hardship:26.36","Group:Dual-parent<br /> Week:2020-05-19<br /> Count:708<br /> Hardship:28.11","Group:Dual-parent<br /> Week:2020-05-25<br /> Count:794<br /> Hardship:30.23","Group:Dual-parent<br /> Week:2020-06-01<br /> Count:921<br /> Hardship:31.16","Group:Dual-parent<br /> Week:2020-06-08<br /> Count:877<br /> Hardship:32.61","Group:Dual-parent<br /> Week:2020-06-15<br /> Count:973<br /> Hardship:29.8","Group:Dual-parent<br /> Week:2020-06-22<br /> Count:887<br /> Hardship:31.34","Group:Dual-parent<br /> Week:2020-06-29<br /> Count:1038<br /> Hardship:37.67","Group:Dual-parent<br /> Week:2020-07-06<br /> Count:930<br /> Hardship:36.02","Group:Dual-parent<br /> Week:2020-07-13<br /> Count:929<br /> Hardship:33.26","Group:Dual-parent<br /> Week:2020-07-20<br /> Count:962<br /> Hardship:33.47","Group:Dual-parent<br /> Week:2020-07-27<br /> Count:1386<br /> Hardship:33.69","Group:Dual-parent<br /> Week:2020-08-11<br /> Count:1405<br /> Hardship:36.51","Group:Dual-parent<br /> Week:2020-08-25<br /> Count:1315<br /> Hardship:36.2","Group:Dual-parent<br /> Week:2020-09-08<br /> Count:1155<br /> Hardship:39.31","Group:Dual-parent<br /> Week:2020-09-21<br /> Count:1193<br /> Hardship:34.53","Group:Dual-parent<br /> Week:2020-10-06<br /> Count:1076<br /> Hardship:35.87","Group:Dual-parent<br /> Week:2020-10-20<br /> Count:913<br /> Hardship:33.63"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"Dual-parent","legendgroup":"Dual-parent","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[52.8301886792453,58.6776859504132,57.4257425742574,48.3870967741936,50,46.031746031746,54.6511627906977,51,57.3913043478261,59.8039215686275,61.4754098360656,57.6271186440678,59.4936708860759,53.968253968254,58.1818181818182,56.0344827586207,55.4140127388535,58.695652173913,58.3892617449664,66.4473684210526,69.1780821917808,57.6923076923077,56.3829787234043],"text":["Group:Single parent<br /> Week:2020-04-06<br /> Count:106<br /> Hardship:52.83","Group:Single parent<br /> Week:2020-04-14<br /> Count:121<br /> Hardship:58.68","Group:Single parent<br /> Week:2020-04-20<br /> Count:101<br /> Hardship:57.43","Group:Single parent<br /> Week:2020-04-27<br /> Count:62<br /> Hardship:48.39","Group:Single parent<br /> Week:2020-05-04<br /> Count:52<br /> Hardship:50","Group:Single parent<br /> Week:2020-05-11<br /> Count:63<br /> Hardship:46.03","Group:Single parent<br /> Week:2020-05-19<br /> Count:86<br /> Hardship:54.65","Group:Single parent<br /> Week:2020-05-25<br /> Count:100<br /> Hardship:51","Group:Single parent<br /> Week:2020-06-01<br /> Count:115<br /> Hardship:57.39","Group:Single parent<br /> Week:2020-06-08<br /> Count:102<br /> Hardship:59.8","Group:Single parent<br /> Week:2020-06-15<br /> Count:122<br /> Hardship:61.48","Group:Single parent<br /> Week:2020-06-22<br /> Count:118<br /> Hardship:57.63","Group:Single parent<br /> Week:2020-06-29<br /> Count:158<br /> Hardship:59.49","Group:Single parent<br /> Week:2020-07-06<br /> Count:126<br /> Hardship:53.97","Group:Single parent<br /> Week:2020-07-13<br /> Count:110<br /> Hardship:58.18","Group:Single parent<br /> Week:2020-07-20<br /> Count:116<br /> Hardship:56.03","Group:Single parent<br /> Week:2020-07-27<br /> Count:157<br /> Hardship:55.41","Group:Single parent<br /> Week:2020-08-11<br /> Count:138<br /> Hardship:58.7","Group:Single parent<br /> Week:2020-08-25<br /> Count:149<br /> Hardship:58.39","Group:Single parent<br /> Week:2020-09-08<br /> Count:152<br /> Hardship:66.45","Group:Single parent<br /> Week:2020-09-21<br /> Count:146<br /> Hardship:69.18","Group:Single parent<br /> Week:2020-10-06<br /> Count:104<br /> Hardship:57.69","Group:Single parent<br /> Week:2020-10-20<br /> Count:94<br /> Hardship:56.38"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"Single parent","legendgroup":"Single parent","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"frame":null},{"x":[18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474],"y":[21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,21.8709927976275,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596,71.4308007343596],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":47.0236612702366,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of households experiencing at least one material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.15,18564.85],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Week","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[21.8709927976275,71.4308007343596],"tickmode":"array","ticktext":["30","40","50","60","70"],"tickvals":[30,40,50,60,70],"categoryorder":"array","categoryarray":["30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e68157a66":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"528e5a16f3ec":{"x":{},"y":{},"colour":{},"text":{}},"528e18e83929":{"xintercept":{}}},"cur_data":"528e68157a66","visdat":{"528e68157a66":["function (y) ","x"],"528e5a16f3ec":["function (y) ","x"],"528e18e83929":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="low-income" class="section level2">
+<h2>Low Income</h2>
+<div id="htmlwidget-36e1648ec057b327adee" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-36e1648ec057b327adee">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[23.1578947368421,26.972010178117,21.7391304347826,18.9189189189189,17.1597633136095,18.6440677966102,21.9281663516068,21.7543859649123,24.1758241758242,23.6928104575163,21.273516642547,22.662440570523,26.6479663394109,26.4840182648402,25.1655629139073,26.0152284263959,27.4934952298352,28.8566243194192,29.4847328244275,32.7433628318584,26.9148936170213,27.2836538461538,27.6964047936085],"text":["Group:High Income<br /> Week:2020-04-06<br /> Count:285<br /> Hardship:23.16","Group:High Income<br /> Week:2020-04-14<br /> Count:393<br /> Hardship:26.97","Group:High Income<br /> Week:2020-04-20<br /> Count:368<br /> Hardship:21.74","Group:High Income<br /> Week:2020-04-27<br /> Count:333<br /> Hardship:18.92","Group:High Income<br /> Week:2020-05-04<br /> Count:338<br /> Hardship:17.16","Group:High Income<br /> Week:2020-05-11<br /> Count:413<br /> Hardship:18.64","Group:High Income<br /> Week:2020-05-19<br /> Count:529<br /> Hardship:21.93","Group:High Income<br /> Week:2020-05-25<br /> Count:570<br /> Hardship:21.75","Group:High Income<br /> Week:2020-06-01<br /> Count:637<br /> Hardship:24.18","Group:High Income<br /> Week:2020-06-08<br /> Count:612<br /> Hardship:23.69","Group:High Income<br /> Week:2020-06-15<br /> Count:691<br /> Hardship:21.27","Group:High Income<br /> Week:2020-06-22<br /> Count:631<br /> Hardship:22.66","Group:High Income<br /> Week:2020-06-29<br /> Count:713<br /> Hardship:26.65","Group:High Income<br /> Week:2020-07-06<br /> Count:657<br /> Hardship:26.48","Group:High Income<br /> Week:2020-07-13<br /> Count:755<br /> Hardship:25.17","Group:High Income<br /> Week:2020-07-20<br /> Count:788<br /> Hardship:26.02","Group:High Income<br /> Week:2020-07-27<br /> Count:1153<br /> Hardship:27.49","Group:High Income<br /> Week:2020-08-11<br /> Count:1102<br /> Hardship:28.86","Group:High Income<br /> Week:2020-08-25<br /> Count:1048<br /> Hardship:29.48","Group:High Income<br /> Week:2020-09-08<br /> Count:904<br /> Hardship:32.74","Group:High Income<br /> Week:2020-09-21<br /> Count:940<br /> Hardship:26.91","Group:High Income<br /> Week:2020-10-06<br /> Count:832<br /> Hardship:27.28","Group:High Income<br /> Week:2020-10-20<br /> Count:751<br /> Hardship:27.7"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)"}},"hoveron":"points","name":"High Income","legendgroup":"High Income","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(248,118,109,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[65.1612903225806,65.1428571428571,62.7450980392157,55.6521739130435,50.9259259259259,49.2753623188406,53.75,56.9148936170213,57.9185520361991,66.5071770334928,66.5322580645161,62.5,67.6557863501484,64.3137254901961,66.1596958174905,65.6488549618321,64.6198830409357,65.5940594059406,63.2978723404255,66.2087912087912,67.5824175824176,63.905325443787,60.4],"text":["Group:Low Income<br /> Week:2020-04-06<br /> Count:155<br /> Hardship:65.16","Group:Low Income<br /> Week:2020-04-14<br /> Count:175<br /> Hardship:65.14","Group:Low Income<br /> Week:2020-04-20<br /> Count:153<br /> Hardship:62.75","Group:Low Income<br /> Week:2020-04-27<br /> Count:115<br /> Hardship:55.65","Group:Low Income<br /> Week:2020-05-04<br /> Count:108<br /> Hardship:50.93","Group:Low Income<br /> Week:2020-05-11<br /> Count:138<br /> Hardship:49.28","Group:Low Income<br /> Week:2020-05-19<br /> Count:160<br /> Hardship:53.75","Group:Low Income<br /> Week:2020-05-25<br /> Count:188<br /> Hardship:56.91","Group:Low Income<br /> Week:2020-06-01<br /> Count:221<br /> Hardship:57.92","Group:Low Income<br /> Week:2020-06-08<br /> Count:209<br /> Hardship:66.51","Group:Low Income<br /> Week:2020-06-15<br /> Count:248<br /> Hardship:66.53","Group:Low Income<br /> Week:2020-06-22<br /> Count:232<br /> Hardship:62.5","Group:Low Income<br /> Week:2020-06-29<br /> Count:337<br /> Hardship:67.66","Group:Low Income<br /> Week:2020-07-06<br /> Count:255<br /> Hardship:64.31","Group:Low Income<br /> Week:2020-07-13<br /> Count:263<br /> Hardship:66.16","Group:Low Income<br /> Week:2020-07-20<br /> Count:262<br /> Hardship:65.65","Group:Low Income<br /> Week:2020-07-27<br /> Count:342<br /> Hardship:64.62","Group:Low Income<br /> Week:2020-08-11<br /> Count:404<br /> Hardship:65.59","Group:Low Income<br /> Week:2020-08-25<br /> Count:376<br /> Hardship:63.3","Group:Low Income<br /> Week:2020-09-08<br /> Count:364<br /> Hardship:66.21","Group:Low Income<br /> Week:2020-09-21<br /> Count:364<br /> Hardship:67.58","Group:Low Income<br /> Week:2020-10-06<br /> Count:338<br /> Hardship:63.91","Group:Low Income<br /> Week:2020-10-20<br /> Count:250<br /> Hardship:60.4"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)"}},"hoveron":"points","name":"Low Income","legendgroup":"Low Income","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,191,196,1)","dash":"solid"},"frame":null},{"x":[18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474],"y":[14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,14.6349621617825,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753,70.1805875019753],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":47.0236612702366,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of households experiencing at least one material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.15,18564.85],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Week","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[14.6349621617825,70.1805875019753],"tickmode":"array","ticktext":["20","30","40","50","60","70"],"tickvals":[20,30,40,50,60,70],"categoryorder":"array","categoryarray":["20","30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528ee83b3fe":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"528e689df023":{"x":{},"y":{},"colour":{},"text":{}},"528e5900bf7d":{"xintercept":{}}},"cur_data":"528ee83b3fe","visdat":{"528ee83b3fe":["function (y) ","x"],"528e689df023":["function (y) ","x"],"528e5900bf7d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="all-groups" class="section level2">
+<h2>All groups</h2>
+<div id="htmlwidget-f1537b753840f866fc93" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f1537b753840f866fc93">{"x":{"data":[{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[41.8647166361974,41.5781487101669,36.8333333333333,31.6287878787879,26.6294227188082,28.2642089093702,30.9433962264151,32.6256983240223,34.0405014464802,35.4443309499489,33.3333333333333,34.4278606965174,40.6015037593985,38.1628787878788,35.8653846153846,35.899814471243,35.9455958549223,38.4964355152301,38.4562841530055,42.5076452599388,38.3582089552239,37.7646062658764,35.7779980178394],"text":"","type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"Average","legendgroup":"Average","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[46.551724137931,57.5757575757576,65.5172413793103,47.0588235294118,33.3333333333333,48.4848484848485,48.6486486486486,50.7462686567164,51.1363636363636,54.5454545454545,54.4117647058824,59.0476190476191,57.4626865671642,59.6153846153846,46.7889908256881,50.4504504504505,44.8818897637795,45.8333333333333,47.1014492753623,48.0519480519481,51.8181818181818,42.9824561403509,42.5925925925926],"text":["Group:Black<br /> Week:2020-04-06<br /> Count:58<br /> Hardship:46.55","Group:Black<br /> Week:2020-04-14<br /> Count:66<br /> Hardship:57.58","Group:Black<br /> Week:2020-04-20<br /> Count:58<br /> Hardship:65.52","Group:Black<br /> Week:2020-04-27<br /> Count:34<br /> Hardship:47.06","Group:Black<br /> Week:2020-05-04<br /> Count:21<br /> Hardship:33.33","Group:Black<br /> Week:2020-05-11<br /> Count:33<br /> Hardship:48.48","Group:Black<br /> Week:2020-05-19<br /> Count:37<br /> Hardship:48.65","Group:Black<br /> Week:2020-05-25<br /> Count:67<br /> Hardship:50.75","Group:Black<br /> Week:2020-06-01<br /> Count:88<br /> Hardship:51.14","Group:Black<br /> Week:2020-06-08<br /> Count:66<br /> Hardship:54.55","Group:Black<br /> Week:2020-06-15<br /> Count:68<br /> Hardship:54.41","Group:Black<br /> Week:2020-06-22<br /> Count:105<br /> Hardship:59.05","Group:Black<br /> Week:2020-06-29<br /> Count:134<br /> Hardship:57.46","Group:Black<br /> Week:2020-07-06<br /> Count:156<br /> Hardship:59.62","Group:Black<br /> Week:2020-07-13<br /> Count:109<br /> Hardship:46.79","Group:Black<br /> Week:2020-07-20<br /> Count:111<br /> Hardship:50.45","Group:Black<br /> Week:2020-07-27<br /> Count:127<br /> Hardship:44.88","Group:Black<br /> Week:2020-08-11<br /> Count:96<br /> Hardship:45.83","Group:Black<br /> Week:2020-08-25<br /> Count:138<br /> Hardship:47.1","Group:Black<br /> Week:2020-09-08<br /> Count:154<br /> Hardship:48.05","Group:Black<br /> Week:2020-09-21<br /> Count:110<br /> Hardship:51.82","Group:Black<br /> Week:2020-10-06<br /> Count:114<br /> Hardship:42.98","Group:Black<br /> Week:2020-10-20<br /> Count:108<br /> Hardship:42.59"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(102,194,165,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(102,194,165,1)"}},"hoveron":"points","name":"Black","legendgroup":"Black","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(102,194,165,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[59.0909090909091,50.9803921568627,48.1012658227848,39.3617021276596,39.7590361445783,32.2916666666667,38.2352941176471,45.3488372093023,43.1818181818182,45.9459459459459,43.5406698564593,47.953216374269,49.2574257425743,50,53.1400966183575,51.4705882352941,53.8135593220339,55.6862745098039,50.6607929515419,56.0747663551402,52.4752475247525,50.5555555555556,49.685534591195],"text":["Group:LatinX<br /> Week:2020-04-06<br /> Count:88<br /> Hardship:59.09","Group:LatinX<br /> Week:2020-04-14<br /> Count:102<br /> Hardship:50.98","Group:LatinX<br /> Week:2020-04-20<br /> Count:79<br /> Hardship:48.1","Group:LatinX<br /> Week:2020-04-27<br /> Count:94<br /> Hardship:39.36","Group:LatinX<br /> Week:2020-05-04<br /> Count:83<br /> Hardship:39.76","Group:LatinX<br /> Week:2020-05-11<br /> Count:96<br /> Hardship:32.29","Group:LatinX<br /> Week:2020-05-19<br /> Count:136<br /> Hardship:38.24","Group:LatinX<br /> Week:2020-05-25<br /> Count:172<br /> Hardship:45.35","Group:LatinX<br /> Week:2020-06-01<br /> Count:220<br /> Hardship:43.18","Group:LatinX<br /> Week:2020-06-08<br /> Count:185<br /> Hardship:45.95","Group:LatinX<br /> Week:2020-06-15<br /> Count:209<br /> Hardship:43.54","Group:LatinX<br /> Week:2020-06-22<br /> Count:171<br /> Hardship:47.95","Group:LatinX<br /> Week:2020-06-29<br /> Count:404<br /> Hardship:49.26","Group:LatinX<br /> Week:2020-07-06<br /> Count:210<br /> Hardship:50","Group:LatinX<br /> Week:2020-07-13<br /> Count:207<br /> Hardship:53.14","Group:LatinX<br /> Week:2020-07-20<br /> Count:204<br /> Hardship:51.47","Group:LatinX<br /> Week:2020-07-27<br /> Count:236<br /> Hardship:53.81","Group:LatinX<br /> Week:2020-08-11<br /> Count:255<br /> Hardship:55.69","Group:LatinX<br /> Week:2020-08-25<br /> Count:227<br /> Hardship:50.66","Group:LatinX<br /> Week:2020-09-08<br /> Count:214<br /> Hardship:56.07","Group:LatinX<br /> Week:2020-09-21<br /> Count:202<br /> Hardship:52.48","Group:LatinX<br /> Week:2020-10-06<br /> Count:180<br /> Hardship:50.56","Group:LatinX<br /> Week:2020-10-20<br /> Count:159<br /> Hardship:49.69"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(252,141,98,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(252,141,98,1)"}},"hoveron":"points","name":"LatinX","legendgroup":"LatinX","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(252,141,98,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[52.8301886792453,58.6776859504132,57.4257425742574,48.3870967741936,50,46.031746031746,54.6511627906977,51,57.3913043478261,59.8039215686275,61.4754098360656,57.6271186440678,59.4936708860759,53.968253968254,58.1818181818182,56.0344827586207,55.4140127388535,58.695652173913,58.3892617449664,66.4473684210526,69.1780821917808,57.6923076923077,56.3829787234043],"text":["Group:Single parents<br /> Week:2020-04-06<br /> Count:106<br /> Hardship:52.83","Group:Single parents<br /> Week:2020-04-14<br /> Count:121<br /> Hardship:58.68","Group:Single parents<br /> Week:2020-04-20<br /> Count:101<br /> Hardship:57.43","Group:Single parents<br /> Week:2020-04-27<br /> Count:62<br /> Hardship:48.39","Group:Single parents<br /> Week:2020-05-04<br /> Count:52<br /> Hardship:50","Group:Single parents<br /> Week:2020-05-11<br /> Count:63<br /> Hardship:46.03","Group:Single parents<br /> Week:2020-05-19<br /> Count:86<br /> Hardship:54.65","Group:Single parents<br /> Week:2020-05-25<br /> Count:100<br /> Hardship:51","Group:Single parents<br /> Week:2020-06-01<br /> Count:115<br /> Hardship:57.39","Group:Single parents<br /> Week:2020-06-08<br /> Count:102<br /> Hardship:59.8","Group:Single parents<br /> Week:2020-06-15<br /> Count:122<br /> Hardship:61.48","Group:Single parents<br /> Week:2020-06-22<br /> Count:118<br /> Hardship:57.63","Group:Single parents<br /> Week:2020-06-29<br /> Count:158<br /> Hardship:59.49","Group:Single parents<br /> Week:2020-07-06<br /> Count:126<br /> Hardship:53.97","Group:Single parents<br /> Week:2020-07-13<br /> Count:110<br /> Hardship:58.18","Group:Single parents<br /> Week:2020-07-20<br /> Count:116<br /> Hardship:56.03","Group:Single parents<br /> Week:2020-07-27<br /> Count:157<br /> Hardship:55.41","Group:Single parents<br /> Week:2020-08-11<br /> Count:138<br /> Hardship:58.7","Group:Single parents<br /> Week:2020-08-25<br /> Count:149<br /> Hardship:58.39","Group:Single parents<br /> Week:2020-09-08<br /> Count:152<br /> Hardship:66.45","Group:Single parents<br /> Week:2020-09-21<br /> Count:146<br /> Hardship:69.18","Group:Single parents<br /> Week:2020-10-06<br /> Count:104<br /> Hardship:57.69","Group:Single parents<br /> Week:2020-10-20<br /> Count:94<br /> Hardship:56.38"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(231,138,195,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(231,138,195,1)"}},"hoveron":"points","name":"Single parents","legendgroup":"Single parents","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(231,138,195,1)","dash":"solid"},"frame":null},{"x":[18358,18366,18372,18379,18386,18393,18401,18407,18414,18421,18428,18435,18442,18449,18456,18463,18470,18485,18499,18513,18526,18541,18555],"y":[65.1612903225806,65.1428571428571,62.7450980392157,55.6521739130435,50.9259259259259,49.2753623188406,53.75,56.9148936170213,57.9185520361991,66.5071770334928,66.5322580645161,62.5,67.6557863501484,64.3137254901961,66.1596958174905,65.6488549618321,64.6198830409357,65.5940594059406,63.2978723404255,66.2087912087912,67.5824175824176,63.905325443787,60.4],"text":["Group:Low income<br /> Week:2020-04-06<br /> Count:155<br /> Hardship:65.16","Group:Low income<br /> Week:2020-04-14<br /> Count:175<br /> Hardship:65.14","Group:Low income<br /> Week:2020-04-20<br /> Count:153<br /> Hardship:62.75","Group:Low income<br /> Week:2020-04-27<br /> Count:115<br /> Hardship:55.65","Group:Low income<br /> Week:2020-05-04<br /> Count:108<br /> Hardship:50.93","Group:Low income<br /> Week:2020-05-11<br /> Count:138<br /> Hardship:49.28","Group:Low income<br /> Week:2020-05-19<br /> Count:160<br /> Hardship:53.75","Group:Low income<br /> Week:2020-05-25<br /> Count:188<br /> Hardship:56.91","Group:Low income<br /> Week:2020-06-01<br /> Count:221<br /> Hardship:57.92","Group:Low income<br /> Week:2020-06-08<br /> Count:209<br /> Hardship:66.51","Group:Low income<br /> Week:2020-06-15<br /> Count:248<br /> Hardship:66.53","Group:Low income<br /> Week:2020-06-22<br /> Count:232<br /> Hardship:62.5","Group:Low income<br /> Week:2020-06-29<br /> Count:337<br /> Hardship:67.66","Group:Low income<br /> Week:2020-07-06<br /> Count:255<br /> Hardship:64.31","Group:Low income<br /> Week:2020-07-13<br /> Count:263<br /> Hardship:66.16","Group:Low income<br /> Week:2020-07-20<br /> Count:262<br /> Hardship:65.65","Group:Low income<br /> Week:2020-07-27<br /> Count:342<br /> Hardship:64.62","Group:Low income<br /> Week:2020-08-11<br /> Count:404<br /> Hardship:65.59","Group:Low income<br /> Week:2020-08-25<br /> Count:376<br /> Hardship:63.3","Group:Low income<br /> Week:2020-09-08<br /> Count:364<br /> Hardship:66.21","Group:Low income<br /> Week:2020-09-21<br /> Count:364<br /> Hardship:67.58","Group:Low income<br /> Week:2020-10-06<br /> Count:338<br /> Hardship:63.91","Group:Low income<br /> Week:2020-10-20<br /> Count:250<br /> Hardship:60.4"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(141,160,203,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(141,160,203,1)"}},"hoveron":"points","name":"Low income","legendgroup":"Low income","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(141,160,203,1)","dash":"solid"},"frame":null},{"x":[18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474,18474],"y":[24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,24.5019897451596,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295,71.3055151654295],"text":"","type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(255,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":47.0236612702366,"l":27.8953922789539},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of households experiencing at least one material hardship","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18348.15,18564.85],"tickmode":"array","ticktext":["Apr","Jul","Oct"],"tickvals":[18353,18444,18536],"categoryorder":"array","categoryarray":["Apr","Jul","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y","title":{"text":"Week","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[24.5019897451596,71.3055151654295],"tickmode":"array","ticktext":["30","40","50","60","70"],"tickvals":[30,40,50,60,70],"categoryorder":"array","categoryarray":["30","40","50","60","70"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e5ab625f7":{"x":{},"y":{},"colour":{},"type":"scatter"},"528e6c76a9a7":{"x":{},"y":{},"colour":{}},"528e627c4a92":{"x":{},"y":{},"colour":{},"text":{}},"528e4e03e9c1":{"x":{},"y":{},"colour":{},"text":{}},"528e62e7a5ea":{"xintercept":{}}},"cur_data":"528e5ab625f7","visdat":{"528e5ab625f7":["function (y) ","x"],"528e6c76a9a7":["function (y) ","x"],"528e627c4a92":["function (y) ","x"],"528e4e03e9c1":["function (y) ","x"],"528e62e7a5ea":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="number-of-hardships" class="section level1 tabset">
+<h1 class="tabset">Number of hardships</h1>
+<p>Note that foreclosure and housing were combined into a single variable.</p>
+<div id="overall-1" class="section level2">
+<h2>Overall</h2>
+<p><img src="hardship_cares_files/figure-html/hardship-cares-14-1.png" width="672" /></p>
+</div>
+<div id="black-african-american" class="section level2">
+<h2>Black African American</h2>
+<p><img src="hardship_cares_files/figure-html/hardship-cares-15-1.png" width="672" /></p>
+</div>
+<div id="latinx-1" class="section level2">
+<h2>LatinX</h2>
+<p><img src="hardship_cares_files/figure-html/hardship-cares-16-1.png" width="672" /></p>
+</div>
+<div id="single" class="section level2">
+<h2>Single</h2>
+<p><img src="hardship_cares_files/figure-html/hardship-cares-17-1.png" width="672" /></p>
+</div>
+<div id="low-income-1" class="section level2">
+<h2>Low Income</h2>
+<p><img src="hardship_cares_files/figure-html/hardship-cares-18-1.png" width="672" /></p>
+</div>
+<div id="all-groups-1" class="section level2">
+<h2>All Groups</h2>
+<p><img src="hardship_cares_files/figure-html/hardship-cares-19-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

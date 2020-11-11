@@ -1,0 +1,482 @@
+---
+title: "Who is participating?"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    theme: paper
+---
+
+```{r demographics-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tsibble)
+library(brolgar)
+```
+
+```{r score_datafile, echo = F, warning = F, message = F}
+source(here("Scripts/score data.R"))
+```
+
+
+```{r demographics-2, key_demographics}
+source(here("Scripts/demo groups.R"))
+```
+
+```{r demographics-3}
+max_weeks = max(scored$Week, na.rm=T)
+start_dates = seq(as.Date("2020-04-07"), by = 7, length.out = max_weeks)
+end_dates = seq(as.Date("2020-04-13"), by = 7, length.out = max_weeks)
+start_dates[1] = as.Date("2020-04-06")
+
+start_dates = format(start_dates, format = "%B %d")
+end_dates = format(end_dates, format = "%B %d")
+
+all_dates = paste(start_dates, "-", end_dates)
+```
+
+# Across all parents sampled
+
+```{r demographics-4, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  select(all_of(binary_demos)) %>%
+  gather("Demographic", "value") %>%
+  group_by(Demographic) %>%
+  summarize(Count = sum(value,na.rm=T),
+            total = n()) %>%
+  mutate(Demographic = factor(Demographic, 
+                              levels = binary_demos, 
+                              labels = binary_labels),
+         Percent = 100*Count/total) %>%
+  select(Demographic, Count, Percent) %>%
+  kable(., col.names = c("Demographic", "Count", "Percent of sample"),
+        digits = c(0,0,1)) %>%
+  kable_styling() %>%
+  scroll_box(width = "650px")
+```
+
+## Income (Self-reported)
+
+```{r demographics-5}
+source(here("Functions/income_levels.R"))
+```
+
+```{r demographics-6, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  filter(!is.na(income)) %>%
+  summarize(Mean = mean(income),
+            Median = median(income),
+            Bottom10 = quantile(income, probs = c(.10)),
+            Top10 = quantile(income, probs = c(.90))) %>%
+  kable(., col.names = c("Average", "Median", "Lowest 10%", "Top 10%")) %>%
+  kable_styling()
+```
+
+
+```{r demographics-7, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  filter(!is.na(income)) %>%
+  mutate(income_cat = income_levels(income, num_levels = 25)) %>%
+  group_by(income_cat) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  kable(., 
+        col.names = c("Income (in thounsands per year)", "Count", "Percent"), 
+        digits = c(0,0,1)) %>%
+  kable_styling()
+```
+
+## Income (Median household in zip)
+
+```{r demographics-8}
+source(here("Functions/income_levels.R"))
+```
+
+```{r demographics-9, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  filter(!is.na(median_income)) %>%
+  summarize(Mean = mean(median_income),
+            Median = median(median_income),
+            Bottom10 = quantile(median_income, probs = c(.10)),
+            Top10 = quantile(median_income, probs = c(.90))) %>%
+  kable(., col.names = c("Average", "Median", "Lowest 10%", "Top 10%")) %>%
+  kable_styling()
+```
+
+
+```{r demographics-10, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  filter(!is.na(median_income)) %>%
+  mutate(income_cat = income_levels(median_income, num_levels = 25)) %>%
+  group_by(income_cat) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  kable(., 
+        col.names = c("Income (in thounsands per year)", "Count", "Percent"), 
+        digits = c(0,0,1)) %>%
+  kable_styling()
+```
+
+## Healthcare
+
+```{r demographics-11, results = 'asis'}
+source(here("Scripts/health variables.R"))
+scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup() %>%
+  select(healthcare_vars) %>%
+  gather("variable", "value") %>%
+  group_by(variable) %>%
+  summarize(Count = sum(value,na.rm=T),
+            total = n()) %>%
+  mutate(variable = factor(variable, 
+                              levels = healthcare_vars, 
+                              labels = healthcare_labels),
+         Percent = 100*Count/total) %>%
+  select(variable, Count, Percent) %>%
+  kable(., col.names = c("Variable", "Count", "Percent of sample"),
+        digits = c(0,0,1)) %>%
+  kable_styling() %>%
+  scroll_box(width = "650px")
+```
+
+
+## Comparisons with national demographics {.tabset}
+
+```{r demographics-12}
+source(here("Scripts/compare nation/load_pop.R"))
+```
+
+### Gender
+
+```{r demographics-13, out.width='100%', code = readLines(here("Scripts/compare nation/gender.R"))}
+```
+
+### Nationality
+
+```{r demographics-14, out.width='100%', code = readLines(here("Scripts/compare nation/nationality.R"))}
+```
+
+### Nationality by region
+
+```{r demographics-15, out.width='100%', code = readLines(here("Scripts/compare nation/nationality_region.R"))}
+```
+
+### Ethnicity by region
+
+```{r demographics-16, out.width='100%', code = readLines(here("Scripts/compare nation/ethnicity.R"))}
+```
+
+# Numbers by the week
+
+```{r demographics-17, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(binary_demos)) %>%
+  gather("Demographic", value, -Week) %>%
+  group_by(Week, Demographic) %>%
+  summarize(Count = sum(value,na.rm=T)) %>%
+  mutate(Demographic = factor(Demographic, 
+                              levels = binary_demos, 
+                              labels = binary_labels)) %>%
+  ungroup() %>%
+  spread("Week", "Count") %>%
+  kable(., col.names = c("Demographic", all_dates)) %>%
+  kable_styling() %>%
+  scroll_box(width = "650px")
+```
+
+
+
+## Self-reported Income
+
+```{r demographics-18, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, income) %>%
+  filter(!is.na(income)) %>%
+  group_by(Week) %>%
+  summarize(Mean = mean(income),
+            Median = median(income),
+            Bottom10 = quantile(income, probs = c(.10)),
+            Top10 = quantile(income, probs = c(.90))) %>%
+  kable(., col.names = c("Week", "Average", "Median", "Lowest 10%", "Top 10%")) %>%
+  kable_styling()
+```
+
+
+```{r demographics-19, results = 'asis'}
+tab.inc = scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week>0) %>%
+  ungroup() %>%
+  filter(!is.na(income)) %>%
+  mutate(income_cat = income_levels(income, num_levels = 25)) %>%
+  group_by(Week, income_cat) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  gather("stat","value", Count, Percent) %>%
+  mutate(stat = paste0("Week", Week,"_",stat)) %>%
+  select(-Week) %>%
+  spread(stat,value) 
+
+beginning = "tab.inc %>% kable(., format = \"html\", col.names = c(\"Income (in thounsands per year)\", rep(c(\"Count\", \"Percent\"), max_weeks)), digits = c(0, rep(c(0,1), max_weeks))) %>% kable_styling() %>%"
+
+header = paste0(",\"Week ", 1:max_weeks, "\" = 2", collapse = "")
+
+header = paste0("add_header_above( c( \" \" = 1", header, ")) %>% scroll_box(width = \"650px\")")
+
+eval(parse(text = paste0(beginning, header)))
+```
+
+```{r demographics-20}
+ts_income = scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week>0) %>%
+  ungroup() %>%
+  filter(!is.na(income)) %>%
+  mutate(income_cat = income_levels(income, num_levels = 25)) %>%
+  group_by(Week, income_cat) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count)) 
+
+ts_income <- as_tsibble(ts_income,
+                      index = Week,
+                      key = income_cat,
+                      regular = FALSE)
+
+ts_income %>%
+  ggplot(aes(x = Week, y = Percent, color = income_cat)) +
+  geom_line() +
+  #facet_wrap(~income_cat) +
+  facet_strata(n_strata = 6) +
+  labs(color = "Yearly income (in thousands)")+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+## Average household income in zip
+
+```{r demographics-21, results = 'asis'}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, median_income) %>%
+  rename(income = median_income) %>%
+  filter(!is.na(income)) %>%
+  group_by(Week) %>%
+  summarize(Mean = mean(income),
+            Median = median(income),
+            Bottom10 = quantile(income, probs = c(.10)),
+            Top10 = quantile(income, probs = c(.90))) %>%
+  kable(., col.names = c("Week", "Average", "Median", "Lowest 10%", "Top 10%")) %>%
+  kable_styling()
+```
+
+
+```{r demographics-22, results = 'asis'}
+tab.inc = scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week>0) %>%
+  ungroup() %>%
+  filter(!is.na(median_income)) %>%
+  mutate(income_cat = income_levels(median_income, num_levels = 25)) %>%
+  group_by(Week, income_cat) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count)) %>%
+  gather("stat","value", Count, Percent) %>%
+  mutate(stat = paste0("Week", Week,"_",stat)) %>%
+  select(-Week) %>%
+  spread(stat,value) 
+
+beginning = "tab.inc %>% kable(., format = \"html\", col.names = c(\"Income (in thounsands per year)\", rep(c(\"Count\", \"Percent\"), max_weeks)), digits = c(0, rep(c(0,1), max_weeks))) %>% kable_styling() %>%"
+
+header = paste0(",\"Week ", 1:max_weeks, "\" = 2", collapse = "")
+
+header = paste0("add_header_above( c( \" \" = 1", header, ")) %>% scroll_box(width = \"650px\")")
+
+eval(parse(text = paste0(beginning, header)))
+```
+
+```{r demographics-23}
+ts_income = scored %>%
+  filter(Week > 0) %>%
+  group_by(CaregiverID) %>%
+  filter(Week>0) %>%
+  ungroup() %>%
+  filter(!is.na(median_income)) %>%
+  mutate(income_cat = income_levels(median_income, num_levels = 25)) %>%
+  group_by(Week, income_cat) %>%
+  summarize(Count = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/sum(Count)) 
+
+ts_income <- as_tsibble(ts_income,
+                      index = Week,
+                      key = income_cat,
+                      regular = FALSE)
+
+ts_income %>%
+  ggplot(aes(x = Week, y = Percent, color = income_cat)) +
+  geom_line() +
+  facet_wrap(~income_facet) +
+  facet_strata(n_strata = 6) +
+  labs(color = "Yearly income (in thousands)")+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+
+
+## Healthcare
+
+```{r demographics-24, results = 'asis'}
+source(here("Scripts/health variables.R"))
+tab.hc = scored %>%
+  filter(Week > 0) %>%
+  select(Week, healthcare_vars) %>%
+  gather("variable", "value", -Week) %>%
+  group_by(Week, variable) %>% 
+  filter(!is.na(value)) %>%
+  summarize(Count = sum(value), n = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/n) %>%
+  select(-n) %>%
+  gather("stat","value", Count, Percent) %>%
+  mutate(stat = paste0("Week", Week,"_",stat)) %>%
+  select(-Week) %>%
+  spread(stat,value) 
+
+beginning = "tab.hc %>% kable(., format = \"html\", col.names = c(\"Income (in thounsands per year)\", rep(c(\"Count\", \"Percent\"), max_weeks)), digits = c(0, rep(c(0,1), max_weeks))) %>% kable_styling() %>%"
+
+header = paste0(",\"Week ", 1:max_weeks, "\" = 2", collapse = "")
+
+header = paste0("add_header_above( c( \" \" = 1", header, ")) %>% scroll_box(width = \"650px\")")
+
+eval(parse(text = paste0(beginning, header)))
+```
+
+```{r demographics-25}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, healthcare_vars) %>%
+  gather("variable", "value", -Week) %>%
+  group_by(Week, variable) %>% 
+  filter(!is.na(value)) %>%
+  summarize(Count = sum(value), n = n()) %>%
+  ungroup() %>%
+  mutate(Percent = 100*Count/n,
+         variable = factor(variable, levels = healthcare_vars, labels = healthcare_labels)) %>%
+  ggplot(aes(x = Week, y = Percent, color = variable)) +
+  geom_line()
+```
+
+# Percentages by the week
+
+## Table
+
+```{r demographics-26, results = 'asis', out.width='100%'}
+total = scored %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  summarize(Total = n())
+
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, all_of(binary_demos)) %>%
+  gather("Demographic", value, -Week) %>%
+  group_by(Week, Demographic) %>%
+  summarize(Count = sum(value,na.rm=T)) %>%
+  mutate(Demographic = factor(Demographic, 
+                              levels = binary_demos, 
+                              labels = binary_labels)) %>%
+  ungroup() %>%
+  full_join(total) %>%
+  mutate(Count = 100*Count/Total) %>%
+  select(-Total) %>%
+  spread("Week", "Count") %>%
+  kable(., col.names = c("Demographic", all_dates), digits = 1) %>%
+  kable_styling() %>%
+  scroll_box(width = "650px")
+```
+
+## Compare to national demographics
+
+```{r demographics-27}
+nation_race = pop %>%
+  select(TotalPop.Count, 
+         (contains("Race") & contains("Count"))) %>%
+  gather(demo, count) %>%
+  group_by(demo) %>%
+  summarize(count = sum(count)) %>%
+  spread(demo, count) %>%
+  mutate(native.Percent = 100*Race.Amer.Ind.Count/TotalPop.Count,
+         asian.Percent = 100*Race.Asian.Count/TotalPop.Count,
+         black.Percent = 100*Race.Black.Count/TotalPop.Count,
+         hawaii.Percent = 100*Race.Nat.HI.Count/TotalPop.Count,
+         white.Percent = 100*Race.White.Count/TotalPop.Count,
+         other.Percent = 100*Race.Other.Count/TotalPop.Count,
+         latinx.Percent = 100*Race.Hispanic.Count/TotalPop.Count) %>%
+  gather("demo", "Percent", contains("Percent")) %>%
+  mutate(demo = gsub("\\.Percent", "", demo),
+         race_cat = factor(demo, 
+                           levels = c(nation, "latinx"), 
+                           labels = c(nation_labels, "Hispanic/Latinx"))) %>%
+  select(race_cat, Percent) 
+
+scored %>%
+  select(Week, race_cat, latinx) %>%
+  mutate(latinx = ifelse(latinx == 1, "Hispanic/Latinx", NA)) %>%
+  group_by(Week) %>%
+  mutate(Total = n())%>%
+  ungroup() %>%
+  gather(x, "race_cat", -Week, -Total) %>%
+  select(-x) %>%
+  filter(!is.na(race_cat)) %>%
+  group_by(Week, race_cat) %>%
+  summarize(Count = n(),
+            Total = min(Total)) %>%
+  mutate(Percent = 100*Count/Total) %>%
+  ggplot(aes(x = Week, y = Percent)) +
+  geom_point()+
+  geom_line() +
+  geom_hline(aes(yintercept = Percent, color = "US Population"), data = nation_race)+
+  scale_x_continuous(breaks = c(1:max_weeks))+
+  facet_wrap(~race_cat, scales = "free_y", ncol = 2) +
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+

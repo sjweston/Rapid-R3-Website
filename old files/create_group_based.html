@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Create group-based pages</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="0prelim_april27.html">Sheltering in place</a>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict (summer)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="winter_is_coming.html">Covid cases rising</a>
+    </li>
+    <li>
+      <a href="Family-Conflict-based-on-Master-Data.html">Family conflict (fall)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texas</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Groups
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="group_single_report.html">Single caregivers</a>
+    </li>
+    <li>
+      <a href="group_latinx_report.html">Latinx caregivers</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Create group-based pages</h1>
+
+</div>
+
+
+<pre class="r"><code>library(here)
+library(tidyverse)
+library(ggpubr)
+library(plotly)
+source(here(&quot;Scripts/score data.R&quot;))</code></pre>
+<pre class="r"><code>groups.df = tribble(
+  ~group, ~variable, ~title, ~grp.name,
+  &quot;black&quot;, &quot;black&quot;, &quot;Analysis of Black/African American households&quot;, &quot;Black&quot;,
+  &quot;latinx&quot;, &quot;latinx&quot;, &quot;Analysis of Hispanic/Latinx households&quot;, &quot;Latinx&quot;,
+    &quot;single&quot;, &quot;single&quot;, &quot;Analysis of single caregiver households&quot;, &quot;Single&quot;
+
+)</code></pre>
+<pre class="r"><code>for (subgroup in 1:nrow(groups.df)) {
+  rmarkdown::render(&quot;_group_based.Rmd&quot;, 
+                    params = list(subset = groups.df$variable[subgroup],
+                                  title = groups.df$title[subgroup],
+                                  grp.name = groups.df$grp.name[subgroup]),
+                    output_file=paste0(&quot;group_&quot;,groups.df$group[subgroup], 
+                                       &quot;_report.html&quot;))
+}</code></pre>
+<pre><code>## 
+## 
+## processing file: _group_based.Rmd</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |.                                                                     |   1%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |..                                                                    |   3%
+## label: usda-1 (with options) 
+## List of 1
+##  $ echo: symbol F
+## 
+## 
+  |                                                                            
+  |...                                                                   |   4%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |....                                                                  |   6%
+## label: unnamed-chunk-1
+## 
+  |                                                                            
+  |.....                                                                 |   7%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |......                                                                |   8%
+## label: unnamed-chunk-2
+## 
+  |                                                                            
+  |.......                                                               |  10%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |........                                                              |  11%
+## label: unnamed-chunk-3</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.........                                                             |  13%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..........                                                            |  14%
+## label: unnamed-chunk-4</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...........                                                           |  15%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |............                                                          |  17%
+## label: unnamed-chunk-5</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;income.cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.............                                                         |  18%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..............                                                        |  20%
+## label: unnamed-chunk-6</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;poverty_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...............                                                       |  21%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |................                                                      |  23%
+## label: unnamed-chunk-7</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;unemployed_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.................                                                     |  24%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..................                                                    |  25%
+## label: unnamed-chunk-8</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;employment_change&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...................                                                   |  27%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |....................                                                  |  28%
+## label: unnamed-chunk-9</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;race_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.....................                                                 |  30%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |......................                                                |  31%
+## label: unnamed-chunk-10</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;latinx_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.......................                                               |  32%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |........................                                              |  34%
+## label: unnamed-chunk-11</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;single_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.........................                                             |  35%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..........................                                            |  37%
+## label: unnamed-chunk-12
+## 
+  |                                                                            
+  |...........................                                           |  38%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |............................                                          |  39%
+## label: unnamed-chunk-13</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.............................                                         |  41%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..............................                                        |  42%
+## label: unnamed-chunk-14
+## 
+  |                                                                            
+  |...............................                                       |  44%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |................................                                      |  45%
+## label: unnamed-chunk-15</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.................................                                     |  46%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..................................                                    |  48%
+## label: unnamed-chunk-16</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...................................                                   |  49%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................                                   |  51%
+## label: unnamed-chunk-17</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |....................................                                  |  52%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.....................................                                 |  54%
+## label: unnamed-chunk-18</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................                                |  55%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.......................................                               |  56%
+## label: unnamed-chunk-19</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |........................................                              |  58%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.........................................                             |  59%
+## label: unnamed-chunk-20</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;variable&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..........................................                            |  61%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...........................................                           |  62%
+## label: unnamed-chunk-21</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39;, &#39;variable&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |............................................                          |  63%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.............................................                         |  65%
+## label: unnamed-chunk-22</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..............................................                        |  66%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...............................................                       |  68%
+## label: unnamed-chunk-23
+## 
+  |                                                                            
+  |................................................                      |  69%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.................................................                     |  70%
+## label: unnamed-chunk-24</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..................................................                    |  72%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................................                   |  73%
+## label: unnamed-chunk-25
+## 
+  |                                                                            
+  |....................................................                  |  75%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.....................................................                 |  76%
+## label: unnamed-chunk-26</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................................                |  77%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.......................................................               |  79%
+## label: unnamed-chunk-27
+## 
+  |                                                                            
+  |........................................................              |  80%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.........................................................             |  82%
+## label: unnamed-chunk-28</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..........................................................            |  83%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...........................................................           |  85%
+## label: unnamed-chunk-29
+## 
+  |                                                                            
+  |............................................................          |  86%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.............................................................         |  87%
+## label: unnamed-chunk-30</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..............................................................        |  89%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...............................................................       |  90%
+## label: unnamed-chunk-31
+## 
+  |                                                                            
+  |................................................................      |  92%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.................................................................     |  93%
+## label: unnamed-chunk-32</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..................................................................    |  94%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................................................   |  96%
+## label: unnamed-chunk-33
+## 
+  |                                                                            
+  |....................................................................  |  97%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |..................................................................... |  99%
+## label: unnamed-chunk-34</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................................................| 100%
+##   ordinary text without R code</code></pre>
+<pre><code>## output file: _group_based.knit.md</code></pre>
+<pre><code>## /Applications/RStudio.app/Contents/MacOS/pandoc/pandoc +RTS -K512m -RTS _group_based.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output group_black_report.html --lua-filter /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/83/gb7xskdj0db9dny6t2pzz0600000gp/T//Rtmpuj1RIg/rmarkdown-str528e2045ba7e.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/83/gb7xskdj0db9dny6t2pzz0600000gp/T//Rtmpuj1RIg/rmarkdown-str528e41d6b6bf.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## 
+## Output created: group_black_report.html
+## 
+## 
+## processing file: _group_based.Rmd</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |.                                                                     |   1%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |..                                                                    |   3%
+## label: usda-1 (with options) 
+## List of 1
+##  $ echo: symbol F
+## 
+## 
+  |                                                                            
+  |...                                                                   |   4%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |....                                                                  |   6%
+## label: unnamed-chunk-1
+## 
+  |                                                                            
+  |.....                                                                 |   7%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |......                                                                |   8%
+## label: unnamed-chunk-2
+## 
+  |                                                                            
+  |.......                                                               |  10%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |........                                                              |  11%
+## label: unnamed-chunk-3</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.........                                                             |  13%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..........                                                            |  14%
+## label: unnamed-chunk-4</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...........                                                           |  15%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |............                                                          |  17%
+## label: unnamed-chunk-5</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;income.cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.............                                                         |  18%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..............                                                        |  20%
+## label: unnamed-chunk-6</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;poverty_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...............                                                       |  21%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |................                                                      |  23%
+## label: unnamed-chunk-7</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;unemployed_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.................                                                     |  24%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..................                                                    |  25%
+## label: unnamed-chunk-8</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;employment_change&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...................                                                   |  27%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |....................                                                  |  28%
+## label: unnamed-chunk-9</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;race_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.....................                                                 |  30%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |......................                                                |  31%
+## label: unnamed-chunk-10</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;latinx_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.......................                                               |  32%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |........................                                              |  34%
+## label: unnamed-chunk-11</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;single_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.........................                                             |  35%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..........................                                            |  37%
+## label: unnamed-chunk-12
+## 
+  |                                                                            
+  |...........................                                           |  38%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |............................                                          |  39%
+## label: unnamed-chunk-13</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.............................                                         |  41%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..............................                                        |  42%
+## label: unnamed-chunk-14
+## 
+  |                                                                            
+  |...............................                                       |  44%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |................................                                      |  45%
+## label: unnamed-chunk-15</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.................................                                     |  46%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..................................                                    |  48%
+## label: unnamed-chunk-16</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...................................                                   |  49%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................                                   |  51%
+## label: unnamed-chunk-17</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |....................................                                  |  52%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.....................................                                 |  54%
+## label: unnamed-chunk-18</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................                                |  55%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.......................................                               |  56%
+## label: unnamed-chunk-19</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |........................................                              |  58%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.........................................                             |  59%
+## label: unnamed-chunk-20</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;variable&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..........................................                            |  61%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...........................................                           |  62%
+## label: unnamed-chunk-21</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39;, &#39;variable&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |............................................                          |  63%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.............................................                         |  65%
+## label: unnamed-chunk-22</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..............................................                        |  66%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...............................................                       |  68%
+## label: unnamed-chunk-23
+## 
+  |                                                                            
+  |................................................                      |  69%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.................................................                     |  70%
+## label: unnamed-chunk-24</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..................................................                    |  72%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................................                   |  73%
+## label: unnamed-chunk-25
+## 
+  |                                                                            
+  |....................................................                  |  75%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.....................................................                 |  76%
+## label: unnamed-chunk-26</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................................                |  77%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.......................................................               |  79%
+## label: unnamed-chunk-27
+## 
+  |                                                                            
+  |........................................................              |  80%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.........................................................             |  82%
+## label: unnamed-chunk-28</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..........................................................            |  83%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...........................................................           |  85%
+## label: unnamed-chunk-29
+## 
+  |                                                                            
+  |............................................................          |  86%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.............................................................         |  87%
+## label: unnamed-chunk-30</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..............................................................        |  89%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...............................................................       |  90%
+## label: unnamed-chunk-31
+## 
+  |                                                                            
+  |................................................................      |  92%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.................................................................     |  93%
+## label: unnamed-chunk-32</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..................................................................    |  94%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................................................   |  96%
+## label: unnamed-chunk-33
+## 
+  |                                                                            
+  |....................................................................  |  97%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |..................................................................... |  99%
+## label: unnamed-chunk-34</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................................................| 100%
+##   ordinary text without R code</code></pre>
+<pre><code>## output file: _group_based.knit.md</code></pre>
+<pre><code>## /Applications/RStudio.app/Contents/MacOS/pandoc/pandoc +RTS -K512m -RTS _group_based.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output group_latinx_report.html --lua-filter /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/83/gb7xskdj0db9dny6t2pzz0600000gp/T//Rtmpuj1RIg/rmarkdown-str528e42f46ea.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/83/gb7xskdj0db9dny6t2pzz0600000gp/T//Rtmpuj1RIg/rmarkdown-str528e3bd8aecb.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## 
+## Output created: group_latinx_report.html
+## 
+## 
+## processing file: _group_based.Rmd</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |.                                                                     |   1%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |..                                                                    |   3%
+## label: usda-1 (with options) 
+## List of 1
+##  $ echo: symbol F
+## 
+## 
+  |                                                                            
+  |...                                                                   |   4%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |....                                                                  |   6%
+## label: unnamed-chunk-1
+## 
+  |                                                                            
+  |.....                                                                 |   7%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |......                                                                |   8%
+## label: unnamed-chunk-2
+## 
+  |                                                                            
+  |.......                                                               |  10%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |........                                                              |  11%
+## label: unnamed-chunk-3</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.........                                                             |  13%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..........                                                            |  14%
+## label: unnamed-chunk-4</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...........                                                           |  15%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |............                                                          |  17%
+## label: unnamed-chunk-5</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;income.cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.............                                                         |  18%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..............                                                        |  20%
+## label: unnamed-chunk-6</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;poverty_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...............                                                       |  21%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |................                                                      |  23%
+## label: unnamed-chunk-7</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;unemployed_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.................                                                     |  24%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..................                                                    |  25%
+## label: unnamed-chunk-8</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;employment_change&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...................                                                   |  27%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |....................                                                  |  28%
+## label: unnamed-chunk-9</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;race_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.....................                                                 |  30%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |......................                                                |  31%
+## label: unnamed-chunk-10</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;latinx_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.......................                                               |  32%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |........................                                              |  34%
+## label: unnamed-chunk-11</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;single_cat&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.........................                                             |  35%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..........................                                            |  37%
+## label: unnamed-chunk-12
+## 
+  |                                                                            
+  |...........................                                           |  38%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |............................                                          |  39%
+## label: unnamed-chunk-13</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.............................                                         |  41%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..............................                                        |  42%
+## label: unnamed-chunk-14
+## 
+  |                                                                            
+  |...............................                                       |  44%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |................................                                      |  45%
+## label: unnamed-chunk-15</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |.................................                                     |  46%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |..................................                                    |  48%
+## label: unnamed-chunk-16</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |...................................                                   |  49%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................                                   |  51%
+## label: unnamed-chunk-17</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |....................................                                  |  52%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.....................................                                 |  54%
+## label: unnamed-chunk-18</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................                                |  55%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.......................................                               |  56%
+## label: unnamed-chunk-19</code></pre>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |........................................                              |  58%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.........................................                             |  59%
+## label: unnamed-chunk-20</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;variable&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..........................................                            |  61%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...........................................                           |  62%
+## label: unnamed-chunk-21</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## Warning in min.default(structure(c(NA_real_, NA_real_, NA_real_, NA_real_, : no
+## non-missing arguments to min; returning Inf</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39;, &#39;variable&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |............................................                          |  63%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.............................................                         |  65%
+## label: unnamed-chunk-22</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;group_f&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..............................................                        |  66%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...............................................                       |  68%
+## label: unnamed-chunk-23
+## 
+  |                                                                            
+  |................................................                      |  69%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.................................................                     |  70%
+## label: unnamed-chunk-24</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..................................................                    |  72%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................................                   |  73%
+## label: unnamed-chunk-25
+## 
+  |                                                                            
+  |....................................................                  |  75%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.....................................................                 |  76%
+## label: unnamed-chunk-26</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................................                |  77%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.......................................................               |  79%
+## label: unnamed-chunk-27
+## 
+  |                                                                            
+  |........................................................              |  80%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.........................................................             |  82%
+## label: unnamed-chunk-28</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..........................................................            |  83%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...........................................................           |  85%
+## label: unnamed-chunk-29
+## 
+  |                                                                            
+  |............................................................          |  86%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |.............................................................         |  87%
+## label: unnamed-chunk-30</code></pre>
+<pre><code>## `summarise()` regrouping output by &#39;Week&#39; (override with `.groups` argument)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..............................................................        |  89%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...............................................................       |  90%
+## label: unnamed-chunk-31
+## 
+  |                                                                            
+  |................................................................      |  92%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |.................................................................     |  93%
+## label: unnamed-chunk-32</code></pre>
+<pre><code>## 
+  |                                                                            
+  |..................................................................    |  94%
+##   ordinary text without R code
+## 
+## 
+  |                                                                            
+  |...................................................................   |  96%
+## label: unnamed-chunk-33
+## 
+  |                                                                            
+  |....................................................................  |  97%
+##    inline R code fragments
+## 
+## 
+  |                                                                            
+  |..................................................................... |  99%
+## label: unnamed-chunk-34</code></pre>
+<pre><code>## 
+  |                                                                            
+  |......................................................................| 100%
+##   ordinary text without R code</code></pre>
+<pre><code>## output file: _group_based.knit.md</code></pre>
+<pre><code>## /Applications/RStudio.app/Contents/MacOS/pandoc/pandoc +RTS -K512m -RTS _group_based.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output group_single_report.html --lua-filter /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /Library/Frameworks/R.framework/Versions/4.0/Resources/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/83/gb7xskdj0db9dny6t2pzz0600000gp/T//Rtmpuj1RIg/rmarkdown-str528e221bd9f5.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/83/gb7xskdj0db9dny6t2pzz0600000gp/T//Rtmpuj1RIg/rmarkdown-str528e52827551.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## 
+## Output created: group_single_report.html</code></pre>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,352 @@
+---
+title: "Unemployment benefits"
+output: 
+  pdf_document:
+    toc: TRUE
+---
+
+
+
+```{r usda-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=11)
+options(knitr.kable.NA = '')
+```
+
+```{r usda-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r usda-3 }
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+```
+
+```{r}
+scored = scored %>%
+  group_by(Week) %>%
+  mutate(Date = min(Date)) %>%
+  ungroup() %>%
+  mutate(race = case_when(
+    black == 1 ~ "Black",
+    latinx == 1 ~ "Latinx",
+    white == 1 ~ "White",
+    TRUE ~ NA_character_
+  )) %>%
+  mutate(poverty150_cat = factor(poverty150,
+                             labels = c("Middle- to High-Income", "Low-Income")))
+```
+
+
+
+## Representativeness disclaimer
+
+```{r usda-6 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+# Lose job if take sick leave{.tabset}
+
+_If you were unable to work because you lost your child care provider or your child's school shut down, were you approved to receive unemployment benefits?_
+
+## All
+
+```{r}
+plot = scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(collectUI) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(
+    x = collectUI,
+    y = percent,
+    text = paste0(
+      "Count: ", count,
+      "\nPercent: ", round(percent, 1)))) +
+  geom_bar(stat = "identity") +
+  labs(x = NULL) +
+  theme_pubr()
+plot
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(collectUI) %>%
+  summarize(count = n()) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  kable(booktabs = T, digits = 2,
+        col.names = c("Response", "Count", "Percent")) %>%
+  kable_styling()
+```
+
+
+## Over time
+
+```{r}
+scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(Date, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ungroup() %>%
+  ggplot(aes(
+    x = Date,
+    y = percent,
+    color = collectUI
+    )) +
+  geom_line() +
+  labs(x = NULL) +
+  theme_pubr()
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(Date, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  kable(booktabs = T, digits = 2,
+        col.names = c("Date","Response", "Count", "Percent")) %>%
+  kable_styling()
+```
+
+## By race/ethnicity
+
+```{r}
+plot = scored %>%
+  filter(!is.na(collectUI) & !is.na(race)) %>%
+  group_by(race, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(race) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ungroup() %>%
+  ggplot(aes(
+    x = race,
+    y = percent,
+    fill = collectUI,
+    #group = 1,
+    text = paste0(
+      "race: ", race,
+      "\nCount: ", count,
+      "\nPercent: ", round(percent, 1))
+    )) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, fill = NULL) +
+  theme_pubr()
+plot
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(collectUI) & !is.na(race)) %>%
+  group_by(race, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(race) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  kable(booktabs = T, digits = 2,
+        col.names = c("Race","Response", "Count", "Percent")) %>%
+  kable_styling()
+```
+
+## By income
+
+```{r}
+plot = scored %>%
+  filter(!is.na(collectUI) & !is.na(poverty150_cat)) %>%
+  group_by(poverty150_cat, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(poverty150_cat) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ungroup() %>%
+  ggplot(aes(
+    x = poverty150_cat,
+    y = percent,
+    fill = collectUI,
+    #group = 1,
+    text = paste0(
+       poverty150_cat,
+      "\nCount: ", count,
+      "\nPercent: ", round(percent, 1))
+    )) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, fill = NULL) +
+  theme_pubr()
+plot
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(collectUI) & !is.na(poverty150_cat)) %>%
+  group_by(poverty150_cat, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(poverty150_cat) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  kable(booktabs = T, digits = 2,
+        col.names = c("Income","Response", "Count", "Percent")) %>%
+  kable_styling()
+```
+
+
+## By race by income
+
+```{r}
+plot = scored %>%
+  filter(!is.na(collectUI) & !is.na(race) & !is.na(poverty150_cat)) %>%
+  group_by(race, poverty150_cat, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(race, poverty150_cat) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ungroup() %>%
+  ggplot(aes(
+    x = race,
+    y = percent,
+    fill = poverty150_cat,
+    #group = 1,
+    text = paste0(
+       poverty150_cat,
+      "\nCount: ", count,
+      "\nPercent: ", round(percent, 1))
+    )) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, fill = NULL) +
+  facet_wrap(~collectUI, scales = "free") +
+  theme_pubr()
+plot
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(collectUI) & !is.na(race) & !is.na(poverty150_cat)) %>%
+  group_by(race, poverty150_cat, collectUI) %>%
+  summarize(count = n()) %>%
+  group_by(race, poverty150_cat) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  kable(booktabs = T, digits = 2,
+        col.names = c("Race","Income","Response", "Count", "Percent")) %>%
+  kable_styling()
+```
+
+# Navigating unemployment benefits
+
+_How difficult was it to navigate the application process?_
+
+Note there are not enough responses to this question to examine change over time or sub group analyses.
+
+## All
+
+```{r}
+plot = scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(collectUI, difficultyUI) %>%
+  summarize(count = n()) %>%
+  group_by(collectUI) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(
+    x = collectUI,
+    y = percent,
+    fill = difficultyUI,
+    text = paste0(
+      difficultyUI,
+      "\nCount: ", count,
+      "\nPercent: ", round(percent, 1)))) +
+  geom_bar(stat = "identity") +
+  labs(x = NULL, fill = NULL) +
+  theme_pubr()
+
+plot
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(collectUI, difficultyUI) %>%
+  summarize(count = n()) %>%
+  group_by(collectUI) %>%
+  mutate(percent = 100*count/sum(count))%>%
+  kable(booktabs = T, digits = 2,
+        col.names = c("Collected unemployment","How easy was process", "Count", "Percent")) %>%
+  kable_styling()
+```
+
+# Directed to specific programs
+
+_Were you directed to file for Pandemic Unemployment Assistance (PUA) or Families First Coronavirus Response Act (FFCRA) benefits?_
+
+Note there are not enough responses to this question to examine change over time or sub group analyses.
+
+## All
+
+```{r}
+plot = scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(collectUI, UIdirectedPUA) %>%
+  summarize(count = n()) %>%
+  group_by(collectUI) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(
+    x = collectUI,
+    y = percent,
+    fill = UIdirectedPUA,
+    text = paste0(
+      UIdirectedPUA,
+      "\nCount: ", count,
+      "\nPercent: ", round(percent, 1)))) +
+  geom_bar(stat = "identity") +
+  labs(x = NULL, fill = NULL) +
+  theme_pubr()
+
+plot
+```
+
+```{r, results = 'asis'}
+scored %>%
+  filter(!is.na(collectUI)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(collectUI, UIdirectedPUA) %>%
+  summarize(count = n()) %>%
+  group_by(collectUI) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  kable(booktabs = T, digits = 2,
+        col.names = c("Collected unemployment","Was directed to PUA or FFCRA","Count", "Percent")) %>%
+  kable_styling()
+```
