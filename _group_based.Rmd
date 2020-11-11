@@ -99,6 +99,20 @@ Since the beginning of the survey, `r prettyNum(n_groups, big.mark = ",")` `r st
 count_by_week(group, params$grp.name)
 ```
 
+```{r policy-state-7 }
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week))
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted. 
+
 # Demographics{.tabset}
 
 ## Age
