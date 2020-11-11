@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Open-ended childcare responses</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="0prelim_april27.html">Sheltering in place</a>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="winter_is_coming.html">Covid cases rising</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texax</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Open-ended childcare responses</h1>
+
+</div>
+
+
+<div id="non-parental-childcare-over-time" class="section level1 tabset">
+<h1 class="tabset">Non-parental childcare over time</h1>
+<p><em>This week, have you used any non-parental care for your child(ren) under the age of 5?</em></p>
+<p>Response options: Yes, No, Unsure</p>
+<div id="rolling-average" class="section level2">
+<h2>Rolling average</h2>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-4-1.png" width="672" /><img src="open_childcare_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+</div>
+</div>
+<div id="challenges" class="section level1">
+<h1>Challenges</h1>
+<p><em>What are the biggest challenges and concerns for you and your family right now?</em></p>
+<div id="word-count" class="section level2 tabset">
+<h2 class="tabset">Word count</h2>
+<div id="race" class="section level3">
+<h3>Race</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="income" class="section level3">
+<h3>Income</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="mental-health" class="section level3">
+<h3>Mental health</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+</div>
+<div id="how-many-topics" class="section level2">
+<h2>How many topics</h2>
+<p><img src="open_childcare_files/figure-html/-open-childcare-9-1.png" width="672" /></p>
+</div>
+<div id="most-common-topics" class="section level2">
+<h2>Most common topics</h2>
+<p><img src="open_childcare_files/figure-html/-open-childcare-15-1.png" width="672" /></p>
+</div>
+<div id="identify-topics" class="section level2 tabset">
+<h2 class="tabset">Identify topics</h2>
+<div id="all" class="section level3">
+<h3>All</h3>
+</div>
+<div id="section" class="section level3">
+<h3>1</h3>
+<pre><code>## Topic 1 Top Words:
+##       Highest Prob: incom, financi, offic, reduc, think 
+##       FREX: financi, offic, debt, reduc, incom 
+##       Lift: finaci, financi, debt, offic, transport 
+##       Score: financi, finaci, offic, incom, reduc</code></pre>
+<pre><code>## 
+##  Topic 1: 
+##       Steady income, finding childcare.
+##      Reduced income, childcare
+##      reduced income, returning my child to daycare
+##      We have no childcare, indefinitely, and my job is pushing us to go back into the office.
+##      Financial burden of building debt coupled with taking on full time childcare, causing one parent loss of time to work and generate income</code></pre>
+</div>
+<div id="section-1" class="section level3">
+<h3>2</h3>
+<pre><code>## Topic 2 Top Words:
+##       Highest Prob: get, sick, hard, take, leav 
+##       FREX: sick, get, done, hard, groceri 
+##       Lift: workdaycar, emerg, impati, sick, breastfeed 
+##       Score: get, sick, workdaycar, hard, done</code></pre>
+<pre><code>## 
+##  Topic 2: 
+##       My biggest concern is that I had to use all of my paid time off (sick leave and vacation) when my daughter was born for pregnancy recovery and parental leave. I&#39;m also taking intermittent parental leave one day per week until my daughter turns one. However, in order to do this, I have to have my paid leave banks exhausted all of the time, so I&#39;m very fearful of me or my wife getting sick and being too sick to work and me having no leave. I pay for a short term disability policy but it doesn&#39;t take effect until you&#39;ve missed 2 weeks pay and then it is only 60% income replacement. The policy also only covers my own illness and wouldn&#39;t help if my wife was too sick to care for our children.
+## 
+## The lack of paid parental leave and paid pregnancy disability leave makes our income feel more precarious as a single income household (due to the high cost of childcare where we live, my wife stays home to care for our children) during this public health emergency.
+##      Getting mental health and marriage counseling .
+## The health of my mother, who does all childcare is troublesome.   She has 2 autoimmune diseases and we are concerned about exposing her
+##      My son needs services, possible autism cannot get diagnosed at Kennedy kreiger even on short wait list cannot get in, my daughter wants to be with friends and go to summer camp but waiting for day care to open
+##      We recently sent our child back to daycare and it&#39;s been great for everyone&#39;s mental health; however, there is the stress of her getting sick and bringing it back home. I&#39;m currently 36 weeks pregnant so am concerned about what that would mean if she got sick and passed it on to us.
+##      Sharing child care duties while getting important things done for each person, equally</code></pre>
+</div>
+<div id="section-2" class="section level3">
+<h3>3</h3>
+<pre><code>## Topic 3 Top Words:
+##       Highest Prob: babysitt, expos, babi, test, covid 
+##       FREX: babysitt, test, result, expos, medic 
+##       Lift: cold, ppd, patient, rest, result 
+##       Score: babysitt, cold, test, result, diagnos</code></pre>
+<pre><code>## 
+##  Topic 3: 
+##       My daughter was always on the shy side and sometimes with separation anxiety, a lot of which I attributed to my being a stay at home mom and her always being with me. But since we’ve been completely quarantining for months due to fears of Covid I worry she’ll be socially regressed after this. She’s great with her dad and I but I don’t know how she’ll be with others. Also, it’s been hard to never get a break as a SAHM and hard on our marriage. We used to use a babysitter to go on dates and we miss that.
+##      My husband and I being able to have a break from our infant has been difficult because we can&#39;t really have a babysitter with the pandemic. We also can&#39;t go out to eat or walk around the mall or really go anywhere fun because it&#39;s unsafe. It&#39;s very isolating to live like this.
+##      I&#39;m afraid to seek outside help like a babysitter but I am sleep deprived and was recently diagnosed with PPD.
+##      I am unwilling to seek non-parental help (hiring a babysitter) due to fear that it will expose our household to COVID 19.
+##      I work in healthcare and I could be exposed to Covid. I&#39;m not sure if my husband would be comfortable with me quarentining I&#39;m there house if I were exposed. We also could really use a break from childcare, which has more to do with my work hours than Covid, but also there aren&#39;t many options for social outlets for the 3 year old and he&#39;s been desperate for friends.</code></pre>
+</div>
+<div id="section-3" class="section level3">
+<h3>4</h3>
+<pre><code>## Topic 4 Top Words:
+##       Highest Prob: due, covid, hour, risk, exposur 
+##       FREX: exposur, due, risk, hour, center 
+##       Lift: serv, shorten, trace, busier, transit 
+##       Score: transit, due, shorten, hour, week</code></pre>
+<pre><code>## 
+##  Topic 4: 
+##       We had to change daycare due to our previous in home daycare closing. We are very concerned about having to stop working in order to care for our child. They closed due to new state ordered restrictions put in place due to covid. Many childcare places have closed due to this in Maine.
+##      If I&#39;m un-furloughed it&#39;s a high covid risk position plus my daughter&#39;s risk at daycare.
+##      There have been positive COVID cases in the daycare but the daycare isn&#39;t very concerned and isn&#39;t tracing. Daycare has limited hours and is no longer serving food but the cost has stayed the same.
+##      I am concerned about finding quality childcare. Many daycare centers are still closed or have limited numbers of children they are taking due to the pandemic. We cannot find our infant a daycare spot and have had to rely on one off baby sitters and family  members to watch him.
+##      General safety when attending daycare due to concerns with COVID-19 infection.</code></pre>
+</div>
+<div id="section-4" class="section level3">
+<h3>5</h3>
+<pre><code>## Topic 5 Top Words:
+##       Highest Prob: work, home, time, full, parent 
+##       FREX: work, full, home, time, manag 
+##       Lift: oblig, full, work, kids’, home 
+##       Score: home, work, time, full, oblig</code></pre>
+<pre><code>## 
+##  Topic 5: 
+##       Continuing to manage full-time work from home with full time childcare at home
+##      One parent working full time at hospital/ high exposure risks, other parent (self) managing working from home full time and taking care of 1 yr old at same time- both parents work in “essential” fields and work same shift / daycare is currently closed. Biggest fear is (self) retuning to work in office 7/20 and child going back to daycare
+##      Managing WFH more than full time while also managing childcare.
+##      Managing work and home education/child care obligations.
+##      Two parents Working from home without childcare</code></pre>
+</div>
+<div id="section-5" class="section level3">
+<h3>6</h3>
+<pre><code>## Topic 6 Top Words:
+##       Highest Prob: provid, support, unemploy, isol, parent 
+##       FREX: support, provid, overwhelm, isol, unemploy 
+##       Lift: abus, aunt, support, coordin, provid 
+##       Score: support, abus, provid, isol, unemploy</code></pre>
+<pre><code>## 
+##  Topic 6: 
+##       Financial instability, mother/grandma who is our biggest support is in poor health and her healthcare is expensive, I have poor mental health and my child’s father has substance abuse issues and does not provide financial or child care support.
+##      Coordinating childcare between roommates who are out of work and on unemployment and the child&#39;s Aunt &amp; Uncle.  Providing appropriate social emotional support to my child.
+##      Worried about cases increasing and immune compromised grandma (and childcare provider) catching it
+##      Contracting COVID, Running out of sick leave, &amp; not receiving a paycheck. Would not have childcare or any support should that occur
+##      The loss of the unemployment stipend ($600/week) has pushed us immediately off of a cliff and into free fall.
+## 
+## As a solo parent I have been unable to find work because there is no free and reliable childcare, and even private daycare is unreliable, and has limited scheduling available.</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-6" class="section level3">
+<h3>7</h3>
+<pre><code>## Topic 7 Top Words:
+##       Highest Prob: school, children, learn, remot, virtual 
+##       FREX: learn, remot, children, virtual, school 
+##       Lift: substanc, remot, learn, virtual, children 
+##       Score: school, learn, substanc, children, remot</code></pre>
+<pre><code>## 
+##  Topic 7: 
+##       Virtual learning and childcare
+##      virtual learning our 2nd grader-keeping him motivated. and if day care closes or we have to quarantine, virtual learning will be 100x more difficult
+##      In our area there is only remote learning.  So I&#39;m looking to quit my job . My older children  can&#39;t help my smaller children  during class
+##      Navigating homeschooling; my children aren’t a private school with a remote learning option, and we are the only family in their classes that has opted for remote learning. We purchased a secular homeschool curriculum (because 5 &amp; 3 year olds don’t want to sit in front of an iPad), and check in with their classes a few times a week. We are learning what schooling looks like for us.
+##      Remote learning and childcare</code></pre>
+</div>
+<div id="section-7" class="section level3">
+<h3>8</h3>
+<pre><code>## Topic 8 Top Words:
+##       Highest Prob: care, child, find, afford, health 
+##       FREX: care, find, child, afford, futur 
+##       Lift: reduct, decent, consist, find, care 
+##       Score: care, child, find, reduct, afford</code></pre>
+<pre><code>## 
+##  Topic 8: 
+##       Economical issues and child care.
+##      Child education future child care
+##      Finances, child care and affordability of mental health care.
+##      Finding employment and safe child care
+##      Primary concerns are not being able to find affordable child care while I find work.</code></pre>
+</div>
+<div id="section-8" class="section level3">
+<h3>9</h3>
+<pre><code>## Topic 9 Top Words:
+##       Highest Prob: make, money, enough, much, can 
+##       FREX: money, enough, make, adequ, problem 
+##       Lift: corona, adequ, money, deni, enough 
+##       Score: enough, money, corona, make, adequ</code></pre>
+<pre><code>## 
+##  Topic 9: 
+##       Loss of usual childcare. Previously had an au pair, by executive order has blocked those visas through end of 2020. Unsure how we will find similar childcare without spending a ton of money
+##      Concern over money if I stay furloughed and my concern that I’m giving baby enough stimulus and education since he’s not going to daycare.
+##      I am having an uncomfortable pregnancy. Money will be tighter once the second baby arrives due to cost of childcare.
+##      I am pregnant and I do not make much money. I am worried about the cost of childcare.
+##      Money for bills, mortgage payment, daycare, car payment</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-9" class="section level3">
+<h3>10</h3>
+<pre><code>## Topic 10 Top Words:
+##       Highest Prob: childcar, balanc, schedul, job, can 
+##       FREX: balanc, childcar, reliabl, schedul, self-employ 
+##       Lift: self-employ, balanc, childcar, reliabl, immens 
+##       Score: childcar, balanc, self-employ, reliabl, appropri</code></pre>
+<pre><code>## 
+##  Topic 10: 
+##       No childcare - balancing work &amp; childcare.
+##      Balancing 2 schedules with childcare
+##      balancing work and childcare - helped immensely by childcare reopening
+##      Balancing work and childcare
+##      Balancing work and childcare</code></pre>
+</div>
+<div id="section-10" class="section level3">
+<h3>11</h3>
+<pre><code>## Topic 11 Top Words:
+##       Highest Prob: daycar, back, send, worri, daughter 
+##       FREX: back, daycar, send, want, worri 
+##       Lift: workplac, hardest, thrill, ifwhen, freelanc 
+##       Score: daycar, back, send, workplac, routin</code></pre>
+<pre><code>## 
+##  Topic 11: 
+##       Routines. Especially bedtime routines. Still a little anxiety as they go back to daycare. Separation anxiety.
+##      Whether or not to send our son back to daycare. Cases are blowing up and the stories of outbreaks at daycares freak me out, but our “new normal” is so exhausting!
+##      Scared to send kids back to daycare and scared to go back to the office
+##      I have no idea when work is going to call me back and my daycare wants to know when we’re coming back. I don’t want to pay for something I don’t need so the uncertainty is very stressful
+##      I am worried about going back to the office and sending my kids to daycare. I am worried that my employer will suddenly call us back and I’m not ready. I am also terrified of the winter</code></pre>
+</div>
+<div id="section-11" class="section level3">
+<h3>12</h3>
+<pre><code>## Topic 12 Top Words:
+##       Highest Prob: week, time, husband, pandem, now 
+##       FREX: structur, per, contract, independ, campus 
+##       Lift: urgent, averag, handyman, own, preschooldaycar 
+##       Score: preschooldaycar, week, structur, watch, potti</code></pre>
+<pre><code>## 
+##  Topic 12: 
+##       My husband owns his own handyman home repair business. It has slowed greatly because people don&#39;t have much money for repairs right now and because people don&#39;t want people in their house much right now. I am a stay at home mom, but I nanny part time for a family whose mother is a nurse. Her hours have gone down a bit (but she has not been laid off luckily), but that means my hours watching her kids have also decreased, which also hurts our income right now. I am also 34 weeks pregnant and kind of emotional at the moment, paired with my husband&#39;s recent behaviors, and our finances being VERY tight this week/month - that has been the point of my recent stress/anxiety. One other thing to point out though, is that is has been very difficult to be in the Texas heat wearing any sort of mask (which I only wear on the rare occasions I am out in public like the grocery store - per our county&#39;s mask mandate).
+##      My husband owns his own handyman home repair business. With the pandemic, people don&#39;t really want visitors in their homes. So his work has dramatically slowed down, lots of big projects cancelled. I bring my daughter with me to nanny a few days a week for a mom who is an urgent care nurse. Her work has thankfully not laid anyone off, but her hours have decreased, which mean I watch her daughter 2 days/wk now instead of previously 3 days/wk, which also means decreased income for us. Besides finances, a lot of my recent stress (in the last week), has been because of potty training my daughter. Even though it&#39;s going well, it&#39;s a test of patience and very stressful at times. And my husband and I have had 2 major fights in the past week, which is uncommon for us. So my stress is not totally from the pandemic.
+##      My husband works for himself and his work has slowed because of COVID and the craziness of the world right now. I nanny part time for an urgent care nurse (and take my daughter with me). She has been able to keep working (despite a lot of other urgent care places laying off employees). So this has been a life saver that I am still able to nanny for her during this time. But her hours have been cut a bit. Thus my hours nannying for her have gone down a little as well (about 2/3 of what they were before). And this week, my daughter has been a little more defiant and clingy and ups/down emotionally because we have just started potty training her. On a usual basis, she is not fussy or defiant at all. But she is testing boundaries these days. Just to see what happens.
+##      Loneliness. We are really trying to do our part to help stop the pandemic by minimizing visits with family and friends. This past week, I had a virtual conference for my field (I am a grad student), and my mom and sister came to help with the baby. It made such a world of difference to be able to hug and spend time with someone in addition to my husband. 
+## Childcare is the other biggest challenge, insofar as I need to write my dissertation. I get frustrated sometimes that my paycheck is the more reliable of the two of us but my husband&#39;s job takes precedent over how we spend our time (he is a journalist so he has to be available at all hours, even though they will only pay him for 35, 40 before the pandemic started). It is really hard to find writing time or interview time with my participants because of this. Before the pandemic, I had planned to hire an in-home nanny two days a week. Now, it&#39;s just me and the baby until my husband runs out his 35 hours; then he takes her and I have more research and writing time at the end of the week. So the beginning of the week is always more frustrating than the end regarding our lack of childcare.
+##      Youngest child’s behavior (has autism and not having structure of preschool/daycare has been very hard for him).</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-12" class="section level3">
+<h3>13</h3>
+<pre><code>## Topic 13 Top Words:
+##       Highest Prob: need, help, kid, social, famili 
+##       FREX: need, meet, help, therapi, develop 
+##       Lift: event, evalu, aris, need, realiz 
+##       Score: need, event, meet, help, social</code></pre>
+<pre><code>## 
+##  Topic 13: 
+##       We desperately need help from family members, or access to free childcare and socialization for the kids, for multiple reasons: to give us a break, to give us time to find jobs, to help social development for the kids, to help my oldest child feel somewhat normal, etc.
+##      No longer having help from family with childcare. 
+## The kids understand the virus but are frustrated that they can no longer do many of the things they once enjoyed doing.
+##      We are concerned about our 3 year old’s development and education. He was thriving in preschool and now that it’s closed we struggle with providing him the attention and stimulation that he needs. We have a newborn and no outside help with childcare.
+##      Being unemployed and not knowing if I&#39;ll be employed at the end of the pandemic. If I need to change careers. What to do for childcare if I do need to change careers. My child has asthma.
+##      Limiting our interaction and exposure to others when we need medical care, childcare, etc. Elderly family members who want to continue going out on a regular basis.</code></pre>
+</div>
+<div id="section-13" class="section level3">
+<h3>14</h3>
+<pre><code>## Topic 14 Top Words:
+##       Highest Prob: year, old, children, month, two 
+##       FREX: year, old, ensur, privat, contact 
+##       Lift: immers, ensur, altern, spanish, workchildcar 
+##       Score: year, old, immers, privat, ensur</code></pre>
+<pre><code>## 
+##  Topic 14: 
+##       My biggest concern is about the social development of my daughter. Prior to Covid, we did mom and baby music classes, story times, and Bible studies. For my daughter, she interacted with other adults and toddlers and then suddenly she no longer saw any children and the only adults in her life became me and my husband. She is young, but I wonder if it will affect anything to have gone several months without the opportunity to interact with different adults or other children.
+##      As a teacher, my biggest concern is teaching and whether they will let us work from home or force us to teach from our classrooms(remotely).
+## I am also seeing more increased social issues for my 5 year old. We’ve seen a behavior change in him especially over the last three weeks.
+##      Ensuring interactions with other children when we are not enrolled in daycare or Spanish immersion.
+##      I will be returning to work, as maternity leave is ending. My job involves a lot of exposure to the public and young children. I am asthmatic and the 3 year old has a part of a lung missing due to a congenital birth defect. The three year old and 2 month old have to go to daycare, and the older children have to go in person to school so my husband and I can work.
+##      Expecting a second child in 6 weeks and fearful of having family visit, watch our oldest.   Would it be safe to go back to daycare?   Who can we really trust with our children as restrictions are loosening and everyone has decided what their own personal definition of &quot;safe&quot; is.  Delivering the baby alone if we can&#39;t trust anyone to be there for us safely</code></pre>
+</div>
+<div id="section-14" class="section level3">
+<h3>15</h3>
+<pre><code>## Topic 15 Top Words:
+##       Highest Prob: hous, move, nanni, parent, also 
+##       FREX: move, hous, nanni, prepar, loan 
+##       Lift: loan, move, mandatori, divorc, prepar 
+##       Score: loan, move, divorc, hous, nanni</code></pre>
+<pre><code>## 
+##  Topic 15: 
+##       Got called for jury duty, trial may be an extended period. Previous childcare arrangement not sufficient.
+##      My spouse and I are slowly but surely untangling our finances in preparation for divorce. The kids are handling a two-time arrangement reasonably well. My three year old does not really understand what our divorce means, and he is doing pretty well at adjusting to our new family life. My now six year old (five when I started the survey process) is struggling. She is realizing that her parents won&#39;t be getting back together, and that has been heartbreaking. Our nanny also has noticed our six year old acting out a bit more.
+##      Childcare. I’m a graduate student employed as a teaching assistant. COVID actually improved my mental well-being because I ended up home with my kids all summer with barely any work to do (I get paid anyway). I had less stress and was actually able to hang out with my kids, whereas before I saw them for like an hour at night before bed. But now that school is starting up, I’m worried about COVID cases exploding in my college town. I worry about what I will do if daycare closes but I still have to teach. And right now finances are tight, my husband hours were cut (unrelatedly to COVID) and my student loans don’t come for another couple weeks.
+##      distance learning kindergarten, newly immigrated step child and husband, no work visa for my husband held up by USCIS, no childcare when he can get a job eventually, can&#39;t afford childcare, many house repairs and expenses, using up all of my savings, very stressful as a nurse working right now
+##      childcare- private nanny costs too much and daycare centers with masks all day would impact language development for baby upon moms return to work.
+## 
+## School/childcare for older kids- they will be hoke alone and parents will be unable to provide appropriate level of learning support. District is all virtual and both kids have special needs and learning differences with IEPs that the district cannot accommodate. Oldest child developed depression during spring with suicidal ideation, so very concerned about leaving him home alone with noone but his younger sister for company</code></pre>
+</div>
+<div id="section-15" class="section level3">
+<h3>16</h3>
+<pre><code>## Topic 16 Top Words:
+##       Highest Prob: sinc, financ, week, employ, time 
+##       FREX: financ, begin, util, search, sinc 
+##       Lift: tax, risen, file, search, director 
+##       Score: tax, financ, search, employ, march</code></pre>
+<pre><code>## 
+##  Topic 16: 
+##       Our daughter just started preschool again 2 weeks ago after being at home for six months during Pandemic... Unfortunately she was just dismissed because she wasn&#39;t behaving properly. They gave her 4 days to adjust and now we have no childcare available. It is extremely frustrating when adults don&#39;t understand the children need time to adjust.
+##      I was recalled from my job from being on furlough since March. I work in a child care facility and when we closed in March, I was paid by the director until June. I then was furloughed in July and was recalled to my position on 8/29. However, I was only working part time (3 days) when put on furlough and I was recalled to work 5 days. I was unable to do so since I only have child care 3 days a week from my mother. So I had to quit my job. I have been searching for a part time job (working 3 days) since quitting my job. I have been waiting for a decision to be made by unemployment since the beginning of the month to see if I still qualify for unemployment benefits. So essentially, I have had no income for 3 weeks and we have been relying on our savings which are draining. So finances are a challenge and me finding new work is stressful since I can only
+## work 3 days due to child care. Additionally, my very active 3.5 year old was pulled from school in March and we are trying to get him enrolled in a local preschool to help him have some routine, peer socialization &amp; time being active outside of the home.
+##      Managing infant twins is hard enough to begin with, but I wish we could get a break or have childcare help. Also I am in the middle of changing jobs and we close on a new house this week. So many life changes at once just is stressful - even if they are positive changes, they require a lot of time and attention to detail.
+##      My husband is self employed and got no government help. We filed our taxes late and got no stimulus payment. My son started speech therapy for the first time in the middle of this pandemic and it’s been rough. I teach high school and march-may teaching from home was awful when daycares closed.
+##      My job may be at risk, with sweeping layoffs coming. Even if I am lucky to maintain a position at my company, it would be smart to begin the search for a new role elsewhere. But looking for a job and potentially starting a new job while I am facing less than ideal childcare issues seems like such a hurdle.</code></pre>
+</div>
+<div id="section-16" class="section level3">
+<h3>17</h3>
+<pre><code>## Topic 17 Top Words:
+##       Highest Prob: abl, feel, mean, husband, babi 
+##       FREX: abl, mean, hold, near, feel 
+##       Lift: daycareschool, court, unless, caretak, intend 
+##       Score: abl, daycareschool, hold, care, husband</code></pre>
+<pre><code>## 
+##  Topic 17: 
+##       My husband and I are both working from home and splitting childcare. We had intended to hire someone to help with childcare but don&#39;t feel confortable doing that in light of the pandemic. We have to split shifts so someone is always caring for the baby, which means we don&#39;t see each other much.
+##      Knowing the right choice for how much social distancing is enough - especially when it comes to using my mother in law, who is in her 70s for childcare. She was our primary childcare before. Having her back would make an immense difference, but are we putting her at risk? Especially knowing soon my husband may need to travel for work and I may need to go back to a busy, open office environment. In the meantime while we delay that decision, it is just the daily stress of managing video conferences while caring for a busy toddler who is too young for independent play - and then doing the work that can’t be completed during the day overnight.... which means every day is managed with sleep deprivation.
+##      We were able to put our mortgage payment on hold in March when my husband was laid off, but the payment will be due in lump sum in August unless we’re able to update the terms of our loan. While we were able to save money, it would be a strain on us financially to pay the lump sum.
+## We still do not have a long term child care plan for our son, particularly because none of the options we have outside of our home feel 100% safe so for the most part he is staying with me while I work from home, and my mom is able to help some. 
+## It is also getting stressful that the local cases continue to climb and my husband works in a healthcare job where he must be close to others. While they are taking precautions, I’m growing more concerned he may bring home the virus and what that could mean for him, my son, my mom and me. 
+## 
+##      Baby is scared of everyone except my husband and I, so getting help with child care is nearly impossible. My parents are able to come help off and on as they live a couple hours away, but our daughter screams whenever anyone else tries to come near her / hold her.
+##      Like everyone else, childcare. We don’t feel like center-based care will be reliable this year with closures any time there is a diagnosis. We are fortunate enough to be able to afford a nanny, but it is hard to find qualified candidates, especially now that schools are virtual. We have a hospital employee in our home too which makes some people wary of helping us and means we can’t rely on grandparent help like we used to.</code></pre>
+</div>
+<div id="section-17" class="section level3">
+<h3>18</h3>
+<pre><code>## Topic 18 Top Words:
+##       Highest Prob: pay, bill, food, cost, expens 
+##       FREX: bill, pay, food, expens, cost 
+##       Lift: fund, oper, item, workno, higher 
+##       Score: fund, pay, bill, food, expens</code></pre>
+<pre><code>## 
+##  Topic 18: 
+##       affordable childcare. We are paying for a nanny which we can barely afford AND we are trying to negotiate with our daycare provider not to give away our spot because once the pandemic is over spots for daycare are going to be a mad scramble. So we will probably end up paying THEM as well to keep our spot.
+##      We would like to put our girls with a good daycare but prices per child are outrageous,  even for part time care.  Also,  not all caregivers apply food, snacks,  diapers,  etc. That would be an additional cost on our end
+##      Prices have gotten a lot higher during the pandemic.  The foods we normally buy are sometimes out of stock so we&#39;re forced to buy higher priced items.  I had to take my child out of daycare because I couldn&#39;t afford the cost anymore.  It&#39;s okay for now because I&#39;m working from home but it puts more stress on me to try to get work done and keep her occupied at the same time.
+##      child care and food cost. I work in a clinic as a senior medical assistant. I am up at 4am with my children to get them to my mothers house for daycare because i cant not afford to pay for child care for my two kids. I try to pay my mom every two weeks between 100-200 dollars because that is all i can afford to her. I am very grateful that she helps me. Even though she doesnt offer me to pay i still insist because caring for someone&#39;s child is hard work.
+##      Paying for quality food and paying for college courses in childcare</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-18" class="section level3">
+<h3>19</h3>
+<pre><code>## Topic 19 Top Words:
+##       Highest Prob: social, friend, famili, see, day 
+##       FREX: friend, play, group, visit, miss 
+##       Lift: mommi, playgroup, recogn, energet, hasn’t 
+##       Score: playgroup, friend, group, miss, toddler</code></pre>
+<pre><code>## 
+##  Topic 19: 
+##       We had a very active social life pre-pandemic and have not socialized with anyone with March 11th. Our weeks were busy and fun, filled with preschool, play dates, playgrounds, gymnastics class, family visits, and now my daughter is missing her friends and teachers terribly. I am struggling with my own loneliness and fear. Although they weren’t very close, my husbands grandmother just passed away in a nursing home from Covid-19, and it has made us very apprehensive about visiting either of our parents. We wish we had answers about when the world might look more like it did before.
+##      I&#39;m concerned about loneliness and feeling disconnected. My biggest concern is about my daughters. The three year old goes to prek3, but they&#39;re not allowed to sit next to each other or play together. She misses her friends a lot and is always desperate to play with other children when we go to the park. Every day she asks to play with a friend or to go to the playground to see if she can find any friends. It breaks my heart. Before she started prek3 in September,  we&#39;d  spent the full 6 mo that in isolation. She had started getting depressed. My sweet 3 year old was depressed. She said things like &quot;my tummy hurts&quot;, and she wasn&#39;t sick or hungry or injured. She would spend part of her nap time yelling out her bedroom window &quot;animals come! My name is xyz. Animals come!&quot; Because she wanted animal friends. One night she started singing &quot;we&#39;re  sad, we&#39;re sad, family is sad, because we&#39;re trapped, we&#39;re trapped, in the house &quot;. She would get sad when we talked to her grandparents on the tablet, pointing out that they were not here. The first 4 mos of the pandemic were so hard. Now for my 7 mo th old I worry about her socialization. And having friends -- how is she going to make friends?? She is at home with us, not daycare. When should we start setting up aydates for her? Should we? Can we?? What are the first 2 years of her life going to be with this isolation?????
+##      We just started a nannyshare with a neighbor/colleague for our 4.5 year old, 6 month old, and our neighbor&#39;s 7 month old. Our 6 month old cries the entire day. The ENTIRE DAY. Every moment she&#39;s awake she scream cries. She cries so much her voice is hoarse. She gave herself a blood nose yesterday. So our 4.5 year old is reasonably distressed and just hangs out in the basement or hides in our home &quot;office&quot; with his earphones on. I recognize that this may be partly developmental, but it&#39;s painful. The only silver lining (small, and mixed bag) is that she sleeps well for the nanny, but this is partly because she&#39;s so exhausted from crying that she just passes out.
+##      I stay at home with my children and did prior to the pandemic. What we are sorely missing right now is community. We were very involved in programs and classes like at the library and art center. It is hard on us to not have much social interaction and friendship.
+##      Social development while we&#39;re isolated from friends &amp; playgroups.</code></pre>
+</div>
+<div id="section-19" class="section level3">
+<h3>20</h3>
+<pre><code>## Topic 20 Top Words:
+##       Highest Prob: lack, social, stress, access, home 
+##       FREX: lack, access, space, clean, live 
+##       Lift: necess, outdoor, sport, fresh, internet 
+##       Score: lack, outdoor, govern, product, live</code></pre>
+<pre><code>## 
+##  Topic 20: 
+##       Never getting a break from childcare and feeling burnt out as parents, the small size of our living space (720 sq ft rental) and long periods trapped inside together because of poor air quality due to smoke from wildfires, poor mental health because of lack of exercise and time outside
+##      Anxiety and depression 
+## Being home too long
+## Not socializing except with family
+## My daughters behavior 
+## My husband’s aggression towards her
+## Not being able to pay for therapy and childcare 
+## New diagnosis of Lupus for myself, more stress
+## 
+##      Lack of childcare (preschool recently opened again but weather-related closures are frequent and cases are rising in my state so we expect it to close again at some point)
+##      Not having childcare outside the home, budgeting our current income for necessities and upcoming holidays, not being able to shop together to make decisions
+##      Social isolation. Lack of access to childcare because of fears of virus spread. Feeling overwhelmed with a newborn at home with no help. Lack of access to In-person marital and personal counseling.</code></pre>
+</div>
+<div id="section-20" class="section level3">
+<h3>21</h3>
+<pre><code>## Topic 21 Top Words:
+##       Highest Prob: job, son, husband, new, lose 
+##       FREX: lose, job, son, secur, anoth 
+##       Lift: subsid, encourag, muscl, tone, love 
+##       Score: son, job, subsid, new, watch</code></pre>
+<pre><code>## 
+##  Topic 21: 
+##       Stressing about me not currently having a job. This has caused tension between my husband and I. Also, worry about putting my son in daycare.
+##      My husband isn&#39;t having luck finding a job after graduating in May. Anf I&#39;m worried about my son&#39;s development because he&#39;s not in daycare.
+##      Job security going forward. Our child’s experiences when daycare reopens.
+##      I just graduated with my doctorate in physical therapy.... I would love to start working but the job market is terrible and we have no childcare options for our son. Furthermore, we’re uncomfortable with the idea of sending him back if/once his preschool reopens due to concerns about virus transmission
+##      Concerned about when the pandemic will end and I’ll be able to go to work- I just finished my doctorate in physical therapy but the job market is horrible right now and even if I could get a job, we don’t have childcare open yet for my son... so that’s probably the biggest stressor at the moment</code></pre>
+</div>
+<div id="section-21" class="section level3">
+<h3>22</h3>
+<pre><code>## Topic 22 Top Words:
+##       Highest Prob: challeng, biggest, now, right, grandpar 
+##       FREX: challeng, biggest, decreas, grandpar, right 
+##       Lift: economi, accustom, ongo, housekeep, challeng 
+##       Score: economi, challeng, biggest, decreas, right</code></pre>
+<pre><code>## 
+##  Topic 22: 
+##       Biggest concern is that someone in my immediate family or parents will have a severe case of Covid-19, which may lead to disability or death. I feel that based on research, my children would recover well, but it is uncertain with myself, my spouse and my children&#39;s grandparents who also provide childcare.
+## 
+## A great challenge is homeschooling my daughter who is in Kindergarten, while also maintaining my job. 
+## 
+## A source of uncertainty and anxiety is job security due to the economy is in a recession and companies are having layoffs left and right. 
+## 
+## Loneliness is another challenge, as quarantining makes us feel less connected with others.
+##      Other then finding a place to rent is almost impossible the high rent makes it almost untouchable also to have 3x rent or to even make that a specially with only 2 small child care places and one 1 being state approved also there is a packed waiting list.
+##      Having our nanny and housekeeper return and fears about adding to our exposure. Fear about the community reopening even though cases are still extremely high. Choosing not to go out for an indefinitely amount of time.
+##      Stress is high right now. We have had huge increases in cases in our state and county recently. We are worried about our safety. Our childcare situation for our oldest child is now uncertain for the fall (starting mid-August). We are lonely as we have not seen our relatives/families since Christmas. We hope to see them in a couple of weeks, although dependent on the COVID situation in our state.
+##      Our biggest challenges relate to childcare for my daughter. Prior to COVID-19, my mother-in-law, grandparents, and a mother-figure (woman who was my father&#39;s girlfriend for 20 years, including the majority of my childhood) of mine watched my daughter while I worked outside the home. I am currently doing tele practice speech therapy. As Berks County prepares to enter the green phase of re-opening in Pennsylvania, I may be expected to go back to providing home-based services and need increased childcare.  However, all caregivers except my mother-in-law are elderly and immune compromised.  I can&#39;t comfortably ask them to come back, but my mother-in-law is a self-employed photographer and needs to work too.</code></pre>
+</div>
+<div id="section-22" class="section level3">
+<h3>23</h3>
+<pre><code>## Topic 23 Top Words:
+##       Highest Prob: plan, fall, next, school, safeti 
+##       FREX: next, plan, safeti, fall, happen 
+##       Lift: long-term, stretch, outcom, unknown, announc 
+##       Score: next, long-term, plan, fall, safeti</code></pre>
+<pre><code>## 
+##  Topic 23: 
+##       We are both professors and planning for the fall with childcare and unknown cuts and unsure plans... that&#39;s really stressful
+##      We are planning for a second child, and unsure how we’ll have childcare for dr appts and giving birth if there’s not a vaccine or drastically reduced rates of covid-19 in the next year
+##      Trying to plan for income/childcare for August through this fall (and beyond) without knowing for sure what my employment situation (independent contractor within schools / dancer in a dance company) will be due to the always evolving COVID-19 crisis .
+##      Planning for this fall when our jobs and childcare depend on what happens with the pandemic.
+##      Safety, concern about future loss of childcare if closures happen again</code></pre>
+</div>
+<div id="section-23" class="section level3">
+<h3>24</h3>
+<pre><code>## Topic 24 Top Words:
+##       Highest Prob: will, school, know, start, like 
+##       FREX: will, know, teacher, kindergarten, look 
+##       Lift: meal, unpaid, will, know, kindergarten 
+##       Score: will, start, meal, know, school</code></pre>
+<pre><code>## 
+##  Topic 24: 
+##       planning for the future. how long will this last? what if daycare closes again? will the public school system exist when she starts kindergarten?
+##      What the fall will look like. Both myself and my husband work for a school
+## District. What will school look like? What will daycare look like? What will be safe?
+##      My daughter will start kindergarten and I have to turn back to work as a teacher at preschool but if the schools don’t open full time I don’t know how I will provide extended childcare for my daughter. Also virtually learning process is not effective  for the kids who starts to school by this year as kindergartener. They don’t know reading or writing and they don’t know the classroom environment and the new teachers and classmates, it would be a challenge for all of us if they start as virtually. On the other hand, we have still lots of health safety concerns so totally I don’t know what we should do for next month about the schools reopening.
+##      What the upcoming school year will look like and how I should best approach the daycare situation.
+##      What will happen with schools in the fall. My husband is a first grade teacher, I also work in schools, and our children will be in kindergarten and 2nd grade.  If schools are open, or one of  our schools is open, or schools are open only part time or schools are closed I will either be worried about health risks, or worried about balancing work demands and childcare/virtual schooling.</code></pre>
+</div>
+<div id="section-24" class="section level3">
+<h3>25</h3>
+<pre><code>## Topic 25 Top Words:
+##       Highest Prob: safe, tri, keep, stay, figur 
+##       FREX: safe, figur, keep, healthi, tri 
+##       Lift: determin, view, safe, remain, healthi 
+##       Score: maintain, safe, determin, tri, figur</code></pre>
+<pre><code>## 
+##  Topic 25: 
+##       Trying to decide when it&#39;s safe to see family and friends, especially since numbers are on the rise again. Trying to plan for employment and childcare for this fall, as our jobs are based in education and/or the arts which are TBD based on the virus.
+##      Making sure daycare remains open and everyone stays healthy.
+##      Staying healthy, income remaining the same, daycare remaining open and safe
+##      Keeping my family healthy while both parents work full time and toddler goes to childcare center and 7 year old goes to grandparents. Too many chances for virus exposure, but not many options
+##      Staying healthy, especially now that my son is in daycare. Also keeping healthy with respect to mental illness (anxiety and depression).</code></pre>
+</div>
+<div id="section-25" class="section level3">
+<h3>26</h3>
+<pre><code>## Topic 26 Top Words:
+##       Highest Prob: stress, high, job, now, new 
+##       FREX: bad, high, suffer, level, relationship 
+##       Lift: fail, news, bad, season, five 
+##       Score: bad, high, suffer, level, five</code></pre>
+<pre><code>## 
+##  Topic 26: 
+##       Two very busy essential jobs, one in public health. Not having stable childcare, not feeling like two job households are sustainable.
+##      1. On days I don&#39;t have help with childcare, working from home and also trying to manage my daughter&#39;s needs are a challenge.   2. We were trying to conceive another child, but I am concerned about the medicals system until a vaccine is developed for COVID-19, so we have stopped.  I am almost 35, and a bit anxious about waiting much longer to continue trying to conceive.  3. Many of my pre-pandemic babysitters are high risk for COVID. I am starting a new job in August at a college and am worried about having enough help with childcare to be able to do my job.  I am extremely worried about the college&#39;s plan to open up face-to-face and the safety concerns.
+##      So much worry and stress. No backup child care. Unable to attend if she has a minor symptom. Worried about heading into cold and flu season. Just worried about sustaining this level of stress.
+##      Right now we have childcare for both children so things are vastly improved. When we didn&#39;t have child care I was barely keeping my head above water and feeling like I was failing at everything all the time. My relationship with my husband has been very negatively affected though because it&#39;s brought to light many imbalances that weren&#39;t as obvious before (essentially how much more I do for the kids than he does)
+##      Our biggest challenge is childcare. I am transitioning to a new job and maintaining my current self-employment on a part-time basis.  I need at least 40 hours per week of childcare. Right now I&#39;m losing sleep trying to stay up late and get up early to do work to make up the difference (I have worked my way up to about 30 hours of childcare), but my mental health, the cleanliness of my house, and our nutrition is suffering (no time to cook healthy food, so I&#39;m using lots of processed stuff we would normally avoid). As I get closer to starting my new job, I get more and more anxious.   My new job is a faculty position at a college, and we plan to open.  The meetings I have attended over the past few weeks have indicated a shift from &quot;We want you to maximize online learning opportunities and only do what is necessary for hands-on experiences face-to-face&quot; to &quot;We want you to maximize face-to-face and only do what you have to online&quot;. I think I&#39;m going to have to go to campus 4 days per week. This is troublesome, because right now I my grandparents (my daughter&#39;s great-grandparents) watch her one day per week (my current 4th day of childcare).  They are high risk related to COVID.  I&#39;m so scared of putting them at risk.</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-26" class="section level3">
+<h3>27</h3>
+<pre><code>## Topic 27 Top Words:
+##       Highest Prob: return, son, unabl, work, uncertainti 
+##       FREX: return, unabl, august, resum, symptom 
+##       Lift: pre, vehicl, schoolchildcar, temporarili, return 
+##       Score: return, vehicl, unabl, son, august</code></pre>
+<pre><code>## 
+##  Topic 27: 
+##       Unable to focus on either work or childcare properly, making a decision around resuming childcare, difficulty making work deadlines
+##      Uncertainty. We are educators and worry about returning to classrooms or the inability to plan for it.
+##      The biggest challenge is that I&#39;m returning to work on a hybrid schedule that doesn&#39;t match my child&#39;s daycare schedule.  We are struggling with drop off and pick up and unfortunately much is falling to my mother in law for childcare support.
+##      I am unable to return to work because there is no good option for childcare and we do not have a vehicle
+##      My son getting a good preK education and having good childcare if the center gets temporarily shutdown for health reasons.</code></pre>
+</div>
+<div id="section-27" class="section level3">
+<h3>28</h3>
+<pre><code>## Topic 28 Top Words:
+##       Highest Prob: class, want, onlin, distanc, kid 
+##       FREX: class, onlin, engag, physic, homeschool 
+##       Lift: absolut, chosen, nobodi, opt, retir 
+##       Score: class, absolut, onlin, homeschool, miss</code></pre>
+<pre><code>## 
+##  Topic 28: 
+##       We’re teachers so we still have to provide education to other people kids but can’t take time for ours who is not engaged in his class
+##      Finacial worries. Making sure my older kids actually attend virtual classes
+##      I don&#39;t want to send my children to in-person class until it is absolutely safe.
+##      Not feeling normal. There is a sense in the air of uncertainty. My biggest concern was school. I don&#39;t think it&#39;s safe sending kids to school. My kids are fine and not at all concerned about falling behind bc they are both ahead in class. I planned on Homeschooling if schools opened but luckily here in CA will remain online. I&#39;m a Substitute so I know I can keep up with their studies. They are missing out on their extra curricular activities and they miss it. But as long as they are safe at home. We will be fine.
+##      Communication. Even though we are home almost 24/7 together I feel the communication and support between spouses is unequal. With telework it often last far kinder longer than a typical day in the office and responsibility did shifts to I&#39;ve adult more than the other. It&#39;s absolutely exhausting to work FT and be a FT mom, virtual school support, and provide daycare for my 0-5 child. Oddly, it&#39;s still far less stressful then going into an office every day for work.</code></pre>
+</div>
+<div id="section-28" class="section level3">
+<h3>29</h3>
+<pre><code>## Topic 29 Top Words:
+##       Highest Prob: can, well, juggl, kid, peopl 
+##       FREX: juggl, potenti, partner, well, elementari 
+##       Lift: surg, restart, elementari, hesit, juggl 
+##       Score: surg, juggl, can, elementari, potenti</code></pre>
+<pre><code>## 
+##  Topic 29: 
+##       I worked as a nurse and had my baby 1/20/2020 and was on maternity leave when covid hit. I quit my job due to lack of childcare because my employer would not allow me to work part time night shift so that I could arrange childcare. I felt uncomfortable leaving them in daycare. So we have taken a large pay cut and I have looked for a new job that can accommodate my weekend night shift schedule so that my husband can watch the kids while they sleep.
+##      I work in a school, so I am back 5 days a week. This is exposing myself and my children (at daycare) to more people, so we are concerned about that. I also am juggling remote learners, hybrid learners, and assignments, as well as all of the daily responsibilities of the household.
+##      Just trying to keep everyone as healthy as possible and trying to continue to be safe about potential exposure to others and avoiding getting in contact with people who may have COVID. Always concerned that the pre-K school and/or daycare will close due to COVID cases or a future state or country mandate.
+##      What to do for schooling (remote vs. in person), as well as childcare with our youngest restarting daycare and the potential exposure and spread that may cause
+##      Husbands return to work - he works for a big company that is wanting all of their employees back in person even though the county is asking businesses to allow employees to work remote. He is on paternity leave until end of August. 
+## 
+## We have a newborn and are trying to figure out when he’ll start daycare in the spring. I’m off work until January.</code></pre>
+</div>
+<div id="section-29" class="section level3">
+<h3>30</h3>
+<pre><code>## Topic 30 Top Words:
+##       Highest Prob: child, also, one, kid, day 
+##       FREX: child, one, also, kid, least 
+##       Lift: least, one, also, child, kid 
+##       Score: child, least, one, also, kid</code></pre>
+<pre><code>## 
+##  Topic 30: 
+##       Lack of help with childcare. Our kids have been with at least one of us constantly for 3 months.
+##      Our child&#39;s daycare is about to open back up and in order to recover financially I&#39;m looking for work and will have to put my child in daycare. We are also very behind on our electric bill and if one of us in our family were to get exposed to covid we can&#39;t afford to stay home and recover even if it will be essential.
+##      We have a 3 month old baby and are both currently on parental leave but that will come to an end and we have to make decisions about putting our young baby in child care, what child care, and when which is difficult with so much uncertainty around COVID and fear of exposure. We are fortunate to have option to have family help provide care but are concerned about our child’s social and other development because he will not be interacting with anyone besides my husband and me and potentially one other family member. We may also have the option for one or both of us to reduce hours at work but that would mean reduction in family income.
+##      I am currently unemployed and am concerned about finding a job and having to expose my child to possible Covid in daycare. I also worry about how to afford the lifestyle we are accustomed to on only one income.
+##      Lack of one of our incomes and getting my child back in daycare due to limited numbers allowed when they open</code></pre>
+</div>
+</div>
+<div id="clusters" class="section level2">
+<h2>Clusters</h2>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre><code>## ICLUST (Item Cluster Analysis)
+## Call: iclust(r.mat = topics_only_wide)
+## 
+## Purified Alpha:
+##  C24  C26  C13  C25 
+## 0.59 0.38 0.21 0.13 
+## 
+## G6* reliability:
+##    C24    C26    C13    C25 
+##  0.625  0.402  0.154 -0.074 
+## 
+## Original Beta:
+##   C24   C13   C26   C25 
+## 0.241 0.194 0.080 0.067 
+## 
+## Cluster size:
+## C24 C26 C13 C25 
+##  10  11   4   5 
+## 
+## Item by Cluster Structure matrix:
+##           O   P   C24   C13   C26   C25
+## Topic1  C24 C24  0.33 -0.06 -0.07 -0.10
+## Topic10 C24 C24  0.80 -0.38  0.03 -0.26
+## Topic11 C13 C13 -0.03  0.39  0.05  0.25
+## Topic12 C24 C24 -0.14 -0.07  0.02 -0.01
+## Topic13 C25 C25  0.00 -0.06  0.02 -0.22
+## Topic14 C24 C26 -0.16  0.08  0.19  0.11
+## Topic15 C26 C13 -0.05 -0.06  0.03  0.04
+## Topic16 C24 C26 -0.06 -0.04 -0.07  0.02
+## Topic17 C25 C25 -0.07 -0.02 -0.05 -0.09
+## Topic18 C26 C26  0.01 -0.03 -0.24 -0.01
+## Topic19 C24 C24 -0.19 -0.11  0.02 -0.04
+## Topic2  C26 C26 -0.04  0.12 -0.14  0.09
+## Topic20 C13 C13  0.01 -0.22 -0.05  0.00
+## Topic21 C26 C26 -0.11  0.11 -0.17  0.03
+## Topic22 C26 C24 -0.07  0.05 -0.07 -0.03
+## Topic23 C26 C26  0.01  0.05  0.21  0.09
+## Topic24 C26 C26 -0.12  0.20  0.36  0.20
+## Topic25 C24 C24  0.22  0.20  0.06  0.13
+## Topic26 C25 C25 -0.08 -0.01  0.00  0.11
+## Topic27 C26 C26  0.09  0.02  0.10  0.02
+## Topic28 C26 C26 -0.13 -0.03  0.25  0.00
+## Topic29 C25 C25  0.01  0.02  0.11  0.17
+## Topic3  C24 C24 -0.17  0.03 -0.08  0.14
+## Topic30 C24 C24  0.70  0.20  0.12 -0.33
+## Topic4  C13 C13 -0.08  0.22 -0.04  0.04
+## Topic5  C24 C24  0.51 -0.11  0.09  0.22
+## Topic6  C24 C25  0.14 -0.13 -0.06 -0.20
+## Topic7  C26 C26  0.15 -0.09  0.49  0.25
+## Topic8  C24 C24  0.47 -0.30 -0.14 -0.19
+## Topic9  C26 C26  0.01 -0.06 -0.24 -0.06
+## 
+## With eigenvalues of:
+##  C24  C13  C26  C25 
+## 1.98 0.69 0.77 0.61 
+## 
+## Purified scale intercorrelations
+##  reliabilities on diagonal
+##  correlations corrected for attenuation above diagonal: 
+##       C24  C26   C13   C25
+## C24  0.59 0.03 -0.09 -0.15
+## C26  0.01 0.38  0.05  0.22
+## C13 -0.03 0.01  0.21  0.24
+## C25 -0.04 0.05  0.04  0.13
+## 
+## Cluster fit =  0.23   Pattern fit =  0.94  RMSR =  0.05</code></pre>
+</div>
+<div id="effects" class="section level2 tabset">
+<h2 class="tabset">Effects</h2>
+<div id="mental-health-1" class="section level3 tabset">
+<h3 class="tabset">Mental health</h3>
+<div id="all-1" class="section level4">
+<h4>All</h4>
+<div id="htmlwidget-c9f220332b93917130fb" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c9f220332b93917130fb">{"x":{"data":[{"x":[1,11,4,25,20,14,2,23,18,26,16,7,24,22,19,5,6,13,27,15,8,9,17,12,10,28,3,21,29],"y":[32.8125,40.4353233830846,35.4423868312757,53.9713541666667,46.8573446327684,42.2275641025641,34.0868794326241,50.8196721311475,45.4066265060241,54.7680412371134,44.1063596491228,36.984126984127,51.6794217687075,49.9239659367397,46.4285714285714,35.9638047138047,36.4837398373984,40.7520325203252,55.1470588235294,43.0952380952381,39.6360759493671,39.7240990990991,44.3181818181818,40.6127450980392,40.0960917312661,56,34.8254504504505,47.3457888493476,59.640522875817],"text":["Topic 1<br />Mental Health: 32.8<br />Number of responses: 4","Topic 10<br />Mental Health: 40.4<br />Number of responses: 335","Topic 11<br />Mental Health: 35.4<br />Number of responses: 243","Topic 12<br />Mental Health: 54<br />Number of responses: 32","Topic 13<br />Mental Health: 46.9<br />Number of responses: 118","Topic 14<br />Mental Health: 42.2<br />Number of responses: 78","Topic 15<br />Mental Health: 34.1<br />Number of responses: 47","Topic 16<br />Mental Health: 50.8<br />Number of responses: 61","Topic 17<br />Mental Health: 45.4<br />Number of responses: 83","Topic 18<br />Mental Health: 54.8<br />Number of responses: 97","Topic 19<br />Mental Health: 44.1<br />Number of responses: 76","Topic 2<br />Mental Health: 37<br />Number of responses: 105","Topic 20<br />Mental Health: 51.7<br />Number of responses: 98","Topic 21<br />Mental Health: 49.9<br />Number of responses: 137","Topic 22<br />Mental Health: 46.4<br />Number of responses: 84","Topic 23<br />Mental Health: 36<br />Number of responses: 99","Topic 24<br />Mental Health: 36.5<br />Number of responses: 164","Topic 25<br />Mental Health: 40.8<br />Number of responses: 123","Topic 26<br />Mental Health: 55.1<br />Number of responses: 34","Topic 27<br />Mental Health: 43.1<br />Number of responses: 70","Topic 28<br />Mental Health: 39.6<br />Number of responses: 79","Topic 29<br />Mental Health: 39.7<br />Number of responses: 74","Topic 3<br />Mental Health: 44.3<br />Number of responses: 66","Topic 4<br />Mental Health: 40.6<br />Number of responses: 170","Topic 5<br />Mental Health: 40.1<br />Number of responses: 516","Topic 6<br />Mental Health: 56<br />Number of responses: 25","Topic 7<br />Mental Health: 34.8<br />Number of responses: 74","Topic 8<br />Mental Health: 47.3<br />Number of responses: 281","Topic 9<br />Mental Health: 59.6<br />Number of responses: 51"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":[3.77952755905512,18.974031886144,16.6908727022099,8.19880793713458,12.696654844808,10.9638927523207,9.25607391466282,10.0848887315146,11.2026408011672,11.8335718682987,10.8661417322835,12.1728368524913,11.8767574020485,13.4111258446654,11.2494747877993,11.9197138299745,14.3436282401565,12.8901074530757,8.35391733804026,10.5644440707142,11.0122728625488,10.7670233658657,10.3556272001929,14.5398821800917,22.6771653543307,7.60673663291803,10.7670233658657,17.6794515306376,9.50513368986181],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,11,4,25,20,14,2,23,18,26,16,7,24,22,19,5,6,13,27,15,8,9,17,12,10,28,3,21,29],"y":[33.8125,41.4353233830846,36.4423868312757,54.9713541666667,47.8573446327684,43.2275641025641,35.0868794326241,51.8196721311475,46.4066265060241,55.7680412371134,45.1063596491228,37.984126984127,52.6794217687075,50.9239659367397,47.4285714285714,36.9638047138047,37.4837398373984,41.7520325203252,56.1470588235294,44.0952380952381,40.6360759493671,40.7240990990991,45.3181818181818,41.6127450980392,41.0960917312661,57,35.8254504504505,48.3457888493476,60.640522875817],"text":["1","10","11","12","13","14","15","16","17","18","19","2","20","21","22","23","24","25","26","27","28","29","3","4","5","6","7","8","9"],"hovertext":["Topic 1<br />Mental Health: 32.8<br />Number of responses: 4","Topic 10<br />Mental Health: 40.4<br />Number of responses: 335","Topic 11<br />Mental Health: 35.4<br />Number of responses: 243","Topic 12<br />Mental Health: 54<br />Number of responses: 32","Topic 13<br />Mental Health: 46.9<br />Number of responses: 118","Topic 14<br />Mental Health: 42.2<br />Number of responses: 78","Topic 15<br />Mental Health: 34.1<br />Number of responses: 47","Topic 16<br />Mental Health: 50.8<br />Number of responses: 61","Topic 17<br />Mental Health: 45.4<br />Number of responses: 83","Topic 18<br />Mental Health: 54.8<br />Number of responses: 97","Topic 19<br />Mental Health: 44.1<br />Number of responses: 76","Topic 2<br />Mental Health: 37<br />Number of responses: 105","Topic 20<br />Mental Health: 51.7<br />Number of responses: 98","Topic 21<br />Mental Health: 49.9<br />Number of responses: 137","Topic 22<br />Mental Health: 46.4<br />Number of responses: 84","Topic 23<br />Mental Health: 36<br />Number of responses: 99","Topic 24<br />Mental Health: 36.5<br />Number of responses: 164","Topic 25<br />Mental Health: 40.8<br />Number of responses: 123","Topic 26<br />Mental Health: 55.1<br />Number of responses: 34","Topic 27<br />Mental Health: 43.1<br />Number of responses: 70","Topic 28<br />Mental Health: 39.6<br />Number of responses: 79","Topic 29<br />Mental Health: 39.7<br />Number of responses: 74","Topic 3<br />Mental Health: 44.3<br />Number of responses: 66","Topic 4<br />Mental Health: 40.6<br />Number of responses: 170","Topic 5<br />Mental Health: 40.1<br />Number of responses: 516","Topic 6<br />Mental Health: 56<br />Number of responses: 25","Topic 7<br />Mental Health: 34.8<br />Number of responses: 74","Topic 8<br />Mental Health: 47.3<br />Number of responses: 281","Topic 9<br />Mental Health: 59.6<br />Number of responses: 51"],"textfont":{"size":14.6645669291339,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":15.1432129514321,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,29.6],"tickmode":"array","ticktext":[null],"categoryorder":"array","categoryarray":[null],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[31.4210988562091,62.0319240196078],"tickmode":"array","ticktext":["40","50","60"],"tickvals":[40,50,60],"categoryorder":"array","categoryarray":["40","50","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"Mental Health Problems","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ac95118529ea":{"size":{},"x":{},"y":{},"text":{},"type":"scatter"},"ac953d82caa2":{"y":{},"label":{},"x":{},"y.1":{},"text":{}}},"cur_data":"ac95118529ea","visdat":{"ac95118529ea":["function (y) ","x"],"ac953d82caa2":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="by-race" class="section level4">
+<h4>By race</h4>
+<div id="htmlwidget-668d2fe687ee35a85e9a" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-668d2fe687ee35a85e9a">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],"y":[22.7777777777778,25,25.8333333333333,29.1666666666667,31.25,32.2222222222222,33.3333333333333,33.75,36.6666666666667,37.5,37.5,37.5,40.1041666666667,40.1041666666667,41.6666666666667,42.1875,42.5,42.9166666666667,44.6428571428571,46.9109195402299,48.6111111111111,51.0416666666667,54.8076923076923,55.3571428571429,55.4166666666667],"text":["Topic 5<br />Mental Health: 22.8<br />Number of responses: 15","Topic 4<br />Mental Health: 25<br />Number of responses: 4","Topic 7<br />Mental Health: 25.8<br />Number of responses: 10","Topic 2<br />Mental Health: 29.2<br />Number of responses: 1","Topic 23<br />Mental Health: 31.2<br />Number of responses: 11","Topic 10<br />Mental Health: 32.2<br />Number of responses: 30","Topic 29<br />Mental Health: 33.3<br />Number of responses: 3","Topic 13<br />Mental Health: 33.8<br />Number of responses: 10","Topic 20<br />Mental Health: 36.7<br />Number of responses: 5","Topic 15<br />Mental Health: 37.5<br />Number of responses: 1","Topic 17<br />Mental Health: 37.5<br />Number of responses: 3","Topic 24<br />Mental Health: 37.5<br />Number of responses: 16","Topic 14<br />Mental Health: 40.1<br />Number of responses: 4","Topic 9<br />Mental Health: 40.1<br />Number of responses: 4","Topic 3<br />Mental Health: 41.7<br />Number of responses: 1","Topic 22<br />Mental Health: 42.2<br />Number of responses: 4","Topic 16<br />Mental Health: 42.5<br />Number of responses: 5","Topic 28<br />Mental Health: 42.9<br />Number of responses: 5","Topic 21<br />Mental Health: 44.6<br />Number of responses: 7","Topic 8<br />Mental Health: 46.9<br />Number of responses: 29","Topic 6<br />Mental Health: 48.6<br />Number of responses: 3","Topic 27<br />Mental Health: 51<br />Number of responses: 2","Topic 18<br />Mental Health: 54.8<br />Number of responses: 13","Topic 11<br />Mental Health: 55.4<br />Number of responses: 7","Topic 25<br />Mental Health: 55.4<br />Number of responses: 5"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[7.22974839373333,5.37666945775468,6.54585847449978,3.77952755905512,6.69549637723638,8.74524352263537,5.08358845859973,6.54585847449978,5.62374816935156,3.77952755905512,5.08358845859973,7.35084541426041,5.37666945775468,5.37666945775468,3.77952755905512,5.37666945775468,5.62374816935156,5.62374816935156,6.03822729323035,8.65887665663926,5.08358845859973,4.70163786420334,6.97381135645424,6.03822729323035,5.62374816935156],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52],"y":[35.15625,36.3095238095238,36.3095238095238,37.2549019607843,40.2777777777778,41.0984848484849,42.3611111111111,45.15625,45.4427083333333,45.5357142857143,46.6346153846154,46.9907407407407,48.8095238095238,49.5056497175141,49.6527777777778,52.2058823529412,52.5641025641026,53.6764705882353,56.6287878787879,57.2916666666667,58.1730769230769,60.0378787878788,65.625,68.9393939393939,69.1666666666667,71.875,92.1875],"text":["Topic 7<br />Mental Health: 35.2<br />Number of responses: 8","Topic 11<br />Mental Health: 36.3<br />Number of responses: 14","Topic 2<br />Mental Health: 36.3<br />Number of responses: 7","Topic 23<br />Mental Health: 37.3<br />Number of responses: 17","Topic 3<br />Mental Health: 40.3<br />Number of responses: 3","Topic 10<br />Mental Health: 41.1<br />Number of responses: 33","Topic 13<br />Mental Health: 42.4<br />Number of responses: 9","Topic 5<br />Mental Health: 45.2<br />Number of responses: 80","Topic 22<br />Mental Health: 45.4<br />Number of responses: 16","Topic 17<br />Mental Health: 45.5<br />Number of responses: 7","Topic 24<br />Mental Health: 46.6<br />Number of responses: 13","Topic 29<br />Mental Health: 47<br />Number of responses: 9","Topic 14<br />Mental Health: 48.8<br />Number of responses: 7","Topic 8<br />Mental Health: 49.5<br />Number of responses: 59","Topic 15<br />Mental Health: 49.7<br />Number of responses: 6","Topic 28<br />Mental Health: 52.2<br />Number of responses: 17","Topic 19<br />Mental Health: 52.6<br />Number of responses: 13","Topic 18<br />Mental Health: 53.7<br />Number of responses: 17","Topic 4<br />Mental Health: 56.6<br />Number of responses: 11","Topic 20<br />Mental Health: 57.3<br />Number of responses: 14","Topic 21<br />Mental Health: 58.2<br />Number of responses: 13","Topic 27<br />Mental Health: 60<br />Number of responses: 11","Topic 9<br />Mental Health: 65.6<br />Number of responses: 6","Topic 16<br />Mental Health: 68.9<br />Number of responses: 11","Topic 25<br />Mental Health: 69.2<br />Number of responses: 5","Topic 6<br />Mental Health: 71.9<br />Number of responses: 2","Topic 12<br />Mental Health: 92.2<br />Number of responses: 4"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[6.21920210784719,7.10424354590077,6.03822729323035,7.467968779648,5.08358845859973,8.99577115723354,6.38764935814433,11.9754232254227,7.35084541426041,6.03822729323035,6.97381135645424,6.38764935814433,6.03822729323035,10.8021104216429,5.84142888411961,7.467968779648,6.97381135645424,7.467968779648,6.69549637723638,7.10424354590077,6.97381135645424,6.69549637723638,5.84142888411961,6.69549637723638,5.62374816935156,4.70163786420334,5.37666945775468],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"x":[53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81],"y":[31.6666666666667,32.8125,34.7597597597598,35.3858024691358,35.5994152046784,36.3839285714286,36.3849765258216,37.1134020618557,38.8458702064897,38.9784946236559,39.546783625731,39.7515835312747,39.8790322580645,41.2607230392157,41.6666666666667,42.3611111111111,44.5564516129032,45.7191780821918,46.7508635578584,46.9401041666667,47.3148148148148,48.5119047619048,48.5900673400673,49.3233618233618,51.6350210970464,55.0373134328358,55.1470588235294,55.5208333333333,60.6707317073171],"text":["Topic 15<br />Mental Health: 31.7<br />Number of responses: 40","Topic 1<br />Mental Health: 32.8<br />Number of responses: 4","Topic 11<br />Mental Health: 34.8<br />Number of responses: 222","Topic 24<br />Mental Health: 35.4<br />Number of responses: 135","Topic 28<br />Mental Health: 35.6<br />Number of responses: 57","Topic 7<br />Mental Health: 36.4<br />Number of responses: 56","Topic 23<br />Mental Health: 36.4<br />Number of responses: 71","Topic 2<br />Mental Health: 37.1<br />Number of responses: 97","Topic 25<br />Mental Health: 38.8<br />Number of responses: 113","Topic 29<br />Mental Health: 39<br />Number of responses: 62","Topic 27<br />Mental Health: 39.5<br />Number of responses: 57","Topic 5<br />Mental Health: 39.8<br />Number of responses: 421","Topic 4<br />Mental Health: 39.9<br />Number of responses: 155","Topic 10<br />Mental Health: 41.3<br />Number of responses: 272","Topic 14<br />Mental Health: 41.7<br />Number of responses: 67","Topic 19<br />Mental Health: 42.4<br />Number of responses: 63","Topic 3<br />Mental Health: 44.6<br />Number of responses: 62","Topic 17<br />Mental Health: 45.7<br />Number of responses: 73","Topic 8<br />Mental Health: 46.8<br />Number of responses: 193","Topic 22<br />Mental Health: 46.9<br />Number of responses: 64","Topic 16<br />Mental Health: 47.3<br />Number of responses: 45","Topic 12<br />Mental Health: 48.5<br />Number of responses: 28","Topic 13<br />Mental Health: 48.6<br />Number of responses: 99","Topic 21<br />Mental Health: 49.3<br />Number of responses: 117","Topic 20<br />Mental Health: 51.6<br />Number of responses: 79","Topic 18<br />Mental Health: 55<br />Number of responses: 67","Topic 26<br />Mental Health: 55.1<br />Number of responses: 34","Topic 6<br />Mental Health: 55.5<br />Number of responses: 20","Topic 9<br />Mental Health: 60.7<br />Number of responses: 41"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[9.53810456900829,5.37666945775468,17.4876827479994,14.453726057833,10.6799692284115,10.6180806090307,11.4944558827817,12.814326495756,13.5382257542234,10.9814392709892,10.6799692284115,22.6771653543307,15.2226155115496,18.9593789887368,11.2707870913898,11.0402313624996,10.9814392709892,11.6038929563228,16.5566627486516,11.0985512054313,9.89611535404866,8.57095325515379,12.9079538558674,13.7109594862156,11.9233852665008,11.2707870913898,9.07664797399737,7.79891319399366,9.61146519541765],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x3","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],"y":[24.7777777777778,27,27.8333333333333,31.1666666666667,33.25,34.2222222222222,35.3333333333333,35.75,38.6666666666667,39.5,39.5,39.5,42.1041666666667,42.1041666666667,43.6666666666667,44.1875,44.5,44.9166666666667,46.6428571428571,48.9109195402299,50.6111111111111,53.0416666666667,56.8076923076923,57.3571428571429,57.4166666666667],"text":["5","4","7","2","23","10","29","13","20","15","17","24","14","9","3","22","16","28","21","8","6","27","18","11","25"],"hovertext":["Topic 5<br />Mental Health: 22.8<br />Number of responses: 15","Topic 4<br />Mental Health: 25<br />Number of responses: 4","Topic 7<br />Mental Health: 25.8<br />Number of responses: 10","Topic 2<br />Mental Health: 29.2<br />Number of responses: 1","Topic 23<br />Mental Health: 31.2<br />Number of responses: 11","Topic 10<br />Mental Health: 32.2<br />Number of responses: 30","Topic 29<br />Mental Health: 33.3<br />Number of responses: 3","Topic 13<br />Mental Health: 33.8<br />Number of responses: 10","Topic 20<br />Mental Health: 36.7<br />Number of responses: 5","Topic 15<br />Mental Health: 37.5<br />Number of responses: 1","Topic 17<br />Mental Health: 37.5<br />Number of responses: 3","Topic 24<br />Mental Health: 37.5<br />Number of responses: 16","Topic 14<br />Mental Health: 40.1<br />Number of responses: 4","Topic 9<br />Mental Health: 40.1<br />Number of responses: 4","Topic 3<br />Mental Health: 41.7<br />Number of responses: 1","Topic 22<br />Mental Health: 42.2<br />Number of responses: 4","Topic 16<br />Mental Health: 42.5<br />Number of responses: 5","Topic 28<br />Mental Health: 42.9<br />Number of responses: 5","Topic 21<br />Mental Health: 44.6<br />Number of responses: 7","Topic 8<br />Mental Health: 46.9<br />Number of responses: 29","Topic 6<br />Mental Health: 48.6<br />Number of responses: 3","Topic 27<br />Mental Health: 51<br />Number of responses: 2","Topic 18<br />Mental Health: 54.8<br />Number of responses: 13","Topic 11<br />Mental Health: 55.4<br />Number of responses: 7","Topic 25<br />Mental Health: 55.4<br />Number of responses: 5"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52],"y":[37.15625,38.3095238095238,38.3095238095238,39.2549019607843,42.2777777777778,43.0984848484849,44.3611111111111,47.15625,47.4427083333333,47.5357142857143,48.6346153846154,48.9907407407407,50.8095238095238,51.5056497175141,51.6527777777778,54.2058823529412,54.5641025641026,55.6764705882353,58.6287878787879,59.2916666666667,60.1730769230769,62.0378787878788,67.625,70.9393939393939,71.1666666666667,73.875,94.1875],"text":["7","11","2","23","3","10","13","5","22","17","24","29","14","8","15","28","19","18","4","20","21","27","9","16","25","6","12"],"hovertext":["Topic 7<br />Mental Health: 35.2<br />Number of responses: 8","Topic 11<br />Mental Health: 36.3<br />Number of responses: 14","Topic 2<br />Mental Health: 36.3<br />Number of responses: 7","Topic 23<br />Mental Health: 37.3<br />Number of responses: 17","Topic 3<br />Mental Health: 40.3<br />Number of responses: 3","Topic 10<br />Mental Health: 41.1<br />Number of responses: 33","Topic 13<br />Mental Health: 42.4<br />Number of responses: 9","Topic 5<br />Mental Health: 45.2<br />Number of responses: 80","Topic 22<br />Mental Health: 45.4<br />Number of responses: 16","Topic 17<br />Mental Health: 45.5<br />Number of responses: 7","Topic 24<br />Mental Health: 46.6<br />Number of responses: 13","Topic 29<br />Mental Health: 47<br />Number of responses: 9","Topic 14<br />Mental Health: 48.8<br />Number of responses: 7","Topic 8<br />Mental Health: 49.5<br />Number of responses: 59","Topic 15<br />Mental Health: 49.7<br />Number of responses: 6","Topic 28<br />Mental Health: 52.2<br />Number of responses: 17","Topic 19<br />Mental Health: 52.6<br />Number of responses: 13","Topic 18<br />Mental Health: 53.7<br />Number of responses: 17","Topic 4<br />Mental Health: 56.6<br />Number of responses: 11","Topic 20<br />Mental Health: 57.3<br />Number of responses: 14","Topic 21<br />Mental Health: 58.2<br />Number of responses: 13","Topic 27<br />Mental Health: 60<br />Number of responses: 11","Topic 9<br />Mental Health: 65.6<br />Number of responses: 6","Topic 16<br />Mental Health: 68.9<br />Number of responses: 11","Topic 25<br />Mental Health: 69.2<br />Number of responses: 5","Topic 6<br />Mental Health: 71.9<br />Number of responses: 2","Topic 12<br />Mental Health: 92.2<br />Number of responses: 4"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"x":[53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81],"y":[33.6666666666667,34.8125,36.7597597597598,37.3858024691358,37.5994152046784,38.3839285714286,38.3849765258216,39.1134020618557,40.8458702064897,40.9784946236559,41.546783625731,41.7515835312747,41.8790322580645,43.2607230392157,43.6666666666667,44.3611111111111,46.5564516129032,47.7191780821918,48.7508635578584,48.9401041666667,49.3148148148148,50.5119047619048,50.5900673400673,51.3233618233618,53.6350210970464,57.0373134328358,57.1470588235294,57.5208333333333,62.6707317073171],"text":["15","1","11","24","28","7","23","2","25","29","27","5","4","10","14","19","3","17","8","22","16","12","13","21","20","18","26","6","9"],"hovertext":["Topic 15<br />Mental Health: 31.7<br />Number of responses: 40","Topic 1<br />Mental Health: 32.8<br />Number of responses: 4","Topic 11<br />Mental Health: 34.8<br />Number of responses: 222","Topic 24<br />Mental Health: 35.4<br />Number of responses: 135","Topic 28<br />Mental Health: 35.6<br />Number of responses: 57","Topic 7<br />Mental Health: 36.4<br />Number of responses: 56","Topic 23<br />Mental Health: 36.4<br />Number of responses: 71","Topic 2<br />Mental Health: 37.1<br />Number of responses: 97","Topic 25<br />Mental Health: 38.8<br />Number of responses: 113","Topic 29<br />Mental Health: 39<br />Number of responses: 62","Topic 27<br />Mental Health: 39.5<br />Number of responses: 57","Topic 5<br />Mental Health: 39.8<br />Number of responses: 421","Topic 4<br />Mental Health: 39.9<br />Number of responses: 155","Topic 10<br />Mental Health: 41.3<br />Number of responses: 272","Topic 14<br />Mental Health: 41.7<br />Number of responses: 67","Topic 19<br />Mental Health: 42.4<br />Number of responses: 63","Topic 3<br />Mental Health: 44.6<br />Number of responses: 62","Topic 17<br />Mental Health: 45.7<br />Number of responses: 73","Topic 8<br />Mental Health: 46.8<br />Number of responses: 193","Topic 22<br />Mental Health: 46.9<br />Number of responses: 64","Topic 16<br />Mental Health: 47.3<br />Number of responses: 45","Topic 12<br />Mental Health: 48.5<br />Number of responses: 28","Topic 13<br />Mental Health: 48.6<br />Number of responses: 99","Topic 21<br />Mental Health: 49.3<br />Number of responses: 117","Topic 20<br />Mental Health: 51.6<br />Number of responses: 79","Topic 18<br />Mental Health: 55<br />Number of responses: 67","Topic 26<br />Mental Health: 55.1<br />Number of responses: 34","Topic 6<br />Mental Health: 55.5<br />Number of responses: 20","Topic 9<br />Mental Health: 60.7<br />Number of responses: 41"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x3","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.9103362391034,"r":7.97011207970112,"b":15.1432129514321,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,0.321473047500445],"automargin":true,"type":"linear","autorange":false,"range":[0.4,25.6],"tickmode":"array","ticktext":[null],"categoryorder":"array","categoryarray":[null],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[19.2072916666667,97.7579861111111],"tickmode":"array","ticktext":["20","40","60","80"],"tickvals":[20,40,60,80],"categoryorder":"array","categoryarray":["20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"annotations":[{"text":"Mental Health Problems","x":-0.0367668860819546,"y":0.5,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-90,"xanchor":"right","yanchor":"center","annotationType":"axis"},{"text":"Black","x":0.160736523750222,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Latinx","x":0.5,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"White","x":0.839263476249778,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.321473047500445,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":0.321473047500445,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.345193619166222,"x1":0.654806380833778,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0.345193619166222,"x1":0.654806380833778,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.678526952499555,"x1":1,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0.678526952499555,"x1":1,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"}],"xaxis2":{"type":"linear","autorange":false,"range":[25.4,52.6],"tickmode":"array","ticktext":null,"categoryorder":"array","categoryarray":null,"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.345193619166222,0.654806380833778],"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"xaxis3":{"type":"linear","autorange":false,"range":[52.4,81.6],"tickmode":"array","ticktext":null,"categoryorder":"array","categoryarray":null,"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.678526952499555,1],"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ac952d0c142b":{"size":{},"x":{},"y":{},"text":{},"type":"scatter"},"ac9574002a27":{"y":{},"label":{},"x":{},"y.1":{},"text":{}}},"cur_data":"ac952d0c142b","visdat":{"ac952d0c142b":["function (y) ","x"],"ac9574002a27":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="by-income" class="section level4">
+<h4>By income</h4>
+<div id="htmlwidget-24cdd63d2280a8f6e2b6" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-24cdd63d2280a8f6e2b6">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],"y":[29.1666666666667,32.8742937853107,34.4093406593407,34.4551282051282,34.9832214765101,35.054347826087,35.8289930555556,38.176703163017,38.6607142857143,39.1782407407407,39.5269097222222,39.543776371308,39.859068627451,41.4511494252874,41.8093607305936,42.6026570048309,43.6631944444444,44.5638020833333,44.7315705128205,45.4571759259259,46.7524509803922,48.4042553191489,48.8729508196721,49.5244565217391,53.7878787878788,55.6787634408602,56.155303030303,56.4732142857143,58.2720588235294],"text":["Topic 1<br />Mental Health: 29.2<br />Number of responses: 3","Topic 7<br />Mental Health: 32.9<br />Number of responses: 59","Topic 2<br />Mental Health: 34.4<br />Number of responses: 91","Topic 15<br />Mental Health: 34.5<br />Number of responses: 39","Topic 24<br />Mental Health: 35<br />Number of responses: 149","Topic 11<br />Mental Health: 35.1<br />Number of responses: 230","Topic 23<br />Mental Health: 35.8<br />Number of responses: 96","Topic 10<br />Mental Health: 38.2<br />Number of responses: 274","Topic 28<br />Mental Health: 38.7<br />Number of responses: 70","Topic 25<br />Mental Health: 39.2<br />Number of responses: 108","Topic 5<br />Mental Health: 39.5<br />Number of responses: 480","Topic 4<br />Mental Health: 39.5<br />Number of responses: 158","Topic 29<br />Mental Health: 39.9<br />Number of responses: 68","Topic 27<br />Mental Health: 41.5<br />Number of responses: 58","Topic 14<br />Mental Health: 41.8<br />Number of responses: 73","Topic 19<br />Mental Health: 42.6<br />Number of responses: 69","Topic 13<br />Mental Health: 43.7<br />Number of responses: 96","Topic 3<br />Mental Health: 44.6<br />Number of responses: 64","Topic 8<br />Mental Health: 44.7<br />Number of responses: 208","Topic 17<br />Mental Health: 45.5<br />Number of responses: 72","Topic 22<br />Mental Health: 46.8<br />Number of responses: 68","Topic 16<br />Mental Health: 48.4<br />Number of responses: 47","Topic 21<br />Mental Health: 48.9<br />Number of responses: 122","Topic 20<br />Mental Health: 49.5<br />Number of responses: 92","Topic 26<br />Mental Health: 53.8<br />Number of responses: 33","Topic 18<br />Mental Health: 55.7<br />Number of responses: 62","Topic 6<br />Mental Health: 56.2<br />Number of responses: 22","Topic 12<br />Mental Health: 56.5<br />Number of responses: 28","Topic 9<br />Mental Health: 58.3<br />Number of responses: 34"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[5.00063748614407,10.3554057640571,11.9709819739673,9.10222233019019,14.283912338689,16.8459743785631,12.1954469423829,18.046147357585,10.9519243804959,12.711176667192,22.6771653543307,14.5985890775863,10.847212237235,10.2984706819856,11.1061871215888,10.8997608022289,12.1954469423829,10.6329900271882,16.2024832658361,11.0551296384881,10.847212237235,9.63576504081842,13.277533769262,12.0163643401624,8.66396726741094,10.5233275522395,7.73637595991274,8.26617192087778,8.73969953103156],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58],"y":[32.2916666666667,36.4583333333333,36.4583333333333,38.1944444444444,40.2777777777778,42.3076923076923,42.5,43.75,45.0520833333333,45.0757575757576,47.2222222222222,47.6851851851852,48.3333333333333,50.5806010928962,51.0416666666667,51.3888888888889,52.0833333333333,53.1547619047619,53.7202380952381,54.6875,54.7945205479452,54.8611111111111,58.4722222222222,58.9285714285714,58.9285714285714,60.7954545454545,62.3774509803922,84.7222222222222,100],"text":["Topic 15<br />Mental Health: 32.3<br />Number of responses: 8","Topic 12<br />Mental Health: 36.5<br />Number of responses: 4","Topic 3<br />Mental Health: 36.5<br />Number of responses: 2","Topic 29<br />Mental Health: 38.2<br />Number of responses: 6","Topic 23<br />Mental Health: 40.3<br />Number of responses: 3","Topic 11<br />Mental Health: 42.3<br />Number of responses: 13","Topic 7<br />Mental Health: 42.5<br />Number of responses: 15","Topic 1<br />Mental Health: 43.8<br />Number of responses: 1","Topic 22<br />Mental Health: 45.1<br />Number of responses: 16","Topic 17<br />Mental Health: 45.1<br />Number of responses: 11","Topic 28<br />Mental Health: 47.2<br />Number of responses: 9","Topic 5<br />Mental Health: 47.7<br />Number of responses: 36","Topic 14<br />Mental Health: 48.3<br />Number of responses: 5","Topic 10<br />Mental Health: 50.6<br />Number of responses: 61","Topic 27<br />Mental Health: 51<br />Number of responses: 12","Topic 24<br />Mental Health: 51.4<br />Number of responses: 15","Topic 25<br />Mental Health: 52.1<br />Number of responses: 15","Topic 18<br />Mental Health: 53.2<br />Number of responses: 35","Topic 2<br />Mental Health: 53.7<br />Number of responses: 14","Topic 4<br />Mental Health: 54.7<br />Number of responses: 12","Topic 8<br />Mental Health: 54.8<br />Number of responses: 73","Topic 6<br />Mental Health: 54.9<br />Number of responses: 3","Topic 21<br />Mental Health: 58.5<br />Number of responses: 15","Topic 16<br />Mental Health: 58.9<br />Number of responses: 14","Topic 19<br />Mental Health: 58.9<br />Number of responses: 7","Topic 13<br />Mental Health: 60.8<br />Number of responses: 22","Topic 9<br />Mental Health: 62.4<br />Number of responses: 17","Topic 20<br />Mental Health: 84.7<br />Number of responses: 6","Topic 26<br />Mental Health: 100<br />Number of responses: 1"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[6.06401504843281,5.27507567966267,4.64298266907393,5.71027188057674,5.00063748614407,6.77062380027023,7.01028074960471,3.77952755905512,7.12367482035566,6.51001236402583,6.22174741323303,8.88779687905146,5.50643777909274,10.4678220816562,6.64328418230255,7.01028074960471,7.01028074960471,8.81429276893316,6.89275923228934,6.64328418230255,11.1061871215888,5.00063748614407,7.01028074960471,6.89275923228934,5.89455199439992,7.73637595991274,7.23334799913036,5.71027188057674,3.77952755905512],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],"y":[31.1666666666667,34.8742937853107,36.4093406593407,36.4551282051282,36.9832214765101,37.054347826087,37.8289930555556,40.176703163017,40.6607142857143,41.1782407407407,41.5269097222222,41.543776371308,41.859068627451,43.4511494252874,43.8093607305936,44.6026570048309,45.6631944444444,46.5638020833333,46.7315705128205,47.4571759259259,48.7524509803922,50.4042553191489,50.8729508196721,51.5244565217391,55.7878787878788,57.6787634408602,58.155303030303,58.4732142857143,60.2720588235294],"text":["1","7","2","15","24","11","23","10","28","25","5","4","29","27","14","19","13","3","8","17","22","16","21","20","26","18","6","12","9"],"hovertext":["Topic 1<br />Mental Health: 29.2<br />Number of responses: 3","Topic 7<br />Mental Health: 32.9<br />Number of responses: 59","Topic 2<br />Mental Health: 34.4<br />Number of responses: 91","Topic 15<br />Mental Health: 34.5<br />Number of responses: 39","Topic 24<br />Mental Health: 35<br />Number of responses: 149","Topic 11<br />Mental Health: 35.1<br />Number of responses: 230","Topic 23<br />Mental Health: 35.8<br />Number of responses: 96","Topic 10<br />Mental Health: 38.2<br />Number of responses: 274","Topic 28<br />Mental Health: 38.7<br />Number of responses: 70","Topic 25<br />Mental Health: 39.2<br />Number of responses: 108","Topic 5<br />Mental Health: 39.5<br />Number of responses: 480","Topic 4<br />Mental Health: 39.5<br />Number of responses: 158","Topic 29<br />Mental Health: 39.9<br />Number of responses: 68","Topic 27<br />Mental Health: 41.5<br />Number of responses: 58","Topic 14<br />Mental Health: 41.8<br />Number of responses: 73","Topic 19<br />Mental Health: 42.6<br />Number of responses: 69","Topic 13<br />Mental Health: 43.7<br />Number of responses: 96","Topic 3<br />Mental Health: 44.6<br />Number of responses: 64","Topic 8<br />Mental Health: 44.7<br />Number of responses: 208","Topic 17<br />Mental Health: 45.5<br />Number of responses: 72","Topic 22<br />Mental Health: 46.8<br />Number of responses: 68","Topic 16<br />Mental Health: 48.4<br />Number of responses: 47","Topic 21<br />Mental Health: 48.9<br />Number of responses: 122","Topic 20<br />Mental Health: 49.5<br />Number of responses: 92","Topic 26<br />Mental Health: 53.8<br />Number of responses: 33","Topic 18<br />Mental Health: 55.7<br />Number of responses: 62","Topic 6<br />Mental Health: 56.2<br />Number of responses: 22","Topic 12<br />Mental Health: 56.5<br />Number of responses: 28","Topic 9<br />Mental Health: 58.3<br />Number of responses: 34"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58],"y":[34.2916666666667,38.4583333333333,38.4583333333333,40.1944444444444,42.2777777777778,44.3076923076923,44.5,45.75,47.0520833333333,47.0757575757576,49.2222222222222,49.6851851851852,50.3333333333333,52.5806010928962,53.0416666666667,53.3888888888889,54.0833333333333,55.1547619047619,55.7202380952381,56.6875,56.7945205479452,56.8611111111111,60.4722222222222,60.9285714285714,60.9285714285714,62.7954545454545,64.3774509803922,86.7222222222222,102],"text":["15","12","3","29","23","11","7","1","22","17","28","5","14","10","27","24","25","18","2","4","8","6","21","16","19","13","9","20","26"],"hovertext":["Topic 15<br />Mental Health: 32.3<br />Number of responses: 8","Topic 12<br />Mental Health: 36.5<br />Number of responses: 4","Topic 3<br />Mental Health: 36.5<br />Number of responses: 2","Topic 29<br />Mental Health: 38.2<br />Number of responses: 6","Topic 23<br />Mental Health: 40.3<br />Number of responses: 3","Topic 11<br />Mental Health: 42.3<br />Number of responses: 13","Topic 7<br />Mental Health: 42.5<br />Number of responses: 15","Topic 1<br />Mental Health: 43.8<br />Number of responses: 1","Topic 22<br />Mental Health: 45.1<br />Number of responses: 16","Topic 17<br />Mental Health: 45.1<br />Number of responses: 11","Topic 28<br />Mental Health: 47.2<br />Number of responses: 9","Topic 5<br />Mental Health: 47.7<br />Number of responses: 36","Topic 14<br />Mental Health: 48.3<br />Number of responses: 5","Topic 10<br />Mental Health: 50.6<br />Number of responses: 61","Topic 27<br />Mental Health: 51<br />Number of responses: 12","Topic 24<br />Mental Health: 51.4<br />Number of responses: 15","Topic 25<br />Mental Health: 52.1<br />Number of responses: 15","Topic 18<br />Mental Health: 53.2<br />Number of responses: 35","Topic 2<br />Mental Health: 53.7<br />Number of responses: 14","Topic 4<br />Mental Health: 54.7<br />Number of responses: 12","Topic 8<br />Mental Health: 54.8<br />Number of responses: 73","Topic 6<br />Mental Health: 54.9<br />Number of responses: 3","Topic 21<br />Mental Health: 58.5<br />Number of responses: 15","Topic 16<br />Mental Health: 58.9<br />Number of responses: 14","Topic 19<br />Mental Health: 58.9<br />Number of responses: 7","Topic 13<br />Mental Health: 60.8<br />Number of responses: 22","Topic 9<br />Mental Health: 62.4<br />Number of responses: 17","Topic 20<br />Mental Health: 84.7<br />Number of responses: 6","Topic 26<br />Mental Health: 100<br />Number of responses: 1"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.9103362391034,"r":7.97011207970112,"b":15.1432129514321,"l":47.0236612702366},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,0.488139714167111],"automargin":true,"type":"linear","autorange":false,"range":[-0.4,30.4],"tickmode":"array","ticktext":[null],"categoryorder":"array","categoryarray":[null],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[25.525,105.641666666667],"tickmode":"array","ticktext":["40","60","80","100"],"tickvals":[40,60,80,100],"categoryorder":"array","categoryarray":["40","60","80","100"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"annotations":[{"text":"Mental Health Problems","x":-0.0462551147482654,"y":0.5,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-90,"xanchor":"right","yanchor":"center","annotationType":"axis"},{"text":"High Income","x":0.244069857083556,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Low Income","x":0.755930142916444,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.488139714167111,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":0.488139714167111,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.511860285832889,"x1":1,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0.511860285832889,"x1":1,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"}],"xaxis2":{"type":"linear","autorange":false,"range":[28.6,59.4],"tickmode":"array","ticktext":null,"categoryorder":"array","categoryarray":null,"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.511860285832889,1],"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ac95317b6d91":{"size":{},"x":{},"y":{},"text":{},"type":"scatter"},"ac951e5663f8":{"y":{},"label":{},"x":{},"y.1":{},"text":{}}},"cur_data":"ac95317b6d91","visdat":{"ac95317b6d91":["function (y) ","x"],"ac951e5663f8":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="race-by-mental-health" class="section level3">
+<h3>Race by Mental Health</h3>
+<p><img src="open_childcare_files/figure-html/-open-childcare-49-1.png" width="672" /></p>
+</div>
+<div id="poverty-by-mental-health" class="section level3">
+<h3>Poverty by Mental Health</h3>
+<p><img src="open_childcare_files/figure-html/-open-childcare-50-1.png" width="672" /></p>
+</div>
+<div id="over-time" class="section level3">
+<h3>Over time</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="over-time-topic-4" class="section level3">
+<h3>Over time – topic 4</h3>
+<div id="htmlwidget-fc14539e7069fd52c92c" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-fc14539e7069fd52c92c">{"x":{"data":[{"x":[18401,18408,18415,18421,18428,18435,18442,18449,18456,18463,18470,18477,18485,18491,18499,18506,18513,18520,18526,18533],"y":[5.74712643678161,2.56410256410256,6.25,6.49350649350649,4.59770114942529,8.04597701149425,13.4831460674157,8.33333333333333,13.4831460674157,7.60869565217391,11.0091743119266,13.1147540983607,12.1739130434783,12.962962962963,17.3553719008264,8.69565217391304,15.0537634408602,18.1818181818182,16.9014084507042,21.4285714285714],"text":["<br />Week: 7<br />Percent: 5.7<br />N: 87","<br />Week: 8<br />Percent: 2.6<br />N: 78","<br />Week: 9<br />Percent: 6.2<br />N: 80","<br />Week: 10<br />Percent: 6.5<br />N: 77","<br />Week: 11<br />Percent: 4.6<br />N: 87","<br />Week: 12<br />Percent: 8<br />N: 87","<br />Week: 13<br />Percent: 13.5<br />N: 89","<br />Week: 14<br />Percent: 8.3<br />N: 96","<br />Week: 15<br />Percent: 13.5<br />N: 89","<br />Week: 16<br />Percent: 7.6<br />N: 92","<br />Week: 17<br />Percent: 11<br />N: 109","<br />Week: 18<br />Percent: 13.1<br />N: 61","<br />Week: 19<br />Percent: 12.2<br />N: 115","<br />Week: 20<br />Percent: 13<br />N: 54","<br />Week: 21<br />Percent: 17.4<br />N: 121","<br />Week: 22<br />Percent: 8.7<br />N: 23","<br />Week: 23<br />Percent: 15.1<br />N: 93","<br />Week: 24<br />Percent: 18.2<br />N: 22","<br />Week: 25<br />Percent: 16.9<br />N: 71","<br />Week: 26<br />Percent: 21.4<br />N: 42"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":5.66929133858268,"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"More caregivers are expressing concern about exposure to COVID through child care","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18394.4,18539.6],"tickmode":"array","ticktext":["Jun","Jul","Aug","Sep","Oct"],"tickvals":[18414,18444,18475,18506,18536],"categoryorder":"array","categoryarray":["Jun","Jul","Aug","Sep","Oct"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[1.62087912087912,22.3717948717949],"tickmode":"array","ticktext":["5","10","15","20"],"tickvals":[5,10,15,20],"categoryorder":"array","categoryarray":["5","10","15","20"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"Percent","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ac9515fa6048":{"x":{},"y":{},"text":{},"type":"scatter"},"ac9568c7223d":{"x":{},"y":{},"text":{}}},"cur_data":"ac9515fa6048","visdat":{"ac9515fa6048":["function (y) ","x"],"ac9568c7223d":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="covid-concerns-by-anxiety-per-week" class="section level2">
+<h2>COVID concerns by anxiety per week</h2>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+</div>
+<div id="question-2" class="section level1">
+<h1>Question 2</h1>
+<div id="word-count-1" class="section level2 tabset">
+<h2 class="tabset">Word count</h2>
+<div id="race-1" class="section level3">
+<h3>Race</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
+<div id="income-1" class="section level3">
+<h3>Income</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="mental-health-2" class="section level3">
+<h3>Mental health</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+</div>
+</div>
+<div id="how-many-topics-1" class="section level2">
+<h2>How many topics</h2>
+<p><img src="open_childcare_files/figure-html/-open-childcare-55-1.png" width="672" /></p>
+</div>
+<div id="most-common-topics-1" class="section level2">
+<h2>Most common topics</h2>
+<p><img src="open_childcare_files/figure-html/-open-childcare-61-1.png" width="672" /></p>
+</div>
+<div id="identify-topics-1" class="section level2 tabset">
+<h2 class="tabset">Identify topics</h2>
+<div id="all-2" class="section level3">
+<h3>All</h3>
+</div>
+<div id="section-30" class="section level3">
+<h3>1</h3>
+<pre><code>## Topic 1 Top Words:
+##       Highest Prob: time, support, provid, live, close 
+##       FREX: live, support, relat, cost, provid 
+##       Lift: live, high-qual, lockdown, relat, team 
+##       Score: provid, support, time, lockdown, live</code></pre>
+<pre><code>## 
+##  Topic 1: 
+##       Part time childcare
+##      Part time childcare
+##      having my parents near by for childcare and support
+##      Part time childcare
+##      Support from family for childcare</code></pre>
+</div>
+<div id="section-31" class="section level3">
+<h3>2</h3>
+<pre><code>## Topic 2 Top Words:
+##       Highest Prob: famili, abl, avail, good, reopen 
+##       FREX: avail, abl, re-open, famili, mask 
+##       Lift: mask, quarantin, re-open, avail, abl 
+##       Score: famili, re-open, abl, avail, good</code></pre>
+<pre><code>## 
+##  Topic 2: 
+##       Food stamps, having employment, and reliable daycare
+##      Family providing free childcare
+##      that my 15 year old is helping  with childcare
+##      Having a nanny for the time being
+##      Outdoors, babysitter.</code></pre>
+</div>
+<div id="section-32" class="section level3">
+<h3>3</h3>
+<pre><code>## Topic 3 Top Words:
+##       Highest Prob: day, week, job, babysitt, friend 
+##       FREX: job, day, babysitt, access, communiti 
+##       Lift: job, communiti, guess, qualiti, expens 
+##       Score: babysitt, communiti, job, day, friend</code></pre>
+<pre><code>## 
+##  Topic 3: 
+##       Each other, childcare, talking (virtually) to friends and family. Knowing we&#39;re financially secure. Knowing quality health care is accessible.
+##      Having a babysitter watch shortly during the day as I run errands
+##      We have an amazing babysitter who has been gracious enough to watch our daughter an extra day each week while day care is closed
+##      having childcare for 2 days a week and FMLA and covid leave from the CARES Act
+##      Splitting the cost of childcare with another family we know and having a friend watch the kids in the mornings during the week.</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-33" class="section level3">
+<h3>4</h3>
+<pre><code>## Topic 4 Top Words:
+##       Highest Prob: child, still, mother, member, hour 
+##       FREX: mother, still, member, child, hope 
+##       Lift: extrem, sister, system, sever, includ 
+##       Score: child, extrem, mother, still, member</code></pre>
+<pre><code>## 
+##  Topic 4: 
+##       The preschool/childcare for my oldest child just had a limited re-opening today with an extremely small number of kids and limited (less) hours. We hope that this will continue. The childcare place for my youngest also re-opened fully, just with special protocols.
+##      My family support system of grandmothers, sister and spouse have been a huge help, especially with child care.
+##      We have childcare again, though the hours are limited compared to their regular hours.
+##      That I am still able to nanny. I will be having to take several weeks off of that when our 2nd baby is born in August though. We also have a really good family / friends support system, which has been a huge lifesaver.
+##      My live in mother for child care</code></pre>
+</div>
+<div id="section-34" class="section level3">
+<h3>5</h3>
+<pre><code>## Topic 5 Top Words:
+##       Highest Prob: open, employ, allow, flexibl, schedul 
+##       FREX: open, flexibl, stabl, part-tim, normal 
+##       Lift: normal, open, appoint, art, danc 
+##       Score: open, employ, lifesav, flexibl, normal</code></pre>
+<pre><code>## 
+##  Topic 5: 
+##       Online classes (art)
+## FaceTime play dates
+## Telemedicine appointments
+## Grocery delivery services
+##      Zoom with the preschool class, art projects, dance parties, Daniel tiger and cheetohs.
+##      Public schools being open for in person  classes. Like prek and early headstart
+##      Educational offerings online from Youtube kids, Amazon Prime, our JCC daycare center and various museums and performing art institutions around the world.
+##      Honestly. ....youtube. it is a great source for projects to do with the kids, or as a babysitter sometimes!</code></pre>
+</div>
+<div id="section-35" class="section level3">
+<h3>6</h3>
+<pre><code>## Topic 6 Top Words:
+##       Highest Prob: care, child, take, continu, get 
+##       FREX: care, continu, option, take, babi 
+##       Lift: cheap, larg, necess, slowli, licens 
+##       Score: care, cheap, child, continu, babi</code></pre>
+<pre><code>## 
+##  Topic 6: 
+##       We were approved for SNAPS benefits. It isn&#39;t much, but it helps. Also, because of the day care issue, my children&#39;s grandparents have been keeping the kids while we are at work, but, it is getting difficult for them to continue watching the kids because their grandmother has a degenerative eye disease that is slowly but surely taking away her abilitly to see. She is slowly going blind and its getting harder for her to care for my kids.
+##      Not having to pay for child care so I can stay home and watch baby.
+##      Some access to child care
+##      What is hoping me and my children the most right now is family members but that includes just my aunt and uncle and their children they have been my child care and my best support and paying my monthly rent
+##      Having work and child care to get out of the house</code></pre>
+</div>
+<div id="section-36" class="section level3">
+<h3>7</h3>
+<pre><code>## Topic 7 Top Words:
+##       Highest Prob: pay, incom, kid, now, also 
+##       FREX: pay, worker, essenti, assist, money 
+##       Lift: bill, card, client, creativ, credit 
+##       Score: one, pay, essenti, worker, bill</code></pre>
+<pre><code>## 
+##  Topic 7: 
+##       Having one parent home to act as the guardian of our social emotional health, and also so we don’t have to expose our kids to other kids’ potential germs at daycare, is the most helpful thing right now. My husband is an essential worker and we do have income, thank goodness, but the government assistance for the pandemic is also incredibly helpful.
+##      Our income has stayed the same so far so at least we aren&#39;t stressed about money right now (especially with paying less for child care since the kids are mostly home with us).
+##      We are thankful to have found the kids a nanny for half of the week. That person has been quite uplifting, and she is great at making sure the kids get out and move their bodies in safe places.
+##      That our daycare center has not closed. If they closed I would have to quit my job to stay home and we would not make enough money on one income to pay bills
+##      Ability for me to work from home and taking care of my kids at the same time. This has allowed me to save up on commuting and childcare cost, therefore enabled me to pay down debt and better financially. Also, I feel more at ease and stress reduce as I don’t have obligation to head to office for work and leave my kids with a sitter.</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-37" class="section level3">
+<h3>8</h3>
+<pre><code>## Topic 8 Top Words:
+##       Highest Prob: social, see, kid, class, also 
+##       FREX: distanc, neighbor, nice, visit, attend 
+##       Lift: neighbor, nice, visit, adult, age 
+##       Score: playgroup, social, see, class, connect</code></pre>
+<pre><code>## 
+##  Topic 8: 
+##       We decided to create a COVID bubble with our next door neighbors, who also work from home and take the same precautions we do regarding social distancing. We spend time with them and let our kids, who are classmates, play together. Both kids are only children, so having another kid to play with after 3 months of isolation has been wonderful for them, and for the adults too.
+##      Is “my mom” an appropriate answer? I really don’t know.  This is very isolating.  Since my daughter goes to daycare, she could be carrying the virus and I am scared to be around family members because I do not want to unknowingly pass the virus to people I love (or anyone).  I’d love for this to end.
+##      Video chats with family members. Social distance visits in yard with sister/daughter. Online learning resources. Walmart pick-up and Amazon delivery. Partial unemployment I&#39;m receiving as I stopped working as a COVID-19 precaution to protect my family (also lacked childcare).
+##      Daycare has been of great help for us with our youngest. That took off a greater burden while we&#39;re at home working. We&#39;ve been having social distancing playdates and seeing family over video calls or in front/back yards with social distancing parameters. We take weekly weekend bike rides as a family and go swimming every weekend, if not during the week. I&#39;ve been having bimonthly video calls with my closest girlfriends. I practice daily reiki and meditation. Our daughters love their yoga and my oldest loves her meditation class she takes twice a week. Giving our girls screen time (not being so strict) has been helpful for the most part (until we have to turn the TV off or remove the tablet). Getting more 1:1 time with my husband has been really nice. Me cooking from home more and having dinner together at a more reasonable hour to put the girls to bed at an earlier bedtime has been very helpful.
+##      Having a steady income and socially distanced contact with our next door neighbors, whose son is also in my daughter&#39;s class at school. The kids have exchanged letters and toys, and we have cooked meals for each other and left them on the doorstep. It&#39;s been a nice way to stay connected.</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-38" class="section level3">
+<h3>9</h3>
+<pre><code>## Topic 9 Top Words:
+##       Highest Prob: help, parent, grandpar, food, stay 
+##       FREX: parent, help, stamp, give, that 
+##       Lift: church, felt, immens, instead, medicaid 
+##       Score: help, grandpar, parent, instead, food</code></pre>
+<pre><code>## 
+##  Topic 9: 
+##       The extra 600 has helped me add to the funds I saved for a used car. I could buy a 13,000 car cash if I wanted to but now more concerned with Bill&#39;s in the future I can&#39;t work due to no childcare and e learning. Have snap helps me stock up on foods as prices increase and meat is scarce or limited. Free lunch from schools they give for the week helps me feed my kids a portion controlled meal 3 times a day and helps me save money by not spending it on fast food, etc. No disconnect on light bill let&#39;s me pay on the lights when I am financially able to pay it instead of paying lump sum when I am late on payment. I keep balance under $225. Medicaid allows me to go to Doctors care when I am really concerned about me or my children&#39;s health but afraid to go to regular doctors office that&#39;s crowded especially pediatric offices. I can sign in online and wait in car until called.
+##      My parents help with childcare and that helps immensely
+##      food stamps, my parents with childcare
+##      Free food programs through daughters school and produce distribution through local churches. Extended Family helping with childcare
+##      My parents stayed with us for 3 weeks and helped with childcare and all sorts of cleaning and projects around the house.</code></pre>
+</div>
+<div id="section-39" class="section level3">
+<h3>10</h3>
+<pre><code>## Topic 10 Top Words:
+##       Highest Prob: daycar, back, son, get, send 
+##       FREX: son, daycar, back, old, keep 
+##       Lift: attent, happier, hes, high, luckili 
+##       Score: daycar, back, send, son, old</code></pre>
+<pre><code>## 
+##  Topic 10: 
+##       Getting back into our regular routine with my daughter being at school and son being at daycare.
+##      Trying to empathize more with my child. We are super stressed as parents, but I understand my son isn’t getting the typical student/teacher interaction and learning they usually get while in childcare. So I understand why there are more tantrums and I try to keep my son happy and engaged as much as humanly possible.
+##      Sending our children back to daycare. They are much happier with the attention, care, and interaction that they were not getting from us.
+##      Having the daycare for my older son still. It’s hard because they can’t be in school.
+##      putting our son back in daycare</code></pre>
+</div>
+<div id="section-40" class="section level3">
+<h3>11</h3>
+<pre><code>## Topic 11 Top Words:
+##       Highest Prob: childcar, free, nanni, part, understand 
+##       FREX: part, childcar, free, mother--law, nanni 
+##       Lift: communic, final, part, mother--law, doesn’t 
+##       Score: childcar, part, free, nanni, understand</code></pre>
+<pre><code>## 
+##  Topic 11: 
+##       Creating a schedule. Communicating daily in the morning to understand our work/childcare needs throughout the day.
+##      Finally having some part time childcare (an in-home babysitter)
+##      Grandparents providing free childcare
+##      Grandparents providing free childcare
+##      Access to grandparent to help with childcare. Understanding coworkers and bosses.</code></pre>
+</div>
+<div id="section-41" class="section level3">
+<h3>12</h3>
+<pre><code>## Topic 12 Top Words:
+##       Highest Prob: work, home, can, husband, fact 
+##       FREX: work, full, fact, husband, household 
+##       Lift: household, easier, entir, major, paycheck 
+##       Score: work, home, mom, can, husband</code></pre>
+<pre><code>## 
+##  Topic 12: 
+##       Working from home! Since our childcare plans either got too dangerous or fell through because of covid, it&#39;s been great that my work can be done entirely from home and my husband has been able to be home a few afternoons a week so I can focus on work.
+##      The fact that my husband has remained steadily employed and that I was already a stay at home mom so we aren’t scrambling for childcare. It’s nerve racking for my husband to leave each day and potentially be exposed but having a steady paycheck is a godsend.
+##      My mom moved in with us to support our childcare needs and has helped maintain our household while my husband and I work full time. It has been a great set up for myself, husband, her and my toddler.
+##      I’m off for the summer &amp; we have a childcare/schooling plan to start the year regardless of my work scenario. My husband is currently working from home.
+##      That I&#39;m able to work from home to keep my family safe and that my mom lives with me and helps with childcare so that I can actually work.</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+</div>
+<div id="section-42" class="section level3">
+<h3>13</h3>
+<pre><code>## Topic 13 Top Words:
+##       Highest Prob: need, dont, will, center, worri 
+##       FREX: consist, worri, dont, afford, come 
+##       Lift: afford, camp, clear, fortun, oper 
+##       Score: toddler’, need, center, dont, consist</code></pre>
+<pre><code>## 
+##  Topic 13: 
+##       My spouse just found full-time employment, so we needed to find additional childcare. We were lucky to find someone who can come to my spouse&#39;s home and look after the kids there while my spouse works remotely. Our kids are taking quite well to the childcare provider, and that has been a morale booster for our family.
+##      Ourselves - we&#39;re doing our best to manage the situation. But our childcare center is fortunately also adjusting their billing/tuition process because they are not in full operations.
+##      Honestly, having my husband furloughed means that we don&#39;t have to worry about finding a daycare center or nanny for our kids.
+##      Our nanny is so helpful, but we have her for 10 hours a week, which is what we can afford right now, but isn&#39;t sufficient. She&#39;s also not equipped to care for our older children, so we don&#39;t always have good solutions to keep everyone happy.
+##      That we don&#39;t have to find an odd source of child care as I work from home, although now I haven&#39;t been able to work at all without their head start program.</code></pre>
+<pre><code>## quartz_off_screen 
+##                 2</code></pre>
+<!-- ### 14 -->
+<!-- ```{r -open-childcare-75 } -->
+<!-- tx = 14 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 15 -->
+<!-- ```{r -open-childcare-76 } -->
+<!-- tx = 15 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 16 -->
+<!-- ```{r -open-childcare-77 } -->
+<!-- tx = 16 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 17 -->
+<!-- ```{r -open-childcare-78 } -->
+<!-- tx = 17 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 18 -->
+<!-- ```{r -open-childcare-79 } -->
+<!-- tx = 18 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 19 -->
+<!-- ```{r -open-childcare-80 } -->
+<!-- tx = 19 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 20 -->
+<!-- ```{r -open-childcare-81 } -->
+<!-- tx = 20 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 21 -->
+<!-- ```{r -open-childcare-82 } -->
+<!-- tx = 21 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 22 -->
+<!-- ```{r -open-childcare-83 } -->
+<!-- tx = 22 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 23 -->
+<!-- ```{r -open-childcare-84 } -->
+<!-- tx = 23 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 24 -->
+<!-- ```{r -open-childcare-85 } -->
+<!-- tx = 24 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 25 -->
+<!-- ```{r -open-childcare-86 } -->
+<!-- tx = 25 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 26 -->
+<!-- ```{r -open-childcare-87 } -->
+<!-- tx = 26 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 27 -->
+<!-- ```{r -open-childcare-37} -->
+<!-- tx = 27 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 28 -->
+<!-- ```{r -open-childcare-38} -->
+<!-- tx = 28 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 29 -->
+<!-- ```{r -open-childcare-39} -->
+<!-- tx = 29 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 30 -->
+<!-- ```{r -open-childcare-40} -->
+<!-- tx = 30 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 31 -->
+<!-- ```{r -open-childcare-41} -->
+<!-- tx = 31 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 32 -->
+<!-- ```{r -open-childcare-42} -->
+<!-- tx = 32 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 33 -->
+<!-- ```{r -open-childcare-43} -->
+<!-- tx = 33 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 34 -->
+<!-- ```{r} -->
+<!-- tx = 34 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 35 -->
+<!-- ```{r} -->
+<!-- tx = 35 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+<!-- ### 36 -->
+<!-- ```{r} -->
+<!-- tx = 36 -->
+<!-- labelTopics(topics_child2, topics = tx, n = 5) -->
+<!-- findThoughts(topics_child2, texts, topics = tx, n = 5) -->
+<!-- ``` -->
+</div>
+</div>
+<div id="clusters-1" class="section level2">
+<h2>Clusters</h2>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre><code>## ICLUST (Item Cluster Analysis)
+## Call: iclust(r.mat = topics_only_wide)
+## 
+## Purified Alpha:
+##  C10  C11 
+## 0.72 0.38 
+## 
+## G6* reliability:
+##   C10   C11 
+##  0.82 -0.11 
+## 
+## Original Beta:
+##  C10  C11 
+## 0.32 0.10 
+## 
+## Cluster size:
+## C10 C11 
+##   8   5 
+## 
+## Item by Cluster Structure matrix:
+##           O   P   C10   C11
+## Topic1  C10 C10  0.65 -0.20
+## Topic10 C10 C10 -0.50  0.31
+## Topic11 C10 C10  0.58 -0.34
+## Topic12 C11 C11 -0.01 -0.39
+## Topic13 C11 C11 -0.29 -0.29
+## Topic2  C10 C10  0.49  0.24
+## Topic3  C11 C11  0.09 -0.18
+## Topic4  C10 C10  0.47  0.16
+## Topic5  C10 C10 -0.45  0.15
+## Topic6  C10 C10  0.30  0.13
+## Topic7  C11 C11  0.01 -0.04
+## Topic8  C11 C11 -0.24  0.65
+## Topic9  C10 C10  0.61  0.37
+## 
+## With eigenvalues of:
+## C10 C11 
+## 2.3 1.2 
+## 
+## Purified scale intercorrelations
+##  reliabilities on diagonal
+##  correlations corrected for attenuation above diagonal: 
+##       C10   C11
+## C10  0.72 -0.02
+## C11 -0.01  0.38
+## 
+## Cluster fit =  0.43   Pattern fit =  0.88  RMSR =  0.12</code></pre>
+</div>
+<div id="effects-1" class="section level2 tabset">
+<h2 class="tabset">Effects</h2>
+<div id="mental-health-3" class="section level3 tabset">
+<h3 class="tabset">Mental health</h3>
+<div id="all-3" class="section level4">
+<h4>All</h4>
+<div id="htmlwidget-28cf5cd9a9ae364a90f8" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-28cf5cd9a9ae364a90f8">{"x":{"data":[{"x":[2,8,4,10,11,1,12,3,7,5,9,13,6],"y":[34.7363945578231,39.3713126843658,35.2037712895377,40.0647095959596,42.2316384180791,32.4024822695036,42.7604166666667,34.7800925925926,39.1927083333333,36.0294117647059,39.9038461538462,42.7961847389558,38.6702127659574],"text":["Topic 1<br />Mental Health: 34.7<br />Number of responses: 49","Topic 10<br />Mental Health: 39.4<br />Number of responses: 226","Topic 11<br />Mental Health: 35.2<br />Number of responses: 274","Topic 12<br />Mental Health: 40.1<br />Number of responses: 264","Topic 13<br />Mental Health: 42.2<br />Number of responses: 59","Topic 2<br />Mental Health: 32.4<br />Number of responses: 47","Topic 3<br />Mental Health: 42.8<br />Number of responses: 120","Topic 4<br />Mental Health: 34.8<br />Number of responses: 72","Topic 5<br />Mental Health: 39.2<br />Number of responses: 112","Topic 6<br />Mental Health: 36<br />Number of responses: 85","Topic 7<br />Mental Health: 39.9<br />Number of responses: 91","Topic 8<br />Mental Health: 42.8<br />Number of responses: 83","Topic 9<br />Mental Health: 38.7<br />Number of responses: 235"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":[5.55334773340699,20.5606539211002,22.6771653543307,22.256229759035,8.12448188167189,3.77952755905512,14.4961029168467,10.0509289285037,13.8918584157605,11.5114304430686,12.0994816599279,11.3052092023934,20.9773522188237],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[2,8,4,10,11,1,12,3,7,5,9,13,6],"y":[35.7363945578231,40.3713126843658,36.2037712895377,41.0647095959596,43.2316384180791,33.4024822695036,43.7604166666667,35.7800925925926,40.1927083333333,37.0294117647059,40.9038461538462,43.7961847389558,39.6702127659574],"text":["1","10","11","12","13","2","3","4","5","6","7","8","9"],"hovertext":["Topic 1<br />Mental Health: 34.7<br />Number of responses: 49","Topic 10<br />Mental Health: 39.4<br />Number of responses: 226","Topic 11<br />Mental Health: 35.2<br />Number of responses: 274","Topic 12<br />Mental Health: 40.1<br />Number of responses: 264","Topic 13<br />Mental Health: 42.2<br />Number of responses: 59","Topic 2<br />Mental Health: 32.4<br />Number of responses: 47","Topic 3<br />Mental Health: 42.8<br />Number of responses: 120","Topic 4<br />Mental Health: 34.8<br />Number of responses: 72","Topic 5<br />Mental Health: 39.2<br />Number of responses: 112","Topic 6<br />Mental Health: 36<br />Number of responses: 85","Topic 7<br />Mental Health: 39.9<br />Number of responses: 91","Topic 8<br />Mental Health: 42.8<br />Number of responses: 83","Topic 9<br />Mental Health: 38.7<br />Number of responses: 235"],"textfont":{"size":14.6645669291339,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":27.1581569115816,"r":7.97011207970112,"b":15.1432129514321,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,13.6],"tickmode":"array","ticktext":[null],"categoryorder":"array","categoryarray":[null],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[31.8327971460309,44.3658698624284],"tickmode":"array","ticktext":["32","36","40","44"],"tickvals":[32,36,40,44],"categoryorder":"array","categoryarray":["32","36","40","44"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"Mental Health Problems","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ac9546142056":{"size":{},"x":{},"y":{},"text":{},"type":"scatter"},"ac955357120b":{"y":{},"label":{},"x":{},"y.1":{},"text":{}}},"cur_data":"ac9546142056","visdat":{"ac9546142056":["function (y) ","x"],"ac955357120b":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="by-race-1" class="section level4">
+<h4>By race</h4>
+<div id="htmlwidget-01d25dc3cb56c3b3d04a" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-01d25dc3cb56c3b3d04a">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12],"y":[11.8055555555556,18.2291666666667,18.4895833333333,24.0277777777778,24.6527777777778,32.9166666666667,33.3333333333333,33.8141025641026,37.2395833333333,45.8333333333333,50,56.25],"text":["Topic 1<br />Mental Health: 11.8<br />Number of responses: 3","Topic 5<br />Mental Health: 18.2<br />Number of responses: 4","Topic 11<br />Mental Health: 18.5<br />Number of responses: 8","Topic 12<br />Mental Health: 24<br />Number of responses: 15","Topic 2<br />Mental Health: 24.7<br />Number of responses: 6","Topic 7<br />Mental Health: 32.9<br />Number of responses: 5","Topic 6<br />Mental Health: 33.3<br />Number of responses: 5","Topic 9<br />Mental Health: 33.8<br />Number of responses: 13","Topic 10<br />Mental Health: 37.2<br />Number of responses: 8","Topic 3<br />Mental Health: 45.8<br />Number of responses: 1","Topic 4<br />Mental Health: 50<br />Number of responses: 1","Topic 8<br />Mental Health: 56.2<br />Number of responses: 4"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[5.46641326366281,5.84553217439718,6.93540173769949,8.24260762363703,6.44672804852427,6.16514420068461,6.16514420068461,7.91153678973923,6.93540173769949,3.77952755905512,3.77952755905512,5.84553217439718],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[13,14,15,16,17,18,19,20,21,22,23,24],"y":[25,29.7101449275362,33.0357142857143,33.0357142857143,34.5833333333333,35.8198924731183,36.5990990990991,37.5,42.1875,43.8271604938272,50.2314814814815,66.6666666666667],"text":["Topic 5<br />Mental Health: 25<br />Number of responses: 1","Topic 2<br />Mental Health: 29.7<br />Number of responses: 23","Topic 11<br />Mental Health: 33<br />Number of responses: 14","Topic 6<br />Mental Health: 33<br />Number of responses: 7","Topic 7<br />Mental Health: 34.6<br />Number of responses: 10","Topic 1<br />Mental Health: 35.8<br />Number of responses: 31","Topic 9<br />Mental Health: 36.6<br />Number of responses: 37","Topic 8<br />Mental Health: 37.5<br />Number of responses: 8","Topic 3<br />Mental Health: 42.2<br />Number of responses: 4","Topic 12<br />Mental Health: 43.8<br />Number of responses: 27","Topic 10<br />Mental Health: 50.2<br />Number of responses: 9","Topic 13<br />Mental Health: 66.7<br />Number of responses: 1"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[3.77952755905512,9.37429450545313,8.08025912155279,6.70129930599727,7.35795252149936,10.3128077999561,10.9363774839436,6.93540173769949,5.84553217439718,9.86168046286535,7.1532989682705,3.77952755905512],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y2","hoverinfo":"text","frame":null},{"x":[25,26,27,28,29,30,31,32,33,34,35,36,37],"y":[34.5657276995305,35.854828042328,36.5011415525114,37.0833333333333,38.4259259259259,38.9852472089314,39.4256756756757,40.1090342679128,40.6906906906907,41.0635964912281,41.8103448275862,42.6349765258216,42.7536231884058],"text":["Topic 4<br />Mental Health: 34.6<br />Number of responses: 71","Topic 11<br />Mental Health: 35.9<br />Number of responses: 252","Topic 6<br />Mental Health: 36.5<br />Number of responses: 73","Topic 1<br />Mental Health: 37.1<br />Number of responses: 15","Topic 2<br />Mental Health: 38.4<br />Number of responses: 18","Topic 10<br />Mental Health: 39<br />Number of responses: 209","Topic 9<br />Mental Health: 39.4<br />Number of responses: 185","Topic 5<br />Mental Health: 40.1<br />Number of responses: 107","Topic 12<br />Mental Health: 40.7<br />Number of responses: 222","Topic 7<br />Mental Health: 41.1<br />Number of responses: 76","Topic 13<br />Mental Health: 41.8<br />Number of responses: 58","Topic 8<br />Mental Health: 42.6<br />Number of responses: 71","Topic 3<br />Mental Health: 42.8<br />Number of responses: 115"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[13.7592779724844,22.6771653543307,13.9008417867013,8.24260762363703,8.69760225688995,20.9824538090458,19.9595668358214,16.0602408592555,21.5118980586607,14.1095506357654,12.7850328942198,13.7592779724844,16.5152353400682],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y3","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12],"y":[13.8055555555556,20.2291666666667,20.4895833333333,26.0277777777778,26.6527777777778,34.9166666666667,35.3333333333333,35.8141025641026,39.2395833333333,47.8333333333333,52,58.25],"text":["1","5","11","12","2","7","6","9","10","3","4","8"],"hovertext":["Topic 1<br />Mental Health: 11.8<br />Number of responses: 3","Topic 5<br />Mental Health: 18.2<br />Number of responses: 4","Topic 11<br />Mental Health: 18.5<br />Number of responses: 8","Topic 12<br />Mental Health: 24<br />Number of responses: 15","Topic 2<br />Mental Health: 24.7<br />Number of responses: 6","Topic 7<br />Mental Health: 32.9<br />Number of responses: 5","Topic 6<br />Mental Health: 33.3<br />Number of responses: 5","Topic 9<br />Mental Health: 33.8<br />Number of responses: 13","Topic 10<br />Mental Health: 37.2<br />Number of responses: 8","Topic 3<br />Mental Health: 45.8<br />Number of responses: 1","Topic 4<br />Mental Health: 50<br />Number of responses: 1","Topic 8<br />Mental Health: 56.2<br />Number of responses: 4"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[13,14,15,16,17,18,19,20,21,22,23,24],"y":[27,31.7101449275362,35.0357142857143,35.0357142857143,36.5833333333333,37.8198924731183,38.5990990990991,39.5,44.1875,45.8271604938272,52.2314814814815,68.6666666666667],"text":["5","2","11","6","7","1","9","8","3","12","10","13"],"hovertext":["Topic 5<br />Mental Health: 25<br />Number of responses: 1","Topic 2<br />Mental Health: 29.7<br />Number of responses: 23","Topic 11<br />Mental Health: 33<br />Number of responses: 14","Topic 6<br />Mental Health: 33<br />Number of responses: 7","Topic 7<br />Mental Health: 34.6<br />Number of responses: 10","Topic 1<br />Mental Health: 35.8<br />Number of responses: 31","Topic 9<br />Mental Health: 36.6<br />Number of responses: 37","Topic 8<br />Mental Health: 37.5<br />Number of responses: 8","Topic 3<br />Mental Health: 42.2<br />Number of responses: 4","Topic 12<br />Mental Health: 43.8<br />Number of responses: 27","Topic 10<br />Mental Health: 50.2<br />Number of responses: 9","Topic 13<br />Mental Health: 66.7<br />Number of responses: 1"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y2","hoverinfo":"text","frame":null},{"x":[25,26,27,28,29,30,31,32,33,34,35,36,37],"y":[36.5657276995305,37.854828042328,38.5011415525114,39.0833333333333,40.4259259259259,40.9852472089314,41.4256756756757,42.1090342679128,42.6906906906907,43.0635964912281,43.8103448275862,44.6349765258216,44.7536231884058],"text":["4","11","6","1","2","10","9","5","12","7","13","8","3"],"hovertext":["Topic 4<br />Mental Health: 34.6<br />Number of responses: 71","Topic 11<br />Mental Health: 35.9<br />Number of responses: 252","Topic 6<br />Mental Health: 36.5<br />Number of responses: 73","Topic 1<br />Mental Health: 37.1<br />Number of responses: 15","Topic 2<br />Mental Health: 38.4<br />Number of responses: 18","Topic 10<br />Mental Health: 39<br />Number of responses: 209","Topic 9<br />Mental Health: 39.4<br />Number of responses: 185","Topic 5<br />Mental Health: 40.1<br />Number of responses: 107","Topic 12<br />Mental Health: 40.7<br />Number of responses: 222","Topic 7<br />Mental Health: 41.1<br />Number of responses: 76","Topic 13<br />Mental Health: 41.8<br />Number of responses: 58","Topic 8<br />Mental Health: 42.6<br />Number of responses: 71","Topic 3<br />Mental Health: 42.8<br />Number of responses: 115"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y3","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.9103362391034,"r":20.7222914072229,"b":15.1432129514321,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,37.6],"tickmode":"array","ticktext":[null],"categoryorder":"array","categoryarray":[null],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y3","title":"","hoverformat":".2f"},"yaxis":{"domain":[0.683271066832711,1],"automargin":true,"type":"linear","autorange":false,"range":[8.9625,71.5097222222222],"tickmode":"array","ticktext":["20","40","60"],"tickvals":[20,40,60],"categoryorder":"array","categoryarray":["20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"annotations":[{"text":"Mental Health Problems","x":-0.0367668860819546,"y":0.5,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-90,"xanchor":"right","yanchor":"center","annotationType":"axis"},{"text":"Black","x":1,"y":0.841635533416355,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":90,"xanchor":"left","yanchor":"middle"},{"text":"Latinx","x":1,"y":0.5,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":90,"xanchor":"left","yanchor":"middle"},{"text":"White","x":1,"y":0.158364466583645,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":90,"xanchor":"left","yanchor":"middle"}],"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0.683271066832711,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","y0":0.683271066832711,"y1":1,"x0":0,"x1":25.5043586550436,"xanchor":1,"xsizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0.349937733499377,"y1":0.650062266500623},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","y0":0.349937733499377,"y1":0.650062266500623,"x0":0,"x1":25.5043586550436,"xanchor":1,"xsizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":0.316728933167289},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","y0":0,"y1":0.316728933167289,"x0":0,"x1":25.5043586550436,"xanchor":1,"xsizemode":"pixel"}],"yaxis2":{"type":"linear","autorange":false,"range":[8.9625,71.5097222222222],"tickmode":"array","ticktext":["20","40","60"],"tickvals":[20,40,60],"categoryorder":"array","categoryarray":["20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.349937733499377,0.650062266500623],"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"yaxis3":{"type":"linear","autorange":false,"range":[8.9625,71.5097222222222],"tickmode":"array","ticktext":["20","40","60"],"tickvals":[20,40,60],"categoryorder":"array","categoryarray":["20","40","60"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.316728933167289],"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ac951c9ea6fc":{"size":{},"x":{},"y":{},"text":{},"type":"scatter"},"ac9573e4f911":{"y":{},"label":{},"x":{},"y.1":{},"text":{}}},"cur_data":"ac951c9ea6fc","visdat":{"ac951c9ea6fc":["function (y) ","x"],"ac9573e4f911":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="by-income-1" class="section level4">
+<h4>By income</h4>
+<div id="htmlwidget-4a1473c9d021008973d8" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4a1473c9d021008973d8">{"x":{"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13],"y":[29.783950617284,34.5766129032258,34.8551432291667,34.8651960784314,35.9148550724638,37.9595588235294,39.6030805687204,39.7671568627451,39.859437751004,39.9070385126162,41.4722222222222,42.374213836478,43.6755952380952],"text":["Topic 2<br />Mental Health: 29.8<br />Number of responses: 27","Topic 6<br />Mental Health: 34.6<br />Number of responses: 62","Topic 11<br />Mental Health: 34.9<br />Number of responses: 256","Topic 4<br />Mental Health: 34.9<br />Number of responses: 68","Topic 1<br />Mental Health: 35.9<br />Number of responses: 46","Topic 9<br />Mental Health: 38<br />Number of responses: 204","Topic 10<br />Mental Health: 39.6<br />Number of responses: 211","Topic 5<br />Mental Health: 39.8<br />Number of responses: 102","Topic 7<br />Mental Health: 39.9<br />Number of responses: 83","Topic 12<br />Mental Health: 39.9<br />Number of responses: 251","Topic 8<br />Mental Health: 41.5<br />Number of responses: 75","Topic 3<br />Mental Health: 42.4<br />Number of responses: 106","Topic 13<br />Mental Health: 43.7<br />Number of responses: 56"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[9.59992821550124,12.9053762965059,22.6771653543307,13.3581694841518,11.5703173763838,20.6235297360335,20.9143231403717,15.6008171748893,14.4060766698998,22.489497965662,13.860757216427,15.8372663803138,12.4289118856093],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[14,15,16,17,18,19,20,21,22,23,24,25,26],"y":[15.2777777777778,16.6666666666667,33.3333333333333,33.3333333333333,35.9375,36.1111111111111,39.945652173913,40.162037037037,40.3645833333333,43.1089743589744,43.3467741935484,45.6845238095238,55.2083333333333],"text":["Topic 13<br />Mental Health: 15.3<br />Number of responses: 3","Topic 1<br />Mental Health: 16.7<br />Number of responses: 3","Topic 4<br />Mental Health: 33.3<br />Number of responses: 4","Topic 5<br />Mental Health: 33.3<br />Number of responses: 10","Topic 2<br />Mental Health: 35.9<br />Number of responses: 20","Topic 10<br />Mental Health: 36.1<br />Number of responses: 15","Topic 6<br />Mental Health: 39.9<br />Number of responses: 23","Topic 11<br />Mental Health: 40.2<br />Number of responses: 18","Topic 7<br />Mental Health: 40.4<br />Number of responses: 8","Topic 12<br />Mental Health: 43.1<br />Number of responses: 13","Topic 9<br />Mental Health: 43.3<br />Number of responses: 31","Topic 3<br />Mental Health: 45.7<br />Number of responses: 14","Topic 8<br />Mental Health: 55.2<br />Number of responses: 8"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":0.7,"size":[3.77952755905512,3.77952755905512,4.96761186795956,6.9229031769943,8.67812465680707,7.8951723324508,9.09280211447748,8.38095830133235,6.4361648367663,7.53658002750021,10.0662787949335,7.71995743099984,6.4361648367663],"symbol":"circle","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y2","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13],"y":[31.783950617284,36.5766129032258,36.8551432291667,36.8651960784314,37.9148550724638,39.9595588235294,41.6030805687204,41.7671568627451,41.859437751004,41.9070385126162,43.4722222222222,44.374213836478,45.6755952380952],"text":["2","6","11","4","1","9","10","5","7","12","8","3","13"],"hovertext":["Topic 2<br />Mental Health: 29.8<br />Number of responses: 27","Topic 6<br />Mental Health: 34.6<br />Number of responses: 62","Topic 11<br />Mental Health: 34.9<br />Number of responses: 256","Topic 4<br />Mental Health: 34.9<br />Number of responses: 68","Topic 1<br />Mental Health: 35.9<br />Number of responses: 46","Topic 9<br />Mental Health: 38<br />Number of responses: 204","Topic 10<br />Mental Health: 39.6<br />Number of responses: 211","Topic 5<br />Mental Health: 39.8<br />Number of responses: 102","Topic 7<br />Mental Health: 39.9<br />Number of responses: 83","Topic 12<br />Mental Health: 39.9<br />Number of responses: 251","Topic 8<br />Mental Health: 41.5<br />Number of responses: 75","Topic 3<br />Mental Health: 42.4<br />Number of responses: 106","Topic 13<br />Mental Health: 43.7<br />Number of responses: 56"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[14,15,16,17,18,19,20,21,22,23,24,25,26],"y":[17.2777777777778,18.6666666666667,35.3333333333333,35.3333333333333,37.9375,38.1111111111111,41.945652173913,42.162037037037,42.3645833333333,45.1089743589744,45.3467741935484,47.6845238095238,57.2083333333333],"text":["13","1","4","5","2","10","6","11","7","12","9","3","8"],"hovertext":["Topic 13<br />Mental Health: 15.3<br />Number of responses: 3","Topic 1<br />Mental Health: 16.7<br />Number of responses: 3","Topic 4<br />Mental Health: 33.3<br />Number of responses: 4","Topic 5<br />Mental Health: 33.3<br />Number of responses: 10","Topic 2<br />Mental Health: 35.9<br />Number of responses: 20","Topic 10<br />Mental Health: 36.1<br />Number of responses: 15","Topic 6<br />Mental Health: 39.9<br />Number of responses: 23","Topic 11<br />Mental Health: 40.2<br />Number of responses: 18","Topic 7<br />Mental Health: 40.4<br />Number of responses: 8","Topic 12<br />Mental Health: 43.1<br />Number of responses: 13","Topic 9<br />Mental Health: 43.3<br />Number of responses: 31","Topic 3<br />Mental Health: 45.7<br />Number of responses: 14","Topic 8<br />Mental Health: 55.2<br />Number of responses: 8"],"textfont":{"size":11.3385826771654,"color":"rgba(0,0,0,1)"},"type":"scatter","mode":"text","hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y2","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":39.9103362391034,"r":20.7222914072229,"b":15.1432129514321,"l":40.6475716064757},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.25,27.25],"tickmode":"array","ticktext":[null],"categoryorder":"array","categoryarray":[null],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y2","title":"","hoverformat":".2f"},"yaxis":{"domain":[0.516604400166044,1],"automargin":true,"type":"linear","autorange":false,"range":[13.18125,59.3048611111111],"tickmode":"array","ticktext":["20","30","40","50"],"tickvals":[20,30,40,50],"categoryorder":"array","categoryarray":["20","30","40","50"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"annotations":[{"text":"Mental Health Problems","x":-0.0367668860819546,"y":0.5,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"xref":"paper","yref":"paper","textangle":-90,"xanchor":"right","yanchor":"center","annotationType":"axis"},{"text":"High Income","x":1,"y":0.758302200083022,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":90,"xanchor":"left","yanchor":"middle"},{"text":"Low Income","x":1,"y":0.241697799916978,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":90,"xanchor":"left","yanchor":"middle"}],"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0.516604400166044,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","y0":0.516604400166044,"y1":1,"x0":0,"x1":25.5043586550436,"xanchor":1,"xsizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":0.483395599833956},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","y0":0,"y1":0.483395599833956,"x0":0,"x1":25.5043586550436,"xanchor":1,"xsizemode":"pixel"}],"yaxis2":{"type":"linear","autorange":false,"range":[13.18125,59.3048611111111],"tickmode":"array","ticktext":["20","30","40","50"],"tickvals":[20,30,40,50],"categoryorder":"array","categoryarray":["20","30","40","50"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0,0.483395599833956],"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"ac95765149c1":{"size":{},"x":{},"y":{},"text":{},"type":"scatter"},"ac9552c15a96":{"y":{},"label":{},"x":{},"y.1":{},"text":{}}},"cur_data":"ac95765149c1","visdat":{"ac95765149c1":["function (y) ","x"],"ac9552c15a96":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="race-by-mental-health-1" class="section level3">
+<h3>Race by Mental Health</h3>
+<p><img src="open_childcare_files/figure-html/-open-childcare-91-1.png" width="672" /></p>
+</div>
+<div id="poverty-by-mental-health-1" class="section level3">
+<h3>Poverty by Mental Health</h3>
+<p><img src="open_childcare_files/figure-html/-open-childcare-92-1.png" width="672" /></p>
+</div>
+<div id="over-time-1" class="section level3">
+<h3>Over time</h3>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="open_childcare_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

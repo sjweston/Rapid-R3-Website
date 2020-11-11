@@ -1,0 +1,211 @@
+---
+title: "RAPID R3"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    theme: paper
+---
+
+We must begin to hear directly from parents about what they need.
+
+Specifically, we need actionable, high quality scientific data, gathered from those with young children in their care, that will allow federal, state, and local policy makers to make the best use of resources.
+
+To this end, the [University of Oregon’s Center for Translational Neuroscience](https://ctn.uoregon.edu/) has launched a project called Rapid Assessment of Pandemic Impact on Development in Early Childhood (RAPID-EC).
+Essential to the project’s impact are strong partnerships with a number of visionary organizations, including:
+
+- Private philanthropic foundations to support the work.
+- Early childhood family-focused organizations with large online networks of parents and other caregivers, who can help us recruit geographically and demographically diverse households.
+- Early childhood advocacy and policy organizations, who will provide input into the content of the questions we ask and serve as mobilization channels for the reports we generate.
+
+In designing RAPID-EC, we quickly recognized a need to collect data at very frequent intervals, because both the evolution of the pandemic and the federal and state responses to it have been difficult to predict.
+
+As such, surveys will be conducted on a weekly basis.
+We further recognized the need for large nationally representative samples for each weekly survey. These representative samples will allow us to not only make statements about the overall well-being of households with young children in the US, but also to examine specific subgroups based on characteristics like household income, race and ethnicity, and region of the country. 
+
+Read more about our study [here](https://medium.com/rapid-ec-project). 
+
+
+```{r, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = TRUE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(haven)
+# require(devtools)
+# install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(zipcode)
+library(ggthemr)
+library(maps)
+library(usmap)
+library(ggsn)
+library(conflicted)
+conflict_prefer("lag", "dplyr")
+conflict_prefer("filter", "dplyr")
+```
+
+```{r score datafile, echo = F, warning = F, message = F}
+source(here("Scripts/score data.R"))
+```
+
+
+```{r, key demographics}
+source(here("Scripts/demo groups.R"))
+```
+
+# Who are we studying?
+
+## Caregivers from many demographic groups
+
+Note that poverty thresholds come from the [United States Census Bureau 2019 thresholds by family size and number of children](https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-poverty-thresholds.html). Family size was estimated by adding the number of children, and 1 (if the parent reported being single, divorced, separated, widowed) or 2. 
+
+```{r binary demo plot}
+demo_data = scored %>%
+  filter(Week == 0) %>%
+  select(all_of(demos))
+
+total_n = nrow(demo_data)
+
+demo_data %>%
+  gather("key", "value") %>%
+  filter(key %in% binary_demos) %>%
+  mutate(key = factor(key, level = demos, labels = demo_labels)) %>%
+  filter(value == 1) %>%
+  group_by(key) %>%
+  summarize(Percent = (n()/total_n)*100) %>%
+  ggplot(aes(x = key, y = Percent))+
+  geom_bar(stat = "identity") +
+  geom_label(aes(label = round(Percent)), nudge_y = -5) +
+  labs(x = "",
+       y = "Percent of all participants", 
+       title = "Our caregivers include") +
+  coord_flip()+
+  theme_minimal()+
+  theme(plot.title.position = "plot")
+
+```
+
+## Caregivers across the United States
+
+```{r location demo plot, out.width=c('50%', '50%'), fig.show='hold'}
+demo_data %>%
+  gather("key", "value") %>%
+  filter(key == "region") %>%
+  filter(!is.na(value)) %>%
+  group_by(value) %>%
+  summarize(Percent = (n()/total_n)*100) %>%
+  ggplot(aes(x = value, y = Percent))+
+  geom_bar(stat = "identity") +
+  geom_label(aes(label = round(Percent)), nudge_y = -5) +
+  labs(x = "",
+       y = "Percent of all participants", 
+       title = "Our caregivers come from the") +
+  coord_flip()+
+  theme_minimal()+
+  theme(plot.title.position = "plot")
+
+us_map <- usmap::us_map() # used to add map scale
+
+state_counts = scored %>%
+  filter(Week == 0) %>%
+  group_by(state) %>%
+  summarize(count = n()) 
+
+plot_state_counts = state_counts %>%
+  usmap::plot_usmap(data = ., values = "count") +
+  labs(fill = 'Number of caregivers') + 
+  scale_fill_gradientn(colours=rev(heat.colors(10)),na.value="grey90",
+                       guide = guide_colourbar(barwidth = 25, barheight = 0.4,
+                                               #put legend title on top of legend
+                                               title.position = "top")) 
+  # map scale
+plot_scale = plot_state_counts + 
+  ggsn::scalebar(data = state_counts, dist = 500, dist_unit = "km",
+           border.size = 0.4, st.size = 4,
+           box.fill = c('black','white'),
+           transform = FALSE, model = "WGS84") + 
+  # put legend at the bottom, adjust legend title and text font sizes
+  theme(legend.position = "bottom",
+        legend.title=element_text(size=12), 
+        legend.text=element_text(size=10))
+plot_scale
+```
+
+## Caregivers of all income levels
+
+```{r income demo plot}
+max_income = 200
+income = seq(0, max_income, by = 20)
+end = rep("K", length(income))
+end[length(income)] = "K+"
+income_labels = paste0(income, end)
+scored %>%
+  filter(Week == 0) %>%
+  select(income) %>% 
+  mutate(income = income/1000) %>%
+  mutate(income = ifelse(income > 200, 200, income)) %>%
+  ggplot(aes(x = income)) +
+  geom_histogram(bins = 30, color = "white") +
+  scale_x_continuous(breaks = income, labels = income_labels)+
+  labs(x = "Yearly income",
+       title = "Our caregivers earn",
+       y = "Frequency") +
+  theme_minimal()+
+  theme(plot.title.position = "plot")
+```
+
+# When do caregivers participate?
+
+```{r, out.width=c('50%', '50%'), fig.show='hold'}
+scored %>%
+  filter(Week != 0) %>%
+  group_by(Week) %>%
+  summarize(n = n()) %>%
+  ggplot(aes(x = Week, y = n)) +
+  geom_bar(stat = "identity")+
+  labs(x = "Week", y = "Number of responses", title = "Survey participation by week") +
+  theme_minimal()
+
+date_data = scored %>%
+  filter(Week != 0) %>%
+  group_by(Date) %>%
+  summarize(n = n()) %>%
+  mutate(day = weekdays(Date)) 
+
+weekends = data.frame(
+  start = date_data$Date[date_data$day == "Saturday"],
+  end = date_data$Date[date_data$day == "Saturday"] + 1
+)
+
+date_data %>%
+  ggplot(aes(x = Date, y = n)) +
+  geom_rect(aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf), data = weekends, fill = "yellow", inherit.aes = F) +
+  geom_point() +
+  geom_line()+
+  labs(x = "Date", y = "Number of responses", title = "Survey participation by day") +
+  theme_minimal()
+```
+
+```{r}
+scored %>%
+  group_by(CaregiverID) %>%
+  filter(days_sheltering == max(days_sheltering, na.rm=T)) %>%
+  ungroup() %>%
+  group_by(days_sheltering) %>%
+  summarize(n = (n()/total_n)*100) %>%
+  ggplot(aes(x = days_sheltering, y = n))+
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Caregivers have spent __ days sheltering in place",
+       y = "Percent of sample",
+       x = "")+
+  theme_minimal()+
+  theme(plot.title.position = "plot")
+```
+
+Shelter-in-place order data comes from [FINRA.org](https://www.finra.org/rules-guidance/key-topics/covid-19/shelter-in-place).

@@ -1,0 +1,250 @@
+---
+title: "Rapid R3 Notebook"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+  
+---
+
+
+```{r, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(haven)
+# require(devtools)
+# install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(zipcode)
+library(ggthemr)
+```
+
+
+```{r score datafile, echo = F, warning = F, message = F}
+# score master --------------------------------------------------------
+
+source(here("Scripts/score data.R"))
+```
+
+```{r}
+total_weeks = max(scored$Week, na.rm=T)
+```
+
+
+# Caregiver Mental Health 
+
+```{r}
+caregiver_mental = scored %>%
+  mutate(anxiety_notebook = ifelse(anxiety >= 1.5, 1, 0),
+         depress_notebook = ifelse(depress >= 1.5, 1, 0),
+         stress_notebook = ifelse(stress >= 4, 1, 0)) %>%
+  select(Week, contains("notebook")) %>%
+  gather("emotion", "value", -Week) %>%
+  mutate(emotion = gsub("_notebook", "", emotion),
+         emotion = str_to_sentence(emotion)) %>%
+  filter(!is.na(value)) %>%
+  group_by(Week, emotion) %>%
+  summarize(n = n(),
+            counts = sum(value),
+            prop = counts/n,
+            Percent = prop*100)
+
+caregiver_mental %>%
+  ggplot(aes(x = Week, y = Percent, color = emotion)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Caregiver mental health",
+       color = "",
+       caption = "Participants were counted above threshold on anxiety and depression if their average response was greater than or equal to 1.5.\nParticipants were counted above threshold on stress if their response was 4 or 5. \nWeek 0 reports are retrospective. ")+
+  theme(legend.position = "top", plot.title.position = "plot")
+```
+
+```{r results = 'asis'}
+caregiver_mental %>%
+  ungroup()%>%
+  gather("statistic", "value", -Week, -emotion) %>%
+  filter(statistic != "prop") %>%
+  mutate(Week = paste("Week", Week),
+         statistic = factor(statistic, 
+                            levels = c("counts", "n", "Percent"),
+                            labels = c("Number above threshold", 
+                                       "Total Respondants",
+                                       "Percent above threshold"))) %>%
+  spread(Week, value) %>%
+  select(-emotion) %>%
+  kable(., digits = 0) %>%
+  kable_styling() %>%
+  group_rows("Anxiety", 1, 3) %>%
+  group_rows("Depression", 4, 6) %>%
+  group_rows("Stress", 7, 9)  %>%
+  footnote(general = "Participants were counted above threshold on anxiety and depression if their average response was greater than or equal to 1.5. \nParticipants were counted above threshold on stress if their response was 4 or 5. \nWeek 0 reports are retrospective.")
+```
+
+
+# Child behavior
+
+```{r}
+child_behavior = scored %>%
+  mutate(fussy_notebook = ifelse(fussy == 2, 1, 0),
+         fear_notebook = ifelse(fear == 2, 1, 0)) %>%
+  select(Week, contains("notebook")) %>%
+  gather("emotion", "value", -Week) %>%
+  mutate(emotion = gsub("_notebook", "", emotion),
+         emotion = str_to_sentence(emotion)) %>%
+  filter(!is.na(value)) %>%
+  group_by(Week, emotion) %>%
+  summarize(n = n(),
+            counts = sum(value),
+            prop = counts/n,
+            Percent = prop*100)
+
+child_behavior %>%
+  ggplot(aes(x = Week, y = Percent, color = emotion)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Child behavior",
+       color = "",
+       caption = "Reports are counted above threshold if caregivers respond `2` to the assessments. \nWeek 0 reports are retrospective. ")+
+  theme(legend.position = "top", plot.title.position = "plot")
+```
+
+```{r results = 'asis'}
+child_behavior %>%
+  ungroup()%>%
+  gather("statistic", "value", -Week, -emotion) %>%
+  filter(statistic != "prop") %>%
+  mutate(Week = paste("Week", Week),
+         statistic = factor(statistic, 
+                            levels = c("counts", "n", "Percent"),
+                            labels = c("Number above threshold", 
+                                       "Total Respondants",
+                                       "Percent above threshold"))) %>%
+  spread(Week, value) %>%
+  select(-emotion) %>%
+  kable(., digits = 0) %>%
+  kable_styling() %>%
+  group_rows("Fussy", 1, 3) %>%
+  group_rows("Fear", 4, 6) %>%
+  footnote(general = "Reports are counted above threshold if caregivers respond `2` to the assessments. \nWeek 0 reports are retrospective.")
+```
+
+# Disability and basic necessities
+
+## Caregivers of children with disabilities
+
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  summarize(num_with = sum(disability),
+            num_without = n()- num_with,
+            total = n()) %>%
+  kable(., col.names = c("Week", "Caregivers of Children with Disabilities", "Caregivers of Children without Disabilities", "Total Respondants")) %>%
+  kable_styling() %>%
+  add_header_above(c(" " = 1, "Counts" = 3))
+```
+
+## Caregivers with difficulty paying basic necessities
+
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  summarize(num_with = sum(difficulty_basics),
+            num_without = n()- num_with,
+            total = n()) %>%
+  kable(., col.names = c("Week", "Caregivers with difficulty", "Caregivers without difficulty", "Total Respondants")) %>%
+  kable_styling() %>%
+  add_header_above(c(" " = 1, "Counts" = 3))
+```
+
+## Cross tabs (disability x basic necessities)
+
+```{r}
+counts = scored %>%
+  filter(Week > 0) %>%
+  select(Week, disability, difficulty_basics) %>%
+  group_by(Week, disability, difficulty_basics) %>%
+  summarize(n = n()) %>%
+  mutate(category = case_when(
+    disability == 0 & difficulty_basics == 0 ~ "No disability, no trouble",
+    disability == 0 & difficulty_basics == 1 ~ "No disability, yes trouble",
+    disability == 1 & difficulty_basics == 0 ~ "Disability, no trouble",
+    disability == 1 & difficulty_basics == 1 ~ "Disability, Trouble")
+    ) %>%
+  ungroup() %>%
+  select(Week, n, category)
+  
+counts %>%
+  spread(category, n) %>%
+  kable(., caption = "Counts by week",
+        col.names = c("Week", "No difficulty", "Difficulty", "No difficulty", "Difficulty")) %>%
+  kable_styling() %>%
+  add_header_above(c(" ", "Caregivers of children with dsiabilities" = 2, "Caregivers of children without dsiabilities" =2))
+```
+
+```{r}
+counts %>%
+  group_by(Week) %>%
+  mutate(total = sum(n),
+         n = n/total*100) %>%
+  select(-total) %>%
+  spread(category, n) %>%
+  kable(., caption = "Percent of each week",
+        digits = 1,
+        col.names = c("Week", "No difficulty", "Difficulty", "No difficulty", "Difficulty")) %>%
+  kable_styling() %>%
+  add_header_above(c(" ", "Caregivers of children with dsiabilities" = 2, "Caregivers of children without dsiabilities" =2))
+```
+
+```{r}
+scored %>%
+  filter(Week > 0) %>%
+  select(Week, disability, difficulty_basics) %>%
+  group_by(Week, disability, difficulty_basics) %>%
+  summarize(n = n())%>%
+  ungroup() %>%
+  group_by(Week) %>%
+  mutate(total = sum(n), 
+         percent = n/total*100,
+         disability = factor(disability, levels = c(0,1),
+                             labels = c("No disability", "Disability")),
+         difficulty_basics = factor(difficulty_basics, levels = c(0,1),
+                             labels = c("No trouble paying", "Trouble paying"))) %>%
+  ungroup() %>%
+  mutate(Week = paste("Week", Week)) %>%
+  ggplot(aes(x = disability, y = percent, fill = difficulty_basics)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "",
+       fill = "Paying for basics",
+       y = "Perent of caregivers each week")+
+  facet_wrap(~Week, scales = "free_x") +
+  theme_bw() +
+  theme(legend.position = "top")
+```
+
+```{r, eval = F}
+chi.sq.function = function(x){
+  chisq.test(x$disability, x$difficulty_basics)
+}
+
+scored %>%
+  select(Week, disability, difficulty_basics) %>%
+  filter(Week > 0) %>%
+  group_by(Week) %>%
+  nest() %>%
+  mutate(chi.sq = map(data, chi.sq.function)) %>%
+  mutate(tidy = map(chi.sq, broom::tidy)) %>%
+  select(Week, tidy) %>%
+  unnest(cols = c(tidy)) %>%
+  select(-method) %>%
+  kable(., caption = "Chi-square test of independence (disability and difficulty paying for basics") %>%
+  kable_styling()
+```
+

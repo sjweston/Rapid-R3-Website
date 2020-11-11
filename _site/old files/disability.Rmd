@@ -1,0 +1,719 @@
+---
+title: "Caregivers of children with disabilities"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+  
+---
+
+Please note that lines by date and days sheltering in place are smoothed curves -- they may be poor representations of the data in locations with few participants. For example, the largest number of days sheltering in place only applies to a small portion of participants; lines representing small demographic groups at these large should not be interpreted. 
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r packages}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(haven)
+# require(devtools)
+# install_version("zipcode", version = "1.0", repos = "http://cran.us.r-project.org")
+library(zipcode)
+library(ggthemr)
+library(corx)
+library(papaja)
+library(zoo)
+library(ggpubr)
+library(lme4)
+```
+
+
+```{r score datafile, echo = F, warning = F, message = F}
+# score master --------------------------------------------------------
+source(here("Scripts/score data.R"))
+
+conflicted::conflict_prefer("chisq.test", "stats")
+conflicted::conflict_prefer("filter", "dplyr")
+conflicted::conflict_prefer("group_rows", "kableExtra")
+
+scored = scored %>%
+  filter(Week > 0)
+```
+
+```{rchunk 2}
+total_weeks = max(scored$Week, na.rm=T)
+```
+
+# Well-being during shelter-in-place 
+
+```{r disability-1}
+source(here("Functions/trend_days_sheltering_rolling.R"))
+```
+## Compared to general population {.tabset}
+
+### Caregiver anxiety
+
+```{r anxiety}
+anxiety_plot = trend_days_sheltering_binary(variable = "anxiety_current_some",
+                                     dataset = scored, 
+                                     label = "some or a lot of anxiety",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+anxiety_plot$plot
+```
+
+### Caregiver depression
+
+```{r depress}
+depress_plot = trend_days_sheltering_binary(variable = "depress_current_some",
+                                     dataset = scored, 
+                                     label = "some or a lot of depression",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+depress_plot$plot
+```
+
+### Caregiver stress
+
+```{r stress}
+stress_plot = trend_days_sheltering_binary(variable = "stress_current_some",
+                                     dataset = scored, 
+                                     label = "some or a lot of stress",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+stress_plot$plot
+```
+
+
+### Caregiver loneliness
+
+```{r disability-2 }
+lonely_plot = trend_days_sheltering_binary(variable = "lonely_current_some",
+                                     dataset = scored, 
+                                     label = "some or a lot of loneliness",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+lonely_plot$plot
+```
+
+### Child externalizing
+
+```{r fussy}
+fussy_plot = trend_days_sheltering_binary(variable = "fussy_current_some",
+                                     dataset = scored, 
+                                     label = "children are sometimes or often fussy or defiant",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+fussy_plot$plot
+```
+
+
+
+### Child internalizing
+
+```{r fear}
+fear_plot = trend_days_sheltering_binary(variable = "fear_current_some",
+                                     dataset = scored, 
+                                     label = "children are sometimes or often fearful or anxious",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+fear_plot$plot
+```
+
+## By poverty level {.tabset}
+
+
+```{r disability-3}
+disability = scored %>%
+  filter(disability == 1) 
+
+pov.tabs = xtabs(~ poverty, data = disability)
+```
+
+Of the `r nrow(disability)` caregivers of children with a disability, `r pov.tabs[2]` report an income below the poverty threshold for their household size and `r pov.tabs[1]` report an income above the threshold. 
+
+```{r disability-4}
+disability %>%
+  select(poverty, anxiety, depress, stress, fussy, fear) %>%
+  gather("emotion", "value", -poverty) %>%
+  filter(!is.nan(value) & !is.na(poverty) & !is.na(value)) %>%
+  group_by(poverty, emotion) %>%
+  summarize(n = n(),
+            m = mean(value),
+            s = sd(value),
+            t = qt(p = .975, df = n-1),
+            moe = t*(s/sqrt(n))) %>%
+  ungroup() %>%
+  mutate(emotion = factor(emotion, 
+                          levels = c("anxiety", "depress", "stress", "fussy", "fear"),
+                          labels = c("Caregiver anxiety", 
+                                     "Caregiver depression", 
+                                     "Caregiver stress", 
+                                     "Child externalizing", "Child internalizing")),
+         poverty = factor(poverty, levels = c(0,1), 
+                          labels = c("Above poverty threshold","Below poverty threshold"))) %>%
+  ggplot(aes(x = emotion, y = m, fill = poverty)) + 
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_errorbar(aes(min = m-moe, max = m+moe), position = position_dodge(1), width = .5) +
+  coord_flip() +
+  labs(x = "",
+      y = "Average response",
+      title = "Well-being in families") + 
+  theme_minimal()
+```
+
+
+## By geographic region {.tabset}
+
+
+### Caregiver anxiety
+
+```{r disability-5}
+disability %>%
+  filter(!is.na(region)) %>%
+  ggerrorplot(data = .,
+          x = "region", 
+          y = "anxiety",
+          desc_stat = "mean_ci")
+```
+
+
+```{r region anxiety}
+anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of anxiety",
+                                     groups = c("region"),
+                                     group_levels = unique(disability$region))
+anxiety_plot$plot
+```
+
+### Caregiver depression
+
+```{r disability-6}
+disability %>%
+  filter(!is.na(region)) %>%
+  ggerrorplot(data = .,
+          x = "region", 
+          y = "depress",
+          desc_stat = "mean_ci")
+```
+
+
+```{r region depress}
+depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of depression",
+                                     groups = c("region"),
+                                     group_levels = unique(disability$region))
+depress_plot$plot
+```
+
+### Caregiver stress
+
+```{r disability-7}
+disability %>%
+  filter(!is.na(region)) %>%
+  ggerrorplot(data = .,
+          x = "region", 
+          y = "stress",
+          desc_stat = "mean_ci")
+```
+
+
+```{r region stress}
+stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of stress",
+                                     groups = c("region"),
+                                     group_levels = unique(disability$region))
+stress_plot$plot
+```
+
+
+### Child externalizing
+
+```{r disability-8}
+disability %>%
+  filter(!is.na(region)) %>%
+  ggerrorplot(data = .,
+          x = "region", 
+          y = "fussy",
+          desc_stat = "mean_ci")
+```
+
+
+```{r region fussy}
+fussy_plot = trend_days_sheltering_cat(variable = "fussy_current_some",
+                                     dataset = disability, 
+                                     label = "children are sometimes or often fussy or defiant",
+                                     groups = c("region"),
+                                     group_levels = unique(disability$region))
+fussy_plot$plot
+```
+
+### Child internalizing
+
+```{r disability-9}
+disability %>%
+  filter(!is.na(region)) %>%
+  ggerrorplot(data = .,
+          x = "region", 
+          y = "fear",
+          desc_stat = "mean_ci")
+```
+
+
+```{r region fear}
+fear_plot = trend_days_sheltering_cat(variable = "fear_current_some",
+                                     dataset = disability, 
+                                     label = "children are sometimes or often fearful or anxious",
+                                     groups = c("region"),
+                                     group_levels = unique(disability$region))
+fear_plot$plot
+```
+
+## By childcare
+
+```{r disability-10}
+disability = disability %>%
+  mutate(nonfamliy_cc = ifelse(hours_nonfamilyCC_current == 0, 
+                               "No nonfamily care", 
+                               "Nonfamily care")) 
+tab_nonfamily_cc = table(disability$nonfamliy_cc)
+```
+
+Of these caregivers, `r tab_nonfamily_cc[2]` have non-family childcare and `r tab_nonfamily_cc[1]` do not.
+
+```{r disability-11}
+disability %>%
+  select(nonfamliy_cc, anxiety, depress, stress, fussy, fear) %>%
+  gather("emotion", "value", -nonfamliy_cc) %>%
+  ggerrorplot(data = .,
+          x = "emotion", 
+          y = "value",
+          color = "nonfamliy_cc",
+          desc_stat = "mean_ci")
+```
+
+
+```{r disability-12}
+disability = disability %>%
+  mutate(famliy_cc = ifelse(hours_familyCC_current == 0, 
+                               "No family care", 
+                               "family care")) 
+tab_family_cc = table(disability$famliy_cc)
+```
+
+Of these caregivers, `r tab_family_cc[1]` have family childcare and `r tab_family_cc[2]` do not.
+
+```{r disability-13}
+disability %>%
+  select(famliy_cc, anxiety, depress, stress, fussy, fear) %>%
+  gather("emotion", "value", -famliy_cc) %>%
+  ggerrorplot(data = .,
+          x = "emotion", 
+          y = "value",
+          color = "famliy_cc",
+          desc_stat = "mean_ci")
+```
+
+## By use of online resources
+
+```{r disability-14}
+disability %>%
+  select(access_online, anxiety, depress, stress, fussy, fear) %>%
+  gather("emotion", "value", -access_online) %>%
+  mutate(access_online = as.factor(access_online)) %>%
+  ggerrorplot(data = .,
+          x = "emotion", 
+          y = "value",
+          color = "access_online",
+          desc_stat = "mean_ci")
+```
+
+
+
+
+# Education 
+
+## Compared to general population {.tabset}
+
+### Parent education interrupted
+
+```{r parent edu}
+parent_edu_plot = trend_days_sheltering_binary(variable = "parent_edu_interrupt",
+                                     dataset = scored, 
+                                     label = "their own education was disrupted",
+                                     groups = c("disability"),
+                                     group_labels = "Parents of children with disabilities")
+parent_edu_plot$plot
+```
+
+### Child education interrupted
+
+```{r child edu}
+child_edu_plot = trend_days_sheltering_binary(variable = "child_edu_interrupt",
+                                     dataset = scored, 
+                                     label = "child(ren)'s education was disrupted",
+                                     groups = c("disability"),
+                                     group_labels = "Caregivers of children with disabilities")
+child_edu_plot$plot
+```
+
+## By poverty level {.tabset}
+
+
+```{r disability-15}
+disability = scored %>%
+  filter(disability == 1) 
+
+pov.tabs = xtabs(~ poverty, data = disability)
+```
+
+Of the `r nrow(disability)` caregivers of children with a disability, `r pov.tabs[2]` report an income below the poverty threshold for their household size and `r pov.tabs[1]` report an income above the threshold. 
+
+```{r disability-16}
+disability %>%
+  select(poverty, parent_edu_interrupt, child_edu_interrupt) %>%
+  gather("student", "value", -poverty) %>%
+  filter(!is.nan(value) & !is.na(poverty) & !is.na(value)) %>%
+  group_by(poverty, student) %>%
+  summarize(n = n(),
+            m = mean(value),
+            s = sd(value),
+            t = qt(p = .975, df = n-1),
+            moe = t*(s/sqrt(n))) %>%
+  ungroup() %>%
+  mutate(student = factor(student, 
+                          levels = c("parent_edu_interrupt", 
+                                     "child_edu_interrupt"),
+                          labels = c("Parent", "Child")),
+         poverty = factor(poverty, levels = c(0,1), 
+                          labels = c("Above poverty threshold","Below poverty threshold"))) %>%
+  ggplot(aes(x = student, y = m, fill = poverty)) + 
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_errorbar(aes(min = m-moe, max = m+moe), position = position_dodge(1), width = .5) +
+  labs(x = "",
+      y = "Proprotion interrupted",
+      title = "Education interrupted") + 
+  theme_minimal() +
+  theme(legend.position = "top")
+```
+
+
+## By geographic region
+
+
+```{r disability-17, out.width=c('50%', '50%'), fig.show='hold'}
+disability %>%
+  filter(!is.na(region)) %>%
+  select(region, parent_edu_interrupt, child_edu_interrupt) %>%
+  gather("student", "value", -region) %>%
+   mutate(student = factor(student, 
+                          levels = c("parent_edu_interrupt", 
+                                     "child_edu_interrupt"),
+                          labels = c("Parent", "Child"))) %>%
+  ggerrorplot(data = .,
+          x = "region", 
+          y = "value",
+          color = "student",
+          desc_stat = "mean_ci", 
+          title = "Interrupted education ")
+
+```
+
+
+
+## By childcare
+
+```{r disability-18}
+disability = disability %>%
+  mutate(nonfamliy_cc = ifelse(hours_nonfamilyCC_current == 0, 
+                               "No nonfamily care", 
+                               "Nonfamily care")) 
+tab_nonfamily_cc = table(disability$nonfamliy_cc)
+```
+
+Of these caregivers, `r tab_nonfamily_cc[2]` have non-family childcare and `r tab_nonfamily_cc[1]` do not.
+
+```{r disability-19}
+disability %>%
+  select(nonfamliy_cc, parent_edu_interrupt, child_edu_interrupt) %>%
+  gather("student", "value", -nonfamliy_cc) %>%
+  mutate(student = factor(student, 
+                          levels = c("parent_edu_interrupt", 
+                                     "child_edu_interrupt"),
+                          labels = c("Parent", "Child"))) %>%
+  ggerrorplot(data = .,
+          x = "student", 
+          y = "value",
+          color = "nonfamliy_cc",
+          desc_stat = "mean_ci")
+```
+
+
+```{r disability-20}
+disability = disability %>%
+  mutate(famliy_cc = ifelse(hours_familyCC_current == 0, 
+                               "No family care", 
+                               "family care")) 
+tab_family_cc = table(disability$famliy_cc)
+```
+
+Of these caregivers, `r tab_family_cc[1]` have family childcare and `r tab_family_cc[2]` do not.
+
+```{r disability-21}
+disability %>%
+  select(famliy_cc, parent_edu_interrupt, child_edu_interrupt) %>%
+  gather("student", "value", -famliy_cc) %>%
+  mutate(student = factor(student, 
+                          levels = c("parent_edu_interrupt", 
+                                     "child_edu_interrupt"),
+                          labels = c("Parent", "Child"))) %>%
+  ggerrorplot(data = .,
+          x = "student", 
+          y = "value",
+          color = "famliy_cc",
+          desc_stat = "mean_ci")
+```
+
+## By use of online resources
+
+```{r disability-22}
+disability %>%
+  select(access_online, parent_edu_interrupt, child_edu_interrupt) %>%
+  gather("student", "value", -access_online) %>%
+  mutate(access_online = as.factor(access_online)) %>%
+  mutate(student = factor(student, 
+                          levels = c("parent_edu_interrupt", 
+                                     "child_edu_interrupt"),
+                          labels = c("Parent", "Child"))) %>%
+  ggerrorplot(data = .,
+          x = "student", 
+          y = "value",
+          color = "access_online",
+          desc_stat = "mean_ci")
+```
+
+# Loss {.tabset}
+
+## Income
+
+```{r disability-23}
+week1 = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week > 0) %>%
+  filter(Week == min(Week))
+
+chisq.test(week1$disability, week1$income_decreaed)
+week1 %>%
+  ungroup()%>%
+  select(disability, income_decreaed) %>%
+  group_by(disability) %>%
+  summarize(n = n(),
+            decreased_income = sum(income_decreaed,na.rm = T),
+            percent = decreased_income/n)
+```
+
+## Non-family childcare
+
+```{r disability-24}
+chisq.test(week1$disability, week1$decrease_nonfamilyCC)
+week1 %>%
+  ungroup()%>%
+  select(disability, decrease_nonfamilyCC) %>%
+  group_by(disability) %>%
+  summarize(n = n(),
+            decrease_nonfamilyCC = sum(decrease_nonfamilyCC,na.rm = T),
+            percent = decrease_nonfamilyCC/n)
+```
+
+# Testing predictors of well-being in this demo 
+
+```{r disability-25}
+
+mlm.model = function(abdata){
+  mod = lmer(o.value~p.value + (1|CaregiverID), 
+             data = abdata,
+             control=lmerControl(check.nobs.vs.nlev="ignore",
+                                 check.nobs.vs.nRE = "ignore"))
+  return(mod)
+}
+```
+
+
+```{r disability-26}
+disability = disability %>%
+  mutate(children2 = ifelse(num_children_raw >= 2, 1, 0),
+         children3 = ifelse(num_children_raw >= 3, 1, 0))
+predictors = c("income_decreaed", 
+               "employment_decreased",
+               "difficulty_basics",
+               "children2", 
+               "children3", 
+               "access_online", 
+               "access_telehealth", 
+               "poverty", 
+               "child_edu_interrupt", 
+               "parent_edu_interrupt",
+               "delay_healthcare",
+               "black",
+               "latinx",
+               "single",
+               "essential")
+predictor.labels = c(
+  "Lost income since pandemic",
+  "Lost employment since pandemic",
+  "Have difficulty paying for basics",
+  "Two or more children in household",
+  "Three or more children in household",
+  "Can access online serivices",
+  "Can access telehealth serivices",
+  "Below the poverty threshold",
+  "Child education interrupted",
+  "Parent education interrupted",
+  "Have delayed healthcare",
+  "African American",
+  "Latinx",
+  "Single",
+  "Essential employees"
+)
+unique = disability %>%
+  group_by(CaregiverID) %>%
+  filter(Week == min(Week)) %>%
+  ungroup()
+  
+N = apply(unique[,predictors], 2, FUN = sum, na.rm=T)
+
+predictor.labels = paste0(predictor.labels, " (N = ", N, ")")
+
+pred.table = disability %>%
+  #censor number of children
+  mutate(num_children_raw = ifelse(num_children_raw > 4, 4, num_children_raw)) %>%
+  select(CaregiverID, anxiety, depress, stress, 
+         fussy, fear, all_of(predictors)) %>%
+  gather("outcome", "o.value", anxiety, depress, stress, 
+         fussy, fear) %>%
+  gather("predictor", "p.value", all_of(predictors)) %>%
+  group_by(outcome,predictor) %>%
+  nest() %>%
+  mutate(model = purrr::map(data, mlm.model)) %>%
+  mutate(output = purrr::map(model, broomExtra::tidy)) %>%
+  select(outcome, predictor, output) %>%
+  unnest(output) %>%
+  filter(term == "p.value") %>%
+  mutate(pvalue = purrr::map_dbl(statistic, 
+                              .f = function(x) pt(q = abs(x), 
+                                                  df = 250, 
+                                                  lower.tail = F)*2)) %>%
+  select(outcome, predictor, estimate, std.error, pvalue) %>%
+  ungroup() %>%
+  mutate(holm = p.adjust(pvalue,  method = "holm")) %>%
+  mutate(outcome = factor(outcome, 
+                          levels = c("anxiety", "depress", "stress", 
+         "fussy", "fear"),
+         labels = c("Caregiver anxiety", "Careviver depression", "Caregver stress", 
+         "Child externalzing", "Child internalizing")))
+```
+
+```{r disability-27}
+source(here("Functions/summarizing_report.R"))
+```
+
+```{r disability-28}
+first.row = sapply(predictors, 
+                   first_instance, 
+                   string = pred.table$predictor)
+last.row = sapply(predictors, 
+                  last_instance, 
+                  string = pred.table$predictor)
+
+
+each_string = paste0("group_rows(group_label = \" ", 
+                     predictor.labels, 
+                     "\" , start_row = ", 
+                     first.row, 
+                     ", end_row = ", 
+                     last.row, 
+                     ")")
+each_string = paste(each_string, collapse = " %>% ")
+
+
+beginning= "pred.table %>% select(-predictor) %>% kable(., col.names = c(\"Outcome\", \"Coefficient Estimate\", \"Std. Error\", \"p-value\", \" Corrected p-value\"), digits = c(1,2,2,3,3)) %>%
+  kable_styling() %>%
+footnote(general = \"Coefficients estimated using a multi-level model in which responses are nested within caregivers. In the case of binary predictors, we report the number (N) of participants who fall into the category listed. p-values are adjusted using a Holm correction\") %>%"
+
+eval(parse(text = paste0(beginning, each_string)))
+```
+
+
+## Trends by income {.tabset}
+
+### Caregiver anxiety
+
+```{r disability-29 }
+anxiety_plot = trend_days_sheltering_cat(variable = "anxiety_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of anxiety",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+anxiety_plot$plot
+```
+
+### Caregiver depression
+
+```{r disability-30 }
+depress_plot = trend_days_sheltering_cat(variable = "depress_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of depression",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+depress_plot$plot
+```
+
+### Caregiver stress
+
+```{r disability-31 }
+stress_plot = trend_days_sheltering_cat(variable = "stress_current_some",
+                                     dataset = disability, 
+                                     label = "some or a lot of stress",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+stress_plot$plot
+```
+
+### Child externalizing
+
+```{r disability-32 }
+fussy_plot = trend_days_sheltering_cat(variable = "fussy_current_some",
+                                     dataset = disability, 
+                                     label = "children are sometimes or often fussy or defiant",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+fussy_plot$plot
+```
+
+### Child internalizing
+
+```{r disability-33 }
+fear_plot = trend_days_sheltering_cat(variable = "fear_current_some",
+                                     dataset = disability, 
+                                     label = "children are sometimes or often fearful or anxious",
+                                     groups = c("difficulty_basics"),
+                                     group_levels = c(0,1),
+                                     group_labels = c("No difficulty",
+                                                      "Difficulty paying for basic necessities"))
+fear_plot$plot
+```

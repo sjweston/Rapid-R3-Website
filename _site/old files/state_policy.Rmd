@@ -1,0 +1,381 @@
+---
+title: "evaulating effect of policies"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r state-policy-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width = 10)
+options(knitr.kable.NA = '')
+```
+
+```{r state-policy-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r state-policy-3 }
+source(here("Scripts/score data.R")) 
+```
+
+```{r state-policy-4 }
+source(here("Functions/pomp.R"))
+source(here("Functions/state_policy_fun.R"))
+```
+
+```{r state-policy-5 }
+scored = scored %>%
+  mutate_at(vars(anxiety, depress, lonely, stress, fussy, fear), pomp) %>%
+  rowwise() %>%
+  mutate(mental_health = mean(c(anxiety, depress, lonely, stress), na.rm=T),
+         child_mental = mean(c(fussy, fear), na.rm=T)) %>%
+  mutate(material_hardship = case_when(
+    Week == 0 ~ NA_real_,
+    TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
+  ungroup() %>%
+ mutate(
+   black_cat = factor(black, labels = c("non-Black", "Black")),
+   poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
+   single_cat = factor(single, labels = c("Dual parent", "Single parent")),
+   disability_cat = factor(disability, labels = c("No disability", "Child with disability")),
+   race_ethnic = case_when(
+     black == 1 ~ "Black",
+     latinx == 1 ~ "LatinX",
+     !is.na(black) ~ "White",
+     !is.na(latinx) ~ "White",
+     TRUE ~ NA_character_),
+   race_poverty = case_when(
+     black == 1 & poverty150 == 1 ~ "Low income, Black",
+     black == 1 & poverty150 == 0 ~ "High income, Black",
+     latinx == 1 & poverty150 == 1 ~ "Low income, LatinX",
+     latinx == 1 & poverty150 == 0 ~ "High income, LatinX",
+     white == 1 & poverty150 == 1 ~ "Low income, White",
+     white == 1 & poverty150 == 0 ~ "High income, White",
+     TRUE ~ NA_character_)) %>%
+  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week, 
+    (Week %% 2) == 0 ~ Week - 1,
+    TRUE ~ Week)) %>%
+  group_by(Week) %>%
+  mutate(Date =case_when(
+    Week == 0 ~ as.Date("2020-03-01"),
+    TRUE ~ min(Date)
+  ))
+```
+
+
+```{r state-policy-6 }
+dates = scored %>%
+  group_by(Week) %>%
+  summarize(
+    Date = min(Date)) %>%
+  mutate(label = case_when(
+    Week == 0 ~ "Pre Pandemic",
+    TRUE ~ format(Date, "%b %d")
+  ))
+```
+
+
+
+# Representativeness disclaimer
+
+```{r state-policy-7 }
+
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+# Material hardship
+
+_Which needs are hard to pay for?:_
+  - _Food_
+  - _Housing_
+  - _Utilities (electric, water, trash)_
+  - _Healthcare_
+  - _Social_
+  - _Emotional_
+  - _Childcare_
+  - _Other_
+
+Caregivers grouped into two categories: trouble paying for 1+ basic need, or no trouble paying for any.
+
+For these analyses, data collected in even numbered weeks starting in August were merged with data in the previous week -- this was due to a shift to a recruitment strategy that prioritized recruiting underrepresented communities and marginalized caregivers every other week.
+
+## Sources of material hardship
+
+```{r state-policy-8}
+sources = scored %>%
+  select(Week, CaregiverID, race_poverty, starts_with("diff_pay")) %>%
+  filter(Week > 0) %>%
+  filter(!is.na(race_poverty)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  select(-Week, -CaregiverID) %>%
+  gather(need, response, -race_poverty) %>%
+  mutate(need = str_remove(need, "diff_pay_")) %>%
+  filter(!is.na(response)) %>%
+  group_by(race_poverty, need) %>%
+  summarize(percent = 100*mean(response)) %>%
+  ungroup() %>%
+  arrange(race_poverty, desc(percent)) %>%
+  mutate(order = row_number())
+  
+  
+sources %>%
+  ggplot(aes(x = order, y = percent, fill = percent)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  # Add categories to axis
+  scale_x_continuous(
+    breaks = sources$order,
+    labels = sources$need,
+    expand = c(0,0)
+  ) +
+  guides(fill = F) +
+  labs(x = NULL) +
+  facet_wrap(~race_poverty, scales = "free_y")+
+  theme_pubr()
+  
+```
+
+
+## Child Care{.tabset}
+
+Data come from [ChildTrends](https://www.childtrends.org/publications/states-are-using-the-cares-act-to-improve-child-care-access-during-covid-19). Legislation related to providing additional funding to childcare providers who offer care to children of essential workers.
+
+
+### All
+
+```{r state-policy-9 }
+policy_binary(childcare_sub, material_hardship)
+```
+
+### Race/ethnicity
+
+```{r state-policy-10 }
+binary_group(childcare_sub, material_hardship, race_ethnic)
+```
+
+### Income
+
+```{r state-policy-11 }
+binary_group(childcare_sub, material_hardship, poverty_cat)
+```
+
+### Race/ethnicity x Income
+
+```{r state-policy-12 }
+binary_group(childcare_sub, material_hardship, race_poverty)
+```
+
+**Statistical tests**
+
+```{r state-policy-13, results = 'asis'}
+concurrent = scored %>%
+  filter(!is.na(material_hardship)) %>%
+  filter(!is.na(childcare_sub)) %>%
+  filter(!is.na(race_poverty)) %>%
+  mutate(race_ethnic = factor(race_ethnic, levels = c("White", "Black", "LatinX"))) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup()
+
+model = glm(material_hardship ~ childcare_sub*race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat"),
+         term = str_remove(term, "childcare_sub")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with three-way interaction") %>%
+  kable_styling(full_width = T)
+```
+
+```{r state-policy-14, results = 'asis'}
+model = glm(material_hardship ~ race_ethnic*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with race by income") %>%
+  kable_styling(full_width = T)
+```
+
+
+```{r state-policy-15, results = 'asis'}
+model = glm(material_hardship ~ childcare_sub*race_ethnic, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "race_ethnic"),
+         term = str_remove(term, "childcare_sub")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by race") %>%
+  kable_styling(full_width = T)
+```
+
+```{r state-policy-16, results = 'asis'}
+model = glm(material_hardship ~ childcare_sub*poverty_cat, data = concurrent)
+
+broom::tidy(model) %>%
+  mutate(p.value = papaja::printp(p.value)) %>%
+  mutate(term = str_remove(term, "childcare_sub"),
+         term = str_remove(term, "poverty_cat")) %>%
+  kable(., digits = 2, booktabs = T, 
+        caption = "Statistical model with legislation by income") %>%
+  kable_styling(full_width = T)
+```
+
+### Single caregivers
+
+```{r state-policy-17 }
+binary_group(childcare_sub, material_hardship, single_cat)
+```
+
+### Disability
+
+```{r state-policy-18 }
+binary_group(childcare_sub, material_hardship, disability_cat)
+```
+
+
+### Over time
+
+
+```{r state-policy-19 }
+time_policy_binary(childcare_sub, material_hardship)
+```
+
+
+
+# Caregiver mental health problems
+
+Caregivers report levels of anxiety, depression, loneliness and stress. All variables are POMP scored (i.e., rescaled to have a minimum value of 0 and maximum of 100) and these scores are averaged to create a single mental health composite.
+
+## Child Care{.tabset}
+
+Data come from [ChildTrends](https://www.childtrends.org/publications/states-are-using-the-cares-act-to-improve-child-care-access-during-covid-19). Legislation related to providing additional funding to childcare providers who offer care to children of essential workers.
+
+
+### All
+
+```{r state-policy-49 }
+policy_cont(childcare_sub, mental_health)
+```
+
+### Race/ethnicity
+
+```{r state-policy-50 }
+cont_group(childcare_sub, mental_health, race_ethnic)
+```
+
+### Income
+
+```{r state-policy-51 }
+cont_group(childcare_sub, mental_health, poverty_cat)
+```
+
+### Race/ethnicity x Income
+
+```{r state-policy-52 }
+cont_group(childcare_sub, mental_health, race_poverty)
+```
+
+### Single caregivers
+
+```{r state-policy-53 }
+cont_group(childcare_sub, mental_health, single_cat)
+```
+
+### Disability
+
+```{r state-policy-54 }
+cont_group(childcare_sub, mental_health, disability_cat)
+```
+
+
+### Over time
+
+```{r state-policy-55 }
+time_policy_cont(childcare_sub, mental_health)
+```
+
+
+
+# Child mental health problems
+
+Caregivers report levels of child fussiness and fear. All variables are POMP scored (i.e., rescaled to have a minimum value of 0 and maximum of 100) and these scores are averaged to create a single child mental health composite.
+
+## Child Care{.tabset}
+
+Data come from [ChildTrends](https://www.childtrends.org/publications/states-are-using-the-cares-act-to-improve-child-care-access-during-covid-19). Legislation related to providing additional funding to childcare providers who offer care to children of essential workers.
+
+### All
+
+```{r state-policy-77 }
+policy_cont(childcare_sub, child_mental)
+```
+
+### Race/ethnicity
+
+```{r state-policy-78 }
+cont_group(childcare_sub, child_mental, race_ethnic)
+```
+
+### Income
+
+```{r state-policy-79 }
+cont_group(childcare_sub, child_mental, poverty_cat)
+```
+
+### Race/ethnicity x Income
+
+```{r state-policy-80 }
+cont_group(childcare_sub, child_mental, race_poverty)
+```
+
+### Single caregivers
+
+```{r state-policy-81 }
+cont_group(childcare_sub, child_mental, single_cat)
+```
+
+### Disability
+
+```{r state-policy-82 }
+cont_group(childcare_sub, child_mental, disability_cat)
+```
+
+
+### Over time
+
+```{r state-policy-83 }
+time_policy_cont(childcare_sub, child_mental)
+```
+

@@ -1,0 +1,206 @@
+---
+title: "Analyses for May 22"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+  
+---
+
+
+```{r chunk 1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+# blw_poverty or race_cat
+which_demo = "race_cat"
+```
+
+```{r}
+library(here)
+library(tidytext)
+library(gganimate)
+```
+
+
+```{r score datafile, echo = F, warning = F, message = F}
+## score master --------------------------------------------------------
+source(here("Scripts/score data.R"))
+```
+
+# Mental health by median household income and region{.tabset}
+
+## Caregiver Anxiety
+
+```{r}
+income_quantiles = scored$median_income/1000
+income_quantiles = quantile(income_quantiles, probs = c(0, .2, .4, .6, .8, 1), na.rm = T)
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(region) & !is.na(median_income)) %>%
+  ggplot(aes(x = Date, y = anxiety)) +
+  geom_smooth(se = F) +
+  facet_grid(median_income ~ region)
+```
+
+## Caregiver depression
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(region) & !is.na(median_income)) %>%
+  ggplot(aes(x = Date, y = depress)) +
+  geom_smooth(se = F) +
+  facet_grid(median_income ~ region)
+```
+
+
+## Caregiver Stress
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(region) & !is.na(median_income)) %>%
+  ggplot(aes(x = Date, y = stress)) +
+  geom_smooth(se = F) +
+  facet_grid(median_income ~ region)
+```
+
+
+## Caregiver loneliness
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(region) & !is.na(median_income)) %>%
+  ggplot(aes(x = Date, y = lonely)) +
+  geom_smooth(se = F) +
+  facet_grid(median_income ~ region)
+```
+
+## Child fussiness
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(region) & !is.na(median_income)) %>%
+  ggplot(aes(x = Date, y = fussy)) +
+  geom_smooth(se = F) +
+  facet_grid(median_income ~ region)
+```
+
+## Child fear
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(region) & !is.na(median_income)) %>%
+  ggplot(aes(x = Date, y = fear)) +
+  geom_smooth(se = F) +
+  facet_grid(median_income ~ region)
+```
+
+# Mental health by median household income and state (selected){.tabset}
+
+## Caregiver Anxiety
+
+```{r}
+states = c("GA","WA","NC","OR","MI","PA","OH","IL","FL","NY","TX","CA")
+
+income_quantiles = scored$median_income/1000
+income_quantiles = quantile(income_quantiles, probs = c(0, .5, 1), na.rm = T)
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(median_income)) %>%
+  filter(state %in% states) %>%
+  ggplot(aes(x = Date, y = anxiety)) +
+  geom_smooth(se = F) +
+  facet_grid(state ~ median_income)
+```
+
+## Caregiver depression
+
+```{r}
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(median_income)) %>%
+  filter(state %in% states) %>%
+  ggplot(aes(x = Date, y = depress)) +
+  geom_smooth(se = F) +
+  facet_grid(state ~ median_income)
+```
+
+
+## Caregiver Stress
+
+```{r}
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(median_income)) %>%
+  filter(state %in% states) %>%
+  ggplot(aes(x = Date, y = stress)) +
+  geom_smooth(se = F) +
+  facet_grid(state ~ median_income)
+```
+
+
+## Caregiver loneliness
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(median_income)) %>%
+  filter(state %in% states) %>%
+  ggplot(aes(x = Date, y = lonely)) +
+  geom_smooth(se = F) +
+  facet_grid(state ~ median_income)
+```
+
+## Child fussiness
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(median_income)) %>%
+  filter(state %in% states) %>%
+  ggplot(aes(x = Date, y = fussy)) +
+  geom_smooth(se = F) +
+  facet_grid(state ~ median_income)
+```
+
+## Child fear
+
+```{r}
+
+scored %>%
+  mutate(median_income = median_income/1000,
+    median_income = cut(median_income, breaks = income_quantiles)) %>%
+  filter(!is.na(median_income)) %>%
+  filter(state %in% states) %>%
+  ggplot(aes(x = Date, y = fear)) +
+  geom_smooth(se = F) +
+  facet_grid(state ~ median_income)
+```
+

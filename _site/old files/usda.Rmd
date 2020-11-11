@@ -1,0 +1,1008 @@
+---
+title: "Food Insecurity and Material Hardship"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+
+```{r usda-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=12)
+options(knitr.kable.NA = '')
+```
+
+```{r usda-2 }
+library(conflicted)
+library(here)
+library(ggpubr)
+conflict_prefer("group_rows", "kableExtra")
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
+conflict_prefer("lag", "dplyr")
+conflict_prefer("map", "purrr")
+library(plotly)
+```
+
+```{r usda-3 }
+source(here("Scripts/score data.R")) 
+source(here("Functions/pomp.R"))
+cutoffv = 1
+```
+
+```{r usda-4 }
+scored = scored %>%
+  filter(Week != BaselineWeek) %>%
+  mutate(black_cat = factor(black, labels = c("non-Black", "Black")),
+         poverty_cat = factor(poverty150, labels = c("High Income", "Low Income")),
+         single_cat = factor(single, labels = c("Dual parent", "Single parent")),
+         disability_cat = factor(disability, labels = c("No disability", "Child with disability")),
+         race_ethnic = case_when(
+           black == 1 ~ "Black",
+           latinx == 1 ~ "LatinX",
+           !is.na(black) ~ "White",
+           !is.na(latinx) ~ "White",
+           TRUE ~ NA_character_
+         ),
+         black_poverty = case_when(
+           black == 1 & poverty150 == 1 ~ "Low income, Black",
+           black == 1 & poverty150 == 0 ~ "High income, Black",
+           latinx == 1 & poverty150 == 1 ~ "Low income, LatinX",
+           latinx == 1 & poverty150 == 0 ~ "High income, LatinX",
+           white == 1 & poverty150 == 1 ~ "Low income, White",
+           white == 1 & poverty150 == 0 ~ "High income, White",
+           TRUE ~ NA_character_))
+```
+
+
+# Food insecurity{.tabset}
+
+```{r usda-5 }
+usda_group = function(group, data = usda_scored){
+  plot = data %>%
+    filter(!is.na({{group}})) %>%
+  group_by(Date, food_cat, {{group}}) %>%
+  summarize(count = n()) %>%
+  group_by(Date, {{group}}) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  filter(food_cat != "No") %>%
+  ggplot(aes(x = Date, 
+             y = percent, 
+             color = {{group}},
+             group = 1, 
+             text = paste0(
+               "Group: ", {{group}}, 
+               "\nCount:", count,
+               "\nPercent: ", round(percent, 1)
+             ))) +
+  geom_point() +
+  geom_line()+  
+  scale_x_time(breaks = date_labels$Date, labels = date_labels$label) +
+  labs(title = "Percent of caregivers experiencing ___ food insecurity", 
+       x = NULL,
+       color = NULL, 
+       y = NULL)+
+    facet_wrap(~food_cat) +
+  theme_pubclean() +
+    theme(axis.text.x = element_text(angle = 35, hjust = 1, vjust = 1))
+
+ggplotly(plot, tooltip = "text")
+
+}
+```
+
+## Representativeness disclaimer
+
+```{r usda-6 }
+usda_scored = scored %>%
+  filter(!is.na(food))
+
+n_care = length(unique(usda_scored$CaregiverID))
+date.min = format(min(as.Date(usda_scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(usda_scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = usda_scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+```{r usda-7 }
+usda_scored = usda_scored  %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date),
+    TRUE ~ as.Date("2020-08-01"))) %>%
+  ungroup() %>%
+  mutate(food_cat = case_when(
+    food < 2 ~ "No",
+    food >=2 & food <=4 ~ "Some",
+    food > 4 ~ "A lot"
+  )) 
+
+date_labels = usda_scored %>%
+  group_by(Date) %>%
+  summarize(N = n()) %>%
+  ungroup() %>%
+  mutate(label = case_when(
+    Date == "2020-08-01" ~ "Pre-pandemic",
+    TRUE ~ format(Date, "%b %d")))
+```
+
+
+
+## All
+
+```{r usda-8 }
+plot = usda_scored %>%
+  group_by(Date, food_cat) %>%
+  summarize(count = n()) %>%
+  group_by(Date) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  #mutate(Week = paste("Week", Week)) %>%
+  filter(food_cat != "No") %>%
+  ggplot(aes(x = Date, 
+             y = percent, 
+             color = food_cat,
+             group = 1, 
+             text = paste0(
+               "Response: ", food_cat, 
+               "\nPercent: ", round(percent, 1)
+             ))) +
+  geom_point() +
+  geom_line()+  
+  scale_x_time(breaks = date_labels$Date, labels = date_labels$label) +
+  labs(title = "Percent of caregivers experiencing ___ food insecurity", 
+       x = NULL,
+       color = NULL, 
+       y = NULL)+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+
+```
+
+## Race/ethnicity
+
+```{r usda-9 }
+usda_group(race_ethnic)
+```
+
+
+## Black
+
+```{r usda-10 }
+usda_group(black_cat)
+```
+
+## Income
+
+```{r usda-11 }
+usda_group(poverty_cat)
+```
+
+## Race + Income
+
+```{r usda-12 }
+usda_group(black_poverty)
+```
+
+
+## Medicaid expansion
+
+```{r usda-13 }
+usda_group(medicaid_expansion)
+```
+
+
+
+# Material hardship{.tabset}
+
+_Which needs are hard to pay for?:_
+- _Food_
+- _Housing_
+- _Utilities (electric, water, trash)_
+- _Healthcare_
+- _Social_
+- _Emotional_
+- _Childcare_
+- _Other_
+
+Caregivers grouped into two categories: trouble paying for 1+ basic need, or no trouble paying for any.
+
+For these analyses, data collected in even numbered weeks starting in August were merged with data in the previous week -- this was due to a shift to a recruitment strategy that prioritized recruiting underrepresented communities and marginalized caregivers every other week.
+
+## Representativeness disclaimer
+
+```{r usda-14 }
+hardship_scored = scored %>%
+  rowwise() %>%
+  mutate(material_hardship = sum(c_across(starts_with("diff_pay_")), na.rm=T)) %>%
+  ungroup() %>%
+  filter(!is.na(material_hardship) & Week > 0) %>%
+  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week, 
+    (Week %% 2) == 0 ~ NA_real_,
+    TRUE ~ Week)) %>%
+  filter(!is.na(Week)) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date))) %>%
+  ungroup() 
+
+n_care = length(unique(hardship_scored$CaregiverID))
+date.min = format(min(as.Date(hardship_scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(hardship_scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = hardship_scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+
+```{r usda-15 }
+hardship_group = function(group, data = hardship_scored){
+  
+  plot = data %>%
+    filter(!is.na({{group}})) %>%
+    group_by(Week, Date, {{group}}) %>%
+     summarize(count = n(),
+            hardship = sum(material_hardship)/count) %>%
+      mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+      mutate_at(vars(hardship, moe), ~100*.x) %>%
+       ungroup()   %>%
+    ggplot(aes(x = Date,
+             y = hardship,
+             group = 1,
+             color = {{group}},
+             fill = {{group}},
+             text = paste0(
+               "Date: ", Date,
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)))) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
+  geom_point() +
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, color = NULL, fill = NULL,
+       title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+  
+  ggplotly(plot, tooltip = "text")
+  
+}
+```
+
+
+## All
+
+```{r usda-16 }
+plot = hardship_scored %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            hardship = sum(material_hardship)/count) %>%
+  mutate(moe = 1.96*sqrt((hardship*(1-hardship))/count)) %>%
+  mutate_at(vars(hardship, moe), ~100*.x) %>%
+  ggplot(aes(x = Date, 
+             y = hardship, 
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)
+             ),
+             group = 1)) +
+  geom_ribbon(aes(ymin = hardship-moe, 
+                  ymax = hardship + moe),
+              alpha = .2) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+```{r}
+hardship_scored %>%
+  group_by(Week, Date) %>%
+  summarize(count = n(),
+            percent = sum(material_hardship)/count) %>%
+  mutate(moe = 1.96*sqrt((percent*(1-percent))/count)) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
+  select(-count) %>%
+  write.csv(file = here("figure data/0917_hardship_over_time.csv"))
+```
+
+
+## Black
+
+```{r usda-17 }
+hardship_group(black_cat)
+```
+
+## Income
+
+```{r usda-18 }
+hardship_group(poverty_cat)
+```
+
+## Race + Income
+
+```{r usda-19 }
+hardship_group(black_poverty)
+```
+
+```{r}
+plot1 = hardship_scored %>%
+    filter(!is.na(black_poverty)) %>%
+    group_by(Week, Date, black_poverty) %>%
+    summarize(count = n(),
+              hardship = 100*sum(material_hardship)/count)  %>%
+       ungroup()  %>%
+  separate(black_poverty, into = c("income", "race"), sep = ", ")
+
+plot_both = plot1 %>%
+    ggplot(aes(x = Date,
+             y = hardship,
+             group = 1,
+             color = race,
+             text = paste0(
+               "Date: ", Date,
+               "\n Count: ", count,
+               "\n Percent: ", round(hardship)))) +
+  geom_point() +
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  facet_wrap(~income) +
+  labs(x = NULL, y = NULL, color = NULL,
+       title = "Percent of households experiencing at least one material hardship") +
+  theme_pubr()
+ggplotly(plot_both, tooltip = "text")
+
+plot1 %>%
+  rename(percent = hardship) %>%
+  mutate(Date = format(Date, "%B %d")) %>%
+  write.csv(here("figure data/0914_hardship_race_income_actual.csv"))
+```
+
+```{r}
+model = glm(material_hardship ~ Week*race_ethnic*poverty_cat, data = hardship_scored, family = "binomial")
+summary(model)
+library(sjPlot)
+model_param = plot_model(model, type = "pred", terms = c("Week", "race_ethnic", "poverty_cat"))
+
+week_date = hardship_scored %>%
+  group_by(Week) %>%
+  summarize(Date = min(Date)) %>%
+  mutate(Date = format(Date, "%B %d"))
+
+as.data.frame(model_param$data) %>%
+  select(x, predicted, group, facet) %>%
+  rename(Week = x,
+         percent = predicted,
+         race = group,
+         income = facet) %>%
+  mutate(percent = round(100*percent,1)) %>%
+  left_join(week_date) %>%
+  write.csv(here("figure data/0914_hardship_race_income_estimated.csv"))
+
+as.data.frame(model_param$data) %>%
+  rename(Week = x,
+         hardship = predicted,
+         race = group,
+         income = facet) %>%
+  mutate(hardship = 100*hardship) %>%
+  mutate(income = str_to_sentence(income)) %>%
+  full_join(select(plot1, Week, Date)) %>%
+  ggplot(aes(x = Date, y = hardship, color = race)) +
+  geom_point(data = plot1, alpha = .5) +
+  geom_line() +
+  facet_wrap(~income) +
+  labs(x = NULL, y = "Percent")+
+  theme_pubr()
+```
+
+```{r, eval = F}
+hardship_scored = hardship_scored %>%
+  mutate(d_black = ifelse(race_ethnic == "Black", 1, 0),
+         d_latinx = ifelse(race_ethnic == "Latinx", 1, 0),
+         high_income = ifelse(poverty150 == 1, 0, 1))
+model = glm(material_hardship ~ Week*d_black*d_latinx*high_income, data = hardship_scored, family = "binomial")
+
+simple_slopes(model, 
+              levels = list(d_black = c(0,1),
+                            d_latinx = c(0,1),
+                            poverty150 = c(0,1)))
+```
+
+
+## Medicaid expansion
+
+```{r usda-20 }
+hardship_group(medicaid_expansion)
+```
+
+## Single 
+
+```{r usda-21 }
+hardship_group(single_cat)
+```
+
+
+## Disability
+
+```{r usda-22 }
+hardship_group(disability_cat)
+```
+
+
+# Family financial status{.tabset}
+
+
+_Which describes your family financially at this time?:_
+- _No problems_
+- _Minor problems_
+- _Major problems_
+_ _Extreme problems_
+
+
+
+For these analyses, data collected in even numbered weeks starting in August were merged with data in the previous week -- this was due to a shift to a recruitment strategy that prioritized recruiting underrepresented communities and marginalized caregivers every other week.
+
+## Representativeness disclaimer
+
+```{r usda-23 }
+hardship_scored = scored %>%
+  rowwise() %>%
+  mutate(material_hardship = sum(c_across(starts_with("diff_pay_")), na.rm=T)) %>%
+  ungroup() %>%
+  filter(!is.na(material_hardship) & Week > 0) %>%
+  mutate(material_hardship = ifelse(material_hardship > 0, 1, 0)) %>%
+  mutate(Week = case_when(
+    Week < 17 ~ Week, 
+    (Week %% 2) == 0 ~ Week - 1,
+    TRUE ~ Week)) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date))) %>%
+  ungroup() 
+
+n_care = length(unique(hardship_scored$CaregiverID))
+date.min = format(min(as.Date(hardship_scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(hardship_scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = hardship_scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+
+```{r usda-24 }
+financial_group = function(group, data = hardship_scored){
+  
+  plot = data %>%
+   filter(!is.na(financial_status) & !is.na({{group}})) %>%
+  group_by(Week, Date, financial_status, {{group}}) %>%
+  summarize(count = n()) %>%
+  group_by(Week, Date, {{group}}) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = Date, 
+             y = percent, 
+             color = {{group}},
+             group = 1, 
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(percent)
+             ))) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, color = NULL, 
+       title = "Percent of households experiencing ___ problems") +
+    facet_wrap(~financial_status) +
+  theme_pubr()
+  
+  ggplotly(plot, tooltip = "text")
+}
+```
+
+
+## All
+
+```{r usda-25 }
+plot = hardship_scored %>%
+  filter(!is.na(financial_status)) %>%
+  group_by(Week, Date, financial_status) %>%
+  summarize(count = n()) %>%
+  group_by(Week, Date) %>%
+  mutate(percent = 100*count/sum(count)) %>%
+  ggplot(aes(x = Date, 
+             y = percent, 
+             color = financial_status,
+             group = 1, 
+             text = paste0(
+               "Date: ", Date, 
+               "\n Count: ", count,
+               "\n Percent: ", round(percent)
+             ))) +
+  geom_point() + 
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, color = NULL, 
+       title = "Percent of households experiencing ___ problems") +
+  theme_pubr()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Black
+
+```{r usda-26 }
+financial_group(black_cat)
+```
+
+## Income
+
+```{r usda-27 }
+financial_group(poverty_cat)
+```
+
+## Race + Income
+
+```{r usda-28 }
+financial_group(black_poverty)
+```
+
+## Medicaid expansion
+
+```{r usda-29 }
+financial_group(medicaid_expansion)
+```
+
+## Single
+
+```{r usda-30 }
+financial_group(single_cat)
+```
+
+## Disability
+
+```{r usda-31 }
+financial_group(disability_cat)
+```
+
+# Looking ahead{.tabset}
+
+_How worried are you about having enough money to pay for food to feed your household in the next month?_
+
+_If you rent the place you currently live, how worried are you about being evicted in the next month?_
+
+_If you own the home where you currently live, how worried are you about your mortgage being foreclosed on in the next month?_
+
+_How worried are you about your utilities (water, electric, gas) being turned off in the next month?_
+
+Response options:
+- Not at all worried
+- Slightly worried
+- Somewhat worried
+- Very worried
+- Extremely worried
+
+
+
+For these analyses, data collected in even numbered weeks starting in August were merged with data in the previous week -- this was due to a shift to a recruitment strategy that prioritized recruiting underrepresented communities and marginalized caregivers every other week.
+
+## Representativeness disclaimer
+
+```{r usda-32 }
+hardship_scored = scored %>%
+  filter(!is.na(mh_food) | !is.na(mh_eviction) | !is.na(mh_foreclose) | !is.na(mh_utilities)) %>%
+  mutate_at(vars(starts_with("mh_")), ~ifelse(.x == 6, NA, .x)) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date))) %>%
+  ungroup() 
+
+n_care = length(unique(hardship_scored$CaregiverID))
+date.min = format(min(as.Date(hardship_scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(hardship_scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = hardship_scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty150, na.rm=T)/nrow(perc)
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+
+```{r usda-33 }
+
+mh_all = function(variable, cutoff = cutoffv, data = hardship_scored){
+    
+    plot = data %>%
+      filter(!is.na({{variable}})) %>%
+      mutate_at(vars({{variable}}), ~ifelse(.x > cutoff, 1, 0)) %>%
+      group_by(Date) %>%
+      summarize(count = n(),
+                percent = 100*sum({{variable}}/count)) %>%
+      ungroup()  %>%
+      ggplot(aes(x = Date,
+                 y = percent,
+                 group = 1,
+                 text = paste0(
+                   "Date: ", Date,
+                   "\n Count: ", count,
+                   "\n Percent: ", round(percent)
+                 ))) +
+      geom_point() +
+      geom_line() +
+      geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+      labs(x = NULL, y = NULL, color = NULL,
+           title = "Percent of households worried") +
+      theme_pubr()
+
+  ggplotly(plot, tooltip = "text")
+}
+
+
+mh_group = function(variable, group, cutoff = cutoffv, data = hardship_scored){
+  
+    plot = data %>%
+  filter(!is.na({{variable}}) & !is.na({{group}})) %>%
+  mutate_at(vars({{variable}}), ~ifelse(.x > cutoff, 1, 0)) %>%
+  group_by(Week, Date, {{group}}) %>%
+  summarize(count = n(),
+            percent = 100*sum({{variable}}/count)) %>%
+    ungroup()  %>%
+  ggplot(aes(x = Date,
+             y = percent,
+             color = {{group}},
+             group = 1,
+             text = paste0(
+               "Date: ", Date,
+               "\n Count: ", count,
+               "\n Percent: ", round(percent)
+             ))) +
+  geom_point() +
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, color = NULL,
+       title = "Percent of households worried") +
+  theme_pubr()
+  
+
+  ggplotly(plot, tooltip = "text")
+}
+```
+
+## Food{.tabset}
+
+### All
+
+```{r usda-34 }
+mh_all(mh_food)
+```
+
+### Black
+
+```{r usda-35 }
+mh_group(mh_food, black_cat)
+```
+
+### Income
+
+```{r usda-36 }
+mh_group(mh_food, poverty_cat)
+```
+
+### Race + Income
+
+```{r usda-37 }
+mh_group(mh_food, black_poverty)
+```
+
+### Medicaid expansion
+
+```{r usda-38 }
+mh_group(mh_food, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-39 }
+mh_group(mh_food, single_cat)
+```
+
+### Disability
+
+```{r usda-40 }
+mh_group(mh_food, disability_cat)
+```
+
+## Eviction{.tabset}
+
+### All
+
+```{r usda-41 }
+mh_all(mh_eviction)
+```
+
+### Black
+
+```{r usda-42 }
+mh_group(mh_eviction, black_cat)
+```
+
+### Income
+
+```{r usda-43 }
+mh_group(mh_eviction, poverty_cat)
+```
+
+### Race + Income
+
+```{r usda-44 }
+mh_group(mh_eviction, black_poverty)
+```
+
+### Medicaid expansion
+
+```{r usda-45 }
+mh_group(mh_eviction, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-46 }
+mh_group(mh_eviction, single_cat)
+```
+
+### Disability
+
+```{r usda-47 }
+mh_group(mh_eviction, disability_cat)
+```
+
+## Foreclosure{.tabset}
+
+### All
+
+```{r usda-48 }
+mh_all(mh_foreclose)
+```
+
+### Black
+
+```{r usda-49 }
+mh_group(mh_foreclose, black_cat)
+```
+
+### Income
+
+```{r usda-50 }
+mh_group(mh_eviction, poverty_cat)
+```
+
+### Race + Income
+
+```{r usda-51 }
+mh_group(mh_foreclose, black_poverty)
+```
+
+### Medicaid expansion
+
+```{r usda-52 }
+mh_group(mh_foreclose, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-53 }
+mh_group(mh_foreclose, single_cat)
+```
+
+### Disability
+
+```{r usda-54 }
+mh_group(mh_foreclose, disability_cat)
+```
+
+## Utilities{.tabset}
+
+### All
+
+```{r usda-55 }
+mh_all(mh_utilities)
+```
+
+### Black
+
+```{r usda-56 }
+mh_group(mh_utilities, black_cat)
+```
+
+### Income
+
+```{r usda-57 }
+mh_group(mh_utilities, poverty_cat)
+```
+
+### Race + Income
+
+```{r usda-58 }
+mh_group(mh_utilities, black_poverty)
+```
+
+### Medicaid expansion
+
+```{r usda-59 }
+mh_group(mh_utilities, medicaid_expansion)
+```
+
+
+### Single
+
+```{r usda-60 }
+mh_group(mh_utilities, single_cat)
+```
+
+### Disability
+
+```{r usda-61 }
+mh_group(mh_utilities, disability_cat)
+```
+
+## All{.tabset}
+
+```{r usda-62 }
+hardship_scored = hardship_scored %>%
+  mutate_at(vars(starts_with("mh_")), .funs = function(x) ifelse(x > cutoffv, 1, 0)) %>%
+  mutate(mh_housing = case_when(
+    mh_eviction == 1 ~ 1, 
+    mh_foreclose == 1 ~ 1,
+    mh_eviction == 0 ~ 0,
+    mh_foreclose == 0 ~ 0,
+    !is.na(mh_food) ~ 0,
+    !is.na(mh_utilities) ~ 0,
+    TRUE ~ NA_real_
+  ),
+  mh_food = case_when(
+    !is.na(mh_food) ~ mh_food,
+    !is.na(mh_housing) ~ 0
+  ),
+  mh_utilities = case_when(
+    !is.na(mh_utilities) ~ mh_utilities,
+    !is.na(mh_housing) ~ 0
+  )) %>%
+  select(-mh_eviction, -mh_foreclose) %>%
+  mutate(mh_all = rowMeans(select(., contains("mh_")), na.rm=T)*3) 
+```
+
+```{r usda-63 }
+
+mh_all = function(variable, cutoff = cutoffv, data = hardship_scored){
+    
+    plot = data %>%
+      filter(!is.na({{variable}})) %>%
+      group_by(Date, {{variable}}) %>%
+      summarize(count = n()) %>%
+      group_by(Date) %>%
+      mutate(percent = 100*count/sum(count)) %>%
+      filter({{variable}} > 0) %>%
+      mutate_at(vars({{variable}}), factor) %>%
+      ggplot(aes(x = Date,
+                 y = percent,
+                 group = 1,
+                 color = {{variable}},
+                 text = paste0(
+                   "Date: ", Date,
+                   "\n Count: ", count,
+                   "\n Percent: ", round(percent)
+                 ))) +
+      geom_point() +
+      geom_line() +
+      geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+      labs(x = NULL, y = NULL, color = NULL,
+           title = "Percent of households worried") +
+      theme_pubr()
+
+  ggplotly(plot, tooltip = "text")
+}
+
+
+mh_group = function(variable, group, cutoff = cutoffv, data = hardship_scored){
+  
+    plot = data %>%
+   filter(!is.na({{variable}}) & !is.na({{group}})) %>%
+      group_by(Date, {{variable}}, {{group}}) %>%
+      summarize(count = n()) %>%
+      group_by(Date, {{group}}) %>%
+      mutate(percent = 100*count/sum(count)) %>%
+      filter({{variable}} > 0) %>%
+      mutate_at(vars({{variable}}), factor) %>%
+  ggplot(aes(x = Date,
+             y = percent,
+             color = {{group}},
+             group = 1,
+             text = paste0(
+               "Date: ", Date,
+               "\n Count: ", count,
+               "\n Percent: ", round(percent)
+             ))) +
+  geom_point() +
+  geom_line() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2020-07-31"))), color = "red") +
+  labs(x = NULL, y = NULL, color = NULL,
+       title = "Percent of households worried") +
+    facet_wrap(facets = vars({{variable}})) +
+  theme_pubr()
+  
+
+  ggplotly(plot, tooltip = "text")
+}
+```
+
+
+
+### All
+
+```{r usda-64 }
+mh_all(mh_all)
+```
+
+### Black
+
+```{r usda-65 }
+mh_group(mh_all, black_cat)
+```
+
+### Income
+
+```{r usda-66 }
+mh_group(mh_all, poverty_cat)
+```
+
+### Race + Income
+
+```{r usda-67 }
+mh_group(mh_all, black_poverty)
+```
+
+### Medicaid expansion
+
+```{r usda-68 }
+mh_group(mh_all, medicaid_expansion)
+```
+
+### Single
+
+```{r usda-69 }
+mh_group(mh_all, single_cat)
+```
+
+### Disability
+
+```{r usda-70 }
+mh_group(mh_all, disability_cat)
+```

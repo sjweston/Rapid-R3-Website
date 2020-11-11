@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Changing trajectories</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By Week
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="week1_report.html">Week 1 (April 6 - April 13)</a>
+    </li>
+    <li>
+      <a href="week2_report.html">Week 2 (April 14 - April 18)</a>
+    </li>
+    <li>
+      <a href="week3_report.html">Week 3 (April 20 - April 27)</a>
+    </li>
+    <li>
+      <a href="week4_report.html">Week 4 (April 27 - April 30)</a>
+    </li>
+    <li>
+      <a href="week5_report.html">Week 5 (May 4 - May 17)</a>
+    </li>
+    <li>
+      <a href="week6_report.html">Week 6 (May 11 - May 14)</a>
+    </li>
+    <li>
+      <a href="week7_report.html">Week 7 (May 19 - May 23)</a>
+    </li>
+    <li>
+      <a href="week8_report.html">Week 8 (May 25 - May 30)</a>
+    </li>
+    <li>
+      <a href="week9_report.html">Week 9 (June 1 - June 4)</a>
+    </li>
+    <li>
+      <a href="week10_report.html">Week 10 (June 8 - June 11)</a>
+    </li>
+    <li>
+      <a href="week11_report.html">Week 11 (June 15 - June 19)</a>
+    </li>
+    <li>
+      <a href="week12_report.html">Week 12 (June 22 - June 25)</a>
+    </li>
+    <li>
+      <a href="week13_report.html">Week 13 (June 29 - July 2)</a>
+    </li>
+    <li>
+      <a href="week14_report.html">Week 14 (July 6 - July 9)</a>
+    </li>
+    <li>
+      <a href="week15_report.html">Week 15 (July 13 - July 16)</a>
+    </li>
+    <li>
+      <a href="week16_report.html">Week 16 (July 20 - July 23)</a>
+    </li>
+    <li>
+      <a href="week17_report.html">Week 17 (July 27 - July 30)</a>
+    </li>
+    <li>
+      <a href="week18_report.html">Week 18 (August 3 - August 6)</a>
+    </li>
+    <li>
+      <a href="week19_report.html">Week 19 (August 11 - August 13)</a>
+    </li>
+    <li>
+      <a href="week20_report.html">Week 20 (August 17 - August 20)</a>
+    </li>
+    <li>
+      <a href="week21_report.html">Week 21 (August 25 - August 27)</a>
+    </li>
+    <li>
+      <a href="week22_report.html">Week 22 (September 01 - September 03)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="0prelim_april27.html">Sheltering in place</a>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict (summer)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may22.html">Childcare (spring)</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="winter_is_coming.html">Covid cases rising</a>
+    </li>
+    <li>
+      <a href="Family-Conflict-based-on-Master-Data.html">Family conflict (fall)</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texas</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Groups
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="group_single_report.html">Single caregivers</a>
+    </li>
+    <li>
+      <a href="group_latinx_report.html">Latinx caregivers</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li>
+  <a href="raw_open.html">Open-ended responses</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Changing trajectories</h1>
+
+</div>
+
+
+<div id="composing-the-childcare-variable" class="section level1">
+<h1>Composing the childcare variable</h1>
+<p>Caregivers were considered to <strong>not have childcare</strong> if:</p>
+<ul>
+<li>They answered “No” to the question, “This week, have you used any non-parental care for your child(ren) under the age of 5?”</li>
+<li>OR if they reported using at least five hours of unpaid care by a relative, friend or neighbor for any child age 5 or under and <em>none</em> of the types of care listed below.</li>
+</ul>
+<p>Caregivers were considered to <strong>have childcare</strong> if they reported using any of the following:</p>
+<ul>
+<li>Any type of paid or unpaid center-based care, such as a pre-school, day care center, public pre-kindergarten, Head Start, or faith-based nursery school. Please do not include kindergarten.</li>
+<li>At least five hours of paid care by a relative, friend or neighbor for any child age 5 or under</li>
+<li>At least 5 hours of paid care from a home-based child care provider. Please include home-based care where the provider is paid to care for your child even if you are not making the payment.</li>
+</ul>
+<p><em>Note: these questions were asked in weeks 5, 6, 9-current.</em></p>
+</div>
+<div id="descriptives" class="section level1 tabset">
+<h1 class="tabset">Descriptives</h1>
+<div id="all" class="section level2">
+<h2>All</h2>
+<div id="htmlwidget-d784c1fec341370862ed" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d784c1fec341370862ed">{"x":{"data":[{"orientation":"v","width":0.9,"base":0,"x":[1],"y":[7.4727346169382],"text":"Percent:7.5<br />Count: 555","type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[2],"y":[9.65396526188232],"text":"Percent:9.7<br />Count: 717","type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[3],"y":[4.44324761007136],"text":"Percent:4.4<br />Count: 330","type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[4],"y":[78.4300525111081],"text":"Percent:78.4<br />Count: 5825","type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Never","legendgroup":"Never","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":24.7073474470735},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,4.6],"tickmode":"array","ticktext":["Always","Gains","Loses","Never"],"tickvals":[1,2,3,4],"categoryorder":"array","categoryarray":["Always","Gains","Loses","Never"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.92150262555541,82.3515551366635],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e3dc25ef4":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e3dc25ef4","visdat":{"528e3dc25ef4":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="raceethnicity" class="section level2">
+<h2>Race/ethnicity</h2>
+<div id="htmlwidget-b744fb0c5866f3de3aed" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b744fb0c5866f3de3aed">{"x":{"data":[{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[0.6625,1.6625,2.6625],"y":[7.99418604651163,6.38930163447251,7.67804154302671],"text":["Percent:8<br />Count: 55","Percent:6.4<br />Count: 86","Percent:7.7<br />Count: 414"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[0.8875,1.8875,2.8875],"y":[11.3372093023256,8.54383358098068,9.71810089020772],"text":["Percent:11.3<br />Count: 78","Percent:8.5<br />Count: 115","Percent:9.7<br />Count: 524"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[1.1125,2.1125,3.1125],"y":[3.92441860465116,2.5260029717682,4.98887240356083],"text":["Percent:3.9<br />Count: 27","Percent:2.5<br />Count: 34","Percent:5<br />Count: 269"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[1.3375,2.3375,3.3375],"y":[76.7441860465116,82.5408618127786,77.6149851632048],"text":["Percent:76.7<br />Count: 528","Percent:82.5<br />Count: 1111","Percent:77.6<br />Count: 4185"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Never","legendgroup":"Never","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":24.7073474470735},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.12704309063893,86.6679049034175],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e452e71c7":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e452e71c7","visdat":{"528e452e71c7":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="income" class="section level2">
+<h2>Income</h2>
+<div id="htmlwidget-3a5b6cf3b1dbb843f34a" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3a5b6cf3b1dbb843f34a">{"x":{"data":[{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[0.6625,1.6625],"y":[8.44125809435708,6.06200832947709],"text":["Percent:8.4<br />Count: 365","Percent:6.1<br />Count: 131"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[0.8875,1.8875],"y":[12.0027752081406,7.03378065710319],"text":["Percent:12<br />Count: 519","Percent:7<br />Count: 152"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[1.1125,2.1125],"y":[6.40610545790934,1.9435446552522],"text":["Percent:6.4<br />Count: 277","Percent:1.9<br />Count: 42"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[1.3375,2.3375],"y":[73.149861239593,84.9606663581675],"text":["Percent:73.1<br />Count: 3163","Percent:85<br />Count: 1836"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Never","legendgroup":"Never","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":24.7073474470735},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,2.6],"tickmode":"array","ticktext":["High Income","Low Income"],"tickvals":[1,2],"categoryorder":"array","categoryarray":["High Income","Low Income"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.24803331790838,89.2086996760759],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e2e61e474":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e2e61e474","visdat":{"528e2e61e474":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="race-by-income" class="section level2">
+<h2>Race by Income</h2>
+<div id="htmlwidget-74d56b61d78278cd9071" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-74d56b61d78278cd9071">{"x":{"data":[{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[0.6625,1.6625,2.6625],"y":[9.47712418300654,7.88690476190476,8.46038863976084],"text":["Percent:9.5<br />Count: 29","Percent:7.9<br />Count: 53","Percent:8.5<br />Count: 283"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[0.6625,1.6625,2.6625],"y":[7.89473684210526,4.93562231759657,6.08817354793562],"text":["Percent:7.9<br />Count: 21","Percent:4.9<br />Count: 23","Percent:6.1<br />Count: 87"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[0.8875,1.8875,2.8875],"y":[13.7254901960784,9.97023809523809,12.2571001494768],"text":["Percent:13.7<br />Count: 42","Percent:10<br />Count: 67","Percent:12.3<br />Count: 410"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[0.8875,1.8875,2.8875],"y":[10.9022556390977,8.58369098712446,5.80825752274318],"text":["Percent:10.9<br />Count: 29","Percent:8.6<br />Count: 40","Percent:5.8<br />Count: 83"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[1.1125,2.1125,3.1125],"y":[4.57516339869281,2.82738095238095,7.29446935724963],"text":["Percent:4.6<br />Count: 14","Percent:2.8<br />Count: 19","Percent:7.3<br />Count: 244"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225],"base":[0,0,0],"x":[1.1125,2.1125,3.1125],"y":[4.13533834586466,1.931330472103,1.53953813855843],"text":["Percent:4.1<br />Count: 11","Percent:1.9<br />Count: 9","Percent:1.5<br />Count: 22"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[1.3375,2.3375,3.3375],"y":[72.2222222222222,79.3154761904762,71.9880418535127],"text":["Percent:72.2<br />Count: 221","Percent:79.3<br />Count: 533","Percent:72<br />Count: 2408"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Never","legendgroup":"Never","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225,0.225000000000001],"base":[0,0,0],"x":[1.3375,2.3375,3.3375],"y":[77.0676691729323,84.549356223176,86.5640307907628],"text":["Percent:77.1<br />Count: 205","Percent:84.5<br />Count: 394","Percent:86.6<br />Count: 1237"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Never","legendgroup":"Never","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":59.0386052303861,"r":7.97011207970112,"b":27.8953922789539,"l":24.7073474470735},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,0.488139714167111],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-4.32820153953814,90.8922323303009],"tickmode":"array","ticktext":["0","25","50","75"],"tickvals":[0,25,50,75],"categoryorder":"array","categoryarray":["0","25","50","75"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.488139714167111,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":0.488139714167111,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.511860285832889,"x1":1,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0.511860285832889,"x1":1,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"}],"annotations":[{"text":"High Income","x":0.244069857083556,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Low Income","x":0.755930142916444,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"xaxis2":{"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.511860285832889,1],"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e160ee162":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e160ee162","visdat":{"528e160ee162":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="single" class="section level2">
+<h2>Single</h2>
+<div id="htmlwidget-e7bf2db933ae8e39c93f" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-e7bf2db933ae8e39c93f">{"x":{"data":[{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[0.6625,1.6625],"y":[7.22815839094909,8.98770104068117],"text":["Percent:7.2<br />Count: 460","Percent:9<br />Count: 95"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[0.8875,1.8875],"y":[9.86800754242615,8.42005676442763],"text":["Percent:9.9<br />Count: 628","Percent:8.4<br />Count: 89"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(124,174,0,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[1.1125,2.1125],"y":[4.49402891263356,4.16272469252602],"text":["Percent:4.5<br />Count: 286","Percent:4.2<br />Count: 44"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,191,196,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.225,0.225],"base":[0,0],"x":[1.3375,2.3375],"y":[78.4098051539912,78.4295175023652],"text":["Percent:78.4<br />Count: 4990","Percent:78.4<br />Count: 829"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(199,124,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Never","legendgroup":"Never","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":24.7073474470735},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,2.6],"tickmode":"array","ticktext":["Dual parent","Single parent"],"tickvals":[1,2],"categoryorder":"array","categoryarray":["Dual parent","Single parent"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-3.92147587511826,82.3509933774834],"tickmode":"array","ticktext":["0","20","40","60","80"],"tickvals":[0,20,40,60,80],"categoryorder":"array","categoryarray":["0","20","40","60","80"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e69698357":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e69698357","visdat":{"528e69698357":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="descriptives-no-never" class="section level1 tabset">
+<h1 class="tabset">Descriptives (no Never)</h1>
+<div id="all-1" class="section level2">
+<h2>All</h2>
+<div id="htmlwidget-5fc0d1fcdb0c64674f3d" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5fc0d1fcdb0c64674f3d">{"x":{"data":[{"orientation":"v","width":0.9,"base":0,"x":[1],"y":[7.4727346169382],"text":"Percent:7.5<br />Count: 555","type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[2],"y":[9.65396526188232],"text":"Percent:9.7<br />Count: 717","type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":0.9,"base":0,"x":[3],"y":[4.44324761007136],"text":"Percent:4.4<br />Count: 330","type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":37.4595267745953},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Always","Gains","Loses"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Always","Gains","Loses"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.482698263094116,10.1366635249764],"tickmode":"array","ticktext":["0.0","2.5","5.0","7.5","10.0"],"tickvals":[0,2.5,5,7.5,10],"categoryorder":"array","categoryarray":["0.0","2.5","5.0","7.5","10.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e538902":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e538902","visdat":{"528e538902":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="raceethnicity-1" class="section level2">
+<h2>Race/ethnicity</h2>
+<div id="htmlwidget-07e85ef707170099710f" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-07e85ef707170099710f">{"x":{"data":[{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[0.7,1.7,2.7],"y":[7.99418604651163,6.38930163447251,7.67804154302671],"text":["Percent:8<br />Count: 55","Percent:6.4<br />Count: 86","Percent:7.7<br />Count: 414"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[1,2,3],"y":[11.3372093023256,8.54383358098068,9.71810089020772],"text":["Percent:11.3<br />Count: 78","Percent:8.5<br />Count: 115","Percent:9.7<br />Count: 524"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[1.3,2.3,3.3],"y":[3.92441860465116,2.5260029717682,4.98887240356083],"text":["Percent:3.9<br />Count: 27","Percent:2.5<br />Count: 34","Percent:5<br />Count: 269"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":18.3312577833126},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.566860465116279,11.9040697674419],"tickmode":"array","ticktext":["0","3","6","9"],"tickvals":[0,3,6,9],"categoryorder":"array","categoryarray":["0","3","6","9"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e4ab0e290":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e4ab0e290","visdat":{"528e4ab0e290":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="income-1" class="section level2">
+<h2>Income</h2>
+<div id="htmlwidget-6f9b89625a598b404d93" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6f9b89625a598b404d93">{"x":{"data":[{"orientation":"v","width":[0.3,0.3],"base":[0,0],"x":[0.7,1.7],"y":[8.44125809435708,6.06200832947709],"text":["Percent:8.4<br />Count: 365","Percent:6.1<br />Count: 131"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3],"base":[0,0],"x":[1,2],"y":[12.0027752081406,7.03378065710319],"text":["Percent:12<br />Count: 519","Percent:7<br />Count: 152"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3],"base":[0,0],"x":[1.3,2.3],"y":[6.40610545790934,1.9435446552522],"text":["Percent:6.4<br />Count: 277","Percent:1.9<br />Count: 42"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":37.4595267745953},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,2.6],"tickmode":"array","ticktext":["High Income","Low Income"],"tickvals":[1,2],"categoryorder":"array","categoryarray":["High Income","Low Income"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.600138760407031,12.6029139685476],"tickmode":"array","ticktext":["0.0","2.5","5.0","7.5","10.0","12.5"],"tickvals":[0,2.5,5,7.5,10,12.5],"categoryorder":"array","categoryarray":["0.0","2.5","5.0","7.5","10.0","12.5"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e7db5b782":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e7db5b782","visdat":{"528e7db5b782":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="race-by-income-1" class="section level2">
+<h2>Race by Income</h2>
+<div id="htmlwidget-b3af4cabf45d6a077a96" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b3af4cabf45d6a077a96">{"x":{"data":[{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[0.7,1.7,2.7],"y":[9.47712418300654,7.88690476190476,8.46038863976084],"text":["Percent:9.5<br />Count: 29","Percent:7.9<br />Count: 53","Percent:8.5<br />Count: 283"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[0.7,1.7,2.7],"y":[7.89473684210526,4.93562231759657,6.08817354793562],"text":["Percent:7.9<br />Count: 21","Percent:4.9<br />Count: 23","Percent:6.1<br />Count: 87"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[1,2,3],"y":[13.7254901960784,9.97023809523809,12.2571001494768],"text":["Percent:13.7<br />Count: 42","Percent:10<br />Count: 67","Percent:12.3<br />Count: 410"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[1,2,3],"y":[10.9022556390977,8.58369098712446,5.80825752274318],"text":["Percent:10.9<br />Count: 29","Percent:8.6<br />Count: 40","Percent:5.8<br />Count: 83"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[1.3,2.3,3.3],"y":[4.57516339869281,2.82738095238095,7.29446935724963],"text":["Percent:4.6<br />Count: 14","Percent:2.8<br />Count: 19","Percent:7.3<br />Count: 244"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3,0.3],"base":[0,0,0],"x":[1.3,2.3,3.3],"y":[4.13533834586466,1.931330472103,1.53953813855843],"text":["Percent:4.1<br />Count: 11","Percent:1.9<br />Count: 9","Percent:1.5<br />Count: 22"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":false,"xaxis":"x2","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":59.0386052303861,"r":7.97011207970112,"b":27.8953922789539,"l":24.7073474470735},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,0.488139714167111],"automargin":true,"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.686274509803922,14.4117647058824],"tickmode":"array","ticktext":["0","5","10"],"tickvals":[0,5,10],"categoryorder":"array","categoryarray":["0","5","10"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.488139714167111,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":0.488139714167111,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.511860285832889,"x1":1,"y0":0,"y1":1},{"type":"rect","fillcolor":"rgba(217,217,217,1)","line":{"color":"transparent","width":0.724555643609193,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0.511860285832889,"x1":1,"y0":0,"y1":25.5043586550436,"yanchor":1,"ysizemode":"pixel"}],"annotations":[{"text":"High Income","x":0.244069857083556,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Low Income","x":0.755930142916444,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":12.7521793275218},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"xaxis2":{"type":"linear","autorange":false,"range":[0.4,3.6],"tickmode":"array","ticktext":["Black","Latinx","White"],"tickvals":[1,2,3],"categoryorder":"array","categoryarray":["Black","Latinx","White"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"domain":[0.511860285832889,1],"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":"","hoverformat":".2f"},"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e10fc5963":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e10fc5963","visdat":{"528e10fc5963":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="single-1" class="section level2">
+<h2>Single</h2>
+<div id="htmlwidget-6a76389050d280005e45" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6a76389050d280005e45">{"x":{"data":[{"orientation":"v","width":[0.3,0.3],"base":[0,0],"x":[0.7,1.7],"y":[7.22815839094909,8.98770104068117],"text":["Percent:7.2<br />Count: 460","Percent:9<br />Count: 95"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(248,118,109,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Always","legendgroup":"Always","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3],"base":[0,0],"x":[1,2],"y":[9.86800754242615,8.42005676442763],"text":["Percent:9.9<br />Count: 628","Percent:8.4<br />Count: 89"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(0,186,56,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Gains","legendgroup":"Gains","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.3,0.3],"base":[0,0],"x":[1.3,2.3],"y":[4.49402891263356,4.16272469252602],"text":["Percent:4.5<br />Count: 286","Percent:4.2<br />Count: 44"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(97,156,255,1)","line":{"width":1.88976377952756,"color":"transparent"}},"name":"Loses","legendgroup":"Loses","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":46.2864259028643,"r":7.97011207970112,"b":27.8953922789539,"l":37.4595267745953},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022},"title":{"text":"Percent of caregivers by change in childcare","font":{"color":"rgba(0,0,0,1)","family":"","size":19.1282689912827},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.4,2.6],"tickmode":"array","ticktext":["Dual parent","Single parent"],"tickvals":[1,2],"categoryorder":"array","categoryarray":["Dual parent","Single parent"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"y","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.493400377121307,10.3614079195475],"tickmode":"array","ticktext":["0.0","2.5","5.0","7.5","10.0"],"tickvals":[0,2.5,5,7.5,10],"categoryorder":"array","categoryarray":["0.0","2.5","5.0","7.5","10.0"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.98505603985056,"tickwidth":0.724555643609193,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":12.7521793275218},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(190,190,190,1)","gridwidth":0.724555643609193,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":15.9402241594022}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":2.06156048675734,"font":{"color":"rgba(0,0,0,1)","family":"","size":12.7521793275218},"y":1},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"528e4660ad32":{"x":{},"y":{},"fill":{},"text":{},"type":"bar"}},"cur_data":"528e4660ad32","visdat":{"528e4660ad32":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="propensity-score-weighting" class="section level1">
+<h1>Propensity score weighting</h1>
+<p>From <a href="http://www.math.umd.edu/~slud/s818M-MissingData/PropensityScoreWeightingR.pdf">Olmos &amp; Govindasamy (2015)</a>:</p>
+<blockquote>
+<p>Propensity score weighting is one of the techniques used in controlling for selection biases in non-experimental studies. Propensity scores can be used as weights to account for selection assignment differences between treatment and comparison groups. One of the advantages of this approach is that all the individuals in the study can be used for the outcomes evaluation.</p>
+</blockquote>
+<p>An individual’s propensity for for gaining childcare (versus never having childcare) was determined by a linear model including caregiver race (Black versus not), ethnicity (Latinx versus not), family income relative to 150% of the federal poverty level, caregiver age, whether the caregiver was single, state of residence, language in which they completed the RAPID survey, the number of children in the household, and the type of health insurance covering the child’s healthcare.</p>
+</div>
+<div id="caregiver-mental-health" class="section level1">
+<h1>Caregiver mental health</h1>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+conf.low
+</th>
+<th style="text-align:right;">
+conf.high
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+</tr>
+</tbody>
+</table>
+<p><img src="propensity_files/figure-html/propensity-5-1.png" width="672" /></p>
+</div>
+<div id="child-mental-health" class="section level1">
+<h1>Child mental health</h1>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+effect
+</th>
+<th style="text-align:left;">
+term
+</th>
+<th style="text-align:right;">
+estimate
+</th>
+<th style="text-align:right;">
+std.error
+</th>
+<th style="text-align:right;">
+statistic
+</th>
+<th style="text-align:right;">
+conf.low
+</th>
+<th style="text-align:right;">
+conf.high
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+</tr>
+</tbody>
+</table>
+<p><img src="propensity_files/figure-html/propensity-7-1.png" width="672" /></p>
+<!-- # Caregiver mental health -->
+<!-- ```{r propensity-4, results = 'asis'} -->
+<!-- # trajectory -->
+<!-- adult_model = lmer(wellbeing ~ SL1*childcare_trajectory + SL2*childcare_trajectory + (1|CaregiverID), -->
+<!--                    data = childcare_data, -->
+<!--                    weights = childcare_data$loses_weights) -->
+<!-- broom::tidy(adult_model, conf.int = TRUE) %>% -->
+<!--   filter(group == "fixed") %>% -->
+<!--   select(-group) %>% -->
+<!--   kable(., booktabs = T, digits = 2) %>% -->
+<!--   kable_styling(full_width = T) -->
+<!-- ``` -->
+<!-- ```{r propensity-5} -->
+<!-- hypothetical = data.frame( -->
+<!--   CaregiverID = rep("000", 21), -->
+<!--   childcare_trajectory = rep(c("Loses", "Never"), each = 21), -->
+<!--   SL1 = rep(c(-10:0, rep(0, 10)),2), -->
+<!--   SL2 = rep(c(rep(0, 10), 0:10),2) -->
+<!-- ) -->
+<!-- hypothetical$predicted = predict(adult_model,  -->
+<!--                     newdata = hypothetical,  -->
+<!--                     allow.new.levels = T) -->
+<!-- hypothetical %>% -->
+<!--   mutate(Time = SL1 + SL2) %>% -->
+<!--   ggplot(aes( -->
+<!--     x = Time,  -->
+<!--     y = predicted, -->
+<!--     color = childcare_trajectory -->
+<!--   )) + -->
+<!--   geom_line() + -->
+<!--   labs(x = "Weeks to childcare",  -->
+<!--        y = "Adult mental health",  -->
+<!--        color = "Childcare experience") + -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+<!-- # Child mental health -->
+<!-- ```{r propensity-6, results = 'asis'} -->
+<!-- # trajectory -->
+<!-- child_model = lmer(child_wellbeing ~ SL1*childcare_trajectory + SL2*childcare_trajectory + (1|CaregiverID), -->
+<!--                    data = childcare_data, -->
+<!--                    weights = childcare_data$loses_weights) -->
+<!-- broom::tidy(child_model, conf.int = TRUE) %>% -->
+<!--   filter(group == "fixed") %>% -->
+<!--   select(-group) %>% -->
+<!--   kable(., booktabs = T, digits = 2) %>% -->
+<!--   kable_styling(full_width = T) -->
+<!-- ``` -->
+<!-- ```{r propensity-7} -->
+<!-- hypothetical = data.frame( -->
+<!--   CaregiverID = rep("000", 21), -->
+<!--   childcare_trajectory = rep(c("Loses", "Never"), each = 21), -->
+<!--   SL1 = rep(c(-10:0, rep(0, 10)),2), -->
+<!--   SL2 = rep(c(rep(0, 10), 0:10),2) -->
+<!-- ) -->
+<!-- hypothetical$predicted = predict(child_model,  -->
+<!--                     newdata = hypothetical,  -->
+<!--                     allow.new.levels = T) -->
+<!-- hypothetical %>% -->
+<!--   mutate(Time = SL1 + SL2) %>% -->
+<!--   ggplot(aes( -->
+<!--     x = Time,  -->
+<!--     y = predicted, -->
+<!--     color = childcare_trajectory -->
+<!--   )) + -->
+<!--   geom_line() + -->
+<!--   labs(x = "Weeks to childcare",  -->
+<!--        y = "Child mental health",  -->
+<!--        color = "Childcare experience") + -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,761 @@
+---
+title: "Return to Previous Childcare"
+author: "Sihong"
+date: "10/5/2020"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, include = FALSE}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(readr)
+library(haven)
+```
+
+```{r}
+source(here("Functions/core_funs.R"))
+```
+
+
+```{r, include=FALSE}
+# load scored master data --------------------------------------------------------
+load(here::here("../../Data Management R3/R data/scored.Rdata"))
+scored = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week %% 2 == 0 ~ NA_real_,
+      TRUE ~ Week)
+  ) %>%
+  filter(!is.na(Week))
+```
+
+```{r, echo=FALSE, message = FALSE}
+total_weeks = max(scored$Week, na.rm=T)
+key_demo <- c ("race_cat", "race_ethnic", "poverty_cat", "unemployment", "unemployed", "work_status", "disability", "single", "single_cat")
+
+ccare <- scored %>%
+  select (CaregiverID, Week, BaselineWeek, key_demo, contains ("familyCC"), contains ("cc_"), contains ("hours_"), contains ("cc2_"), contains ("priorcc_"), contains ("expect_"), contains ("same_cc"), comfort_return, contains ("know_cc"), lack_cc)
+
+num_responses = function(x){length(which(!is.na(x)))}
+ccare.num = ccare %>%
+  group_by(Week) %>%
+  summarize_all(num_responses) %>%
+  gather("Variable", "num_responses",-Week) %>%
+  mutate(week = paste0("Week", Week),
+         week = factor(Week, levels = paste0("Week", c(1:total_weeks)))) %>%
+  spread(Week, num_responses)
+
+
+
+#Merge even-number weeks with preceding odd-number weeks, starting from week 18. Because there are no overlapping respondents across the two weeks, we only need to change the name of weeks. 
+# ccare$Week[which(ccare$Week == 18)] <- 17
+# ccare$Week[which(ccare$Week == 20)] <- 19
+# ccare$Week[which(ccare$Week == 22)] <- 21
+# ccare$Week[which(ccare$Week == 24)] <- 23
+
+ccare <- ccare%>%
+  mutate (singleparent = (ifelse (single == 1, "single parent", "not single parent")),
+          cdisability = (ifelse (disability == 1, "child with disability", "child without disability")))
+
+```
+
+# Ability to Return to Previous Childcare{.tabset}
+  Results showed that most (73.29%) of caregivers said they could go back to their previous childcare. However, there were also 14.4% saying they could not and 12.3% saying they were not sure if they could return.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (same_cc) %>%
+  filter (same_cc != "NA" ) %>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+ 
+ cc_return %>%
+  ggplot ( mapping = aes (x = same_cc, y = prop*100))+
+  geom_bar(stat = "identity", position = "dodge") +
+   geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5)+
+  geom_text(aes(label = round (prop*100,2)),vjust = 1.6, color = "white")+
+  ylim (0,100)
+```
+
+## Breakdown by Race 
+  Latinx families were less confident in their abilities to go back to previous childcare. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (same_cc, race_ethnic) %>%
+  filter (race_ethnic != "NA" & same_cc != "NA" ) %>%
+ group_by (race_ethnic)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = race_ethnic, y = prop*100, fill = same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Income    
+  Fewer low-income families reported they could go back to previous childcare compared to high-income families.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (same_cc, poverty_cat) %>%
+  filter (poverty_cat != "NA" & same_cc != "NA" ) %>%
+ group_by (poverty_cat)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = poverty_cat, y = prop*100, fill = same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Single Parent Status 
+  Single parents reported less likely to go back to previous childcare compared to non-single parents.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (same_cc, singleparent) %>%
+  filter (singleparent != "NA" & same_cc != "NA" ) %>%
+ group_by (singleparent)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = singleparent, y = prop*100, fill = same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Child Disability Status{.tabset}
+
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (same_cc, cdisability) %>%
+  filter (cdisability != "NA" & same_cc != "NA" ) %>%
+ group_by (cdisability)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = cdisability, y = prop*100, fill = same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+```
+
+# Willingness to Return to Previous Childcare
+  *Based on Data Collected from Week 7 & 8
+  Most (63.53%) families reported willing to return to their previous childcare. However, there were also 15.9% not willing to, and 20.58% unsure. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (willing_same_cc) %>%
+  filter (willing_same_cc != "NA" ) %>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+ 
+ cc_return %>%
+  ggplot ( mapping = aes (x = willing_same_cc, y = prop*100))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1)) +
+  geom_text(aes(label = round (prop*100,2)),vjust = 1.6, color = "white")
+```
+
+## Breakdown by Race 
+  A higher percentage of Black caregivers reported to be willing to return to their previous childcare, compared to White and Latinx families. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (willing_same_cc, race_ethnic) %>%
+  filter (race_ethnic != "NA" & willing_same_cc != "NA" ) %>%
+ group_by (race_ethnic)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = race_ethnic, y = prop*100, fill = willing_same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Income 
+  More low-income families reported being willing to return to previous childcare.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (willing_same_cc, poverty_cat) %>%
+  filter (poverty_cat != "NA" & willing_same_cc != "NA" ) %>%
+ group_by (poverty_cat)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = poverty_cat, y = prop*100, fill = willing_same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Single Parent Status 
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (willing_same_cc, singleparent) %>%
+  filter (singleparent != "NA" & willing_same_cc != "NA" ) %>%
+ group_by (singleparent)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = singleparent, y = prop*100, fill = willing_same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Child Disability Status 
+  Families of chlidren without disability reported more willing to return to previous childcare
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (willing_same_cc, cdisability) %>%
+  filter (cdisability != "NA" & willing_same_cc != "NA" ) %>%
+ group_by (cdisability)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = cdisability, y = prop*100, fill = willing_same_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+```  
+
+# Comfortable to Return to Previous Childcare{.tabset}
+
+  *Based on Data Collected from Week 7 & 8
+  About half (49.61%) of families reported "a little bit comfortable and a little bit worried" about returning to previous childcare; 20.46% report not comfortable at all and very worried; 25.2% reporting very comfortable and not worried at all. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (comfort_return) %>%
+  filter (comfort_return != "NA" ) %>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+ 
+ cc_return %>%
+  ggplot ( mapping = aes (x = comfort_return, y = prop*100))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1)) +
+  geom_text(aes(label = round (prop*100,2)),vjust = 1.6, color = "white")
+```
+  
+  *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
+  
+## Breakdown by Race 
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (comfort_return, race_ethnic) %>%
+  filter (race_ethnic != "NA" & comfort_return != "NA" ) %>%
+ group_by (race_ethnic)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = race_ethnic, y = prop*100, fill = comfort_return ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+  
+  *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
+  
+## Breakdown by Income 
+  Low-income families reported more comfortable to return to previous childcare.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (comfort_return, poverty_cat) %>%
+  filter (poverty_cat != "NA" & comfort_return != "NA" ) %>%
+ group_by (poverty_cat)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = poverty_cat, y = prop*100, fill = comfort_return ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+  
+  *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
+  
+## Breakdown by Single Parent Status 
+  Single-parent families reported more comfortable to return to previous childcare.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (comfort_return, singleparent) %>%
+  filter (singleparent != "NA" & comfort_return != "NA" ) %>%
+ group_by (singleparent)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = singleparent, y = prop*100, fill = comfort_return ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+  
+  *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
+  
+## Breakdown by Child Disability Status 
+  Caregivers of children with disability reported more comfortable to return to previous childcare.
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (comfort_return, cdisability) %>%
+  filter (cdisability != "NA" & comfort_return != "NA" ) %>%
+ group_by (cdisability)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = cdisability, y = prop*100, fill = comfort_return ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+```  
+  
+  *Note: 1 = Not at all comfortable/Very worried; 2 = A little comfortable and also a little worried; 3 = Neither comfortable nor worried; 4 = Very comfortable and not at all worried
+  
+# Barrier of Returning to Previous Childcare{.tabset}
+  The biggest barrier of caregivers' deciding to return to previous childcare was safety - 27.3% of caregivers reported concern about safety. Then, there were also 11.16% of caregivers reported no need to return to previous childcare currently, and 8.93% of caregivers reports costs being the main barrier. 
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  summarise(n = n(),
+            cost = sum(barrier_same_cc_cost, na.rm = TRUE)/n,
+            safety = sum(barrier_same_cc_safe, na.rm = TRUE)/n,
+            need = sum(barrier_same_cc_need, na.rm = TRUE)/n,
+            )%>%
+  pivot_longer(cols = c("cost","safety", "need"), 
+               names_to = "barrier", 
+               values_to = "Percent") %>%
+  mutate(moe = map2_dbl(Percent, n, moe.p)) %>%
+  mutate_at(vars(Percent, moe), ~100*.x)
+
+cc_return %>%
+  ggplot ( mapping = aes (x = barrier, y = Percent)) +
+  geom_bar(stat = "identity", position = position_dodge(1), alpha = .7) +
+  geom_errorbar(aes(ymin = Percent - moe,
+                    ymax = Percent + moe),
+                width = .5) +
+  geom_text(aes(label = round (Percent,2)),vjust = 1.6) +
+  coord_flip()
+```
+
+## Breakdown by race
+
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(race_ethnic) %>%
+  summarise(n = n(),
+            cost = sum(barrier_same_cc_cost, na.rm = TRUE)/n,
+            safety = sum(barrier_same_cc_safe, na.rm = TRUE)/n,
+            need = sum(barrier_same_cc_need, na.rm = TRUE)/n,
+            )%>%
+  pivot_longer(cols = c("cost","safety", "need"), 
+               names_to = "barrier", 
+               values_to = "Percent") %>%
+  mutate(moe = map2_dbl(Percent, n, moe.p)) %>%
+  mutate_at(vars(Percent, moe), ~100*.x)
+
+cc_return %>%
+  ggplot ( mapping = aes (x = barrier, y = Percent, fill = race_ethnic)) +
+  geom_bar(stat = "identity", position = position_dodge(1), alpha = .7) +
+  geom_errorbar(aes(ymin = Percent - moe,
+                    ymax = Percent + moe),
+                width = .5, 
+                position = position_dodge(1)) +
+  geom_text(aes(label = round (Percent,2)),
+            vjust = 1.6,
+            position = position_dodge(1)) +
+  coord_flip()
+```
+
+## Breakdown by income
+
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(poverty_cat) %>%
+  summarise(n = n(),
+            cost = sum(barrier_same_cc_cost, na.rm = TRUE)/n,
+            safety = sum(barrier_same_cc_safe, na.rm = TRUE)/n,
+            need = sum(barrier_same_cc_need, na.rm = TRUE)/n,
+            )%>%
+  pivot_longer(cols = c("cost","safety", "need"), 
+               names_to = "barrier", 
+               values_to = "Percent") %>%
+  mutate(moe = map2_dbl(Percent, n, moe.p)) %>%
+  mutate_at(vars(Percent, moe), ~100*.x)
+
+cc_return %>%
+  ggplot ( mapping = aes (x = barrier, y = Percent, fill = poverty_cat)) +
+  geom_bar(stat = "identity", position = position_dodge(1), alpha = .7) +
+  geom_errorbar(aes(ymin = Percent - moe,
+                    ymax = Percent + moe),
+                width = .5, 
+                position = position_dodge(1)) +
+  geom_text(aes(label = round (Percent,2)),
+            vjust = 1.6,
+            position = position_dodge(1)) +
+  coord_flip()
+```
+
+## Breakdown by single parent status
+
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  filter(!is.na(single_cat)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(single_cat) %>%
+  summarise(n = n(),
+            cost = sum(barrier_same_cc_cost, na.rm = TRUE)/n,
+            safety = sum(barrier_same_cc_safe, na.rm = TRUE)/n,
+            need = sum(barrier_same_cc_need, na.rm = TRUE)/n,
+            )%>%
+  pivot_longer(cols = c("cost","safety", "need"), 
+               names_to = "barrier", 
+               values_to = "Percent") %>%
+  mutate(moe = map2_dbl(Percent, n, moe.p)) %>%
+  mutate_at(vars(Percent, moe), ~100*.x)
+
+cc_return %>%
+  ggplot ( mapping = aes (x = barrier, y = Percent, fill = single_cat)) +
+  geom_bar(stat = "identity", position = position_dodge(1), alpha = .7) +
+  geom_errorbar(aes(ymin = Percent - moe,
+                    ymax = Percent + moe),
+                width = .5, 
+                position = position_dodge(1)) +
+  geom_text(aes(label = round (Percent,2)),
+            vjust = 1.6,
+            position = position_dodge(1)) +
+  coord_flip()
+```
+
+## Breakdown by child disability status
+
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  filter(!is.na(disability)) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  group_by(disability) %>%
+  summarise(n = n(),
+            cost = sum(barrier_same_cc_cost, na.rm = TRUE)/n,
+            safety = sum(barrier_same_cc_safe, na.rm = TRUE)/n,
+            need = sum(barrier_same_cc_need, na.rm = TRUE)/n,
+            )%>%
+  pivot_longer(cols = c("cost","safety", "need"), 
+               names_to = "barrier", 
+               values_to = "Percent") %>%
+  mutate(moe = map2_dbl(Percent, n, moe.p)) %>%
+  mutate_at(vars(Percent, moe), ~100*.x)
+
+cc_return %>%
+  ggplot ( mapping = aes (x = barrier, y = Percent, fill = as.factor(disability))) +
+  geom_bar(stat = "identity", position = position_dodge(1), alpha = .7) +
+  geom_errorbar(aes(ymin = Percent - moe,
+                    ymax = Percent + moe),
+                width = .5, 
+                position = position_dodge(1)) +
+  geom_text(aes(label = round (Percent,2)),
+            vjust = 1.6,
+            position = position_dodge(1)) +
+  coord_flip()
+```
+
+# What Caregivers Want to Know to Feel comfortable Returning to Same Childcare
+  Things that caregivers want to know about the childcare facility to feel comfortable returning included:\
+  1) plans for cleaning the physical space (68.84%)\
+  2) plans if anyone affiliated with the childcare gets a confirmed or suspected diagnosis of COVID19 (66.12%)\
+  3) plans for deciding if an employee is healthy enough to work (62.31%)\
+  4) plans for deciding if a child is healthy enough to attend child care (61.50%)\
+  5) number of children in the same space (57.19%)\
+  6) social distancing measures (54.6%)\
+  7) number of adults in the same space (50.48%)\
+  8) new and updated policies for enrollment, cost, etc. (34.06%)
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  summarise(n = n(),
+            childhealth = sum(know_cc_childHealth, na.rm = TRUE)/n*100,
+            cleaning = sum(know_cc_cleaning, na.rm = TRUE)/n*100,
+            numchild = sum(know_cc_numchild, na.rm = TRUE)/n*100,
+            numadult = sum(know_cc_numadult, na.rm = TRUE)/n*100,
+            COVID = sum(know_cc_COVID, na.rm = TRUE)/n*100,
+            socialdist = sum(know_cc_socialDis, na.rm = TRUE)/n*100,
+            employeehealth = sum(know_cc_employeeHealth, na.rm = TRUE)/n*100,
+            enroll = sum(know_cc_enroll, na.rm = TRUE)/n*100
+            )%>%
+  pivot_longer(cols = c("childhealth","cleaning", "numchild", "numadult", "COVID", "socialdist", "employeehealth", "enroll"), names_to = "know", values_to = "Percent" )
+
+cc_return %>%
+  ggplot ( mapping = aes (x = Percent, y = know)) +
+  geom_col(position = 'dodge') + 
+  geom_text(aes(label = round (Percent,2)),vjust = 1.6, color = "white")+
+  xlim (0,100) +
+  coord_flip()
+```  
+  
+  *Note.
+  numchild = number of children in the same space as my child;
+  numadult = number of adult in the same space as my child;
+  socialdist = social distancing measures;
+  cleaning = plans for cleaning the physical space;
+  childhealth = plans for deciding if a child is healthy enough to attend child care;
+  employeehealth = plans for deciding if an employee is healthy enough to work;
+  COVID = plans if anyone affiliated with the childcare gets a confirmed or suspected diagnosis of covid19
+  enroll = new and updated policies for enrollment, cost, etc.
+  
+# Concerned not Able to Return to Work Because of Lack Appropriate Childcare{.tabset}
+  *Based on Data Collected from Week 7 & 8
+  About half of caregivers (53.22%) reported no concern about their ability of returning to work because of lacking appropriate childcare. However, there were also 32.48% of caregivers reporting such a concern.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (lack_cc) %>%
+  filter (lack_cc != "NA" ) %>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+ 
+ cc_return %>%
+  ggplot ( mapping = aes (x = lack_cc, y = prop*100))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1)) +
+  geom_text(aes(label = round (prop*100,2)),vjust = 1.6, color = "white")
+```
+
+## Breakdown by Race 
+  Compared to White caregivers, Black and Latinx caregivers reported more concern about their ability of returning to work because of lacking appropriate childcare.
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (lack_cc, race_ethnic) %>%
+  filter (race_ethnic != "NA" & lack_cc != "NA" ) %>%
+ group_by (race_ethnic)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = race_ethnic, y = prop*100, fill = lack_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Income 
+  Compared to high-income families, low-income families reported more concern about their ability of returning to work because of lacking appropriate childcare
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (lack_cc, poverty_cat) %>%
+  filter (poverty_cat != "NA" & lack_cc != "NA" ) %>%
+ group_by (poverty_cat)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = poverty_cat, y = prop*100, fill = lack_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Single Parent Status 
+  Single parents reported more concern about their ability of returning to work because of lacking appropriate childcare.
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (lack_cc, singleparent) %>%
+  filter (singleparent != "NA" & lack_cc != "NA" ) %>%
+ group_by (singleparent)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = singleparent, y = prop*100, fill = lack_cc ))+
+  geom_bar(stat = "identity",  position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+
+```
+
+## Breakdown by Child Disability Status 
+  Caregivers of children with disability reported more concerns about their ability of returning to work because of lacking appropriate childcare
+  
+```{r, echo=FALSE, message = FALSE}
+cc_return <- ccare %>%
+  filter (Week == 7| Week == 8) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  count (lack_cc, cdisability) %>%
+  filter (cdisability != "NA" & lack_cc != "NA" ) %>%
+ group_by (cdisability)%>%
+ mutate(prop = prop.table(n),         
+        moe = map2_dbl(prop, n, moe.p))
+
+cc_return %>%
+  ggplot ( mapping = aes (x = cdisability, y = prop*100, fill = lack_cc ))+
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = (prop-moe)*100, 
+                     ymax = (prop+moe)*100),
+                 width = .5, position = position_dodge(1))
+```  

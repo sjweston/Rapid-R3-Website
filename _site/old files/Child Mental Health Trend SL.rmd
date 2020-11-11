@@ -1,0 +1,199 @@
+---
+title: "Trending of Child Mental Health Outcomes"
+author: "Sihong"
+date: "9/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r packages, include = FALSE}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+```
+
+```{r, include=FALSE}
+# load scored master data --------------------------------------------------------
+load(here::here("../../Data Management R3/R Data/scored.Rdata"))
+```
+
+# Child Internalizing & Externalizing Problems Responses Frequency Table
+```{r, echo=FALSE, message = FALSE}
+total_weeks = max(scored$Week, na.rm=T)
+key_demo <- c ("race_cat", "race_ethnic", "poverty_cat")
+
+child_probs <- scored %>%
+  select (CaregiverID, Week, contains("fussy"), contains("fear"), key_demo)
+```
+
+## Externalizing Problems (Fussy) Frequency Table
+```{r, echo=FALSE, message = FALSE}
+child_probs %>%
+  count (fussy, poverty_cat, race_ethnic) %>%
+  filter ((poverty_cat == "Low Income" | poverty_cat == "High Income") & (race_ethnic == "White" | race_ethnic == "Black" | race_ethnic == "LatinX") & (fussy == 0 | fussy == 50 | fussy == 100)) %>%
+ group_by (poverty_cat, race_ethnic)%>%
+ mutate(prop = prop.table(n))
+```
+
+## Internalizing Problems (Fear) Frequency Table
+```{r, echo=FALSE, message = FALSE}
+child_probs %>%
+  count (fear, poverty_cat, race_ethnic) %>%
+  filter ((poverty_cat == "Low Income" | poverty_cat == "High Income") & (race_ethnic == "White" | race_ethnic == "Black" | race_ethnic == "LatinX") & (fear == 0 | fear == 50 | fear == 100)) %>%
+ group_by (poverty_cat, race_ethnic)%>%
+ mutate(prop = prop.table(n))
+```
+
+# Child Internalizing & Externalizing Problems Percentage Change Over Time 
+```{r, echo=FALSE, message = FALSE}
+
+child_probs_week <- child_probs %>%
+  group_by (Week) %>%
+  summarize (total = n(), 
+             fussy_some_pct = sum (fussy_current_some, na.rm = TRUE)/total*100, 
+             fussy_lots_pct = sum (fussy_current_lots, na.rm = TRUE)/total*100,
+             fear_some_pct = sum (fear_current_some, na.rm = TRUE)/total*100, 
+             fear_lots_pct = sum (fear_current_lots, na.rm = TRUE)/total*100) 
+  
+  
+child_fussy_week_long <- gather (subset(child_probs_week, select = c("Week","fussy_some_pct", "fussy_lots_pct")), level, fussy_pct, fussy_some_pct, fussy_lots_pct ) 
+
+child_fear_week_long <- gather (subset(child_probs_week, select = c("Week","fear_some_pct", "fear_lots_pct")), level, fear_pct, fear_some_pct, fear_lots_pct ) 
+
+child_fussy_week_long$level = str_replace (child_fussy_week_long$level, "fussy_some_pct", "some")
+child_fussy_week_long$level = str_replace (child_fussy_week_long$level, "fussy_lots_pct", "lots")
+child_fear_week_long$level = str_replace (child_fear_week_long$level, "fear_some_pct", "some")
+child_fear_week_long$level = str_replace (child_fear_week_long$level, "fear_lots_pct", "lots")
+
+child_probs_week_long <- merge (child_fussy_week_long, child_fear_week_long, by = c ("Week", "level"))
+
+ggplot (data = child_probs_week_long, aes (x = Week, y = fussy_pct,color = level)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100))
+ 
+
+ggplot (data = child_probs_week_long, aes (x = Week, y = fear_pct, color = level)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100))
+```
+
+# Child behaviors breakdown by income
+```{r, echo=FALSE, message = FALSE}
+child_probs_week_income <- child_probs %>%
+  group_by (Week, poverty_cat) %>%
+  summarize (total = n(),
+             fussy_some_pct = sum (fussy_current_some, na.rm = TRUE)/total*100, 
+             fussy_lots_pct = sum (fussy_current_lots, na.rm = TRUE)/total*100,
+             fear_some_pct = sum (fear_current_some, na.rm = TRUE)/total*100, 
+             fear_lots_pct = sum (fear_current_lots, na.rm = TRUE)/total*100)%>%
+   filter (poverty_cat == "Low Income" | poverty_cat == "High Income")
+
+ child_fussy_week_income_long <- gather (subset(child_probs_week_income, select = c("Week","fussy_some_pct", "fussy_lots_pct", "poverty_cat")), level, fussy_pct, fussy_some_pct, fussy_lots_pct ) 
+
+child_fear_week_income_long <- gather (subset(child_probs_week_income, select = c("Week","fear_some_pct", "fear_lots_pct", "poverty_cat")), level, fear_pct, fear_some_pct, fear_lots_pct ) 
+
+child_fussy_week_income_long$level = str_replace (child_fussy_week_income_long$level, "fussy_some_pct", "some")
+child_fussy_week_income_long$level = str_replace (child_fussy_week_income_long$level, "fussy_lots_pct", "lots")
+child_fear_week_income_long$level = str_replace (child_fear_week_income_long$level, "fear_some_pct", "some")
+child_fear_week_income_long$level = str_replace (child_fear_week_income_long$level, "fear_lots_pct", "lots")
+
+child_probs_week_income_long <- merge (child_fussy_week_income_long, child_fear_week_income_long, by = c ("Week", "level", "poverty_cat"))
+
+ggplot (data = child_probs_week_income_long, aes (x = Week, y = fussy_pct, color = level, shape = poverty_cat, linetype = poverty_cat)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100)) 
+
+
+ggplot (data = child_probs_week_income_long, aes (x = Week, y = fear_pct, color = level, shape = poverty_cat, linetype = poverty_cat)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100))
+```
+
+# Child behaviors breakdown by race/ethnicity
+```{r, echo=FALSE, message = FALSE}
+child_probs_week_race <- child_probs %>%
+  group_by (Week, race_ethnic) %>%
+  summarize (total = n(),
+             fussy_some_pct = sum (fussy_current_some, na.rm = TRUE)/total*100, 
+             fussy_lots_pct = sum (fussy_current_lots, na.rm = TRUE)/total*100,
+             fear_some_pct = sum (fear_current_some, na.rm = TRUE)/total*100, 
+             fear_lots_pct = sum (fear_current_lots, na.rm = TRUE)/total*100)%>%
+   filter (race_ethnic == "White" | race_ethnic == "Black" | race_ethnic == "LatinX")
+
+ child_fussy_week_race_long <- gather (subset(child_probs_week_race, select = c("Week","fussy_some_pct", "fussy_lots_pct", "race_ethnic")), level, fussy_pct, fussy_some_pct, fussy_lots_pct ) 
+
+child_fear_week_race_long <- gather (subset(child_probs_week_race, select = c("Week","fear_some_pct", "fear_lots_pct", "race_ethnic")), level, fear_pct, fear_some_pct, fear_lots_pct ) 
+
+child_fussy_week_race_long$level = str_replace (child_fussy_week_race_long$level, "fussy_some_pct", "some")
+child_fussy_week_race_long$level = str_replace (child_fussy_week_race_long$level, "fussy_lots_pct", "lots")
+child_fear_week_race_long$level = str_replace (child_fear_week_race_long$level, "fear_some_pct", "some")
+child_fear_week_race_long$level = str_replace (child_fear_week_race_long$level, "fear_lots_pct", "lots")
+
+child_probs_week_race_long <- merge (child_fussy_week_race_long, child_fear_week_race_long, by = c ("Week", "level", "race_ethnic"))
+
+ggplot (data = child_probs_week_race_long, aes (x = Week, y = fussy_pct, color = level, shape = race_ethnic, linetype = race_ethnic)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100)) 
+
+
+ggplot (data = child_probs_week_race_long, aes (x = Week, y = fear_pct, color = level, shape = race_ethnic, linetype = race_ethnic)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100))
+```
+
+# Child behaviors breakdown by the interaction of income and race/ethnicity
+
+```{r, echo=FALSE, message = FALSE}
+child_probs_week_race_income <- child_probs %>%
+  group_by (Week, race_ethnic, poverty_cat) %>%
+  summarize (total = n(),
+             fussy_some_pct = sum (fussy_current_some, na.rm = TRUE)/total*100, 
+             fussy_lots_pct = sum (fussy_current_lots, na.rm = TRUE)/total*100,
+             fear_some_pct = sum (fear_current_some, na.rm = TRUE)/total*100, 
+             fear_lots_pct = sum (fear_current_lots, na.rm = TRUE)/total*100)%>%
+   filter ((race_ethnic == "White" | race_ethnic == "Black" | race_ethnic == "LatinX")&(poverty_cat == "Low Income" | poverty_cat == "High Income"))
+
+ child_fussy_week_race_income_long <- gather (subset(child_probs_week_race_income, select = c("Week","fussy_some_pct", "fussy_lots_pct", "race_ethnic", "poverty_cat")), level, fussy_pct, fussy_some_pct, fussy_lots_pct ) 
+
+child_fear_week_race_income_long <- gather (subset(child_probs_week_race_income, select = c("Week","fear_some_pct", "fear_lots_pct", "race_ethnic", "poverty_cat")), level, fear_pct, fear_some_pct, fear_lots_pct ) 
+
+child_fussy_week_race_income_long$level = str_replace (child_fussy_week_race_income_long$level, "fussy_some_pct", "some")
+child_fussy_week_race_income_long$level = str_replace (child_fussy_week_race_income_long$level, "fussy_lots_pct", "lots")
+child_fear_week_race_income_long$level = str_replace (child_fear_week_race_income_long$level, "fear_some_pct", "some")
+child_fear_week_race_income_long$level = str_replace (child_fear_week_race_income_long$level, "fear_lots_pct", "lots")
+
+child_probs_week_race_income_long <- merge (child_fussy_week_race_income_long, child_fear_week_race_income_long, by = c ("Week", "level", "race_ethnic", "poverty_cat"))
+
+ggplot (data = child_probs_week_race_income_long, aes (x = Week, y = fussy_pct, color = level, shape = poverty_cat, linetype = poverty_cat)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100)) +
+  facet_wrap (~race_ethnic)
+
+
+ggplot (data = child_probs_week_race_income_long, aes (x = Week, y = fear_pct, color = level, shape = poverty_cat, linetype = poverty_cat)) +
+  geom_point (size = 2) +
+  geom_line()+
+   scale_x_continuous(breaks = c(0:total_weeks))+
+    scale_y_continuous(limits = c(0,100))+
+  facet_wrap (~race_ethnic)
+```
+

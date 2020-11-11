@@ -126,7 +126,7 @@ scored = scored %>%
 scored = scored %>%
   group_by(CaregiverID) %>%
   summarize(returner = n(),
-            returner = ifelse(returner > 1, 1, 0)) %>%
+            returner = ifelse(returner > 2, 1, 0)) %>%
   ungroup()%>%
   full_join(scored)
 
