@@ -35,7 +35,6 @@ identify_state = function(ZC, zipcode.dataset = zipcode){
 
 
 ```{r}
-
 master = read_sav(
   here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 ```
@@ -106,6 +105,37 @@ master %>%
 ```{r, results = 'asis'}
 master %>%
   filter(grepl("5", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q7: Now that the school year has started, we would like you to think about what resources would make things easier for you to support them. This could be technology, better internet access, more time, support etc. If you have older children who are of school age, what are the resources that you wish you had (or need) in order to support your child’s education?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("8", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q8: Many parents are also primarily responsible for their younger children’s early learning. If this is true of you, what additional resources would be helpful to make your child’s educational experience successful?  (This could be toys, books, adult attention etc.)
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("8", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+
+# Q9: What would you like your elected officials or other policymakers (for example, U.S. Congress, state and local leaders) to know about how your family is doing or what you need during this time?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("9", Question)) %>%
   select(-Question) %>%
   datatable(filter = "top", rownames = F, 
             options = list(autoWidth = T))

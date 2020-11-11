@@ -21,7 +21,7 @@ library(naniar)
 ```
 
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-1, echo=FALSE, message = FALSE}
 #Define functions
 moe.p = function(p, n){
   q = 1-p
@@ -56,7 +56,7 @@ find_items = function(string, data2){
 my.max = function(x) ifelse (!all(is.na(x)), max(x,na.rm = TRUE), NA)
 ```
 
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
+```{r children-with-disability-2, echo=FALSE, message = FALSE, warning = FALSE}
 #OR load master data file
 master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
@@ -105,15 +105,19 @@ master = master %>%
 ```
 
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-3, echo=FALSE, message = FALSE}
 #Variables Needed for Analyses Lists
 
 total_weeks = max(master$Week, na.rm=T)
 
 #Domains of data need to pull: caregivers' mental health, children's behavioral outcomes, material hardship, health interrupted, childcare, social support
 
-cbp <- c("fussy", "fussy_current_some", "fussy_current_lots", "fear", "fear_current_some", "fear_current_lots")
-pmh <- c("depress", "depress_current_some", "depress_current_lots", "depress_increase", "anxiety", "anxiety_current_some", "anxiety_current_lots", "anxiety_increase", "stress", "stress_current_some", "stress_current_lots", "stress_increase", "lonely", "lonely_current_some", "lonely_current_lots")
+cbp <- c("fussy", "fussy_current_some", "fussy_current_lots", 
+         "fear", "fear_current_some", "fear_current_lots")
+pmh <- c("depress", "depress_current_some", "depress_current_lots", "depress_increase", 
+         "anxiety", "anxiety_current_some", "anxiety_current_lots", "anxiety_increase", 
+         "stress", "stress_current_some", "stress_current_lots", "stress_increase", 
+         "lonely", "lonely_current_some", "lonely_current_lots")
 mh <- c ("mh_food", "mh_eviction", "mh_foreclose", "mh_utilities", "num_hardship")
 cc <- c("cc2_nonparental", "cc2_centerbased", "cc2_homebased", "cc2_paid", "cc2_unpaid", "lack_cc")
 hi <- c ("miss_vaccine_any", "missed_wellbaby", "delay_healthcare")
@@ -135,7 +139,7 @@ hi <- c ("miss_vaccine_any", "missed_wellbaby", "delay_healthcare")
     - Prior to/Since COVID19 pandemic, please describe how often...I felt lonely\
   * Note that all scores were transformed to range 0-1 for comparison. \
     
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-4, echo=FALSE, message = FALSE}
 #Score caregivers' mental health problems
 depress_pre = rowMeans(master[,find_items("PHQ.001.[a-b]$", master)], na.rm=T)
 depress_crt= rowMeans(master[,find_items("PHQ.002.[a-b]$", master)], na.rm=T)
@@ -156,8 +160,9 @@ master <- master %>%
   mutate (total_pre = sum(depress_pre, anxiety_pre, stress_pre, lonely_pre, na.rm = TRUE)/4,
           total_crt = sum(depress_crt, anxiety_crt, stress_crt, lonely_crt, na.rm = TRUE)/4)
 
-pmh <- master %>%
-  select(CaregiverID,month,Week,  BaselineWeek, baseline, disability_cat, contains ("depress"),contains ("anxiety"), stress_pre, stress_crt, lonely_pre, lonely_crt, contains ("total"))
+pmh <- master %>% 
+  select(CaregiverID,month, Week,  BaselineWeek, baseline, disability_cat, contains ("depress"),
+         contains ("anxiety"), stress_pre, stress_crt, lonely_pre, lonely_crt, contains ("total"))
 
 ```
 
@@ -171,7 +176,7 @@ pmh <- master %>%
   * Pre-COVID vs. Current comparison:\
     + For caregivers of children with or without disability, reported total mental health problems and specific symptoms (depression, anxiety, stress, and loneliness) all significantly increased from pre-COVID to currently. 
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-5, echo=FALSE, message = FALSE}
 pmh_pre_m <- pmh %>%
   filter (baseline == 1)%>%
   group_by (disability_cat)%>%
@@ -198,7 +203,9 @@ pmh_pre_sd <- pmh %>%
                 names_to = "problems", values_to = "sd") %>%
   mutate (time = "a.pre-COVID")
 
-pmh_pre = merge (x = pmh_pre_m, y = pmh_pre_sd,  by.x = c("problems", "n", "disability_cat", "time"), by.y = c("problems", "n", "disability_cat", "time"))%>%
+pmh_pre = merge (x = pmh_pre_m, y = pmh_pre_sd,  
+                 by.x = c("problems", "n", "disability_cat", "time"), 
+                 by.y = c("problems", "n", "disability_cat", "time")) %>%
   mutate (moe = map2_dbl(sd, n, moe.m))
 
 
@@ -232,7 +239,9 @@ pmh_crt_sd <- pmh %>%
                 names_to = "problems", values_to = "sd")  %>%
   mutate (time = "b.current")
 
-pmh_crt = merge (x = pmh_crt_m, y = pmh_crt_sd,  by.x = c("problems", "n", "disability_cat", "time"), by.y = c("problems", "n", "disability_cat", "time"))%>%
+pmh_crt = merge (x = pmh_crt_m, y = pmh_crt_sd, 
+                 by.x = c("problems", "n", "disability_cat", "time"), 
+                 by.y = c("problems", "n", "disability_cat", "time"))%>%
   mutate (moe = map2_dbl(sd, n, moe.m))
 
 pmh_merge <- rbind(pmh_pre, pmh_crt) 
@@ -263,13 +272,11 @@ pmh_merge %>%
   geom_text(aes(label = round(mean,2)),vjust = -1, color = "black",  position = position_dodge(1))+
   facet_wrap (problems~time, nrow = 1)+
   theme(axis.text.x = element_blank())
-  
-
-```
+  ```
 
 ### Mean Level Changes Over Time
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-6, echo=FALSE, message = FALSE}
 pmh_trend <- pmh %>%
   group_by (Week, disability_cat) %>%
   summarise (n = n(),
@@ -366,7 +373,7 @@ ggplot( mapping = aes (x = Week, y = lonely_m, fill = disability_cat)) +
   * Caregivers of children without disability showed significantly more increases in total mental health problem as well as anxietyd levels, from pre- to post-COVID, compared to caregivers of children with disability (likely due to the ceiling effect among caregivers of children with disability)\
   
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-7, echo=FALSE, message = FALSE}
 
 pmh_pre <- pmh %>%
   filter (baseline == 1) %>%
@@ -435,7 +442,7 @@ pmh_cg_smy %>%
   theme(axis.text.x = element_blank())
 ```
 
-```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+```{r children-with-disability-8, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
 pairwise.t.test(x = pmh_cg$depress_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
 pairwise.t.test(x = pmh_cg$anxiety_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
 pairwise.t.test(x = pmh_cg$stress_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
@@ -452,7 +459,7 @@ pairwise.t.test(x = pmh_cg$total_cg, g = pmh_cg$disability_cat, p.adjust.method 
   * Internalizing Problems (ranged 0-2):\
     + Too fearful or anxious\
     
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-9, echo=FALSE, message = FALSE}
 #Score children's behavioral outcomes
 master <- master %>%
   mutate (fussy_pre = CBCL.001.a,
@@ -461,7 +468,9 @@ master <- master %>%
           fear_crt = CBCL.002.b)
 
 cp <- master %>%
-  select(CaregiverID,month,Week,  BaselineWeek, baseline, disability_cat, contains ("fussy"),contains ("fear"))
+  select(CaregiverID,month,Week,  BaselineWeek, baseline, disability_cat, 
+         contains ("fussy"),
+         contains ("fear"))
 
 ```
 
@@ -474,7 +483,7 @@ cp <- master %>%
   * Pre-COVID vs. Current comparison:\
     + For families of children with or without disability, caregivers reported significant increases in children's mean levels of internalizing and externalizing problems from pre-COVID to currently. 
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-10, echo=FALSE, message = FALSE}
 cp_pre_m <- cp %>%
   filter (baseline == 1)%>%
   group_by (disability_cat)%>%
@@ -546,7 +555,7 @@ cp_merge %>%
 
 ### Mean Level Changes Over Time
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-11, echo=FALSE, message = FALSE}
 cp_trend <- cp %>%
   group_by (Week, disability_cat) %>%
   summarise (n = n(),
@@ -597,7 +606,7 @@ cp_trend %>%
   * Both caregivers of children with/without disability showed significant increases in mental health problems\
   * Reported increases in children's internalizing and externalizing problems did not differ significantly by children's disability status\
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-12, echo=FALSE, message = FALSE}
 
 cp_pre <- cp %>%
   filter (baseline == 1) %>%
@@ -645,7 +654,7 @@ cp_cg_smy %>%
   theme(axis.text.x = element_blank())
 ```
 
-```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+```{r children-with-disability-13, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
 pairwise.t.test(x = cp_cg$fussy_cg, g = cp_cg$disability_cat, p.adjust.method = "holm")
 pairwise.t.test(x = cp_cg$fear_cg, g = cp_cg$disability_cat, p.adjust.method = "holm")
 ```
@@ -668,7 +677,7 @@ pairwise.t.test(x = cp_cg$fear_cg, g = cp_cg$disability_cat, p.adjust.method = "
   - In the last 30 days, the gas or electric company turned off service, or the oil company would not deliver oil\
 
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-14, echo=FALSE, message = FALSE}
 
 mh <- master %>%
   select(CaregiverID, month, Week,  BaselineWeek, baseline, disability_cat, contains ("MH."))%>%
@@ -715,7 +724,7 @@ mh_rct <- mh %>%
 
   * Caregiver of children with disability reported higher levels of worry about material hardship compared to caregivers of children without disability. This difference was marginally significant. \
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-15, echo=FALSE, message = FALSE}
 mh_wry <- mh_rct%>%
   group_by (disability_cat)%>%
   summarise (n = n(),
@@ -735,7 +744,7 @@ mh_wry %>%
 
 ``` 
 
-```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+```{r children-with-disability-16, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
 pairwise.t.test(x = mh_rct$mh_worry, g = mh_rct$disability_cat, p.adjust.method = "holm")
 ```
 
@@ -746,7 +755,7 @@ pairwise.t.test(x = mh_rct$mh_worry, g = mh_rct$disability_cat, p.adjust.method 
 
   * The mean levels of experienced material hardship were relatively low. Caregiver of children with disability reported experiencing more material hardship in the past 30 days compared to caregivers of children without disability. This difference was marginally significant. \
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-17, echo=FALSE, message = FALSE}
 mh_exp <- mh_rct%>%
   group_by (disability_cat)%>%
   summarise (n = n(),
@@ -766,7 +775,7 @@ mh_exp %>%
 
 ```
 
-```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+```{r children-with-disability-18, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
 pairwise.t.test(x = mh_rct$mh_hardship, g = mh_rct$disability_cat, p.adjust.method = "holm")
 ```
 
@@ -774,7 +783,7 @@ pairwise.t.test(x = mh_rct$mh_hardship, g = mh_rct$disability_cat, p.adjust.meth
 
   * Higher percentage of caregivers of children with disabilities reported experiencing material hardship in paying for utility bills, housing expenses, and food in the past 30 days, compared to caregivers of children without disabilities. But these differences were not statistically significant. \
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-19, echo=FALSE, message = FALSE}
 mh_housepay <- mh_rct %>%
   filter (is.na(mh_housepay) == FALSE)%>%
   group_by (disability_cat)%>%
@@ -834,7 +843,8 @@ mh_exp_pct %>%
                     position = position_dodge(1)) +
   geom_text(aes(label = round(prop*100,2)),vjust= 0, hjust = -1, size = 3, color = "black",  position = position_dodge(1))
 ```
-```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+
+```{r children-with-disability-20, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
 mh_exp_pct <- mh_exp_pct %>%
   mutate (count = round ( n * prop, 0))
 
@@ -843,7 +853,7 @@ pairwise.prop.test(x = mh_exp_pct$count, n = mh_exp_pct$n, p.adjust.method = "ho
 
 # Health Interrupted{.tabset}
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-21, echo=FALSE, message = FALSE}
 
 master$num_delay_healthcare = rowSums(master[,find_items("HEALTH.003.[a-f]$", master)],na.rm=T)
 master <- master %>%
@@ -904,7 +914,7 @@ health_rct <- health %>%
   * Significantly higher percentage of caregivers of children with disability reported delaying heaLthcare visits (65.38%) compared to caregivers of children without disabilities (51.27%)\
   * Caregivers of children with disability reported significantly more number of delayed healthcare visits (M = 8.46) compared to caregivers of children without disabilites (M = 3.99)\
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-22, echo=FALSE, message = FALSE}
 health_pct <- health_rct %>%
   filter (delay_healthcare != "NA") %>%
   group_by (disability_cat)%>%
@@ -944,7 +954,7 @@ health_m %>%
 
   * Among caregivers who reported delayed healthcare, those of children with or without disabilities both reported one major barrier as concerns of exposure to COVID-19 (>80%). However, caregivers of children with disabilites reported significantly more other barriers, such as cost, unable to get time away from work, inability to find childcare, and caring for family members.\
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-23, echo=FALSE, message = FALSE}
 health_pct <- health_rct %>%
   filter (delay_healthcare == 1) %>%
   group_by (disability_cat)%>%
@@ -974,7 +984,7 @@ health_pct %>%
 
   * Significantly higher percentage of caregivers of children with disability reported missing well-baby visits (41.67%) compared to caregivers of children without disabilities (28.07%)
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-24, echo=FALSE, message = FALSE}
 health_pct <- health_rct %>%
   filter (miss_wellbaby != "NA") %>%
   group_by (disability_cat)%>%
@@ -996,7 +1006,7 @@ health_pct %>%
 
 ### Which visits were missed
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-25, echo=FALSE, message = FALSE}
 health_wb <- health %>%
   mutate (missed_wb_1 = sum((which_wellbaby_missed.1 == 1) , (which_wellbaby_missed.2 == 1), (which_wellbaby_missed.3 == 1) , (which_wellbaby_missed.4 == 1) , (which_wellbaby_missed.5 == 1), na.rm = T), 
           missed_wb_2 = sum((which_wellbaby_missed.1 == 2) , (which_wellbaby_missed.2 == 2), (which_wellbaby_missed.3 == 2) , (which_wellbaby_missed.4 == 2) , (which_wellbaby_missed.5 == 2), na.rm = T),
@@ -1126,7 +1136,7 @@ health_wb_count %>%
   * Among caregivers who reported missing well-baby visits, caregivers of children with disabilities reported significantly more barriers in cost, unable to get time away from work, inability to find childcare, and caring for family members. \
   * Although majority caregivers in both groups reported concerns of COVID being one major reason for missing well-baby visits (>65%), smaller percentage of caregivers of children with disabilities reported this concern being the major reason (67%) compared to caregivers of children without disability (79%)\
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-26, echo=FALSE, message = FALSE}
 health_pct <- health_rct %>%
   filter (miss_wellbaby == 1) %>%
   group_by (disability_cat)%>%
@@ -1156,7 +1166,7 @@ health_pct %>%
 
   * Significantly higher percentage of caregivers of children with disability reported missing vaccines (15.61%) compared to caregivers of children without disabilities (10.88%)\
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-27, echo=FALSE, message = FALSE}
 health_pct <- health_rct %>%
   filter (miss_vaccine_any != "NA") %>%
   group_by (disability_cat)%>%
@@ -1178,7 +1188,7 @@ health_pct %>%
 
 # Childcare{.tabset}
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-28, echo=FALSE, message = FALSE}
 
 master <- master %>%
   mutate (c_nonparental_pre.1 = POLICY.009.a, 
@@ -1240,7 +1250,7 @@ cc <- master %>%
   * At most time-points, the percentage of using non-parental childcare did not differ significantly by children's disability status.\
   * At Week 5 (early May), families of children with disabilities reported significantly higher percentage of using non-parental childcare compared to families of children without disabilities. \
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-29, echo=FALSE, message = FALSE}
 cc_pre <- cc %>%
   filter (c_nonparental_pre != "NA")%>%
   group_by (disability_cat) %>%
@@ -1274,7 +1284,7 @@ cc_np %>%
   * For caregivers of children without disabilities, the percentage of using center-based and other types of non-parental childcare decreased from pre-COVID to right after COVID, and then gradually and slowly increased over time.\
   * At Week 5 (early May), families of children with disabilities reported significantly higher percentage of using center-based and other types of non-parental childcare compared to families of children without disabilities. \
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-30, echo=FALSE, message = FALSE}
 cc <- cc %>%
   mutate (c_other_pre = case_when (c_home_pre==1 | c_paid_pre==1 | c_unpaid_pre==1 ~ 1),
           c_other_crt = case_when (c_home_crt==1 | c_paid_crt==1 | c_unpaid_crt==1 ~ 1))
@@ -1332,7 +1342,7 @@ cc_np %>%
   
   * A higher percentage of caregivers of children with disabilities reported that they were concerned not able to return to work because of lacking appropriate childcare. But the difference was not statistically significant. \
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-31, echo=FALSE, message = FALSE}
 cc_lack <- cc %>%
   filter (is.na (c_lackcc) == FALSE) %>%
   mutate (c_lackcc_rc = case_when (c_lackcc == 0 ~ "0.No",
@@ -1354,7 +1364,7 @@ cc_lack %>%
   geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))
 ```
 
-```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+```{r children-with-disability-32, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
 pairwise.prop.test(x = cc_lack$n, n = cc_lack$n_total, p.adjust.method = "holm")
 ```
 
@@ -1362,7 +1372,7 @@ pairwise.prop.test(x = cc_lack$n, n = cc_lack$n_total, p.adjust.method = "holm")
   
   * Data based on special topics asked in weeks 15, 19, 21, 23\
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-33, echo=FALSE, message = FALSE}
 ss <- master %>%
   filter (Week %in% c (15, 19, 21, 23)) %>%
   rowwise %>%
@@ -1405,7 +1415,7 @@ ss <- master %>%
   * Questions only asked at week 15\
   * Families of children with disabilities reported significantly lower levels of social support compared to families of children without disabilities\
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-34, echo=FALSE, message = FALSE}
 ss_pre = ss %>%
   filter (Week == 15) %>%
   group_by (disability_cat) %>%
@@ -1441,7 +1451,7 @@ ss_total %>%
 
   * Families of children with and without disabilities both reported significantly decreased social support levels from pre- to post-COVID. The degrees of decreases across the two groups were comparable. Other categories of social support were comparable between two groups\
 
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-35, echo=FALSE, message = FALSE}
 ss <- ss %>%
   mutate (ss_cg = ss_total_crt - ss_total_pre)
 
@@ -1468,7 +1478,7 @@ ss_cg %>%
 
   * Compared to caregivers of children without disabilities, caregivers of children of disabilities reported significantly higher percentage of seeking social support from physical/mental health professionals, babysitter/nanny, and childcare providers\
   
-```{r, echo=FALSE, message = FALSE}
+```{r children-with-disability-36, echo=FALSE, message = FALSE}
 ss_pre <- ss %>%
   mutate (disability = case_when (disability_cat == "with disability" ~ 1, 
                                   disability_cat == "without disability" ~ 0)) %>%
