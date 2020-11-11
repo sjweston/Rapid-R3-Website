@@ -11,6 +11,8 @@ library(plotly)
 source(here("Scripts/score data.R"))
 ```
 
+# Subgroups
+
 ```{r 00-weekly-reports-2}
 groups.df = tribble(
   ~group, ~variable, ~title, ~grp.name,
@@ -33,5 +35,34 @@ for (subgroup in 1:nrow(groups.df)) {
                                   grp.name = groups.df$grp.name[subgroup]),
                     output_file=paste0("group_",groups.df$group[subgroup], 
                                        "_report.html"))
+}
+```
+
+# Open ended questions
+
+```{r 00-weekly-reports-2}
+questions.df = tribble(
+  ~num, ~question, ~title, 
+  "1", "What are the biggest challenges and concerns for you and your family right now?", "Open ended Challenges",
+  "2", "What is helping you and your family the most right now?", "Open ended Supporting families",
+  "3", "What is on your mind the most when you think about your community re-opening?", "Open ended: Reopening",
+  "4", "What concerns do you have about your place of employment and/or your child’s child care setting re-opening?", "Open ended Reopening 2",
+  "5", "Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?", "Open ended Additional information",
+  "7", "Now that the school year has started, we would like you to think about what resources would make things easier for you to support them. This could be technology, better internet access, more time, support etc. If you have older children who are of school age, what are the resources that you wish you had (or need) in order to support your child’s education?", "Open ended School support",
+  "8", "Many parents are also primarily responsible for their younger children’s early learning. If this is true of you, what additional resources would be helpful to make your child’s educational experience successful?  (This could be toys, books, adult attention etc.)", "Open ended Early learning",
+  "9", "What would you like your elected officials or other policymakers (for example, U.S. Congress, state and local leaders) to know about how your family is doing or what you need during this time?", "Open ended Policy makers"
+)
+
+```
+
+
+```{r 00-weekly-reports-4}
+for (subgroup in 1:2) {
+  rmarkdown::render("_open_q.Rmd", 
+                    params = list(num = questions.df$num[subgroup],
+                                  question = questions.df$question[subgroup],
+                                  title = questions.df$grp.name[title]),
+                    output_file=paste0("open_q",questions.df$num[subgroup], 
+                                       ".html"))
 }
 ```

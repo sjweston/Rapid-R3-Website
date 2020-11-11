@@ -1,0 +1,110 @@
+---
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+params: 
+  num: "1"
+  title: "Open ended Challenges"
+  question: "What are the biggest challenges and concerns for you and your family right now?"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r open-1-1}
+library(here)
+library(haven)
+library(tidyverse)
+library(zoo)
+library(DT)
+library(zipcode)
+library(tidytext)
+library(igraph)
+library(ggraph)
+```
+
+```{r open-1-2}
+identify_state = function(ZC, zipcode.dataset = zipcode){
+  if(!is.na(ZC)) {
+    loc = which(zipcode.dataset$zip == ZC)
+    state = zipcode.dataset$state[loc]
+    if(length(loc) == 0) state = NA
+  }
+  if(is.na(ZC)) state = NA
+  return(state)
+}
+```
+
+
+```{r open-1-3}
+master = read_sav(
+  here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+```
+
+```{r open-1-4}
+data(zipcode)
+
+response_table = master %>%
+  mutate(State = map(DEMO.001, identify_state)) %>%
+  select(CaregiverID, Week, starts_with("OPEN"), State, FPL.150, RaceGroup, CaregiverAge) %>%
+  arrange(Week) %>%
+  group_by(CaregiverID) %>%
+  mutate_if(is.labelled, as_factor, levels = "labels") %>%
+  mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge), na.locf0) %>%
+  ungroup() %>%
+  select(-CaregiverID) %>%
+  rename(canuse = OPEN.006,
+         `Below 1.5xFPL` = FPL.150) %>%
+  gather("Question", "Response", starts_with("OPEN")) %>%
+  filter(Response != "")
+
+```
+
+**Question:** `r params$question`
+
+# Responses
+
+```{r open-1-5, results = 'asis'}
+response_table %>%
+  filter(grepl(params$num, Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Bi-gram network
+
+```{r open-1-6}
+bigrams <- master %>%
+  filter(UserLanguage == "EN") %>%
+  select(CaregiverID, starts_with("OPEN")) %>%
+  gather("Question", "Response", starts_with("OPEN")) %>%
+  filter(Response != "")%>%
+  filter(grepl(params$num, Question)) %>%
+  unnest_tokens(bigram, Response, token = "ngrams", n = 2)
+  
+  bigrams <- bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+  
+  bigrams <- bigrams %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+    filter(!is.na(word1)) %>%
+    filter(!is.na(word2))
+  
+  bigram_counts <- bigrams %>% 
+  count(word1, word2, sort = TRUE)
+
+  bigram_graph <- bigram_counts %>%
+  filter(n > 20) %>%
+  graph_from_data_frame()
+  
+  ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link(alpha = .3) +
+  geom_node_point(alpha = .3) +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1, size = 2)
+```
+
