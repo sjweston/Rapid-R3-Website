@@ -63,8 +63,7 @@ for (subgroup in 1:nrow(questions.df)) {
                                   question = questions.df$question[subgroup]),
                     output_file=paste0("open_q",questions.df$num[subgroup], 
                                        ".html"),
-                     output_options = list(pandoc_args = c(paste0("--metadata=title:\"", 
-                                                                  questions.df$title[subgroup],
-                                                                  "\""))))
+                     output_options = list(pandoc_args = c(paste0("--metadata=title:", 
+                                                                  questions.df$title[subgroup]))))
 }
 ```
