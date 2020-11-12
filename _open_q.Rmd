@@ -97,9 +97,11 @@ bigrams <- master %>%
   
   bigram_counts <- bigrams %>% 
   count(word1, word2, sort = TRUE)
+  
+  filter_num = ifelse(params$num %in% c("1", "2"), 20, 5)
 
   bigram_graph <- bigram_counts %>%
-  filter(n > 20) %>%
+  filter(n >= filter_num) %>%
   graph_from_data_frame()
   
   ggraph(bigram_graph, layout = "fr") +
