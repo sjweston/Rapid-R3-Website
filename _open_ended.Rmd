@@ -26,7 +26,8 @@ library(conflicted)
 ```{r}
 conflict_prefer("filter", "dplyr")
 conflict_prefer("lag", "dplyr")
-source(here("Scripts/score data.R")) 
+#source(here("Scripts/score data.R")) 
+load(here("data/scored.Rdata"))
 source(here("Functions/pomp.R"))
 conflict_prefer("map", "purrr")
 
@@ -990,1246 +991,1246 @@ findThoughts(topics_rapid2, texts = out2$meta$response,
              topics = c(24, 7, 66, 30, 14, 11, 67, 48, 17, 52, 68, 28, 21, 12), n = 5)
 ```
 
-# Question 3{.tabset}
-
-*What is on your mind the most when you think about your community re-opening?*
-
-## How many topics
-
-```{r prep q3, results='hide'}
-processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]])
-out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta)
-docs3 <- out3$documents
-vocab3 <- out3$vocab
-meta3 <- out3$meta
-
-heldout3 = make.heldout(docs3, vocab3)
-```
-```{r models q3, eval = F}
-set.seed(07332020)
-plan(multiprocess)
-
-many_models3 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>%
-  mutate(topic_model = future_map(K, ~stm(heldout3$documents, heldout3$vocab, K = .,
-                                          verbose = FALSE)))
-
-k_result3 <- many_models3 %>%
-  mutate(exclusivity = map(topic_model, exclusivity),
-         semantic_coherence = map(topic_model, semanticCoherence, heldout3$documents),
-         eval_heldout = map(topic_model, eval.heldout, heldout3$missing),
-         residual = map(topic_model, checkResiduals, heldout3$documents),
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-         lbound = bound + lfact,
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-
-save(many_models3, k_result3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata"))
-```
-
-```{r}
-load(here("../../Data Management R3/R Data/open3_many_models.Rdata"))
-```
-
-
-
-```{r}
-k_result3 %>%
-  transmute(K,
-            `Lower bound` = lbound,
-            Residuals = map_dbl(residual, "dispersion"),
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
-  gather(Metric, Value, -K) %>%
-  ggplot(aes(K, Value, color = Metric)) +
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
-  facet_wrap(~Metric, scales = "free_y") +
-  scale_x_continuous(breaks = seq(0,90,10))+
-  labs(x = "K (number of topics)",
-       y = NULL,
-       title = "Model diagnostics by number of topics",
-       subtitle = "These diagnostics indicate that a good number of topics would around 25, 40, or 60") 
-```
-
-```{r}
-k_result3 %>%
-  select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(25, 40, 60)) %>%
-  unnest(cols = c(exclusivity, semantic_coherence)) %>%
-  mutate(K = as.factor(K)) %>%
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
-  stat_ellipse()+
-  geom_point(size = 2, alpha = 0.7) +
-  labs(x = "Semantic coherence",
-       y = "Exclusivity",
-       title = "Comparing exclusivity and semantic coherence",
-       subtitle = "Decide to model 40 topics")+
-  theme_pubr()
-```
-
-```{r, eval = F}
-topics_rapid3 <- stm(documents = docs3, 
-                    vocab = vocab3,
-                    K = 40, 
-                    prevalence =~ black + s(Week),
-                    data = meta3, 
-                    init.type = "Spectral")
-
-prep3 = estimateEffect(1:40 ~ black + s(Week), 
-                       topics_rapid3, 
-                       meta = meta3)
-save(topics_rapid3, prep3, file = here("../../Data Management R3/R Data/open3_fit.Rdata"))
-```
-
-```{r}
-load(file = here("../../Data Management R3/R Data/open3_fit.Rdata"))
-```
-
-## Most common topics
-
-```{r}
-td_beta3 <- tidy(topics_rapid3)
-td_gamma3 <- tidy(topics_rapid3, matrix = "gamma")
-
-meta3 = meta3 %>%
-  mutate(document = row_number())
-
+<!-- # Question 3{.tabset} -->
+
+<!-- *What is on your mind the most when you think about your community re-opening?* -->
+
+<!-- ## How many topics -->
+
+<!-- ```{r prep q3, results='hide'} -->
+<!-- processed3 <- textProcessor(open_ended$data[[3]]$response, metadata = open_ended$data[[3]]) -->
+<!-- out3 <- prepDocuments(processed3$documents, processed3$vocab, processed3$meta) -->
+<!-- docs3 <- out3$documents -->
+<!-- vocab3 <- out3$vocab -->
+<!-- meta3 <- out3$meta -->
+
+<!-- heldout3 = make.heldout(docs3, vocab3) -->
+<!-- ``` -->
+<!-- ```{r models q3, eval = F} -->
+<!-- set.seed(07332020) -->
+<!-- plan(multiprocess) -->
+
+<!-- many_models3 <- tibble(K = c(2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 , 80, 90)) %>% -->
+<!--   mutate(topic_model = future_map(K, ~stm(heldout3$documents, heldout3$vocab, K = ., -->
+<!--                                           verbose = FALSE))) -->
+
+<!-- k_result3 <- many_models3 %>% -->
+<!--   mutate(exclusivity = map(topic_model, exclusivity), -->
+<!--          semantic_coherence = map(topic_model, semanticCoherence, heldout3$documents), -->
+<!--          eval_heldout = map(topic_model, eval.heldout, heldout3$missing), -->
+<!--          residual = map(topic_model, checkResiduals, heldout3$documents), -->
+<!--          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)), -->
+<!--          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)), -->
+<!--          lbound = bound + lfact, -->
+<!--          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound))) -->
+
+<!-- save(many_models3, k_result3, file = here("../../Data Management R3/R Data/open3_many_models.Rdata")) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- load(here("../../Data Management R3/R Data/open3_many_models.Rdata")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- k_result3 %>% -->
+<!--   transmute(K, -->
+<!--             `Lower bound` = lbound, -->
+<!--             Residuals = map_dbl(residual, "dispersion"), -->
+<!--             `Semantic coherence` = map_dbl(semantic_coherence, mean), -->
+<!--             `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>% -->
+<!--   gather(Metric, Value, -K) %>% -->
+<!--   ggplot(aes(K, Value, color = Metric)) + -->
+<!--   geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) + -->
+<!--   facet_wrap(~Metric, scales = "free_y") + -->
+<!--   scale_x_continuous(breaks = seq(0,90,10))+ -->
+<!--   labs(x = "K (number of topics)", -->
+<!--        y = NULL, -->
+<!--        title = "Model diagnostics by number of topics", -->
+<!--        subtitle = "These diagnostics indicate that a good number of topics would around 25, 40, or 60")  -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- k_result3 %>% -->
+<!--   select(K, exclusivity, semantic_coherence) %>% -->
+<!--   filter(K %in% c(25, 40, 60)) %>% -->
+<!--   unnest(cols = c(exclusivity, semantic_coherence)) %>% -->
+<!--   mutate(K = as.factor(K)) %>% -->
+<!--   ggplot(aes(semantic_coherence, exclusivity, color = K)) + -->
+<!--   stat_ellipse()+ -->
+<!--   geom_point(size = 2, alpha = 0.7) + -->
+<!--   labs(x = "Semantic coherence", -->
+<!--        y = "Exclusivity", -->
+<!--        title = "Comparing exclusivity and semantic coherence", -->
+<!--        subtitle = "Decide to model 40 topics")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ```{r, eval = F} -->
+<!-- topics_rapid3 <- stm(documents = docs3,  -->
+<!--                     vocab = vocab3, -->
+<!--                     K = 40,  -->
+<!--                     prevalence =~ black + s(Week), -->
+<!--                     data = meta3,  -->
+<!--                     init.type = "Spectral") -->
+
+<!-- prep3 = estimateEffect(1:40 ~ black + s(Week),  -->
+<!--                        topics_rapid3,  -->
+<!--                        meta = meta3) -->
+<!-- save(topics_rapid3, prep3, file = here("../../Data Management R3/R Data/open3_fit.Rdata")) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- load(file = here("../../Data Management R3/R Data/open3_fit.Rdata")) -->
+<!-- ``` -->
+
+<!-- ## Most common topics -->
+
+<!-- ```{r} -->
+<!-- td_beta3 <- tidy(topics_rapid3) -->
+<!-- td_gamma3 <- tidy(topics_rapid3, matrix = "gamma") -->
+
+<!-- meta3 = meta3 %>% -->
+<!--   mutate(document = row_number()) -->
+
 
-top_terms <- td_beta3 %>%
-  arrange(beta) %>%
-  group_by(topic) %>%
-  top_n(7, beta) %>%
-  arrange(-beta) %>%
-  select(topic, term) %>%
-  summarise(terms = list(term)) %>%
-  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
-  unnest(cols = c(terms))
-
-gamma_terms <- td_gamma3 %>%
-  group_by(topic) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  top_n(20, gamma) %>%
-  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .11))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 20 topics by prevalence response to Q3",
-       subtitle = "With the top words that contribute to each topic") +
-  theme_pubr()
-```
-
-## Identify topics{.tabset}
-
-### All topics
-
-```{r}
-labelTopics(topics_rapid3)
-```
-
-### 2 - More infections (Sp)
-
-```{r}
-labelTopics(topics_rapid3, topics = 2)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 2, n = 5)
-```
-
-### 3 - Self or loved ones getting sick
-
-```{r}
-labelTopics(topics_rapid3, topics = 3)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 3, n = 5)
-```
-
-### 10 - Virus spreading
-
-```{r}
-labelTopics(topics_rapid3, topics = 10)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 10, n = 5)
-```
-
-### 20 - Others not wearing masks
-
-```{r}
-labelTopics(topics_rapid3, topics = 20)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 20, n = 5)
-```
-
-### 25 - School safety
-
-```{r}
-labelTopics(topics_rapid3, topics = 25)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 25, n = 5)
-```
-
-### 27 - Other not complying
-
-```{r}
-labelTopics(topics_rapid3, topics = 27)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 27, n = 5)
-```
-
-### 28 - Second wave
-
-```{r}
-labelTopics(topics_rapid3, topics = 28)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 28, n = 5)
-```
-
-### 32 - Is this the new normal (Sp)
-
-```{r}
-labelTopics(topics_rapid3, topics = 32)
-findThoughts(topics_rapid3, texts = out3$meta$response, topics = 32, n = 5)
-```
-
-
-## Topics by demographic{.tabset}
-
-### Black/African American
-
-```{r}
-
-gamma_terms <- td_gamma3 %>%
-  full_join(meta3) %>%
-  group_by(topic, black) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  group_by(black) %>%
-  top_n(15, gamma) %>%
-  mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .2))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 15 topics by prevalence response to Q1",
-       subtitle = "With the top words that contribute to each topic") +
-  facet_wrap(~black, scales = "free")+
-  theme_pubr()
-```
-
-```{r}
-big_diff = gamma_terms %>%
-  filter(!is.na(black)) %>%
-  select(-terms) %>%
-  spread(black, gamma) %>%
-  mutate(diff = `1`-`0`) %>%
-  arrange(desc(abs(diff))) 
-
-gamma_terms %>%
-  filter(topic %in% big_diff$topic[1:5]) %>%
-  filter(!is.na(black)) %>%
-  group_by(black) %>%
-  top_n(20, gamma) %>%
-  mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = black))+
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = expression(gamma), title = "Differences among income groups", fill = NULL)+
-  theme_pubr()
-```
-
-
-### Poverty
-
-```{r}
-
-gamma_terms <- td_gamma3 %>%
-  full_join(meta3) %>%
-  group_by(topic, poverty150) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  filter(!is.na(poverty150)) %>%
-  group_by(poverty150) %>%
-  top_n(15, gamma) %>%
-  mutate(poverty150 = factor(poverty150, levels = c(0,1), labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .2))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 15 topics by prevalence response to Q1",
-       subtitle = "With the top words that contribute to each topic") +
-  facet_wrap(~poverty150, scales = "free")+
-  theme_pubr()
-```
-
-
-```{r}
-big_diff = gamma_terms %>%
-  filter(!is.na(poverty150)) %>%
-  select(-terms) %>%
-  spread(poverty150, gamma) %>%
-  mutate(diff = `1`-`0`) %>%
-  arrange(desc(abs(diff))) 
-
-gamma_terms %>%
-  filter(topic %in% big_diff$topic[1:5]) %>%
-  filter(!is.na(poverty150)) %>%
-  group_by(poverty150) %>%
-  top_n(20, gamma) %>%
-  mutate(poverty150 = factor(poverty150, levels = c(0,1), 
-                             labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = poverty150))+
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = expression(gamma), 
-       title = "Differences among income groups", fill = NULL)+
-  theme_pubr()
-```
-
-## Topics by week
-
-```{r}
-gamma_terms <- td_gamma3 %>%
-  full_join(meta3) %>%
-  group_by(topic, Week) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma)) %>%
-  ungroup()
-
-gamma_terms = as_tsibble(gamma_terms,
-                         index = Week, 
-                         key = topic)
-
-gamma_terms %>%
-  ggplot(aes(x = Week, y = gamma, color = topic)) +
-  geom_line() + 
-  facet_strata(n_strata = 6) +
-  guides(colour = guide_legend(nrow = 3))+
-  #guides(color = F)+
-  theme_pubclean()
-
-gamma_terms %>%
-  #filter(grepl("(2[2-7])", topic)) %>%
-  #filter(grepl(" [1-6]$", topic)) %>%
-  filter(topic  %in% c("Topic 3", "Topic 28", "Topic 20", "Topic 25")) %>%
-  ggplot(aes(x = Week, y = gamma, color = topic)) +
-  geom_line() + 
-  guides(colour = guide_legend(nrow = 1))+
-  theme_pubclean()
-
-```
-
-## Topic clusters{.tabset}
-
-### Topic structure
-
-```{r}
-gamma_terms_wide <- td_gamma3 %>%
-  full_join(meta3) %>%
-  mutate(topic = paste0("Topic", topic)) %>%
-  spread(topic, gamma) 
-
-topics_only_wide = gamma_terms_wide %>%
-  select(starts_with("Topic"))
-
-iclust(topics_only_wide)
-```
-
-### Topic structure (Black respondants only)
-
-```{r}
-gamma_terms_wide <- td_gamma3 %>%
-  full_join(meta3) %>%
-  mutate(topic = paste0("Topic", topic)) %>%
-  spread(topic, gamma) 
-
-topics_only_wide = gamma_terms_wide %>%
-  filter(black == 1) %>%
-  select(starts_with("Topic"))
-
-iclust(topics_only_wide)
-```
-
-# Question 4{.tabset}
-
-**What concerns do you have about your place of employment and/or your child’s child care setting re-opening?**
-
-## How many topics?
-
-```{r prep q4, results = 'hide'}
-processed4 <- textProcessor(open_ended$data[[4]]$response, metadata = open_ended$data[[4]])
-out4 <- prepDocuments(processed4$documents, processed4$vocab, processed4$meta)
-docs4 <- out4$documents
-vocab4 <- out4$vocab
-meta4 <- out4$meta
-
-heldout4 = make.heldout(docs4, vocab4)
-```
-```{r models q4, eval = F}
-set.seed(07342020)
-plan(multiprocess)
-
-many_models4 <- tibble(K = c(2:30)) %>%
-  mutate(topic_model = future_map(K, ~stm(heldout4$documents, heldout4$vocab, K = .,
-                                          verbose = FALSE)))
-
-k_result4 <- many_models4 %>%
-  mutate(exclusivity = map(topic_model, exclusivity),
-         semantic_coherence = map(topic_model, semanticCoherence, heldout4$documents),
-         eval_heldout = map(topic_model, eval.heldout, heldout4$missing),
-         residual = map(topic_model, checkResiduals, heldout4$documents),
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-         lbound = bound + lfact,
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-
-save(many_models4, k_result4, file = here("../../Data Management R3/R Data/open4_many_models.Rdata"))
-```
-
-```{r}
-load(here("../../Data Management R3/R Data/open4_many_models.Rdata"))
-```
-
-
-
-```{r}
-k_result4 %>%
-  transmute(K,
-            `Lower bound` = lbound,
-            Residuals = map_dbl(residual, "dispersion"),
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
-  gather(Metric, Value, -K) %>%
-  ggplot(aes(K, Value, color = Metric)) +
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
-  facet_wrap(~Metric, scales = "free_y") +
-  scale_x_continuous(breaks = seq(0,90,10))+
-  labs(x = "K (number of topics)",
-       y = NULL,
-       title = "Model diagnostics by number of topics",
-       subtitle = "These diagnostics indicate that a good number of topics would around 25, 50, or 90") 
-```
-
-```{r}
-k_result4 %>%
-  select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(25, 50, 90)) %>%
-  unnest(cols = c(exclusivity, semantic_coherence)) %>%
-  mutate(K = as.factor(K)) %>%
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
-  stat_ellipse()+
-  geom_point(size = 2, alpha = 0.7) +
-  labs(x = "Semantic coherence",
-       y = "Exclusivity",
-       title = "Comparing exclusivity and semantic coherence",
-       subtitle = "Decide to model 50 topics")+
-  theme_pubr()
-```
-
-
-```{r, eval = F}
-topics_rapid4 <- stm(documents = docs4, 
-                    vocab = vocab4,
-                    K = 50, 
-                    prevalence =~ black + s(Week),
-                    data = meta4, 
-                    init.type = "Spectral")
-
-prep4 = estimateEffect(1:50 ~ black + s(Week), 
-                       topics_rapid4, 
-                       meta = meta4)
-save(topics_rapid4, prep4, file = here("../../Data Management R3/R Data/open4_fit.Rdata"))
-```
-
-```{r}
-load(here("../../Data Management R3/R Data/open4_fit.Rdata"))
-```
-
-## Most common topics
-
-```{r}
-td_beta4 <- tidy(topics_rapid4)
-td_gamma4 <- tidy(topics_rapid4, matrix = "gamma")
-
-meta4 = meta4 %>%
-  mutate(document = row_number())
-
-
-top_terms <- td_beta4 %>%
-  arrange(beta) %>%
-  group_by(topic) %>%
-  top_n(7, beta) %>%
-  arrange(-beta) %>%
-  select(topic, term) %>%
-  summarise(terms = list(term)) %>%
-  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
-  unnest(cols = c(terms))
-
-gamma_terms <- td_gamma4 %>%
-  group_by(topic) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  top_n(20, gamma) %>%
-  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .11))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 20 topics by prevalence response to Q3",
-       subtitle = "With the top words that contribute to each topic") +
-  theme_pubr()
-```
-
-## Identify topics{.tabset}
-
-### All topics
-
-```{r}
-labelTopics(topics_rapid4)
-```
-
-### 4 - Essential workers worried about daycare
-
-```{r}
-labelTopics(topics_rapid4, topics = 4)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 4, n = 5)
-```
-
-### 7 - Lost job
-
-```{r}
-labelTopics(topics_rapid4, topics = 7)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 7, n = 5)
-```
-
-### 8 - Forced distance at work and childcare (Sp)
-
-```{r}
-labelTopics(topics_rapid4, topics = 8)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 8, n = 5)
-```
-
-### 9 - Will children be safe?
-
-```{r}
-labelTopics(topics_rapid4, topics = 9)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 9, n = 5)
-```
-
-### 10 - Cleaning protocols
-
-```{r}
-labelTopics(topics_rapid4, topics = 10)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 10, n = 5)
-```
-
-### 18 - Getting or giving the virus
-
-```{r}
-labelTopics(topics_rapid4, topics = 18)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 18, n = 5)
-```
-
-### 20 - Forgetting or relaxing stanrdards
-
-```{r}
-labelTopics(topics_rapid4, topics = 20)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 20, n = 5)
-```
-
-### 24 - Health and safety of family
-
-```{r}
-labelTopics(topics_rapid4, topics = 24)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 24, n = 10)
-```
-
-### 28 - Masks at work and by children (Sp)
-
-```{r}
-labelTopics(topics_rapid4, topics = 28)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 28, n = 10)
-```
-
-### 31 - Lack of precautions or adherence
-
-```{r}
-labelTopics(topics_rapid4, topics = 31)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 31, n = 5)
-```
-
-### 32 - Spreading the virus
-
-```{r}
-labelTopics(topics_rapid4, topics = 32)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 32, n = 5)
-```
-
-### 34 - Catching the virus at work
-
-```{r}
-labelTopics(topics_rapid4, topics = 34)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 34, n = 5)
-```
-### 35 - Exposure to covid
-
-```{r}
-labelTopics(topics_rapid4, topics = 35)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 35, n = 5)
-```
-
-### 39 - No worries: Stay at home mom
-
-```{r}
-labelTopics(topics_rapid4, topics = 39)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 39, n = 5)
-```
-
-### 41 - Waiting for child care solutions
-
-```{r}
-labelTopics(topics_rapid4, topics = 41)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 41, n = 5)
-```
-
-### 42 - Compliance (Sp)
-
-```{r}
-labelTopics(topics_rapid4, topics = 42)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 42, n = 5)
-```
-
-### 43 - Social distancing
-
-```{r}
-labelTopics(topics_rapid4, topics = 43)
-findThoughts(topics_rapid4, texts = out4$meta$response, topics = 43, n = 5)
-```
-## Topics by demographic{.tabset}
-
-### Black/African American
-
-```{r}
-
-gamma_terms <- td_gamma4 %>%
-  full_join(meta4) %>%
-  group_by(topic, black) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  group_by(black) %>%
-  top_n(15, gamma) %>%
-  mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .2))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 15 topics by prevalence response to Q1",
-       subtitle = "With the top words that contribute to each topic") +
-  facet_wrap(~black, scales = "free")+
-  theme_pubr()
-```
-
-```{r}
-big_diff = gamma_terms %>%
-  filter(!is.na(black)) %>%
-  select(-terms) %>%
-  spread(black, gamma) %>%
-  mutate(diff = `1`-`0`) %>%
-  arrange(desc(abs(diff))) 
-
-gamma_terms %>%
-  filter(topic %in% big_diff$topic[1:5]) %>%
-  filter(!is.na(black)) %>%
-  group_by(black) %>%
-  top_n(20, gamma) %>%
-  mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = black))+
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = expression(gamma), title = "Differences among income groups", fill = NULL)+
-  theme_pubr()
-```
-
-### Poverty
-
-```{r}
-
-gamma_terms <- td_gamma4 %>%
-  full_join(meta4) %>%
-  group_by(topic, poverty150) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  filter(!is.na(poverty150)) %>%
-  group_by(poverty150) %>%
-  top_n(15, gamma) %>%
-  mutate(poverty150 = factor(poverty150, levels = c(0,1), labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .2))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 15 topics by prevalence response to Q1",
-       subtitle = "With the top words that contribute to each topic") +
-  facet_wrap(~poverty150, scales = "free")+
-  theme_pubr()
-```
-
-
-```{r}
-big_diff = gamma_terms %>%
-  filter(!is.na(poverty150)) %>%
-  select(-terms) %>%
-  spread(poverty150, gamma) %>%
-  mutate(diff = `1`-`0`) %>%
-  arrange(desc(abs(diff))) 
-
-gamma_terms %>%
-  filter(topic %in% big_diff$topic[1:5]) %>%
-  filter(!is.na(poverty150)) %>%
-  group_by(poverty150) %>%
-  top_n(20, gamma) %>%
-  mutate(poverty150 = factor(poverty150, levels = c(0,1), 
-                             labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = poverty150))+
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = expression(gamma), 
-       title = "Differences among income groups", fill = NULL)+
-  theme_pubr()
-```
-
-## Topics by week
-
-```{r}
-gamma_terms <- td_gamma4 %>%
-  full_join(meta4) %>%
-  group_by(topic, Week) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma)) %>%
-  ungroup()
-
-gamma_terms = as_tsibble(gamma_terms,
-                         index = Week, 
-                         key = topic)
-
-gamma_terms %>%
-  ggplot(aes(x = Week, y = gamma, color = topic)) +
-  geom_line() + 
-  facet_strata(n_strata = 6) +
-  guides(colour = guide_legend(nrow = 5))+
-  #guides(color = F)+
-  theme_pubclean()
-
-gamma_terms %>%
-  #filter(grepl("(2[2-7])", topic)) %>%
-  #filter(grepl("4[0-9]$", topic)) %>%
-  filter(topic  %in% c("Topic 43", "Topic 18", "Topic 28", "Topic 42")) %>%
-  ggplot(aes(x = Week, y = gamma, color = topic)) +
-  geom_line() + 
-  guides(colour = guide_legend(nrow = 1))+
-  theme_pubclean()
-
-```
-
-## Topic clusters{.tabset}
-
-### Topic structure
-
-```{r}
-gamma_terms_wide <- td_gamma4 %>%
-  full_join(meta4) %>%
-  mutate(topic = paste0("Topic", topic)) %>%
-  spread(topic, gamma) 
-
-topics_only_wide = gamma_terms_wide %>%
-  select(starts_with("Topic"))
-
-iclust(topics_only_wide)
-```
-
-### Topic structure (Black respondants only)
-
-```{r}
-gamma_terms_wide <- td_gamma4 %>%
-  full_join(meta4) %>%
-  mutate(topic = paste0("Topic", topic)) %>%
-  spread(topic, gamma) 
-
-topics_only_wide = gamma_terms_wide %>%
-  filter(black == 1) %>%
-  select(starts_with("Topic"))
-
-iclust(topics_only_wide)
-```
-
-# Question 5{.tabset}
-
-**Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?**
-
-```{r prep q5}
-processed5 <- textProcessor(open_ended$data[[5]]$response, metadata = open_ended$data[[5]])
-out5 <- prepDocuments(processed5$documents, processed5$vocab, processed5$meta)
-docs5 <- out5$documents
-vocab5 <- out5$vocab
-meta5 <- out5$meta
-
-heldout5 = make.heldout(docs5, vocab5)
-```
-```{r models q5, eval = F}
-set.seed(07352020)
-plan(multiprocess)
-
-many_models5 <- tibble(K = c(2:30)) %>%
-  mutate(topic_model = future_map(K, ~stm(heldout5$documents, heldout5$vocab, K = .,
-                                          verbose = FALSE)))
-k_result5 <- many_models5 %>%
-  mutate(exclusivity = map(topic_model, exclusivity),
-         semantic_coherence = map(topic_model, semanticCoherence, heldout5$documents),
-         eval_heldout = map(topic_model, eval.heldout, heldout5$missing),
-         residual = map(topic_model, checkResiduals, heldout5$documents),
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
-         lbound = bound + lfact,
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-
-save(many_models5, k_result5, file = here("../../Data Management R3/R Data/open5_many_models.Rdata"))
-```
-
-```{r}
-load(here("../../Data Management R3/R Data/open5_many_models.Rdata"))
-```
-
-
-
-```{r}
-k_result5 %>%
-  transmute(K,
-            `Lower bound` = lbound,
-            Residuals = map_dbl(residual, "dispersion"),
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
-  gather(Metric, Value, -K) %>%
-  ggplot(aes(K, Value, color = Metric)) +
-  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
-  facet_wrap(~Metric, scales = "free_y") +
-  scale_x_continuous(breaks = seq(0,90,10))+
-  labs(x = "K (number of topics)",
-       y = NULL,
-       title = "Model diagnostics by number of topics",
-       subtitle = "These diagnostics indicate that a good number of topics would 20 or 40") 
-```
-
-```{r}
-k_result5 %>%
-  select(K, exclusivity, semantic_coherence) %>%
-  filter(K %in% c(20, 40)) %>%
-  unnest(cols = c(exclusivity, semantic_coherence)) %>%
-  mutate(K = as.factor(K)) %>%
-  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
-  stat_ellipse()+
-  geom_point(size = 2, alpha = 0.7) +
-  labs(x = "Semantic coherence",
-       y = "Exclusivity",
-       title = "Comparing exclusivity and semantic coherence",
-       subtitle = "Decide to model 40 topics")+
-  theme_pubr()
-```
-
-
-```{r, eval = F}
-topics_rapid5 <- stm(documents = docs5, 
-                    vocab = vocab5,
-                    K = 40, 
-                    prevalence =~ black + s(Week),
-                    data = meta5, 
-                    init.type = "Spectral")
-
-prep5 = estimateEffect(1:40 ~ black + s(Week), 
-                       topics_rapid5, 
-                       meta = meta5)
-save(topics_rapid5, prep5, file = here("../../Data Management R3/R Data/open5_fit.Rdata"))
-```
-
-```{r}
-load(here("../../Data Management R3/R Data/open5_fit.Rdata"))
-```
-
-## Most common topics
-
-```{r}
-td_beta5 <- tidy(topics_rapid5)
-td_gamma5 <- tidy(topics_rapid5, matrix = "gamma")
-
-meta5 = meta5 %>%
-  mutate(document = row_number())
-
-
-top_terms <- td_beta5 %>%
-  arrange(beta) %>%
-  group_by(topic) %>%
-  top_n(7, beta) %>%
-  arrange(-beta) %>%
-  select(topic, term) %>%
-  summarise(terms = list(term)) %>%
-  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
-  unnest(cols = c(terms))
-
-gamma_terms <- td_gamma5 %>%
-  group_by(topic) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  top_n(20, gamma) %>%
-  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .11))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 20 topics by prevalence response to Q5",
-       subtitle = "With the top words that contribute to each topic") +
-  theme_pubr()
-```
-
-## Identify topics{.tabset}
-
-### All topics
-
-```{r}
-labelTopics(topics_rapid4)
-```
-
-### 2 - Protests
-
-```{r}
-labelTopics(topics_rapid5, topics = 2)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 2, n = 10)
-```
-
-### 5 - Horrible situation
-
-```{r}
-labelTopics(topics_rapid5, topics = 5)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 5, n = 10)
-```
-
-### 6 - This is hard
-
-```{r}
-labelTopics(topics_rapid5, topics = 6)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 6, n = 10)
-```
-
-### 7 - This is stressful
-
-```{r}
-labelTopics(topics_rapid5, topics = 7)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 7, n = 10)
-```
-
-### 9 - Mental health (Sp)
-
-```{r}
-labelTopics(topics_rapid5, topics = 9)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 9, n = 10)
-```
-
-### 11 - Thinking ahead
-
-```{r}
-labelTopics(topics_rapid5, topics = 11)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 11, n = 10)
-```
-
-### 12 - Staying home and safe
-
-```{r}
-labelTopics(topics_rapid5, topics = 12)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 12, n = 10)
-```
-
-
-### 16 - Thinking about familky (Sp)
-
-```{r}
-labelTopics(topics_rapid5, topics = 16)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 16, n = 10)
-```
-
-### 17 - Juggling work and home
-
-```{r}
-labelTopics(topics_rapid5, topics = 17)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 17, n = 10)
-```
-
-### 19 - Brought us together
-
-```{r}
-labelTopics(topics_rapid5, topics = 19)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 19, n = 10)
-```
-
-### 20 - Miss our friends and family
-
-```{r}
-labelTopics(topics_rapid5, topics = 20)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 20, n = 10)
-```
-
-### 29 - Worried about school and second waves
-
-```{r}
-labelTopics(topics_rapid5, topics = 29)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 29, n = 10)
-```
-
-### 34 - People refuse to wear masks
-
-```{r}
-labelTopics(topics_rapid5, topics = 34)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 34, n = 10)
-```
-
-### 36 - Family sick and poorly behaving (Sp)
-
-```{r}
-labelTopics(topics_rapid5, topics = 36)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 36, n = 10)
-```
-
-### 37 - Opened my eyes
-
-```{r}
-labelTopics(topics_rapid5, topics = 37)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 37, n = 10)
-```
-
-### 39 - Fortunate to maintain lifestyle
-
-```{r}
-labelTopics(topics_rapid5, topics = 39)
-findThoughts(topics_rapid5, texts = out5$meta$response, topics = 39, n = 10)
-```
-
-## Topics by demographic{.tabset}
-
-### Black/African American
-
-```{r}
-
-gamma_terms <- td_gamma5 %>%
-  full_join(meta5) %>%
-  group_by(topic, black) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  group_by(black) %>%
-  top_n(15, gamma) %>%
-  mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .2))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 15 topics by prevalence response to Q1",
-       subtitle = "With the top words that contribute to each topic") +
-  facet_wrap(~black, scales = "free")+
-  theme_pubr()
-```
-
-```{r}
-big_diff = gamma_terms %>%
-  filter(!is.na(black)) %>%
-  select(-terms) %>%
-  spread(black, gamma) %>%
-  mutate(diff = `1`-`0`) %>%
-  arrange(desc(abs(diff))) 
-
-gamma_terms %>%
-  filter(topic %in% big_diff$topic[1:5]) %>%
-  filter(!is.na(black)) %>%
-  group_by(black) %>%
-  top_n(20, gamma) %>%
-  mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = black))+
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = expression(gamma), title = "Differences among income groups", fill = NULL)+
-  theme_pubr()
-```
-
-### Poverty
-
-```{r}
-
-gamma_terms <- td_gamma5 %>%
-  full_join(meta5) %>%
-  group_by(topic, poverty150) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma))
-
-gamma_terms %>%
-  filter(!is.na(poverty150)) %>%
-  group_by(poverty150) %>%
-  top_n(15, gamma) %>%
-  mutate(poverty150 = factor(poverty150, levels = c(0,1), labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
-  scale_y_continuous(limits =c(0, .2))+
-  coord_flip() +
-  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
-  labs(x = NULL, y = expression(gamma),
-       title = "Top 15 topics by prevalence response to Q1",
-       subtitle = "With the top words that contribute to each topic") +
-  facet_wrap(~poverty150, scales = "free")+
-  theme_pubr()
-```
-
-
-```{r}
-big_diff = gamma_terms %>%
-  filter(!is.na(poverty150)) %>%
-  select(-terms) %>%
-  spread(poverty150, gamma) %>%
-  mutate(diff = `1`-`0`) %>%
-  arrange(desc(abs(diff))) 
-
-gamma_terms %>%
-  filter(topic %in% big_diff$topic[1:5]) %>%
-  filter(!is.na(poverty150)) %>%
-  group_by(poverty150) %>%
-  top_n(20, gamma) %>%
-  mutate(poverty150 = factor(poverty150, levels = c(0,1), 
-                             labels = c("High Income", "Low Income"))) %>%
-  ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = poverty150))+
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = expression(gamma), 
-       title = "Differences among income groups", fill = NULL)+
-  theme_pubr()
-```
-
-## Topics by week
-
-```{r}
-gamma_terms <- td_gamma5 %>%
-  full_join(meta5) %>%
-  group_by(topic, Week) %>%
-  summarise(gamma = mean(gamma)) %>%
-  arrange(desc(gamma)) %>%
-  left_join(top_terms, by = "topic") %>%
-  mutate(topic = paste0("Topic ", topic),
-         topic = reorder(topic, gamma)) %>%
-  ungroup()
-
-gamma_terms = as_tsibble(gamma_terms,
-                         index = Week, 
-                         key = topic)
-
-gamma_terms %>%
-  ggplot(aes(x = Week, y = gamma, color = topic)) +
-  geom_line() + 
-  facet_strata(n_strata = 6) +
-  guides(colour = guide_legend(nrow = 5))+
-  #guides(color = F)+
-  theme_pubclean()
-
-gamma_terms %>%
-  #filter(grepl("(2[0-9]$)", topic)) %>%
-  #filter(grepl("4[0-9]$", topic)) %>%
-  filter(topic  %in% c("Topic 17", "Topic 34", "Topic 29", "Topic 20")) %>%
-  ggplot(aes(x = Week, y = gamma, color = topic)) +
-  geom_line() + 
-  guides(colour = guide_legend(nrow = 1))+
-  theme_pubclean()
-
-```
-
-## Topic clusters{.tabset}
-
-### Topic structure
-
-```{r}
-gamma_terms_wide <- td_gamma5 %>%
-  full_join(meta5) %>%
-  mutate(topic = paste0("Topic", topic)) %>%
-  spread(topic, gamma) 
-
-topics_only_wide = gamma_terms_wide %>%
-  select(starts_with("Topic"))
-
-iclust(topics_only_wide)
-```
-
-### Topic structure (Black respondants only)
-
-```{r}
-gamma_terms_wide <- td_gamma5 %>%
-  full_join(meta5) %>%
-  mutate(topic = paste0("Topic", topic)) %>%
-  spread(topic, gamma) 
-
-topics_only_wide = gamma_terms_wide %>%
-  filter(black == 1) %>%
-  select(starts_with("Topic"))
-
-iclust(topics_only_wide)
-```
+<!-- top_terms <- td_beta3 %>% -->
+<!--   arrange(beta) %>% -->
+<!--   group_by(topic) %>% -->
+<!--   top_n(7, beta) %>% -->
+<!--   arrange(-beta) %>% -->
+<!--   select(topic, term) %>% -->
+<!--   summarise(terms = list(term)) %>% -->
+<!--   mutate(terms = map(terms, paste, collapse = ", ")) %>%  -->
+<!--   unnest(cols = c(terms)) -->
+
+<!-- gamma_terms <- td_gamma3 %>% -->
+<!--   group_by(topic) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   ggplot(aes(topic, gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .11))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 20 topics by prevalence response to Q3", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ## Identify topics{.tabset} -->
+
+<!-- ### All topics -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3) -->
+<!-- ``` -->
+
+<!-- ### 2 - More infections (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 2) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 2, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 3 - Self or loved ones getting sick -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 3) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 3, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 10 - Virus spreading -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 10) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 10, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 20 - Others not wearing masks -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 20) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 20, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 25 - School safety -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 25) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 25, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 27 - Other not complying -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 27) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 27, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 28 - Second wave -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 28) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 28, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 32 - Is this the new normal (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid3, topics = 32) -->
+<!-- findThoughts(topics_rapid3, texts = out3$meta$response, topics = 32, n = 5) -->
+<!-- ``` -->
+
+
+<!-- ## Topics by demographic{.tabset} -->
+
+<!-- ### Black/African American -->
+
+<!-- ```{r} -->
+
+<!-- gamma_terms <- td_gamma3 %>% -->
+<!--   full_join(meta3) %>% -->
+<!--   group_by(topic, black) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   group_by(black) %>% -->
+<!--   top_n(15, gamma) %>% -->
+<!--   mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .2))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 15 topics by prevalence response to Q1", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   facet_wrap(~black, scales = "free")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- big_diff = gamma_terms %>% -->
+<!--   filter(!is.na(black)) %>% -->
+<!--   select(-terms) %>% -->
+<!--   spread(black, gamma) %>% -->
+<!--   mutate(diff = `1`-`0`) %>% -->
+<!--   arrange(desc(abs(diff)))  -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(topic %in% big_diff$topic[1:5]) %>% -->
+<!--   filter(!is.na(black)) %>% -->
+<!--   group_by(black) %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = black))+ -->
+<!--   geom_col(position = "dodge") + -->
+<!--   coord_flip() + -->
+<!--   labs(x = NULL, y = expression(gamma), title = "Differences among income groups", fill = NULL)+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+
+<!-- ### Poverty -->
+
+<!-- ```{r} -->
+
+<!-- gamma_terms <- td_gamma3 %>% -->
+<!--   full_join(meta3) %>% -->
+<!--   group_by(topic, poverty150) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   group_by(poverty150) %>% -->
+<!--   top_n(15, gamma) %>% -->
+<!--   mutate(poverty150 = factor(poverty150, levels = c(0,1), labels = c("High Income", "Low Income"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .2))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 15 topics by prevalence response to Q1", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   facet_wrap(~poverty150, scales = "free")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- big_diff = gamma_terms %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   select(-terms) %>% -->
+<!--   spread(poverty150, gamma) %>% -->
+<!--   mutate(diff = `1`-`0`) %>% -->
+<!--   arrange(desc(abs(diff)))  -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(topic %in% big_diff$topic[1:5]) %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   group_by(poverty150) %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   mutate(poverty150 = factor(poverty150, levels = c(0,1),  -->
+<!--                              labels = c("High Income", "Low Income"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = poverty150))+ -->
+<!--   geom_col(position = "dodge") + -->
+<!--   coord_flip() + -->
+<!--   labs(x = NULL, y = expression(gamma),  -->
+<!--        title = "Differences among income groups", fill = NULL)+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ## Topics by week -->
+
+<!-- ```{r} -->
+<!-- gamma_terms <- td_gamma3 %>% -->
+<!--   full_join(meta3) %>% -->
+<!--   group_by(topic, Week) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) %>% -->
+<!--   ungroup() -->
+
+<!-- gamma_terms = as_tsibble(gamma_terms, -->
+<!--                          index = Week,  -->
+<!--                          key = topic) -->
+
+<!-- gamma_terms %>% -->
+<!--   ggplot(aes(x = Week, y = gamma, color = topic)) + -->
+<!--   geom_line() +  -->
+<!--   facet_strata(n_strata = 6) + -->
+<!--   guides(colour = guide_legend(nrow = 3))+ -->
+<!--   #guides(color = F)+ -->
+<!--   theme_pubclean() -->
+
+<!-- gamma_terms %>% -->
+<!--   #filter(grepl("(2[2-7])", topic)) %>% -->
+<!--   #filter(grepl(" [1-6]$", topic)) %>% -->
+<!--   filter(topic  %in% c("Topic 3", "Topic 28", "Topic 20", "Topic 25")) %>% -->
+<!--   ggplot(aes(x = Week, y = gamma, color = topic)) + -->
+<!--   geom_line() +  -->
+<!--   guides(colour = guide_legend(nrow = 1))+ -->
+<!--   theme_pubclean() -->
+
+<!-- ``` -->
+
+<!-- ## Topic clusters{.tabset} -->
+
+<!-- ### Topic structure -->
+
+<!-- ```{r} -->
+<!-- gamma_terms_wide <- td_gamma3 %>% -->
+<!--   full_join(meta3) %>% -->
+<!--   mutate(topic = paste0("Topic", topic)) %>% -->
+<!--   spread(topic, gamma)  -->
+
+<!-- topics_only_wide = gamma_terms_wide %>% -->
+<!--   select(starts_with("Topic")) -->
+
+<!-- iclust(topics_only_wide) -->
+<!-- ``` -->
+
+<!-- ### Topic structure (Black respondants only) -->
+
+<!-- ```{r} -->
+<!-- gamma_terms_wide <- td_gamma3 %>% -->
+<!--   full_join(meta3) %>% -->
+<!--   mutate(topic = paste0("Topic", topic)) %>% -->
+<!--   spread(topic, gamma)  -->
+
+<!-- topics_only_wide = gamma_terms_wide %>% -->
+<!--   filter(black == 1) %>% -->
+<!--   select(starts_with("Topic")) -->
+
+<!-- iclust(topics_only_wide) -->
+<!-- ``` -->
+
+<!-- # Question 4{.tabset} -->
+
+<!-- **What concerns do you have about your place of employment and/or your child’s child care setting re-opening?** -->
+
+<!-- ## How many topics? -->
+
+<!-- ```{r prep q4, results = 'hide'} -->
+<!-- processed4 <- textProcessor(open_ended$data[[4]]$response, metadata = open_ended$data[[4]]) -->
+<!-- out4 <- prepDocuments(processed4$documents, processed4$vocab, processed4$meta) -->
+<!-- docs4 <- out4$documents -->
+<!-- vocab4 <- out4$vocab -->
+<!-- meta4 <- out4$meta -->
+
+<!-- heldout4 = make.heldout(docs4, vocab4) -->
+<!-- ``` -->
+<!-- ```{r models q4, eval = F} -->
+<!-- set.seed(07342020) -->
+<!-- plan(multiprocess) -->
+
+<!-- many_models4 <- tibble(K = c(2:30)) %>% -->
+<!--   mutate(topic_model = future_map(K, ~stm(heldout4$documents, heldout4$vocab, K = ., -->
+<!--                                           verbose = FALSE))) -->
+
+<!-- k_result4 <- many_models4 %>% -->
+<!--   mutate(exclusivity = map(topic_model, exclusivity), -->
+<!--          semantic_coherence = map(topic_model, semanticCoherence, heldout4$documents), -->
+<!--          eval_heldout = map(topic_model, eval.heldout, heldout4$missing), -->
+<!--          residual = map(topic_model, checkResiduals, heldout4$documents), -->
+<!--          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)), -->
+<!--          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)), -->
+<!--          lbound = bound + lfact, -->
+<!--          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound))) -->
+
+<!-- save(many_models4, k_result4, file = here("../../Data Management R3/R Data/open4_many_models.Rdata")) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- load(here("../../Data Management R3/R Data/open4_many_models.Rdata")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- k_result4 %>% -->
+<!--   transmute(K, -->
+<!--             `Lower bound` = lbound, -->
+<!--             Residuals = map_dbl(residual, "dispersion"), -->
+<!--             `Semantic coherence` = map_dbl(semantic_coherence, mean), -->
+<!--             `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>% -->
+<!--   gather(Metric, Value, -K) %>% -->
+<!--   ggplot(aes(K, Value, color = Metric)) + -->
+<!--   geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) + -->
+<!--   facet_wrap(~Metric, scales = "free_y") + -->
+<!--   scale_x_continuous(breaks = seq(0,90,10))+ -->
+<!--   labs(x = "K (number of topics)", -->
+<!--        y = NULL, -->
+<!--        title = "Model diagnostics by number of topics", -->
+<!--        subtitle = "These diagnostics indicate that a good number of topics would around 25, 50, or 90")  -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- k_result4 %>% -->
+<!--   select(K, exclusivity, semantic_coherence) %>% -->
+<!--   filter(K %in% c(25, 50, 90)) %>% -->
+<!--   unnest(cols = c(exclusivity, semantic_coherence)) %>% -->
+<!--   mutate(K = as.factor(K)) %>% -->
+<!--   ggplot(aes(semantic_coherence, exclusivity, color = K)) + -->
+<!--   stat_ellipse()+ -->
+<!--   geom_point(size = 2, alpha = 0.7) + -->
+<!--   labs(x = "Semantic coherence", -->
+<!--        y = "Exclusivity", -->
+<!--        title = "Comparing exclusivity and semantic coherence", -->
+<!--        subtitle = "Decide to model 50 topics")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+
+<!-- ```{r, eval = F} -->
+<!-- topics_rapid4 <- stm(documents = docs4,  -->
+<!--                     vocab = vocab4, -->
+<!--                     K = 50,  -->
+<!--                     prevalence =~ black + s(Week), -->
+<!--                     data = meta4,  -->
+<!--                     init.type = "Spectral") -->
+
+<!-- prep4 = estimateEffect(1:50 ~ black + s(Week),  -->
+<!--                        topics_rapid4,  -->
+<!--                        meta = meta4) -->
+<!-- save(topics_rapid4, prep4, file = here("../../Data Management R3/R Data/open4_fit.Rdata")) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- load(here("../../Data Management R3/R Data/open4_fit.Rdata")) -->
+<!-- ``` -->
+
+<!-- ## Most common topics -->
+
+<!-- ```{r} -->
+<!-- td_beta4 <- tidy(topics_rapid4) -->
+<!-- td_gamma4 <- tidy(topics_rapid4, matrix = "gamma") -->
+
+<!-- meta4 = meta4 %>% -->
+<!--   mutate(document = row_number()) -->
+
+
+<!-- top_terms <- td_beta4 %>% -->
+<!--   arrange(beta) %>% -->
+<!--   group_by(topic) %>% -->
+<!--   top_n(7, beta) %>% -->
+<!--   arrange(-beta) %>% -->
+<!--   select(topic, term) %>% -->
+<!--   summarise(terms = list(term)) %>% -->
+<!--   mutate(terms = map(terms, paste, collapse = ", ")) %>%  -->
+<!--   unnest(cols = c(terms)) -->
+
+<!-- gamma_terms <- td_gamma4 %>% -->
+<!--   group_by(topic) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   ggplot(aes(topic, gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .11))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 20 topics by prevalence response to Q3", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ## Identify topics{.tabset} -->
+
+<!-- ### All topics -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4) -->
+<!-- ``` -->
+
+<!-- ### 4 - Essential workers worried about daycare -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 4) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 4, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 7 - Lost job -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 7) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 7, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 8 - Forced distance at work and childcare (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 8) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 8, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 9 - Will children be safe? -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 9) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 9, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 10 - Cleaning protocols -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 10) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 10, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 18 - Getting or giving the virus -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 18) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 18, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 20 - Forgetting or relaxing stanrdards -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 20) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 20, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 24 - Health and safety of family -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 24) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 24, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 28 - Masks at work and by children (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 28) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 28, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 31 - Lack of precautions or adherence -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 31) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 31, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 32 - Spreading the virus -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 32) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 32, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 34 - Catching the virus at work -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 34) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 34, n = 5) -->
+<!-- ``` -->
+<!-- ### 35 - Exposure to covid -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 35) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 35, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 39 - No worries: Stay at home mom -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 39) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 39, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 41 - Waiting for child care solutions -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 41) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 41, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 42 - Compliance (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 42) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 42, n = 5) -->
+<!-- ``` -->
+
+<!-- ### 43 - Social distancing -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4, topics = 43) -->
+<!-- findThoughts(topics_rapid4, texts = out4$meta$response, topics = 43, n = 5) -->
+<!-- ``` -->
+<!-- ## Topics by demographic{.tabset} -->
+
+<!-- ### Black/African American -->
+
+<!-- ```{r} -->
+
+<!-- gamma_terms <- td_gamma4 %>% -->
+<!--   full_join(meta4) %>% -->
+<!--   group_by(topic, black) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   group_by(black) %>% -->
+<!--   top_n(15, gamma) %>% -->
+<!--   mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .2))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 15 topics by prevalence response to Q1", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   facet_wrap(~black, scales = "free")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- big_diff = gamma_terms %>% -->
+<!--   filter(!is.na(black)) %>% -->
+<!--   select(-terms) %>% -->
+<!--   spread(black, gamma) %>% -->
+<!--   mutate(diff = `1`-`0`) %>% -->
+<!--   arrange(desc(abs(diff)))  -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(topic %in% big_diff$topic[1:5]) %>% -->
+<!--   filter(!is.na(black)) %>% -->
+<!--   group_by(black) %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = black))+ -->
+<!--   geom_col(position = "dodge") + -->
+<!--   coord_flip() + -->
+<!--   labs(x = NULL, y = expression(gamma), title = "Differences among income groups", fill = NULL)+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ### Poverty -->
+
+<!-- ```{r} -->
+
+<!-- gamma_terms <- td_gamma4 %>% -->
+<!--   full_join(meta4) %>% -->
+<!--   group_by(topic, poverty150) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   group_by(poverty150) %>% -->
+<!--   top_n(15, gamma) %>% -->
+<!--   mutate(poverty150 = factor(poverty150, levels = c(0,1), labels = c("High Income", "Low Income"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .2))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 15 topics by prevalence response to Q1", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   facet_wrap(~poverty150, scales = "free")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- big_diff = gamma_terms %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   select(-terms) %>% -->
+<!--   spread(poverty150, gamma) %>% -->
+<!--   mutate(diff = `1`-`0`) %>% -->
+<!--   arrange(desc(abs(diff)))  -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(topic %in% big_diff$topic[1:5]) %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   group_by(poverty150) %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   mutate(poverty150 = factor(poverty150, levels = c(0,1),  -->
+<!--                              labels = c("High Income", "Low Income"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = poverty150))+ -->
+<!--   geom_col(position = "dodge") + -->
+<!--   coord_flip() + -->
+<!--   labs(x = NULL, y = expression(gamma),  -->
+<!--        title = "Differences among income groups", fill = NULL)+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ## Topics by week -->
+
+<!-- ```{r} -->
+<!-- gamma_terms <- td_gamma4 %>% -->
+<!--   full_join(meta4) %>% -->
+<!--   group_by(topic, Week) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) %>% -->
+<!--   ungroup() -->
+
+<!-- gamma_terms = as_tsibble(gamma_terms, -->
+<!--                          index = Week,  -->
+<!--                          key = topic) -->
+
+<!-- gamma_terms %>% -->
+<!--   ggplot(aes(x = Week, y = gamma, color = topic)) + -->
+<!--   geom_line() +  -->
+<!--   facet_strata(n_strata = 6) + -->
+<!--   guides(colour = guide_legend(nrow = 5))+ -->
+<!--   #guides(color = F)+ -->
+<!--   theme_pubclean() -->
+
+<!-- gamma_terms %>% -->
+<!--   #filter(grepl("(2[2-7])", topic)) %>% -->
+<!--   #filter(grepl("4[0-9]$", topic)) %>% -->
+<!--   filter(topic  %in% c("Topic 43", "Topic 18", "Topic 28", "Topic 42")) %>% -->
+<!--   ggplot(aes(x = Week, y = gamma, color = topic)) + -->
+<!--   geom_line() +  -->
+<!--   guides(colour = guide_legend(nrow = 1))+ -->
+<!--   theme_pubclean() -->
+
+<!-- ``` -->
+
+<!-- ## Topic clusters{.tabset} -->
+
+<!-- ### Topic structure -->
+
+<!-- ```{r} -->
+<!-- gamma_terms_wide <- td_gamma4 %>% -->
+<!--   full_join(meta4) %>% -->
+<!--   mutate(topic = paste0("Topic", topic)) %>% -->
+<!--   spread(topic, gamma)  -->
+
+<!-- topics_only_wide = gamma_terms_wide %>% -->
+<!--   select(starts_with("Topic")) -->
+
+<!-- iclust(topics_only_wide) -->
+<!-- ``` -->
+
+<!-- ### Topic structure (Black respondants only) -->
+
+<!-- ```{r} -->
+<!-- gamma_terms_wide <- td_gamma4 %>% -->
+<!--   full_join(meta4) %>% -->
+<!--   mutate(topic = paste0("Topic", topic)) %>% -->
+<!--   spread(topic, gamma)  -->
+
+<!-- topics_only_wide = gamma_terms_wide %>% -->
+<!--   filter(black == 1) %>% -->
+<!--   select(starts_with("Topic")) -->
+
+<!-- iclust(topics_only_wide) -->
+<!-- ``` -->
+
+<!-- # Question 5{.tabset} -->
+
+<!-- **Is there anything else you would like to tell us about you and your family’s experiences during the COVID-19 pandemic?** -->
+
+<!-- ```{r prep q5} -->
+<!-- processed5 <- textProcessor(open_ended$data[[5]]$response, metadata = open_ended$data[[5]]) -->
+<!-- out5 <- prepDocuments(processed5$documents, processed5$vocab, processed5$meta) -->
+<!-- docs5 <- out5$documents -->
+<!-- vocab5 <- out5$vocab -->
+<!-- meta5 <- out5$meta -->
+
+<!-- heldout5 = make.heldout(docs5, vocab5) -->
+<!-- ``` -->
+<!-- ```{r models q5, eval = F} -->
+<!-- set.seed(07352020) -->
+<!-- plan(multiprocess) -->
+
+<!-- many_models5 <- tibble(K = c(2:30)) %>% -->
+<!--   mutate(topic_model = future_map(K, ~stm(heldout5$documents, heldout5$vocab, K = ., -->
+<!--                                           verbose = FALSE))) -->
+<!-- k_result5 <- many_models5 %>% -->
+<!--   mutate(exclusivity = map(topic_model, exclusivity), -->
+<!--          semantic_coherence = map(topic_model, semanticCoherence, heldout5$documents), -->
+<!--          eval_heldout = map(topic_model, eval.heldout, heldout5$missing), -->
+<!--          residual = map(topic_model, checkResiduals, heldout5$documents), -->
+<!--          bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)), -->
+<!--          lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)), -->
+<!--          lbound = bound + lfact, -->
+<!--          iterations = map_dbl(topic_model, function(x) length(x$convergence$bound))) -->
+
+<!-- save(many_models5, k_result5, file = here("../../Data Management R3/R Data/open5_many_models.Rdata")) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- load(here("../../Data Management R3/R Data/open5_many_models.Rdata")) -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- k_result5 %>% -->
+<!--   transmute(K, -->
+<!--             `Lower bound` = lbound, -->
+<!--             Residuals = map_dbl(residual, "dispersion"), -->
+<!--             `Semantic coherence` = map_dbl(semantic_coherence, mean), -->
+<!--             `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>% -->
+<!--   gather(Metric, Value, -K) %>% -->
+<!--   ggplot(aes(K, Value, color = Metric)) + -->
+<!--   geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) + -->
+<!--   facet_wrap(~Metric, scales = "free_y") + -->
+<!--   scale_x_continuous(breaks = seq(0,90,10))+ -->
+<!--   labs(x = "K (number of topics)", -->
+<!--        y = NULL, -->
+<!--        title = "Model diagnostics by number of topics", -->
+<!--        subtitle = "These diagnostics indicate that a good number of topics would 20 or 40")  -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- k_result5 %>% -->
+<!--   select(K, exclusivity, semantic_coherence) %>% -->
+<!--   filter(K %in% c(20, 40)) %>% -->
+<!--   unnest(cols = c(exclusivity, semantic_coherence)) %>% -->
+<!--   mutate(K = as.factor(K)) %>% -->
+<!--   ggplot(aes(semantic_coherence, exclusivity, color = K)) + -->
+<!--   stat_ellipse()+ -->
+<!--   geom_point(size = 2, alpha = 0.7) + -->
+<!--   labs(x = "Semantic coherence", -->
+<!--        y = "Exclusivity", -->
+<!--        title = "Comparing exclusivity and semantic coherence", -->
+<!--        subtitle = "Decide to model 40 topics")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+
+<!-- ```{r, eval = F} -->
+<!-- topics_rapid5 <- stm(documents = docs5,  -->
+<!--                     vocab = vocab5, -->
+<!--                     K = 40,  -->
+<!--                     prevalence =~ black + s(Week), -->
+<!--                     data = meta5,  -->
+<!--                     init.type = "Spectral") -->
+
+<!-- prep5 = estimateEffect(1:40 ~ black + s(Week),  -->
+<!--                        topics_rapid5,  -->
+<!--                        meta = meta5) -->
+<!-- save(topics_rapid5, prep5, file = here("../../Data Management R3/R Data/open5_fit.Rdata")) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- load(here("../../Data Management R3/R Data/open5_fit.Rdata")) -->
+<!-- ``` -->
+
+<!-- ## Most common topics -->
+
+<!-- ```{r} -->
+<!-- td_beta5 <- tidy(topics_rapid5) -->
+<!-- td_gamma5 <- tidy(topics_rapid5, matrix = "gamma") -->
+
+<!-- meta5 = meta5 %>% -->
+<!--   mutate(document = row_number()) -->
+
+
+<!-- top_terms <- td_beta5 %>% -->
+<!--   arrange(beta) %>% -->
+<!--   group_by(topic) %>% -->
+<!--   top_n(7, beta) %>% -->
+<!--   arrange(-beta) %>% -->
+<!--   select(topic, term) %>% -->
+<!--   summarise(terms = list(term)) %>% -->
+<!--   mutate(terms = map(terms, paste, collapse = ", ")) %>%  -->
+<!--   unnest(cols = c(terms)) -->
+
+<!-- gamma_terms <- td_gamma5 %>% -->
+<!--   group_by(topic) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   ggplot(aes(topic, gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .11))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 20 topics by prevalence response to Q5", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ## Identify topics{.tabset} -->
+
+<!-- ### All topics -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid4) -->
+<!-- ``` -->
+
+<!-- ### 2 - Protests -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 2) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 2, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 5 - Horrible situation -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 5) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 5, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 6 - This is hard -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 6) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 6, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 7 - This is stressful -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 7) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 7, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 9 - Mental health (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 9) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 9, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 11 - Thinking ahead -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 11) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 11, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 12 - Staying home and safe -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 12) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 12, n = 10) -->
+<!-- ``` -->
+
+
+<!-- ### 16 - Thinking about familky (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 16) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 16, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 17 - Juggling work and home -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 17) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 17, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 19 - Brought us together -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 19) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 19, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 20 - Miss our friends and family -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 20) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 20, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 29 - Worried about school and second waves -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 29) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 29, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 34 - People refuse to wear masks -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 34) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 34, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 36 - Family sick and poorly behaving (Sp) -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 36) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 36, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 37 - Opened my eyes -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 37) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 37, n = 10) -->
+<!-- ``` -->
+
+<!-- ### 39 - Fortunate to maintain lifestyle -->
+
+<!-- ```{r} -->
+<!-- labelTopics(topics_rapid5, topics = 39) -->
+<!-- findThoughts(topics_rapid5, texts = out5$meta$response, topics = 39, n = 10) -->
+<!-- ``` -->
+
+<!-- ## Topics by demographic{.tabset} -->
+
+<!-- ### Black/African American -->
+
+<!-- ```{r} -->
+
+<!-- gamma_terms <- td_gamma5 %>% -->
+<!--   full_join(meta5) %>% -->
+<!--   group_by(topic, black) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   group_by(black) %>% -->
+<!--   top_n(15, gamma) %>% -->
+<!--   mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .2))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 15 topics by prevalence response to Q1", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   facet_wrap(~black, scales = "free")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- big_diff = gamma_terms %>% -->
+<!--   filter(!is.na(black)) %>% -->
+<!--   select(-terms) %>% -->
+<!--   spread(black, gamma) %>% -->
+<!--   mutate(diff = `1`-`0`) %>% -->
+<!--   arrange(desc(abs(diff)))  -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(topic %in% big_diff$topic[1:5]) %>% -->
+<!--   filter(!is.na(black)) %>% -->
+<!--   group_by(black) %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   mutate(black = factor(black, levels = c(0,1), labels = c("Not Black", "Black"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = black))+ -->
+<!--   geom_col(position = "dodge") + -->
+<!--   coord_flip() + -->
+<!--   labs(x = NULL, y = expression(gamma), title = "Differences among income groups", fill = NULL)+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ### Poverty -->
+
+<!-- ```{r} -->
+
+<!-- gamma_terms <- td_gamma5 %>% -->
+<!--   full_join(meta5) %>% -->
+<!--   group_by(topic, poverty150) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   group_by(poverty150) %>% -->
+<!--   top_n(15, gamma) %>% -->
+<!--   mutate(poverty150 = factor(poverty150, levels = c(0,1), labels = c("High Income", "Low Income"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = topic)) + -->
+<!--   geom_col(show.legend = FALSE) + -->
+<!--   geom_text(hjust = 0, nudge_y = 0.0005, size = 3) + -->
+<!--   scale_y_continuous(limits =c(0, .2))+ -->
+<!--   coord_flip() + -->
+<!--   #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) + -->
+<!--   labs(x = NULL, y = expression(gamma), -->
+<!--        title = "Top 15 topics by prevalence response to Q1", -->
+<!--        subtitle = "With the top words that contribute to each topic") + -->
+<!--   facet_wrap(~poverty150, scales = "free")+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- big_diff = gamma_terms %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   select(-terms) %>% -->
+<!--   spread(poverty150, gamma) %>% -->
+<!--   mutate(diff = `1`-`0`) %>% -->
+<!--   arrange(desc(abs(diff)))  -->
+
+<!-- gamma_terms %>% -->
+<!--   filter(topic %in% big_diff$topic[1:5]) %>% -->
+<!--   filter(!is.na(poverty150)) %>% -->
+<!--   group_by(poverty150) %>% -->
+<!--   top_n(20, gamma) %>% -->
+<!--   mutate(poverty150 = factor(poverty150, levels = c(0,1),  -->
+<!--                              labels = c("High Income", "Low Income"))) %>% -->
+<!--   ggplot(aes(reorder(topic,gamma), gamma, label = terms, fill = poverty150))+ -->
+<!--   geom_col(position = "dodge") + -->
+<!--   coord_flip() + -->
+<!--   labs(x = NULL, y = expression(gamma),  -->
+<!--        title = "Differences among income groups", fill = NULL)+ -->
+<!--   theme_pubr() -->
+<!-- ``` -->
+
+<!-- ## Topics by week -->
+
+<!-- ```{r} -->
+<!-- gamma_terms <- td_gamma5 %>% -->
+<!--   full_join(meta5) %>% -->
+<!--   group_by(topic, Week) %>% -->
+<!--   summarise(gamma = mean(gamma)) %>% -->
+<!--   arrange(desc(gamma)) %>% -->
+<!--   left_join(top_terms, by = "topic") %>% -->
+<!--   mutate(topic = paste0("Topic ", topic), -->
+<!--          topic = reorder(topic, gamma)) %>% -->
+<!--   ungroup() -->
+
+<!-- gamma_terms = as_tsibble(gamma_terms, -->
+<!--                          index = Week,  -->
+<!--                          key = topic) -->
+
+<!-- gamma_terms %>% -->
+<!--   ggplot(aes(x = Week, y = gamma, color = topic)) + -->
+<!--   geom_line() +  -->
+<!--   facet_strata(n_strata = 6) + -->
+<!--   guides(colour = guide_legend(nrow = 5))+ -->
+<!--   #guides(color = F)+ -->
+<!--   theme_pubclean() -->
+
+<!-- gamma_terms %>% -->
+<!--   #filter(grepl("(2[0-9]$)", topic)) %>% -->
+<!--   #filter(grepl("4[0-9]$", topic)) %>% -->
+<!--   filter(topic  %in% c("Topic 17", "Topic 34", "Topic 29", "Topic 20")) %>% -->
+<!--   ggplot(aes(x = Week, y = gamma, color = topic)) + -->
+<!--   geom_line() +  -->
+<!--   guides(colour = guide_legend(nrow = 1))+ -->
+<!--   theme_pubclean() -->
+
+<!-- ``` -->
+
+<!-- ## Topic clusters{.tabset} -->
+
+<!-- ### Topic structure -->
+
+<!-- ```{r} -->
+<!-- gamma_terms_wide <- td_gamma5 %>% -->
+<!--   full_join(meta5) %>% -->
+<!--   mutate(topic = paste0("Topic", topic)) %>% -->
+<!--   spread(topic, gamma)  -->
+
+<!-- topics_only_wide = gamma_terms_wide %>% -->
+<!--   select(starts_with("Topic")) -->
+
+<!-- iclust(topics_only_wide) -->
+<!-- ``` -->
+
+<!-- ### Topic structure (Black respondants only) -->
+
+<!-- ```{r} -->
+<!-- gamma_terms_wide <- td_gamma5 %>% -->
+<!--   full_join(meta5) %>% -->
+<!--   mutate(topic = paste0("Topic", topic)) %>% -->
+<!--   spread(topic, gamma)  -->
+
+<!-- topics_only_wide = gamma_terms_wide %>% -->
+<!--   filter(black == 1) %>% -->
+<!--   select(starts_with("Topic")) -->
+
+<!-- iclust(topics_only_wide) -->
+<!-- ``` -->

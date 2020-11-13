@@ -42,7 +42,6 @@ dates = scored %>%
 
 ```{r}
 scored = scored %>%
-  filter(Week < 25) %>%
   mutate(poverty200 = ifelse(is.na(poverty200), poverty200s, poverty200)) %>%
   mutate(num_adults = household_size-num_children_raw) %>%
   rename(children = num_children_raw,
@@ -64,6 +63,63 @@ black_caregivers = scored %>%
   filter(Week == max(Week)) %>%
   ungroup()
 ```
+
+
+# Representativeness disclaimer
+
+```{r riser1-5 }
+scored_full = scored
+
+scored = scored %>%
+  filter(Week > 0)
+
+n_care = length(unique(scored$CaregiverID))
+date.min = format(min(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(scored$Date), na.rm = T), format = "%B %d, %Y")
+perc = scored %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) 
+perc.black = 100*sum(perc$black, na.rm=T)/nrow(perc)
+perc.latinx = 100*sum(perc$latinx, na.rm=T)/nrow(perc)
+perc.bl = 100*sum(perc$black_latinx, na.rm=T)/nrow(perc)
+perc.fpl = 100*sum(perc$poverty200, na.rm=T)/nrow(perc)
+
+scored = scored_full %>%
+  mutate(
+    blackIncome = case_when(
+      black == 1 & poverty200 == 1 ~ "Black, Low income",
+      black == 1 & poverty200 == 0 ~ "Black, High income",
+      black == 0 & poverty200 == 1 ~ "Non-Black, Low income",
+      black == 0 & poverty200 == 0 ~ "Non-Black, High income",
+      TRUE ~ NA_character_),
+    black = factor(black, labels = c("Non-Black", "Black"))
+    ) %>%
+  group_by(Week) %>%
+  mutate(Date = case_when(
+    !is.na(Date) ~ min(Date),
+    TRUE ~ as.Date("2020-08-01")))
+
+date_labels = scored %>%
+  group_by(Date) %>%
+  summarize(N = n()) %>%
+  ungroup() %>%
+  mutate(label = case_when(
+    Date == "2020-08-01" ~ "Pre-pandemic",
+    TRUE ~ format(Date, "%b %d")))
+```
+
+These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, (`r papaja::printnum(perc.bl)`\% report being both Black/African American and LatinX,) and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
+
+```{r}
+black_data = filter(scored, black == "Black") 
+
+n_care = length(unique(black_data$CaregiverID))
+date.min = format(min(as.Date(black_data$Date), na.rm = T), format = "%B %d, %Y")
+date.max = format(max(as.Date(black_data$Date), na.rm = T), format = "%B %d, %Y")
+```
+
+
+More specifically, there were `r papaja::printnum(n_care, format = "d")` Black caregivers who participated between the dates of `r date.min` and `r date.max`.
 
 # Demographics{.tabset}
 
