@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Structural topic modeling of open-ended responses</title>
+
+<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+      </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Reports for RAPID R3</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Trends
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="demographics.html">Demographics</a>
+    </li>
+    <li>
+      <a href="notebook.html">Notebook</a>
+    </li>
+    <li>
+      <a href="trend_mental.html">Caregiver mental health</a>
+    </li>
+    <li>
+      <a href="trend_child.html">Child behavior</a>
+    </li>
+    <li>
+      <a href="change_over_time.html">Change over time</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Specific groups</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="disability.html">Children with disabilities</a>
+        </li>
+        <li>
+          <a href="access_by_race.html">Race/Ethnicity</a>
+        </li>
+        <li>
+          <a href="single.html">Single parents</a>
+        </li>
+        <li>
+          <a href="poverty.html">Low-income households</a>
+        </li>
+        <li>
+          <a href="inequality.html">racial_inequality</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="canary.html">Family Conflict (summer)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Curves</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="spline_final.html">Final Spline Analyses</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Policy-relevant variables</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="policy.html">Policy-relevant variables</a>
+        </li>
+        <li>
+          <a href="policy_state.html">By states</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="wellbeing_states.html">State-level trajectories</a>
+    </li>
+    <li>
+      <a href="social_support.html">Social support</a>
+    </li>
+    <li>
+      <a href="hotspots.html">covid Hotspots</a>
+    </li>
+    <li>
+      <a href="open_ended.html">Open-ended responses</a>
+    </li>
+    <li>
+      <a href="school_childcare.html">School reopening</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Material hardship</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="social_support2.html">Additional hardship and support</a>
+        </li>
+        <li>
+          <a href="hardship_cares.html">Hardship trends post CARES</a>
+        </li>
+        <li>
+          <a href="usda.html">Food insecurity and hardship</a>
+        </li>
+        <li>
+          <a href="mh_followup.html">Material hardship details</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="kinder.html">Kindergarten</a>
+    </li>
+    <li>
+      <a href="state_policy.html">State legislation</a>
+    </li>
+    <li>
+      <a href="child_health.html">Well-baby and vaccines</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Childcare</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="childcare.html">Changes in childcare (May)</a>
+        </li>
+        <li>
+          <a href="propensity.html">Effect of childcare (prop score)</a>
+        </li>
+        <li>
+          <a href="open_childcare.html">Open-ended childcare</a>
+        </li>
+        <li>
+          <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
+        </li>
+        <li>
+          <a href="Childcare-descriptives---SL.html">Childcare descriptives</a>
+        </li>
+        <li>
+          <a href="Childcare-Special-Topic.html">Childcare special topic</a>
+        </li>
+        <li>
+          <a href="childcare_trends.html">Follow-up on trends</a>
+        </li>
+        <li>
+          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a href="winter_is_coming.html">Covid cases rising</a>
+    </li>
+    <li>
+      <a href="Family-Conflict-based-on-Master-Data.html">Family conflict (fall)</a>
+    </li>
+    <li>
+      <a href="children_with_disability.html">Families of children with disability</a>
+    </li>
+    <li>
+      <a href="stm_open.html">Structural topic modeling</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    RISER
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="riser1.html">Discrimination and concerns for children</a>
+    </li>
+    <li>
+      <a href="riser_0908.html">Access to resources</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    By state
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="state_AZ_report.html">Arizona</a>
+    </li>
+    <li>
+      <a href="state_CA_report.html">Califorina</a>
+    </li>
+    <li>
+      <a href="state_FL_report.html">Florida</a>
+    </li>
+    <li>
+      <a href="state_GA_report.html">Georgia</a>
+    </li>
+    <li>
+      <a href="state_IL_report.html">Illinois</a>
+    </li>
+    <li>
+      <a href="state_MI_report.html">Michigan</a>
+    </li>
+    <li>
+      <a href="state_NC_report.html">North Carolina</a>
+    </li>
+    <li>
+      <a href="state_NY_report.html">New York</a>
+    </li>
+    <li>
+      <a href="state_OH_report.html">Ohio</a>
+    </li>
+    <li>
+      <a href="state_OR_report.html">Oregon</a>
+    </li>
+    <li>
+      <a href="state_PA_report.html">Pennsylvania</a>
+    </li>
+    <li>
+      <a href="state_TX_report.html">Texas</a>
+    </li>
+    <li>
+      <a href="state_VA_report.html">Virginia</a>
+    </li>
+    <li>
+      <a href="state_WA_report.html">Washington</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Groups
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="group_single_report.html">Single caregivers</a>
+    </li>
+    <li>
+      <a href="group_latinx_report.html">Latinx caregivers</a>
+    </li>
+    <li>
+      <a href="group_black_report.html">Black caregivers</a>
+    </li>
+    <li>
+      <a href="group_poverty150_report.html">Low income caregivers</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="variable_list.html">Variables</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Open-ended responses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="raw_open.html">All resposnes</a>
+    </li>
+    <li>
+      <a href="open_q1.html">Challenges</a>
+    </li>
+    <li>
+      <a href="open_q2.html">What's helping</a>
+    </li>
+    <li>
+      <a href="open_q3.html">Community reopening</a>
+    </li>
+    <li>
+      <a href="open_q4.html">Employment/school reopening</a>
+    </li>
+    <li>
+      <a href="open_q7.html">Education (older children)</a>
+    </li>
+    <li>
+      <a href="open_q8.html">Education (young children)</a>
+    </li>
+    <li>
+      <a href="open_q9.html">Information for policy makers</a>
+    </li>
+    <li>
+      <a href="open_q5.html">Anything else</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/sjweston/Rapid-R3-Website">
+    <span class="fa fa-github"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Structural topic modeling of open-ended responses</h1>
+
+</div>
+
+
+<div id="question-1-challenges" class="section level1">
+<h1>Question 1: Challenges</h1>
+<pre><code>## Building corpus... 
+## Converting to Lower Case... 
+## Removing punctuation... 
+## Removing stopwords... 
+## Removing numbers... 
+## Stemming... 
+## Creating Output...</code></pre>
+<pre><code>## Removing 2288 of 4843 terms (2288 of 114814 tokens) due to frequency 
+## Removing 17 Documents with No Words 
+## Your corpus now has 13837 documents, 2555 terms and 112526 tokens.</code></pre>
+<p>Testing three solutions: 27, 30 and 34 topics</p>
+<div id="most-common-topics" class="section level2 tabset">
+<h2 class="tabset">Most common topics</h2>
+<div id="section" class="section level3">
+<h3>27</h3>
+<p><img src="stm_open_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="section-1" class="section level3">
+<h3>30</h3>
+<p><img src="stm_open_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="section-2" class="section level3">
+<h3>34</h3>
+<p><img src="stm_open_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<div id="identify-topics" class="section level2 tabset">
+<h2 class="tabset">Identify topics</h2>
+<div id="section-3" class="section level3 tabset">
+<h3 class="tabset">27</h3>
+<div id="section-4" class="section level4">
+<h4>1-5</h4>
+<p><strong>Topic 1</strong></p>
+<pre><code>## Topic 1 Top Words:
+##       Highest Prob: also, just, peopl, want, dont, lot, around 
+##       FREX: mask, peopl, wear, act, understand, defiant, around 
+##       Lift: answer, cabin, hyperact, intens, pet, self-isol, vari 
+##       Score: peopl, mask, want, dont, around, wear, lot</code></pre>
+<pre><code>## 
+##  Topic 1: 
+##       Defiant behavior. Temper tantrum when he doesn’t get his way. He also constantly change his mind about what he wants.
+##      I’m concerned that the USA will never be the same. It seems like fascism is winning while our country is sick with the pandemic and hurting from racial tensions caused by unforgivable police violence.
+##      Our biggest concerns is still catching covid 19 from just being out and doing essential things, there are many people not wearing mask around our area. We also do not know who has it because like health officials have mentioned, somebody can be positive and not feel any symptoms, even when we want to sneeze and cough, we force not to because we don&#39;t want anybody discriminating about us too.
+##      Our child is so ridiculously fussy and we feel so helpless as she just screams and whines all the time now and nobody believes us.  We are strongly opposed to cry it out so we feel like we&#39;re traumatizing her because she cries all the time even with us holding her constantly.  We have no idea what&#39;s wrong with her and everyone tells us that she&#39;s normal and babies whine.  This is beyond that and we don&#39;t have anyone to help us because we are scared to have people come over.
+##      When to venture out again, most people don&#39;t seem to be taking precautions so I don&#39;t want to expose my family.</code></pre>
+<p><strong>Topic 2</strong></p>
+<pre><code>## Topic 2 Top Words:
+##       Highest Prob: live, cant, realli, space, area, ’re, credit 
+##       FREX: live, space, credit, anywher, bad, marriag, wors 
+##       Lift: apt, grandchild, heavi, initi, marriag, max, moratorium 
+##       Score: live, cant, realli, credit, card, space, loan</code></pre>
+<pre><code>## 
+##  Topic 2: 
+##       Well, we just found out Saturday that or landlord has notified the homeowners across the street that they will be tearing down our building to build a 300-unit apartment complex here instead. There was no date on the postcard saying when construction would begin, but we can&#39;t afford anywhere else it looks like and the idea of moving with a newborn is daunting.
+##      My marriage is really strained. It wasn&#39;t great to begin with, but this has made it so much worse.
+##      Newish (3years) marriage with twin toddlers living in a tiny apartment. Alot of change really fast and a tiny living space.
+##      Helping my child move forward with his IEP goals, especially the social/emotional and speech.
+## 
+## Trying to explain to him what’s going on since he knows about the looting and rioting in the twin cities area and we are close to it.
+## 
+## Trying to figure out if we think it’s a good idea for my hubby’s job to be reopening.
+## 
+## Coping with our child finally going through the “no” phase. It’s developmentally important but making things really hard on us right now.
+## 
+## We’re on edge. I totally panicked last night when I noticed a vehicle creeping up slowly, shining a flashlight on the laundromat across the street and into the dark and bushy areas surrounding it. It took several minutes, but eventually it pulled away and I saw it was a Sheriff’s vehicle. A few days back I heard lots of honking and wondered if it was rioters. It turned out being a graduation celebration, but took about 10 minutes for me to figure that out and it was alarming. That’s twice this week I’ve found myself trying to peek out my window without being in front of my window because I didn’t know if it was safe.
+##      Our housing problem started before covid but it definitely boiled into a whole bigger issue once this virus hit and even though I have extensive proof of everything that happened, no one, not the city I live in, not the court system in our city, council members in this area, I mean no one seems to care of this slumlord violates every right a tenant is supposed to have. I had eviction court last week and I wasn&#39;t even allowed in because i &quot;had a fever of 102&quot; yet i got home and took my temp three times on 2 different thermometers and I was under 98.6. So I literally wasn&#39;t allowed to defend myself, they refused to take or even look at any of our evidence, and they told us we had 30 days and were going to have another court date and then a magistrate made a ruling for my slumlord the next morning. I cannot even find a new place willing to work with us because people assume eviction makes me the trash in this situation but the truth is I almost lost my life in this property and my children have been hurt and even almost seriously hurt as well but this city doesn&#39;t seem to care. Not knowing if you&#39;ll be homeless while covid is still going around us literally terrifying and I can&#39;t believe we got our lives together and came so far to get totally screwed by some garbage person who values a meager amount of money over a family of 4 and their lives and mental and emotional health and I really can&#39;t believe no one seems to care either way.</code></pre>
+<p><strong>Topic 3</strong></p>
+<pre><code>## Topic 3 Top Words:
+##       Highest Prob: school, learn, start, exposur, virtual, schedul, person 
+##       FREX: schedul, learn, virtual, camp, summer, school, person 
+##       Lift: benefici, camp, digit, facilit, back--school, inadequ, site 
+##       Score: school, learn, virtual, start, remot, onlin, schedul</code></pre>
+<pre><code>## 
+##  Topic 3: 
+##       Our schedule when school starts- our district is doing a hybrid schedule. My 3 year old is not going to preschool because of covid.
+##      Socialization for kids. School was supposed to start virtually however Governor trying to implement a 50% in person learning law. Now becoming a struggle between school district and state, leaving parents/kids in limbo
+##      School for the older kids. They are desperately in need of in person schooling rather than virtual learning.
+##      Figuring out our back-to-school plans; what to do for childcare for my 5-year-old when he is doing virtual school; if I am going back to work when school starts again (I am a part-time teacher)
+##      Waiting for school district to decide if we are going back to online learning or hybrid model; dealing with the unknown and contemplating various complicated work/daycare scenarios.</code></pre>
+<p><strong>Topic 4</strong></p>
+<pre><code>## Topic 4 Top Words:
+##       Highest Prob: hous, move, state, current, increas, leav, case 
+##       FREX: hous, move, state, case, better, number, rise 
+##       Lift: bought, coast, cross, floor, skyrocket, better, case 
+##       Score: hous, move, state, increas, case, current, leav</code></pre>
+<pre><code>## 
+##  Topic 4: 
+##       We are trying to sell our house in a different town but before COVID we had contractors doing flooring and they cancelled indefinitely so we can&#39;t sell our house because we have no floors and we cant buy a new house because we haven&#39;t sold our current house so we live with my parents and share a room.
+##      My son’s father got a new job so now we are moving up the east coast from Florida to New Jersey so that’s a huge change. The move itself is extremely challenging especially while worrying about covid numbers on the rise
+##      My in laws moved in with us before the pandemic. My father in law passed away in April. And Mother in law is still living with us and it&#39;s a challenge.
+##      Hearing the numbers in our state are increasing faster note that everything is opening back to
+##      Because of the fact that our county in MD (Montgomery) is barely into Phase 1 and a half, we&#39;re moving to a different county here in MD. There will be more space, and more room for our children to be able to play, and to not be on top of everyone else. The concern though is the extreme risk. The movers have all either had some run in with positively tested for Covid-19 cases, or having to deal with individuals involved with purchase of a house.</code></pre>
+<p><strong>Topic 5</strong></p>
+<pre><code>## Topic 5 Top Words:
+##       Highest Prob: abl, thing, much, place, afford, everyth, togeth 
+##       FREX: abl, togeth, everyth, rais, afford, thing, spend 
+##       Lift: steam, argument, friends’, inconveni, monotoni, obstacl, shelter 
+##       Score: abl, thing, afford, much, place, togeth, spend</code></pre>
+<pre><code>## 
+##  Topic 5: 
+##       Getting along, too much together time leads to arguments &amp; attitudes.
+##      The unpredictable nature of everything and not being able to see family as easily.
+##      The monotony of not being able to go places and do things as a family
+##      Not being able to spend time with family and friends. Not being able to do things we normally do.
+##      Too much together time leads to tension &amp; arguments.</code></pre>
+</div>
+<div id="section-5" class="section level4">
+<h4>6-10</h4>
+<p><strong>Topic 6</strong></p>
+<pre><code>## Topic 6 Top Words:
+##       Highest Prob: work, time, parent, take, full, hard, manag 
+##       FREX: full, time, infant, parent, manag, singl, mom 
+##       Lift: artist, attorney, burnout, confer, decompress, deserv, extern 
+##       Score: work, time, full, parent, manag, care, take</code></pre>
+<pre><code>## 
+##  Topic 6: 
+##       Managing working full time from home while caring for an infant full time, with interrupted sleep.
+##      Both parents work full time from home and have to simultaneously juggle working with parenting.
+##      Working Full time and Parenting Full time at the same time
+##      Managing working from home full-time while caring for an infant full-time, and not sleeping enough
+##      Working from home (mom) and working full time while providing childcare on my own with NO breaks</code></pre>
+<p><strong>Topic 7</strong></p>
+<pre><code>## Topic 7 Top Words:
+##       Highest Prob: home, kid, keep, tri, activ, entertain, busi 
+##       FREX: entertain, occupi, engag, kid, activ, stuck, tri 
+##       Lift: devic, satisfi, spirit, unnecessari, entertain, engag, glu 
+##       Score: keep, kid, home, tri, activ, entertain, occupi</code></pre>
+<pre><code>## 
+##  Topic 7: 
+##       Just trying to keep the kids active and happy with being home all the time
+##      Keeping kids active and off electronics while I work from home.
+##      Trying to keep the kids occupied and active and happy while staying safe and healthy
+##      Keeping my kids occupied other than with electronics while I am working from home
+##      Entertaining the kids, who after 3 months at home are still stuck at home.</code></pre>
+<p><strong>Topic 8</strong></p>
+<pre><code>## Topic 8 Top Words:
+##       Highest Prob: social, son, daughter, distanc, educ, interact, develop 
+##       FREX: social, interact, develop, skill, educ, autism, appropri 
+##       Lift: critic, “new, appropri, chemo, cooler, cue, lupus 
+##       Score: social, interact, distanc, develop, educ, son, daughter</code></pre>
+<pre><code>## 
+##  Topic 8: 
+##       Social and emotional development of our child, such as learning social cues from other kids. Staying on top of age appropriate educational development.
+##      Our sons social development and education although I do love homeschooling him and he loves all of us being home together. Our daughters social development is a concern and she’s almost in her teens.
+##      Play and exploring, social interaction and social education
+##      Missing out on important social interaction for my children. My oldest missing the opportunity for socio-emotional growth and learning that she would have received through pre-school
+##      Education for our children being adequate and socializing with others</code></pre>
+<p><strong>Topic 9</strong></p>
+<pre><code>## Topic 9 Top Words:
+##       Highest Prob: famili, friend, see, miss, deal, visit, due 
+##       FREX: famili, see, visit, member, travel, crazi, normalci 
+##       Lift: border, cancer, crimin, famili, fli, georg, germani 
+##       Score: famili, friend, see, miss, visit, member, deal</code></pre>
+<pre><code>## 
+##  Topic 9: 
+##       Travel ban for Europe, grandparents cannot visit
+##      Traveling out of state to see our families.  We are a military family and the unknown about when it is safe to see our extended family creates uncomfortable conversations with them.  Some extended family members do not take the virus seriously and are judging our concerns for traveling in the future.
+##      We miss our friends &amp; regular outings. We have not been visiting relatives &amp; missed several planned birthday celebrations.
+##      Missing friends and family members
+## 
+##      Missing nearby family and friends</code></pre>
+<p><strong>Topic 10</strong></p>
+<pre><code>## Topic 10 Top Words:
+##       Highest Prob: enough, food, rent, util, groceri, buy, cost 
+##       FREX: enough, util, groceri, car, mortgag, suppli, transport 
+##       Lift: diaper, accid, bathroom, bull, curbsid, dad’, estat 
+##       Score: food, rent, enough, util, car, groceri, buy</code></pre>
+<pre><code>## 
+##  Topic 10: 
+##       Paying the mortgage, car insurance, car payments, electric, and propane. Significant house and car problems that we cannot afford to fix
+##      Financial. Cannot pay my vehicle property tax in addition to my car payment and insurance and still afford to eat and have utilities on.
+##      not having enough money to pay for rent and utilities and food just basic needs
+##      There are still supplies that have not became available in the store. I only go to one store once a week and my stores are still not stocked up
+##      Buying a car
+## Food</code></pre>
+</div>
+<div id="section-6" class="section level4">
+<h4>11-15</h4>
+<p><strong>Topic 11</strong></p>
+<pre><code>## Topic 11 Top Words:
+##       Highest Prob: feel, none, small, impact, comfort, communiti, countri 
+##       FREX: none, comfort, communiti, countri, children’, train, aren’t 
+##       Lift: aren’t, client, conceiv, disagre, guilti, heath, kinda 
+##       Score: feel, none, comfort, small, countri, communiti, train</code></pre>
+<pre><code>## 
+##  Topic 11: 
+##       Feeling unsupported due to the la k of social contact.
+## Feeling uncertain about our job outlook and the outlook of our children’s schooling
+## Reading the news causes so much panic
+##      As the stay-home orders are lifted, there is more demand for our hospitality businesses- B&amp;B, restaurant, Irish pub, hotel, craft brewery- we are concerned that increased interaction with customers will result in the transmission of COVID 19. Since our businesses are nearly a quarter million dollars in the red right now, we kinda need those paying customers regardless of their pandemic hygiene.
+##      Governmental overreach in personal freedoms and small business operations
+##      We&#39;re anxious about where this country is going. My husband says he&#39;ll be comfortable staying if Trump loses the election in November, but I&#39;m DONE. The lackluster response to Covid-19 was the last straw for me, and the mass riots are just the icing on top of the giant cake of suck this country has become. My husband and I disagree about what to do next, and that&#39;s a challenge.
+##      Opening up our state fully and completely to reduce economic impact. Governmental overreach and control.</code></pre>
+<p><strong>Topic 12</strong></p>
+<pre><code>## Topic 12 Top Words:
+##       Highest Prob: day, two, teach, teacher, first, everi, adult 
+##       FREX: day, teach, fight, boy, four, sibl, first 
+##       Lift: assign, boy, colicki, doabl, fight, insist, itll 
+##       Score: day, two, teach, class, teacher, first, everi</code></pre>
+<pre><code>## 
+##  Topic 12: 
+##       We just started a nannyshare with a neighbor/colleague for our 4.5 year old, 6 month old, and our neighbor&#39;s 7 month old. Our 6 month old cries the entire day. The ENTIRE DAY. Every moment she&#39;s awake she scream cries. She cries so much her voice is hoarse. She gave herself a blood nose yesterday. So our 4.5 year old is reasonably distressed and just hangs out in the basement or hides in our home &quot;office&quot; with his earphones on. I recognize that this may be partly developmental, but it&#39;s painful. The only silver lining (small, and mixed bag) is that she sleeps well for the nanny, but this is partly because she&#39;s so exhausted from crying that she just passes out.
+##      Not going insane b/c it&#39;s impossible for two adults to work when you have three younger kids running around.
+##      Remote learning full time with 3 kids was insane and just about impossible. My 5 year old hasn’t received any services related to his IEP since March. Teletherapy was offered but he was 4 1/2 and turned 5 in August and it just wasn’t doable. His regression is scary and my 3 year old is picking up on the 5 year olds habits that he can’t help.
+##      Navigating hybrid school model (in classroom two days a week, distance learning three days a week) for our second grader and Kindergartener and hoping it will change to full time in person soon as our second grader struggled/fell behind with the abrupt switch to distance learning only in the spring.
+##      Worrying about schooling for next year, both for me as a kindergarten teacher and for my first grader and preschooler, trying to balance my work with my first grader&#39;s studies.</code></pre>
+<p><strong>Topic 13</strong></p>
+<pre><code>## Topic 13 Top Words:
+##       Highest Prob: safe, continu, everyon, reopen, way, especi, coronavirus 
+##       FREX: safe, coronavirus, everyon, continu, vaccin, agre, track 
+##       Lift: arizona, coronavirus, dilig, effici, lax, pertain, recommend 
+##       Score: safe, everyon, continu, reopen, way, coronavirus, especi</code></pre>
+<pre><code>## 
+##  Topic 13: 
+##       Keeping everyone safe I. The most efficient way
+##      Stress over whether reopening is safe.  Not being able to go to my grandpas funeral in Florida.
+##      Keeping morale up and keeping everyone home to stay safe.
+##      Continuing to remain healthy! Finding new ways to enjoy life that incorporate masks and social distancing.
+##      Allergic to toxic chemicals and fragrances being stayed everywhere and do not agree with mandatory vaccinations</code></pre>
+<p><strong>Topic 14</strong></p>
+<pre><code>## Topic 14 Top Words:
+##       Highest Prob: job, incom, due, unemploy, employ, lose, spous 
+##       FREX: unemploy, lose, benefit, loss, secur, furlough, job 
+##       Lift: airlin, appeal, breadwinn, compani, differenti, director, fmla 
+##       Score: job, incom, unemploy, employ, lose, benefit, loss</code></pre>
+<pre><code>## 
+##  Topic 14: 
+##       I am out of work. I lost my job. I lost my income. I am losing my mind.
+##      Ongoing uncertainty about job security and pay security and benefits security
+##      Income decreasing due to reduces unemployment benefits.
+##      Financial - my spouse is indefinitely furloughed and I freelance part-time so we are almost 100% reliant on unemployment benefits right now to cover our expenses. Once the extra $600 weekly payment expires at the end of July, we will have to start depleting our savings to pay for expenses. In addition, we are expecting our third child and if my spouse loses his job, we also lose our healthcare.
+##      my husband being partial unemployed and not knowing if we are going to continue to rec&#39; the extended benefits, bc our income has been cut in 1/4</code></pre>
+<p><strong>Topic 15</strong></p>
+<pre><code>## Topic 15 Top Words:
+##       Highest Prob: get, covid, virus, sick, fear, covid-, expos 
+##       FREX: virus, sick, fear, get, infect, expos, corona 
+##       Lift: corona, sick, virus, epicent, fear, get, gettimg 
+##       Score: get, covid, sick, virus, fear, expos, covid-</code></pre>
+<pre><code>## 
+##  Topic 15: 
+##       Fear of getting covid or fear of being asymptomatic and passing it on
+##      I am exposed at work, there have been a few cases of corona virus and I am scared of getting infected and infecting my family
+##      Bot getting infected. My brother in law may have covid and i fear he will infect us somehow.
+##      The fear of getting covid-19 virus
+##      The fear and doom of having to live differently and fear of getting covid virus</code></pre>
+</div>
+<div id="section-7" class="section level4">
+<h4>16-20</h4>
+<p><strong>Topic 16</strong></p>
+<pre><code>## Topic 16 Top Words:
+##       Highest Prob: childcar, find, make, stress, new, can, sure 
+##       FREX: childcar, sure, find, make, reliabl, stress, meet 
+##       Lift: reliabl, stressanxieti, planner, popul, sure, childcar, dip 
+##       Score: childcar, find, make, sure, stress, new, can</code></pre>
+<pre><code>## 
+##  Topic 16: 
+##       Making ends meet , making sure they are learning
+##      Making sure we don’t overspend and can stick to our budget.
+##      Making sure my son can continue with early intervention and I can find a new position for an income after July.
+##      just making ends meet and making sure that we can financially fix things that are broken around the house
+##      How to find adequate safe childcare so that we can return to work adequate hours/make enough money.</code></pre>
+<p><strong>Topic 17</strong></p>
+<pre><code>## Topic 17 Top Words:
+##       Highest Prob: help, without, outsid, use, play, toddler, limit 
+##       FREX: park, often, group, play, librari, outsid, depress 
+##       Lift: attach, disappoint, group, librari, museum, often, pool 
+##       Score: help, outsid, play, without, park, toddler, use</code></pre>
+<pre><code>## 
+##  Topic 17: 
+##       Not being able to expose my toddlers to activities outside the home like zoos museums, swimming lessons, other kids their age, trips to the library, and story time, athleti a
+##      Work/life balance without help with toddler plus pregnancy exhaustion
+##      Keeping a toddler busy with no parks, pools, museums, etc
+##      Just getting outside and having my toddler enjoy things like the zoo or museums
+##      The biggest challenges continue to be a modified routine for the kids. We cannot take them places they otherwise would be going on a regular basis (park, play dates, church, restaurants, etc).</code></pre>
+<p><strong>Topic 18</strong></p>
+<pre><code>## Topic 18 Top Words:
+##       Highest Prob: year, old, lack, preschool, oldest, homeschool, public 
+##       FREX: homeschool, year, upcom, old, oldest, public, lack 
+##       Lift: asd, congenit, friendsfamili, -year, debat, defect, foid 
+##       Score: year, old, lack, preschool, oldest, homeschool, public</code></pre>
+<pre><code>## 
+##  Topic 18: 
+##       Caring for a newborn while meeting the needs of a very energetic 5 year old with special needs. Also prospects of upcoming school year for the five year old.
+##      My 4 year old is ADHD my 2 year old has asd and deaf in 1 ear
+##      Distance learning for my 9 year old! And social skill for both my 9 year old and 3 three year old
+##      Managing newborn twins and three year old twins with zero support, when we had planned on having support.
+##      Everyone is antsy in the house. My oldest (6-years) is more down than usual and cries or feels sad more frequently. We stopped receiving some services for my 3-year old autistic son. Preschool for my 4-year old was cancelled and school online is a nightmare.</code></pre>
+<p><strong>Topic 19</strong></p>
+<pre><code>## Topic 19 Top Words:
+##       Highest Prob: worri, now, balanc, right, risk, anxieti, high 
+##       FREX: air, risk, elearn, anxieti, worri, ignor, level 
+##       Lift: air, elearn, loot, block, hoursweek, realiti, chunk 
+##       Score: worri, now, balanc, right, risk, high, anxieti</code></pre>
+<pre><code>## 
+##  Topic 19: 
+##       Not many challenges right now- just the mental hurdles trying to overcome (stress, anxiety, paranoia). I feel weary.
+##      juggling work and children. It is unhealthy to work from 7 pm to 1 am and be a caretaker from 7 am to 6 pm, but its the reality of our lives right now. We are worried about our children&#39;s social health, mental health, and of course, risk of getting COVID.
+##      My son is high risk so when I am ordered back to work I worry about his health and if it’s worth it to return at all.
+##      The biggest concern I am facing right now as the single parent of my son is the uncertainty of my son&#39;s health right now. Unfortunately, my son has had ongoing fevers not accompanied by any other symptoms. As of right now, there is nothing doctors can do to assist this strange occurrence- lack of symptoms has them stumped. I worry about his health and hope this passes soon. He has been unable to attend daycare due to his fever. This leaves me worried about my online courses and juggling classes and taking care of a sick child.
+##      Navigating when (and if) to reduce social isolation measures and invite our childcare provider (my mother-in-law, who is high risk) back into our home. Balancing increasing her risk and our risk (since I am high risk) with the stress of working from home full time with a very active 18 month old.</code></pre>
+<p><strong>Topic 20</strong></p>
+<pre><code>## Topic 20 Top Words:
+##       Highest Prob: child, children, health, care, isol, mental, support 
+##       FREX: mental, child, isol, health, children, support, system 
+##       Lift: cognit, psycholog, capac, illeg, mental, relentless, foster 
+##       Score: child, health, children, mental, isol, care, behavior</code></pre>
+<pre><code>## 
+##  Topic 20: 
+##       Parents’ mental health, kids’ mental health
+##      Access to behavioral health care and medical specialists.
+##      Coordinating childcare between roommates who are out of work and on unemployment and the child&#39;s Aunt &amp; Uncle.  Providing appropriate social emotional support to my child.
+##      Maintaining our health and child care by a trusted provider. Also learning and cognitive are important to us.
+##      Childs behavior and violent behavior</code></pre>
+</div>
+<div id="section-8" class="section level4">
+<h4>21-25</h4>
+<p><strong>Topic 21</strong></p>
+<pre><code>## Topic 21 Top Words:
+##       Highest Prob: month, week, pandem, babi, come, next, issu 
+##       FREX: babi, birth, pregnant, month, come, born, pandem 
+##       Lift: appt, face--fac, histori, led, mayb, network, recoveri 
+##       Score: week, babi, month, pandem, next, issu, come</code></pre>
+<pre><code>## 
+##  Topic 21: 
+##       Our biggest challenge is childcare and maintaining and income.  I am transitioning from a purely clinical position where I am currently able to telework due to the pandemic, to a faculty position where I am expected to be on campus and put my family at risk.  The Pandemic Unemployment Assistance (PUA) for independent contractors I have qualified for 3 weeks since the pandemic began, but my income has decreased greatly.  I typically made 1800-1900 per week before setting aside for taxes prior to the pandemic.  To qualify for PUA, I have to make less than 717$ per week.  I currently average 700-800$ per week due to cancellations and no-shows.
+## 
+## My grandparents watch my daughter one day per week.  I would like them to watch my daughter 2 days per week so that I can get my work done.  However, I think they are going to end up not watching her at all because the college I am going to work to plans to re-open face to face.  I don&#39;t blame them.  Every interaction we have with other people in-person amplifies our risks for contracting COVID-19 exponentially.
+##      Preparing to have a baby in the next week during the pandemic.
+##      having to wait for testing when there are signs showing something is wrong with your child. What took maybe 2 weeks to get tested is now taking months.
+##      Preparing for a second baby (just found out we&#39;re expecting)
+##      I am trying to work from home as a 1099 independent contractor doing telepractice speech therapy.  I am working 7 days per week to see half my caseload, and half of the sessions that do occur are rescheduled 2 or 3 times.  This is very distressful to my daughter, who turns 3 this week. My husband is still working outside the home.  On Saturday, I gave in and asked my mother-in-law to help with childcare for 3 days a week, despite our county in our state still being under a stay-at-home order.  I needed to preserve my and my daughter&#39;s mental health.  Unfortunately, this is somewhat risky because my husband works in healthcare.</code></pre>
+<p><strong>Topic 22</strong></p>
+<pre><code>## Topic 22 Top Words:
+##       Highest Prob: husband, sinc, one, hour, close, therapi, speech 
+##       FREX: therapi, appoint, doctor, speech, close, hour, occup 
+##       Lift: telehealth, audit, certainti, committe, doctor, factori, flu 
+##       Score: husband, hour, therapi, one, speech, sinc, write</code></pre>
+<pre><code>## 
+##  Topic 22: 
+##       My son is speech delayed (20 months old and has no verbal words) and his pediatrician would not see him for his 18 month appointment and would not refer him to speech therapy. We referred him ourselves as parents and he now receives early intervention services but that is all. He has no socializing and his speech therapy is all via Zoom.
+##      My main challenge is getting my 2 year old the care that he needs. He has multiple medical/developmental issues. Offices have been closed, surgeries cancelled, therapy has gone virtual. I can&#39;t bring my daughter with me to his appointments so my husband has missed work. I broke a bone in my foot and couldn&#39;t go to the ER because I couldn&#39;t bring the kids. My children&#39;s peds office was closed for months so my newborn daughter didn&#39;t have an appointment until she was 2 months old. Getting medical care, therapy, etc. for myself and my kids has been a compete DISASTER.
+##      Balance.  We&#39;re both professors and are not being paid,  but he&#39;s on COVID committees for his university. This means he&#39;s working all the time,  while I care for the kids. This means I&#39;m barely working, which puts me at risk.  I feel like he&#39;s thriving work wise, and I&#39;m drowning.
+##      Social interactions for our child (or lack thereof), our child may also have some speech delay and we have reached out to our state program for speech therapy and are awaiting our evaluation results but even if we are eligible I wonder about the effectiveness of online speech therapy.
+##      My husband is furloughed effective October 1st and he was just notified that he was a close contact of someone who tested positive for COVID; my husband has no symptoms and is awaiting test results.</code></pre>
+<p><strong>Topic 23</strong></p>
+<pre><code>## Topic 23 Top Words:
+##       Highest Prob: stay, healthi, challeng, biggest, safeti, struggl, physic 
+##       FREX: healthi, challeng, safeti, stabil, biggest, sane, stay 
+##       Lift: bond, burden, challeng, discord, self-quarantin, safeti, stabil 
+##       Score: stay, healthi, challeng, biggest, safeti, burden, stabil</code></pre>
+<pre><code>## 
+##  Topic 23: 
+##       Staying healthy, staying sane
+##      Staying sane while staying in to stay safe.
+##      Our biggest concern is to stay healthy
+##      Staying healthy and staying afloat financially
+##      I&#39;m a healthcare worker and the biggest challenge is for us to stay healthy.</code></pre>
+<p><strong>Topic 24</strong></p>
+<pre><code>## Topic 24 Top Words:
+##       Highest Prob: will, back, return, fall, open, know, send 
+##       FREX: fall, back, will, return, whether, open, send 
+##       Lift: dog, whether, challengeconcern, childcareschool, hubbi, ifwhen, soccer 
+##       Score: will, back, fall, return, send, whether, open</code></pre>
+<pre><code>## 
+##  Topic 24: 
+##       Whether we will be ready to go back when schools open up in the fall and what that transition will be like.
+##      Figuring out plans for Fall, whether my position will go back to on-site and whether my son will be back in his preschool.
+##      Will school open in the fall and what will it look like?
+##      What the fall will look like. Both myself and my husband work for a school
+## District. What will school look like? What will daycare look like? What will be safe?
+##      What will kindergarten look like this Fall. When will Dad go back to work.</code></pre>
+<p><strong>Topic 25</strong></p>
+<pre><code>## Topic 25 Top Words:
+##       Highest Prob: pay, bill, money, save, routin, medic, debt 
+##       FREX: bill, money, catch, cloth, water, pay, tabl 
+##       Lift: flow, heater, kinder, leftov, outstand, preoccupi, tabl 
+##       Score: bill, pay, money, save, debt, paid, medic</code></pre>
+<pre><code>## 
+##  Topic 25: 
+##       Paying bills, clothing that fits
+##      Due to minor decrease in pay paying for certain non essential bills and non necessities has been difficult.
+##      Paying the higher electric bills
+##      Paying to fix the water heater and medical bills.
+##      Paying my light bill</code></pre>
+</div>
+<div id="section-9" class="section level4">
+<h4>26-27</h4>
+<p><strong>Topic 26</strong></p>
+<pre><code>## Topic 26 Top Words:
+##       Highest Prob: concern, financi, financ, emot, uncertainti, futur, well 
+##       FREX: financi, financ, futur, concern, emot, boredom, child’ 
+##       Lift: boredom, dentist, financ, financi, heal, parents’, partner’ 
+##       Score: concern, financi, financ, emot, uncertainti, futur, well</code></pre>
+<pre><code>## 
+##  Topic 26: 
+##       Financial instability, mother/grandma who is our biggest support is in poor health and her healthcare is expensive, I have poor mental health and my child’s father has substance abuse issues and does not provide financial or child care support.
+##      Emotional wellness and financial concerns
+##      Financial uncertainty for the future and health uncertainty
+##      Being socially isolated, financial concerns, employment concerns and family concerns.
+##      Financial wellness and health wellness</code></pre>
+<p><strong>Topic 27</strong></p>
+<pre><code>## Topic 27 Top Words:
+##       Highest Prob: need, daycar, normal, put, decis, hope, allow 
+##       FREX: decis, need, put, normal, daycar, center, hope 
+##       Lift: courag, surpris, trace, decis, workchildcar, whatev, center 
+##       Score: need, daycar, normal, decis, put, best, hope</code></pre>
+<pre><code>## 
+##  Topic 27: 
+##       At the 10 day of school count our elementary school had so many children they needed to hire 5 teachers, so instead of allowing us to switch our method of schooling after first quarter in Oct. we were given until this past Friday to decide. It’s either now, 3 weeks into school or January, so in what seems like a year of never ending difficult decisions, we had yet another. We opted to keep our 5 and 9 year old home and have hopefully some sense of consistency until then at least. We are hoping that their teachers remain the same until then and there are no more surprises for awhile. We miss normalcy and friends, but I am doing my best to keep my kids safe and educated.
+##      In February I was to start utilizing a local workforce education and certification program in order to start working at a daycare facility part time. There has been a daycare provider shortage in my area for over a year and this was the only way I could get my child into a daycare because they allow staff members’ age appropriate children to attend as a benefit. Both options were closed down and are still closed. I am not even allowed to access study materials and test online for the childcare certifications needed. My family is surviving this pandemic but we’ve had to be extremely careful financially. I am worried once the daycares open up there will be so many others needing/wanting the same positions at this specific daycare that I will lose the opportunity to even have a chance at the position because I am unable to access the free certification program.
+##      School. On the social/emotional level our child needs (and wants) to go, but on a health and safety standpoint he can’t handle it. He gravitates toward danger and loooooves putting things in his mouth.
+## 
+## Also, my hubby’s job isn’t what we would classify as stable. Restaurants it’s a little shaky on how they can remain open and we won’t be surprised if it needs to close up again with the way this pandemic is going.
+##      I want my kids back in school. They need to be taught by their teachers. They need to see their peers. I need a break from them. They need a break from each other.
+##      Having to work full time and be a full time mom doesn&#39;t allow me to be great at either. We need to go back to normal.</code></pre>
+</div>
+</div>
+<div id="section-10" class="section level3 tabset">
+<h3 class="tabset">30</h3>
+<div id="section-11" class="section level4">
+<h4>1-5</h4>
+<p><strong>Topic 1</strong></p>
+<pre><code>## Topic 1 Top Words:
+##       Highest Prob: schedul, difficult, mani, chang, routin, grandpar, adjust 
+##       FREX: adjust, routin, chang, big, spread, grandpar, mani 
+##       Lift: bodi, lifestyl, promot, sold, adjust, chanlleng, format 
+##       Score: chang, difficult, mani, routin, adjust, schedul, grandpar</code></pre>
+<pre><code>## 
+##  Topic 1: 
+##       I have had many health issues, due to stress. My body handles stress very poorly, and not without many venues to relax and wind down. I built up too much stress in my body that it caused me multiple visits to the doctor. therefore, way too many hospital bills...
+##      Re-entering into society after isolation. We are still being cautious which is difficult when some family are not doing the same.
+##      Our biggest challenges relate to childcare for my daughter. Prior to COVID-19, my mother-in-law, grandparents, and a mother-figure (woman who was my father&#39;s girlfriend for 20 years, including the majority of my childhood) of mine watched my daughter while I worked outside the home. I am currently doing tele practice speech therapy. As Berks County prepares to enter the green phase of re-opening in Pennsylvania, I may be expected to go back to providing home-based services and need increased childcare.  However, all caregivers except my mother-in-law are elderly and immune compromised.  I can&#39;t comfortably ask them to come back, but my mother-in-law is a self-employed photographer and needs to work too.
+##      Constant change and adjustments to our schedule due to my husband&#39;s varying schedule to work physically.
+##      The biggest challenge for us now is that sometimes we need to avoid many people outside when going out, so as to not have much contact with people. That means that we have to choose inconvenient times for us. Compared to the obstacles that we have overcome, this really is not that much of a big deal.</code></pre>
+<p><strong>Topic 2</strong></p>
+<pre><code>## Topic 2 Top Words:
+##       Highest Prob: live, cant, way, situat, differ, even, area 
+##       FREX: live, situat, way, doesnt, custodi, cant, differ 
+##       Lift: copar, eager, custodi, financesh, flight, housem, limbo 
+##       Score: live, cant, way, situat, differ, doesnt, divorc</code></pre>
+<pre><code>## 
+##  Topic 2: 
+##       Our housing problem started before covid but it definitely boiled into a whole bigger issue once this virus hit and even though I have extensive proof of everything that happened, no one, not the city I live in, not the court system in our city, council members in this area, I mean no one seems to care of this slumlord violates every right a tenant is supposed to have. I had eviction court last week and I wasn&#39;t even allowed in because i &quot;had a fever of 102&quot; yet i got home and took my temp three times on 2 different thermometers and I was under 98.6. So I literally wasn&#39;t allowed to defend myself, they refused to take or even look at any of our evidence, and they told us we had 30 days and were going to have another court date and then a magistrate made a ruling for my slumlord the next morning. I cannot even find a new place willing to work with us because people assume eviction makes me the trash in this situation but the truth is I almost lost my life in this property and my children have been hurt and even almost seriously hurt as well but this city doesn&#39;t seem to care. Not knowing if you&#39;ll be homeless while covid is still going around us literally terrifying and I can&#39;t believe we got our lives together and came so far to get totally screwed by some garbage person who values a meager amount of money over a family of 4 and their lives and mental and emotional health and I really can&#39;t believe no one seems to care either way.
+##      My marriage is really strained. It wasn&#39;t great to begin with, but this has made it so much worse.
+##      My marriage is pretty rocky right now. It wasn&#39;t great to begin with, but quarantine has definitely made things worse. I can&#39;t get out and do things with my son that make me feel happy.
+##      Newish (3years) marriage with twin toddlers living in a tiny apartment. Alot of change really fast and a tiny living space.
+##      We were in the middle of an ugly divorce and custody dispute that has been put in limbo due to COVID-19 shutting down the courts. Additionally, I&#39;m attempting to find a new job and positions aren&#39;t readily available.</code></pre>
+<p><strong>Topic 3</strong></p>
+<pre><code>## Topic 3 Top Words:
+##       Highest Prob: work, home, husband, financ, hour, reduc, mom 
+##       FREX: work, financ, home, full-tim, load, reduc, husband 
+##       Lift: inadequ, financ, load, work, home, workno, full-tim 
+##       Score: work, home, financ, husband, hour, full-tim, reduc</code></pre>
+<pre><code>## 
+##  Topic 3: 
+##       Trying to maintain my full-time work load while also being a full-time caregiver for my children since my husband is an essential employee
+##      I am pregnant so coordinating doctor&#39;s appointments/blood draws while my husband works from home. Also trying to balance my at home work with my husband&#39;s while watching the kids.
+##      Worried about my husband being furloughed from work and working less hours.
+##      How to manage the demands of working from home and schooling from home.
+##      Being able to work from home so we can stay safe and keep our jobs. I need my husband to work from home to make it easier for me to work from home too.</code></pre>
+<p><strong>Topic 4</strong></p>
+<pre><code>## Topic 4 Top Words:
+##       Highest Prob: pandem, sinc, risk, move, covid-, current, high 
+##       FREX: risk, high, move, pandem, riot, coronavirus, immigr 
+##       Lift: amid, deputi, dispit, grandpa, inequ, mourn, seper 
+##       Score: pandem, move, risk, high, covid-, sinc, coronavirus</code></pre>
+<pre><code>## 
+##  Topic 4: 
+##       My in laws moved in with us before the pandemic. My father in law passed away in April. And Mother in law is still living with us and it&#39;s a challenge.
+##      Finding a safe and affordable location away from looting, rioting, fireworks, gunshots, protests,  homelessness epidemic, failed schools, overpriced housing and failed public institutions/government.  All of these negative trends have been significantly accelerated by the Covid crisis.  Urban centers are now VERY dangerous and VERY unhealthy places for people especially people with kids.  It is very clear that our child has been traumatized by a combination of being forced inside by the pandemic while watching protesters and rioters from the window.  He has a sound sensitivity and the gunshots and fireworks are pretty constant after dark.
+## 
+## Where to go though is the million $ question.  I have lived in the DC city core for 20+ years so it is very daunting to have to plan to evacuate your home you have loved for such a long time especially during a pandemic.  I wish I were joking or exaggerating.  I am not.  Even a good bit of the food supply chain continues to break down on a weekly basis.  It is insane.  Instead of fixing these issues, our mayor is running for Vice President and our city council has proposed raising taxes???????
+##      High risk pregnancy during coronavirus, moving during a pandemic
+##      My son’s father got a new job so now we are moving up the east coast from Florida to New Jersey so that’s a huge change. The move itself is extremely challenging especially while worrying about covid numbers on the rise
+##      A high risk pregnancy during coronavirus, moving.</code></pre>
+<p><strong>Topic 5</strong></p>
+<pre><code>## Topic 5 Top Words:
+##       Highest Prob: abl, hous, thing, place, buy, togeth, spend 
+##       FREX: hous, abl, stuck, buy, thing, travel, most 
+##       Lift: germani, europ, friends’, leisur, steam, most, stuck 
+##       Score: abl, hous, thing, buy, place, stuck, togeth</code></pre>
+<pre><code>## 
+##  Topic 5: 
+##       Not being able to travel to Germany to visit grandparents and them not being able to travel either
+##      The weather being hot and not being able to go swimming.
+##      Being stuck in the house and not being able to go out and enjoy some fresh air.  Being stuck at home is not healthy at all. We are weakening our immune systems.
+##      Depression from having to stay home and not be able to go do things like go to the beach, zoo or playground to relieve stress and be outside of the house (playgrounds are now open here but we are not ready to venture out yet)
+##      Not being able to spend time with family and friends. Not being able to do things we normally do.</code></pre>
+</div>
+<div id="section-12" class="section level4">
+<h4>6-10</h4>
+<p><strong>Topic 6</strong></p>
+<pre><code>## Topic 6 Top Words:
+##       Highest Prob: enough, just, hard, dont, lot, realli, break 
+##       FREX: sleep, enough, train, potti, space, exercis, energi 
+##       Lift: deserv, scream, whine, worn, attorney, breast, fals 
+##       Score: enough, lot, sleep, dont, hard, just, break</code></pre>
+<pre><code>## 
+##  Topic 6: 
+##       Sleep. The kids aren&#39;t sleeping good, which ensures we don&#39;t sleep good either.
+##      Our child is so ridiculously fussy and we feel so helpless as she just screams and whines all the time now and nobody believes us.  We are strongly opposed to cry it out so we feel like we&#39;re traumatizing her because she cries all the time even with us holding her constantly.  We have no idea what&#39;s wrong with her and everyone tells us that she&#39;s normal and babies whine.  This is beyond that and we don&#39;t have anyone to help us because we are scared to have people come over.
+##      We just started a nannyshare with a neighbor/colleague for our 4.5 year old, 6 month old, and our neighbor&#39;s 7 month old. Our 6 month old cries the entire day. The ENTIRE DAY. Every moment she&#39;s awake she scream cries. She cries so much her voice is hoarse. She gave herself a blood nose yesterday. So our 4.5 year old is reasonably distressed and just hangs out in the basement or hides in our home &quot;office&quot; with his earphones on. I recognize that this may be partly developmental, but it&#39;s painful. The only silver lining (small, and mixed bag) is that she sleeps well for the nanny, but this is partly because she&#39;s so exhausted from crying that she just passes out.
+##      4-month-old does not sleep well and takes up a lot of our time, so we don&#39;t have time for simple household chores.
+##      Being burnt out. It is a constant cycle of working, cleaning, cooking, trying to engage the kids, and not getting enough sleep or peace and quiet.</code></pre>
+<p><strong>Topic 7</strong></p>
+<pre><code>## Topic 7 Top Words:
+##       Highest Prob: time, childcar, tri, parent, balanc, full, manag 
+##       FREX: full, balanc, childcar, manag, juggl, time, infant 
+##       Lift: execut, generat, wfh, workschool, impend, -line, full 
+##       Score: childcar, time, balanc, full, manag, figur, parent</code></pre>
+<pre><code>## 
+##  Topic 7: 
+##       Agreeing on how we spend our time (alone time ha time together as a couple) and equal division of household duties
+##      Managing WFH more than full time while also managing childcare.
+##      Working Full time and Parenting Full time at the same time
+##      Both parents work full time from home and have to simultaneously juggle working with parenting.
+##      Managing working full time from home while caring for an infant full time, with interrupted sleep.</code></pre>
+<p><strong>Topic 8</strong></p>
+<pre><code>## Topic 8 Top Words:
+##       Highest Prob: son, daughter, daycar, want, open, send, oldest 
+##       FREX: speech, son, daycar, therapi, send, daughter, delay 
+##       Lift: chemo, “new, motor, normal”, thrill, asleep, speech 
+##       Score: daycar, son, send, daughter, open, therapi, behavior</code></pre>
+<pre><code>## 
+##  Topic 8: 
+##       Whether or not to send our son back to daycare. Cases are blowing up and the stories of outbreaks at daycares freak me out, but our “new normal” is so exhausting!
+##      Accessing health therapy services such as speech therapy, occupational therapy, physical therapy
+##      Our oldest son is showing signs of depression and the youngest has been extremely hyperactive bored out of his mind.
+##      My oldest is showing signs of depression not wanting to do anything, my youngest is acting up, he’s bored and very hyperactive.
+##      Being separated from 2 of my daughters. Speech therapy and behavioral therapy appointments.</code></pre>
+<p><strong>Topic 9</strong></p>
+<pre><code>## Topic 9 Top Words:
+##       Highest Prob: stay, safe, healthi, virus, tri, none, expos 
+##       FREX: stay, none, healthi, sane, corona, stir, safe 
+##       Lift: corona, idiot, none, racist, stir, sane, stay 
+##       Score: stay, healthi, safe, none, virus, expos, infect</code></pre>
+<pre><code>## 
+##  Topic 9: 
+##       Just trying to stay healthy and safe
+##      Staying safe from Corona virus
+##      Staying sane while staying in to stay safe.
+##      Just trying not to catch the virus and stay safe and healthy
+##      Staying safe while staying sane</code></pre>
+<p><strong>Topic 10</strong></p>
+<pre><code>## Topic 10 Top Words:
+##       Highest Prob: make, sure, food, end, still, provid, meet 
+##       FREX: sure, food, make, budget, cloth, item, noth 
+##       Lift: applic, distribut, fruit, sure, tent, veggi, bull 
+##       Score: make, food, sure, meet, end, cost, provid</code></pre>
+<pre><code>## 
+##  Topic 10: 
+##       Making sure our finances cover all needs. Making sure my son is growing and hitting all his milestones
+##      Making sure we have food to eat and utilities are paid
+##      Making sure there is food on table, clean clothes
+##      Making ends meet , making sure they are learning
+##      Making sure everything is going to be paid</code></pre>
+</div>
+<div id="section-13" class="section level4">
+<h4>11-15</h4>
+<p><strong>Topic 11</strong></p>
+<pre><code>## Topic 11 Top Words:
+##       Highest Prob: employ, busi, uncertainti, close, futur, everyth, long 
+##       FREX: futur, busi, uncertainti, employ, close, econom, apart 
+##       Lift: oper, owner, bankruptci, failur, kinda, liabil, overreach 
+##       Score: busi, employ, futur, uncertainti, close, small, government</code></pre>
+<pre><code>## 
+##  Topic 11: 
+##       Governmental overreach in personal freedoms and small business operations
+##      Small appliance failures, and minor air condition maintenance.
+##      As a small business owner, there have been some negative impacts on the business that had not previously been anticipated. Trying to figure out how to work through that.
+##      As the stay-home orders are lifted, there is more demand for our hospitality businesses- B&amp;B, restaurant, Irish pub, hotel, craft brewery- we are concerned that increased interaction with customers will result in the transmission of COVID 19. Since our businesses are nearly a quarter million dollars in the red right now, we kinda need those paying customers regardless of their pandemic hygiene.
+##      Opening up our state fully and completely to reduce economic impact. Governmental overreach and control.</code></pre>
+<p><strong>Topic 12</strong></p>
+<pre><code>## Topic 12 Top Words:
+##       Highest Prob: much, spous, older, teach, unabl, first, caus 
+##       FREX: fight, younger, older, spous, teach, act, focus 
+##       Lift: argument, attitud, fight, rivalri, secondari, solo, younger 
+##       Score: much, older, teach, spous, unabl, fight, class</code></pre>
+<pre><code>## 
+##  Topic 12: 
+##       Behavior of older sibling. We are unable to manage his meltdowns anymore
+##      Mental health/behavior of my elementary age child and how that is impacting the entire family - more anxious, acting out, rude, defiant. This is causing younger siblings to act out in the same and causing parents to be overwhelmed, stressed and more likely to yell and feel out of control of the household.
+##      Too much together time leads to tension &amp; arguments.
+##      I feel trapped in my home, unable to help my cold cope with his stressors. I&#39;m constantly fighting him to get him to do schoolwork, use his manners and follow instructions. My husband is usually helpful when he&#39;s home, but he works 60+ hours a week. The little time we have together, we wanted to talk about current events, which is a subject about which we constantly disagree. Lately we&#39;ve been fighting a few times a week right before bed about social justice, politics, science, you name it. It&#39;s exhausting. I feel like I don&#39;t have anyone in my corner who knows how to do anything without throwing a tantrum. It&#39;s exhausting. I miss adults.
+##      Not getting along with spouse. Spouse getting aggressive during argument. Drinking too much.</code></pre>
+<p><strong>Topic 13</strong></p>
+<pre><code>## Topic 13 Top Words:
+##       Highest Prob: feel, friend, see, activ, peopl, outsid, miss 
+##       FREX: friend, miss, outsid, play, lone, activ, church 
+##       Lift: epicent, rejoin, stepdaught, church, daddi, extracurricular, resurg 
+##       Score: friend, activ, see, feel, peopl, miss, outsid</code></pre>
+<pre><code>## 
+##  Topic 13: 
+##       Not seeing friends and family in person. I am an extrovert, and miss bing around people. And it seems my 19 mo might also very much be a people person and he misses being around people too.
+##      Missing playgroups and extracurricular group activities
+##      Feeling isolated and alone. Inability to visit with family and friends. Restrictions from doing activities we enjoy such as hiking, going to the beach, swimming, taking vacations.
+##      My children were used to extra curricular activities, library visits, play dates. Family trips and gatherings. Being stuck at home has affected there mood. My children need to build immunities by being around other people. This will only affect them.
+##      Not being able to get out and do the social activities we like. We miss parks, playgrounds and church.</code></pre>
+<p><strong>Topic 14</strong></p>
+<pre><code>## Topic 14 Top Words:
+##       Highest Prob: worri, exposur, continu, state, lose, happen, reopen 
+##       FREX: case, possibl, continu, exposur, partner, lose, remain 
+##       Lift: halt, spike, bout, progress, sacrific, surg, surpris 
+##       Score: worri, exposur, continu, happen, state, case, reopen</code></pre>
+<pre><code>## 
+##  Topic 14: 
+##       Being able to protect ourselves from thieves when the economy gets worse and people get more desperate. Possible civil war if communism is pushed on people. Having to use deadly force if vaccines are pushed on my family. Having to organize to develop a black market local economy if people are no longer allowed access to stores without required vaccines, and organizing to develop our own economies to be able to avoid the requirements. The threat of communism is serious regardless of who wins the elections, civil war will happen in my town against anyone who pushes for communism, people are organizing and preparing for it.
+##      I&quot;m worried about the stock market and I&#39;m worried about states reopening and spreading coronavirus.
+##      worried about the stock market crashing and losing retirement account funds.
+##      Worry about the uncertainty of what will happen with school in the fall and with how our state, local and national officials are treating the COVID crisis
+##      We are concerned with continuing to be home as much as possible, especially since it looks like our state is rapidly increasing in case numbers.</code></pre>
+<p><strong>Topic 15</strong></p>
+<pre><code>## Topic 15 Top Words:
+##       Highest Prob: get, covid, normal, bring, done, scare, relat 
+##       FREX: get, along, done, relat, normal, bring, winter 
+##       Lift: gettimg, trustworthi, along, get, renov, nerv, winter 
+##       Score: get, covid, normal, done, bring, along, scare</code></pre>
+<pre><code>## 
+##  Topic 15: 
+##       Trying to get our lives back to as normal as possible. Trying to get the kids to get along and get space.
+##      Getting along. Everyone is getting annoyed with each other.
+##      getting the kids out to play and get back to normal
+##      Concerned about being pregnant, my partner’s type 2 diabetes, and how that makes us susceptible to a bad case of covid
+##      Kids are getting very antsy and do not get along as well because they have been with each other constantly</code></pre>
+</div>
+<div id="section-14" class="section level4">
+<h4>16-20</h4>
+<p><strong>Topic 16</strong></p>
+<pre><code>## Topic 16 Top Words:
+##       Highest Prob: pay, bill, stress, safeti, rent, afford, medic 
+##       FREX: rent, bill, pay, util, stress, electr, expens 
+##       Lift: electr, stressanxieti, outstand, registr, rent, bill, pay 
+##       Score: bill, pay, rent, stress, safeti, util, afford</code></pre>
+<pre><code>## 
+##  Topic 16: 
+##       Paying our rent and car payment electric bill water bill
+##      Paying utilities and car repairs
+##      Paying Bill&#39;s, paying rent
+##      Paying bills or rent
+##      Paying rent and car payment</code></pre>
+<p><strong>Topic 17</strong></p>
+<pre><code>## Topic 17 Top Words:
+##       Highest Prob: social, lack, isol, distanc, learn, interact, develop 
+##       FREX: lack, social, interact, develop, distanc, isol, skill 
+##       Lift: coup, lax, urg, interact, develop, lack, social 
+##       Score: social, isol, lack, interact, distanc, develop, learn</code></pre>
+<pre><code>## 
+##  Topic 17: 
+##       Dealing with social isolation and lack of social interaction
+##      My child’s social and academic growth.
+##      social development during distance learning
+##      The strong urge to socialize, but the small likelihood social distancing will be honored by others
+##      Isolation and lack of social interaction for my children and myself</code></pre>
+<p><strong>Topic 18</strong></p>
+<pre><code>## Topic 18 Top Words:
+##       Highest Prob: year, old, incom, month, one, preschool, come 
+##       FREX: old, loss, year, autism, doctor, four, month 
+##       Lift: audit, foid, old, intervent, seven, five, autism 
+##       Score: old, year, incom, month, preschool, one, loss</code></pre>
+<pre><code>## 
+##  Topic 18: 
+##       My 4 year old is ADHD my 2 year old has asd and deaf in 1 ear
+##      Distance learning for my 9 year old! And social skill for both my 9 year old and 3 three year old
+##      Distance learning with my seven year old while having a four year old to tend to at the same time,
+## Finding time to fit my work in (I’m self-employed)
+##      Managing newborn twins and three year old twins with zero support, when we had planned on having support.
+##      Caring for a newborn while meeting the needs of a very energetic 5 year old with special needs. Also prospects of upcoming school year for the five year old.</code></pre>
+<p><strong>Topic 19</strong></p>
+<pre><code>## Topic 19 Top Words:
+##       Highest Prob: famili, job, find, new, husband, anoth, member 
+##       FREX: find, job, new, member, extend, famili, lost 
+##       Lift: loot, profess, find, lol, job, connected, extend 
+##       Score: job, find, famili, new, member, loot, husband</code></pre>
+<pre><code>## 
+##  Topic 19: 
+##       finding a new and better job for my husband. Having a new baby.
+##      Husband to find a new job
+## Not seeing family
+##      Finding an apartment to move out of my moms with my 2 kids, finding a new car that’s reliable, finding another job for my significant other for more money or a better paying job for him.
+##      My husband finding a new job
+##      Keeping myself and my family healthy and safe and finding my husband a job in his chosen profession</code></pre>
+<p><strong>Topic 20</strong></p>
+<pre><code>## Topic 20 Top Words:
+##       Highest Prob: child, care, need, take, educ, help, life 
+##       FREX: child, care, educ, need, special, eldest, take 
+##       Lift: cognit, illeg, behaviot, child, eldest, special, educ 
+##       Score: child, care, need, educ, take, life, help</code></pre>
+<pre><code>## 
+##  Topic 20: 
+##       Meeting my client&#39;s clinical needs, meeting my child&#39;s social, emotional and educational needs, being able to take care of myself (social and emotional needs)
+##      Taking care of my child&#39;s educational and developmental needs while working full time and providing most of the care
+##      We are trying to expand my child care program to help meet the child care needs of the community, but that is stressful and expensive.
+##      Child care, education and quality of life for our child. Getting behind on Bill&#39;s. Paying for child care.
+##      I have a child that just turned 18 that wants to join the military but I need their help with the younger child</code></pre>
+</div>
+<div id="section-15" class="section level4">
+<h4>21-25</h4>
+<p><strong>Topic 21</strong></p>
+<pre><code>## Topic 21 Top Words:
+##       Highest Prob: day, week, babi, mask, pregnant, wear, posit 
+##       FREX: test, wear, week, second, posit, birth, pregnant 
+##       Lift: -unit, colon, cough, implic, mayb, monday, notifi 
+##       Score: week, day, mask, mayb, wear, babi, pregnant</code></pre>
+<pre><code>## 
+##  Topic 21: 
+##       My husband has been in the hospital for a few days twice this past week and a half.
+##      I just found out I am pregnant, and we are so excited, however I am concerned about if there might be danger to the baby.
+##      My husband is furloughed effective October 1st and he was just notified that he was a close contact of someone who tested positive for COVID; my husband has no symptoms and is awaiting test results.
+##      My father who is in the organ transplant list was diagnosed with colon cancer Monday.  We can&#39;t go see him. I was told by my landlord that he&#39;s giving me 90 days to move because he wants to move into my property.  My husband was exposed to covid at work 3 weeks ago,  went back in Monday to find more peeps not wearing masks and more people tested positive last week, while he was out for 14 days being quarantined.
+##      Our biggest challenge is childcare and maintaining and income.  I am transitioning from a purely clinical position where I am currently able to telework due to the pandemic, to a faculty position where I am expected to be on campus and put my family at risk.  The Pandemic Unemployment Assistance (PUA) for independent contractors I have qualified for 3 weeks since the pandemic began, but my income has decreased greatly.  I typically made 1800-1900 per week before setting aside for taxes prior to the pandemic.  To qualify for PUA, I have to make less than 717$ per week.  I currently average 700-800$ per week due to cancellations and no-shows.
+## 
+## My grandparents watch my daughter one day per week.  I would like them to watch my daughter 2 days per week so that I can get my work done.  However, I think they are going to end up not watching her at all because the college I am going to work to plans to re-open face to face.  I don&#39;t blame them.  Every interaction we have with other people in-person amplifies our risks for contracting COVID-19 exponentially.</code></pre>
+<p><strong>Topic 22</strong></p>
+<pre><code>## Topic 22 Top Words:
+##       Highest Prob: return, don’t, leav, teacher, think, furlough, part 
+##       FREX: leav, matern, ’re, teacher, don’t, return, ’ll 
+##       Lift: beat, hug, matern, readjust, write, director, pose 
+##       Score: return, teacher, write, leav, don’t, prepar, matern</code></pre>
+<pre><code>## 
+##  Topic 22: 
+##       I went back to work for 2 weeks in March before my school closed where I am an childhood educator working part time. I went from working 40 hrs a week to 28 hrs a week after returning from maternity leave. Then the pandemic closed my school. So, my director has paid us our usual salary since March, but we are now being furloughed for July and possibly further. I will need to file for unemployment. So I have gone from fulltime to part time to no employment after maternity leave. That is a lot of change for my family’s finances. We are trying to keep up without draining savings.
+##      I am taking a leave of absence from my job in a public elementary school because we are not allowed to do online only as employees and we have had a large spike in cases since university students have returned to town.
+##      I have been furloughed where I work at a school 28 hours a week. I was paid by my employer up until July and will now have to file for unemployment indefinitely. My employer is thinking of opening the school in August with minimal teachers and fewer classrooms so I do not know when I will return to work. I am going to make only 60% of my usual pay on unemployment and that’s stressful.
+##      I don’t think my husband and I are very good at “preschool” activities for the kids and we don’t know how to beat engage their creative side.
+##      I worked as a nurse and had my baby 1/20/2020 and was on maternity leave when covid hit. I quit my job due to lack of childcare because my employer would not allow me to work part time night shift so that I could arrange childcare. I felt uncomfortable leaving them in daycare. So we have taken a large pay cut and I have looked for a new job that can accommodate my weekend night shift schedule so that my husband can watch the kids while they sleep.</code></pre>
+<p><strong>Topic 23</strong></p>
+<pre><code>## Topic 23 Top Words:
+##       Highest Prob: due, financi, struggl, limit, quarantin, debt, becom 
+##       FREX: stabil, financi, stabl, struggl, debt, quarantin, limit 
+##       Lift: burden, dementia, leak, mount, stabl, stabil, alheizm 
+##       Score: financi, due, burden, stabil, struggl, debt, limit</code></pre>
+<pre><code>## 
+##  Topic 23: 
+##       On top of quarantine, neighbors struggling financially, and a bad federal government, the California wildfire smoke is challenging because I developed daily asthma after having pneumonia / suspected covid. Learning how to manage and treat asthma.
+##      Additional childcare/nanny salary costs due to closures from air quality from the fires in  California...
+##      Continuing as Covid lingers on for the foreseeable future. Financially it eventually drain us as the months go on. Little assistance from country leadership and zero plan to help families or ease burdens.
+##      Financially we are struggling, but can keep our heads above water thanks to forbearance and credit cards
+##      Oil leak on our property causing major financial problems</code></pre>
+<p><strong>Topic 24</strong></p>
+<pre><code>## Topic 24 Top Words:
+##       Highest Prob: kid, keep, sick, without, fear, everyon, toddler 
+##       FREX: keep, occupi, entertain, happi, kid, fear, electron 
+##       Lift: devic, dog, busyentertain, occupi, resort, entertain, electron 
+##       Score: keep, kid, sick, entertain, fear, everyon, without</code></pre>
+<pre><code>## 
+##  Topic 24: 
+##       Keeping children occupied without resorting to electronics
+##      keeping kids stimulated so they aren&#39;t bored and unruly
+##      Keeping kids entertained and happy
+##      Keeping the kids happy and entertained
+##      Keeping kids occupied and busy without electronics and friends.</code></pre>
+<p><strong>Topic 25</strong></p>
+<pre><code>## Topic 25 Top Words:
+##       Highest Prob: unemploy, hour, groceri, even, cut, husband, benefit 
+##       FREX: groceri, cut, shop, receiv, avail, store, unemploy 
+##       Lift: claim, pickup, blown, carousel, chose, demot, groceri 
+##       Score: unemploy, groceri, cut, kinder, benefit, receiv, store</code></pre>
+<pre><code>## 
+##  Topic 25: 
+##       Not receiving our stimulus payment , husband not receiving his unemployment benefits
+##      Financially speaking we are in a bind. Husbands hours cut significantly, he doesn’t qualify for any type of underemployment. He is depressed, in turn he is extremely mean and moody. In turn my toddler is feeding off his negative energy and she is unruly. I am holding it together with duct tape and prayer
+##      not receiving the extra covid unemployment benefit while my husband is on workshare, even though it was approved, but NY is refusing to implement it.
+##      Access to organic meat while doing grocery delivery and sometimes alternative options aren’t available.
+##      Getting my husband’s unemployment check. Still haven’t received it.</code></pre>
+</div>
+<div id="section-16" class="section level4">
+<h4>26-30</h4>
+<p><strong>Topic 26</strong></p>
+<pre><code>## Topic 26 Top Words:
+##       Highest Prob: money, support, emot, save, maintain, physic, problem 
+##       FREX: money, maintain, emot, boredom, problem, save, insur 
+##       Lift: bathroom, boredom, parents’, rich, ventil, maintain, problem 
+##       Score: money, emot, save, maintain, problem, support, physic</code></pre>
+<pre><code>## 
+##  Topic 26: 
+##       Saving money for extra major kitchen appliances.
+##      Saving money or not depleting all of savings
+##      Medical coverage. I&#39;m disabled but I&#39;ve been kicked off disability for a while now. But I still need my meds. I got kicked off my parents insurance in March after turning 26
+##      Violence in the neighborhood and rioters/looters, uncertainty of our living situation (rental), personal/marital problems, and being both too poor to afford all the things we need, to include healthcare, but too &quot;rich&quot; to qualify for assistance (SNAP or medicaid).
+##      money and housing and transportation and dental insurance finding a dentist who accepts our badger care insurance</code></pre>
+<p><strong>Topic 27</strong></p>
+<pre><code>## Topic 27 Top Words:
+##       Highest Prob: school, will, back, start, fall, know, plan 
+##       FREX: school, fall, will, kindergarten, virtual, start, upcom 
+##       Lift: childcareschool, courag, vote, wether, slp, fall, site 
+##       Score: school, will, back, fall, start, kindergarten, virtual</code></pre>
+<pre><code>## 
+##  Topic 27: 
+##       What the fall will look like. Both myself and my husband work for a school
+## District. What will school look like? What will daycare look like? What will be safe?
+##      Not knowing if school is going to start in the fall. He will begin kindergarten and we would rely on him going to school so we could go to work.
+##      Figuring out plans for Fall, whether my position will go back to on-site and whether my son will be back in his preschool.
+##      What school will look like this fall
+##      Anticipating whether or not to send her to school for in-person instruction this fall.</code></pre>
+<p><strong>Topic 28</strong></p>
+<pre><code>## Topic 28 Top Words:
+##       Highest Prob: concern, now, challeng, biggest, right, deal, summer 
+##       FREX: biggest, challeng, cabin, summer, camp, now, deal 
+##       Lift: cabin, divid, biggest, chemic, fragranc, strife, theyv 
+##       Score: challeng, biggest, now, concern, right, summer, deal</code></pre>
+<pre><code>## 
+##  Topic 28: 
+##       Allergic to toxic chemicals and fragrances being stayed everywhere and do not agree with mandatory vaccinations
+##      The biggest challenges and concerns for myself and my family right now are simply dealing with the fear- based ignorance of others
+##      We do NOT want mandatory vaccinations and are worried about toxic chemicals and fragrances in disinfectants being sprayed everywhere.
+##      I believe the biggest challenges for my family right now are dealing with the quarantine and the kids being out of school.
+##      Our biggest challenge right now would be the stress causing us to argue and trying our best not to argue. Our biggest concern would just be financial stability for us and our son.</code></pre>
+<p><strong>Topic 29</strong></p>
+<pre><code>## Topic 29 Top Words:
+##       Highest Prob: health, mental, issu, secur, decis, abil, regular 
+##       FREX: health, mental, secur, issu, low, regular, well- 
+##       Lift: broke, health, stone, tone, -day, bipolar, encourag 
+##       Score: health, mental, issu, secur, broke, abil, regular</code></pre>
+<pre><code>## 
+##  Topic 29: 
+##       Parents’ mental health, kids’ mental health
+##      my mental health and my spouse’s anxiety
+##      Seeking and securing reliable and sufficient health care for elderly parents.
+##      Mental health &amp; wellness, physical health
+##      My mental health is deteriorating</code></pre>
+<p><strong>Topic 30</strong></p>
+<pre><code>## Topic 30 Top Words:
+##       Highest Prob: children, also, can, well, children’, still, toddler’ 
+##       FREX: also, children, can, children’, toddler’, uncharacterist, well 
+##       Lift: toddler’, uncharacterist, children’, also, can, children, well 
+##       Score: children, also, can, toddler’, well, children’, uncharacterist</code></pre>
+<pre><code>## 
+##  Topic 30: 
+##       Distancing from others. There are more and more individuals outside with their other children, without protection on such as masks. We&#39;re trying to keep our distance while keeping our children active so they have a balance. We are also moving to another location in the state partially because of timing, but also because where we are going has fewer confirmed cases on a daily basis. But also because our children need more space where we are not hampered by others right on top of us in a community. Also, close contact with movers, realtors, and other things that we have to handle to still survive. We&#39;re taking the maximum precautions. But our children are tired just like us. They make comments such as &quot;we can&#39;t do that because of the virus&quot;. I hear other children in my 8 year olds virtual morning meeting saying &quot;we had to be real careful because of the coronavirus&quot;, or &quot;we heard a friend died from the coronavirus&quot;. Our children are both aware of the risk.
+##      Finding childcare and employment as well as contact for children with other children
+##      We have no idea what to do for school and childcare. There’s no right answer. We are scared to go back to work to teach as well.  We’ll  be at 4 different schools with so much varied exposure.  Even though we’ve practiced with masks our children are not consistent.  I’m also worried about how I can work and keep kids home.  I also worry that this os not “beat” for them
+##      Right now it is difficult to engage in social learning and to provide educational needs of all my children as well as basic needs due to our income restrictions and social distancing because of covid 19. Also the stress of making our bill payments can be a bit overwhelming at times. We are thankful we can make these payments and provide a home for our family.
+##      high yet necessary cost of childcare for 3 children so I can work my job effectively and not half the time as needed in order to care for my children.</code></pre>
+</div>
+</div>
+<div id="section-17" class="section level3 tabset">
+<h3 class="tabset">34</h3>
+<div id="section-18" class="section level4">
+<h4>1-5</h4>
+<p><strong>Topic 1</strong></p>
+<pre><code>## Topic 1 Top Words:
+##       Highest Prob: now, challeng, biggest, right, difficult, mani, big 
+##       FREX: now, challeng, biggest, right, communiti, big, spread 
+##       Lift: bodi, accustom, amongst, biggest, challeng, chanlleng, communiti 
+##       Score: now, challeng, biggest, right, difficult, mani, big</code></pre>
+<pre><code>## 
+##  Topic 1: 
+##       The biggest challenge right now is to endure this pandemic- we might feel &quot;over it,&quot; but it&#39;s still happening and affecting so many lives. I am paranoid that I could get the virus and unknowingly spread it because I was asymptomatic. It&#39;s also hard to know what to believe with the media all over the place- it&#39;s confusing and presents a big challenge.
+##      My children always want technology now like cell phones and tablets to play games and watch youtube
+##      I would say a big challenge right now is trying to figure out activities to do with the kids that don&#39;t involve being around any other people and trying to explain to them why they can&#39;t do things they&#39;ve grown accustomed to doing.
+##      Eating is my biggest challenges right now.
+##      Income is a big challenge right now.</code></pre>
+<p><strong>Topic 2</strong></p>
+<pre><code>## Topic 2 Top Words:
+##       Highest Prob: live, even, cant, realli, way, situat, though 
+##       FREX: live, even, situat, cant, way, realli, apart 
+##       Lift: octob, afterward, definit, extens, leisur, recov, screw 
+##       Score: live, even, cant, realli, way, situat, though</code></pre>
+<pre><code>## 
+##  Topic 2: 
+##       Our housing problem started before covid but it definitely boiled into a whole bigger issue once this virus hit and even though I have extensive proof of everything that happened, no one, not the city I live in, not the court system in our city, council members in this area, I mean no one seems to care of this slumlord violates every right a tenant is supposed to have. I had eviction court last week and I wasn&#39;t even allowed in because i &quot;had a fever of 102&quot; yet i got home and took my temp three times on 2 different thermometers and I was under 98.6. So I literally wasn&#39;t allowed to defend myself, they refused to take or even look at any of our evidence, and they told us we had 30 days and were going to have another court date and then a magistrate made a ruling for my slumlord the next morning. I cannot even find a new place willing to work with us because people assume eviction makes me the trash in this situation but the truth is I almost lost my life in this property and my children have been hurt and even almost seriously hurt as well but this city doesn&#39;t seem to care. Not knowing if you&#39;ll be homeless while covid is still going around us literally terrifying and I can&#39;t believe we got our lives together and came so far to get totally screwed by some garbage person who values a meager amount of money over a family of 4 and their lives and mental and emotional health and I really can&#39;t believe no one seems to care either way.
+##      My marriage is really strained. It wasn&#39;t great to begin with, but this has made it so much worse.
+##      We had been looking forward to our vacation. We had been offered by friends (whom we work with and share a bubble with) to join them at a house on the beach in Outerbanks with their family. We had been monitoring the situation of COVID cases as they rise for the past several weeks with alarm. This was to be a very special and rare vacation for us and we’ve been watching it slip away. It had been a bright spot for us to look forward too. We even asked our family doctor what his professional opinion was and he concluded that as long as we were smart we would probably be fine. And even though the county we would be visiting has had a total of only 16 cases this entire time, we were put into an ultimatum. Two weeks before we were to leave, NYS put together a list of states that residents were banned from traveling to unless they quarantined. Added to that if we were to get sick afterward we could be fined up to $10,000 and no paid sick time. This was confirmed my our employer (my husband and I work for the same place) we could take our week vacation but would need to take the two week Mandatory quarantine without pay. That would mean we would lose two paychecks just for a week of leisure. The remote possibility that we could jeopardize the financial safety of our family through fines and no paychecks, petrified us. We chose to back out. Two of the most stressful and hard parts of this process have been the complexity of feelings that come from being forced into a situation. We were taking so many precautions to do this correctly, but that didn’t matter, the state had layed out their blanket rules. I never knew I would have to make a decision this heavy over a vacation! The second hardest part is dealing with the social repercussions, which not aLot of people talk about now. We didn’t know how this would affect our friendship. They are still trying to figure out a way to go... they have the right to make their own decisions, but we didn’t know if they would resen
+##      Newish (3years) marriage with twin toddlers living in a tiny apartment. Alot of change really fast and a tiny living space.
+##      My marriage is pretty rocky right now. It wasn&#39;t great to begin with, but quarantine has definitely made things worse. I can&#39;t get out and do things with my son that make me feel happy.</code></pre>
+<p><strong>Topic 3</strong></p>
+<pre><code>## Topic 3 Top Words:
+##       Highest Prob: school, will, back, start, fall, open, know 
+##       FREX: fall, will, reopen, start, open, teacher, school 
+##       Lift: sept, inadequ, lazi, slp, tomorrow, vote, fall 
+##       Score: school, will, fall, back, start, open, kindergarten</code></pre>
+<pre><code>## 
+##  Topic 3: 
+##       Not knowing if school is going to start in the fall. He will begin kindergarten and we would rely on him going to school so we could go to work.
+##      Wether school will start soon
+##      preparing for what will happen when school opens
+##      Will school reopen and as a slp in the schools will I be safe?
+##      Figuring out our back-to-school plans; what to do for childcare for my 5-year-old when he is doing virtual school; if I am going back to work when school starts again (I am a part-time teacher)</code></pre>
+<p><strong>Topic 4</strong></p>
+<pre><code>## Topic 4 Top Words:
+##       Highest Prob: hous, just, move, current, away, anoth, coronavirus 
+##       FREX: hous, move, coronavirus, face, confin, anoth, away 
+##       Lift: bye, floor, hous, sold, coronavirus, move, blend 
+##       Score: hous, move, just, current, coronavirus, away, anoth</code></pre>
+<pre><code>## 
+##  Topic 4: 
+##       The 2 oldest children are my husbands from a previous marriage. Their mother has been in an abusive relationship for 4 years, and she finally got the courage to leave when their step dad physically assaulted our 12 year old daughter. The police were called and charges filed and their step dad is in jail but they are still scared that he will get out and come after them and their mom. Their mom has moved to a place that is safe and the step dad is unaware of where it is.
+##      We just bought a house so figuring out how to do all the inspections and walk throughs with the current restrictions. Also, how to do work on the house and move in during a pandemic.
+##      I have a family case in Wisconsin. They will not protect my children and I from their abusive father. He will be released from prison in December. He stalks us regularly and has broken into our house. The police will not enforce the restraining order. My children will have to go back for more abuse if I do not find help. He has joint custody and unsupervised visits.
+##      How coronavirus has slowed down the legal process to get custody of my fiancé&#39;s kids.
+##      Trying to move (affording a house, a good house to move into that isn&#39;t in rough shape...).</code></pre>
+<p><strong>Topic 5</strong></p>
+<pre><code>## Topic 5 Top Words:
+##       Highest Prob: incom, new, financ, rent, util, expens, car 
+##       FREX: incom, financ, car, loss, new, crazi, util 
+##       Lift: financ, friends’, incom, leak, liabil, loss, mid-march 
+##       Score: incom, financ, rent, new, util, car, payment</code></pre>
+<pre><code>## 
+##  Topic 5: 
+##       Oil leak on our property devastating finances.
+##      Oil leak on property devastating our finances.
+##      My husband works and his income can cover rent, and some utilities but not all. We are 1250 behind in rent and depending on the eviction ban to allow us to catch up.
+##      Paying the mortgage, car insurance, car payments, electric, and propane. Significant house and car problems that we cannot afford to fix
+##      Lots of big bills all due at once (e.g. car registration, new car seat, property taxes, etc.)</code></pre>
+</div>
+<div id="section-19" class="section level4">
+<h4>6-10</h4>
+<p><strong>Topic 6</strong></p>
+<pre><code>## Topic 6 Top Words:
+##       Highest Prob: much, dont, lot, come, littl, household, give 
+##       FREX: sleep, give, much, born, birth, lot, household 
+##       Lift: -month-old, beg, book, deserv, facetim, hip, over 
+##       Score: much, dont, lot, sleep, give, household, littl</code></pre>
+<pre><code>## 
+##  Topic 6: 
+##       We just started a nannyshare with a neighbor/colleague for our 4.5 year old, 6 month old, and our neighbor&#39;s 7 month old. Our 6 month old cries the entire day. The ENTIRE DAY. Every moment she&#39;s awake she scream cries. She cries so much her voice is hoarse. She gave herself a blood nose yesterday. So our 4.5 year old is reasonably distressed and just hangs out in the basement or hides in our home &quot;office&quot; with his earphones on. I recognize that this may be partly developmental, but it&#39;s painful. The only silver lining (small, and mixed bag) is that she sleeps well for the nanny, but this is partly because she&#39;s so exhausted from crying that she just passes out.
+##      Our child is so ridiculously fussy and we feel so helpless as she just screams and whines all the time now and nobody believes us.  We are strongly opposed to cry it out so we feel like we&#39;re traumatizing her because she cries all the time even with us holding her constantly.  We have no idea what&#39;s wrong with her and everyone tells us that she&#39;s normal and babies whine.  This is beyond that and we don&#39;t have anyone to help us because we are scared to have people come over.
+##      4-month-old does not sleep well and takes up a lot of our time, so we don&#39;t have time for simple household chores.
+##      My mother in law is in the hospital for a GI bleed and my grandpa is in hospice.
+##      My 14-month-old daughter is having a really difficult time sleeping the past two weeks or so. It is probably that she is teething and getting in about 6-8 teeth, but it is really impacting everyone in the household&#39;s sleep and sanity. 
+## We&#39;re eating out a lot and it takes a toll on both our health and our wallets.</code></pre>
+<p><strong>Topic 7</strong></p>
+<pre><code>## Topic 7 Top Words:
+##       Highest Prob: work, home, time, care, parent, balanc, full 
+##       FREX: full, home, balanc, care, time, work, manag 
+##       Lift: dedic, physician, full, generat, giver, opposit, workschool 
+##       Score: work, home, time, care, full, balanc, manag</code></pre>
+<pre><code>## 
+##  Topic 7: 
+##       Both parents work full time from home and have to simultaneously juggle working with parenting.
+##      Managing working full time from home while caring for an infant full time, with interrupted sleep.
+##      Working Full time and Parenting Full time at the same time
+##      Juggling working from home full time and parenting.
+##      Managing full time work and caring for an infant with no child care</code></pre>
+<p><strong>Topic 8</strong></p>
+<pre><code>## Topic 8 Top Words:
+##       Highest Prob: son, send, preschool, oldest, therapi, whether, decid 
+##       FREX: son, send, therapi, decid, speech, delay, servic 
+##       Lift: aba, chemo, conduct, delay, disord, messag, motor 
+##       Score: son, therapi, send, preschool, speech, whether, oldest</code></pre>
+<pre><code>## 
+##  Topic 8: 
+##       My son is speech delayed (20 months old and has no verbal words) and his pediatrician would not see him for his 18 month appointment and would not refer him to speech therapy. We referred him ourselves as parents and he now receives early intervention services but that is all. He has no socializing and his speech therapy is all via Zoom.
+##      Accessing health therapy services such as speech therapy, occupational therapy, physical therapy
+##      Getting accessed for disorders via zoom not in person example autism
+##      We have a child with autism and global developmental delay who is not receiving any services
+##      My oldest child (22 months) is receiving online speech services for her Speech Delay through the Birth to 3 program. I feel these sessions are largely ineffective and I am concerned her delay is going to worsen not improve.</code></pre>
+<p><strong>Topic 9</strong></p>
+<pre><code>## Topic 9 Top Words:
+##       Highest Prob: stay, tri, safe, healthi, continu, maintain, sane 
+##       FREX: stay, safe, healthi, sane, remain, normalci, tri 
+##       Lift: convinc, racist, calm, dilig, ex-husband, idiot, incorpor 
+##       Score: stay, healthi, safe, tri, maintain, sane, continu</code></pre>
+<pre><code>## 
+##  Topic 9: 
+##       Staying sane while staying in to stay safe.
+##      Maintain normalcy while staying healthy
+##      Staying safe while staying sane
+##      Staying healthy, safe and sane
+##      Trying to convince my In laws that this is not a hoax and they should be safe. Also trying to convince my husband we shouldn’t see them if they are not being safe.</code></pre>
+<p><strong>Topic 10</strong></p>
+<pre><code>## Topic 10 Top Words:
+##       Highest Prob: babi, food, afford, groceri, buy, quarantin, avail 
+##       FREX: groceri, suppli, train, head, item, potti, cloth 
+##       Lift: deliveri, diaper, gettin, head, pickup, sitter, toilet 
+##       Score: food, babi, afford, groceri, buy, store, test</code></pre>
+<pre><code>## 
+##  Topic 10: 
+##       Access to organic meat while doing grocery delivery and sometimes alternative options aren’t available.
+##      Locating the items we need such as toilet paper and cleaning supplies
+##      Being able to afford more than the bare necessities, and keeping up with clothing for a growing baby
+##      There are still supplies that have not became available in the store. I only go to one store once a week and my stores are still not stocked up
+##      I can&#39;t buy essential items such as cleaning supplies, clothing, and other things of that nature because after my bills are paid I am left with a negative balance every month. I currently have 467 dollars owed to my bank.</code></pre>
+</div>
+<div id="section-20" class="section level4">
+<h4>11-15</h4>
+<p><strong>Topic 11</strong></p>
+<pre><code>## Topic 11 Top Words:
+##       Highest Prob: exposur, increas, possibl, public, other, small, impact 
+##       FREX: exposur, possibl, public, contact, countri, worker, potenti 
+##       Lift: anti-sci, countri, cross, dine, exposur, general, government 
+##       Score: exposur, increas, possibl, public, other, contact, countri</code></pre>
+<pre><code>## 
+##  Topic 11: 
+##       We are small business owners. My husband’s job puts him in contact with far more people than the rest of us. Since many Americans in our part of the country are too selfish and anti-science to mask up in public, it’s a concern for his health. But another mandatory shutdown would mean bankruptcy for us.
+##      Finishing up distance learning and making it through the final stretch.  Discussing systemic racism and explaining what is going on in the country.  Trying to explain that COVID-19 hasn&#39;t disappeared and we still have to be cautious.
+##      My husband is an essential worker and in contact with the public.
+##      Fear of illness and the way that would devastate our family system. Inability to see my aging parents across the country, who cannot meet their new grandchild.
+##      The strong urge to socialize, but the small likelihood social distancing will be honored by others</code></pre>
+<p><strong>Topic 12</strong></p>
+<pre><code>## Topic 12 Top Words:
+##       Highest Prob: feel, deal, long, last, depress, caus, comfort 
+##       FREX: deal, depress, world, term, frustrat, long, loneli 
+##       Lift: colicki, hyperact, loneli, manner, monoton, relaps, religi 
+##       Score: feel, deal, long, depress, last, frustrat, caus</code></pre>
+<pre><code>## 
+##  Topic 12: 
+##       Mental health/behavior of my elementary age child and how that is impacting the entire family - more anxious, acting out, rude, defiant. This is causing younger siblings to act out in the same and causing parents to be overwhelmed, stressed and more likely to yell and feel out of control of the household.
+##      This feels never ending. There&#39;s no morale. What do I tell my kids about the world they are going to grow up in? That they have no rights, that no one sees them as anything more than a germ to avoid? I hate that society has de-humanized each other. I am afraid for their futures.
+##      Depression in myself, anger in my husband and sadness, longing and loneliness in my children. It’s hard to escape without all the physical outlets and allowance to hang with friends.
+##      My child&#39;s behavior has grown more intense and defiant. There&#39;s a lot of anger, frustration, and resistance. My husband is also in recovery for alcoholism and he has relapsed twice during this pandemic due to extreme anxiety, which has been very stressful for our family.
+##      Being new parents is hard in a “normal” world, never mind during a pandemic world. You really don’t feel like yourself anymore, especially having to limit your exposures and being cooped up with the baby all day every day, a baby that’s colicky nonetheless</code></pre>
+<p><strong>Topic 13</strong></p>
+<pre><code>## Topic 13 Top Words:
+##       Highest Prob: abl, thing, hard, without, take, place, busi 
+##       FREX: play, park, abl, librari, church, playground, thing 
+##       Lift: gym, librari, museum, park, pool, storytim, swim 
+##       Score: abl, thing, play, without, busi, place, park</code></pre>
+<pre><code>## 
+##  Topic 13: 
+##       The biggest challenges continue to be a modified routine for the kids. We cannot take them places they otherwise would be going on a regular basis (park, play dates, church, restaurants, etc).
+##      Being together 24/7 and the kids not being able to play with their friends is incredibly hard. They miss their friends and being able to go to the zoo, museums, parks etc.
+##      My son is very hyper active and not being able too go to the park and play has been really hard. Even though we have a backyard it’s not the same as the playground. Attitude, sleeping schedule have also been very hard with both of the children.
+##      The isolation and disruption from our normal lives. Being unable to take our 3 year old many of the places that he’s used to for stimulation (museums, indoor play places, travel, etc) is difficult.
+##      lack of resources such as being able to go to the library, parks, group gatherings mseeting</code></pre>
+<p><strong>Topic 14</strong></p>
+<pre><code>## Topic 14 Top Words:
+##       Highest Prob: job, husband, unemploy, one, hour, lose, benefit 
+##       FREX: unemploy, benefit, furlough, assist, job, lose, lost 
+##       Lift: appeal, assist, bartend, claim, halt, industri, lose 
+##       Score: job, husband, unemploy, lose, benefit, hour, one</code></pre>
+<pre><code>## 
+##  Topic 14: 
+##       The ending of the $600 federal assistance that has been coming in addition to unemployment.
+## My husband who is the main financial support has been furloughed.
+##      Not receiving our stimulus payment , husband not receiving his unemployment benefits
+##      My husband has not received unemployment benefits yet.  He has applied and is eligible.  We are depleting savings. 
+## 
+##      Money and employment. My husband was laid off. We haven&#39;t received unemployment or have heard anything.
+##      Husbands furlough has been extended and we are about to lose the extra unemployment benefits so we have to move out of our apartment</code></pre>
+<p><strong>Topic 15</strong></p>
+<pre><code>## Topic 15 Top Words:
+##       Highest Prob: want, risk, fear, normal, covid-, put, high 
+##       FREX: risk, fear, noth, normal, covid-, immunocompromis, ever 
+##       Lift: colder, advantag, capit, dispit, europ, gettimg, immunocompromis 
+##       Score: fear, risk, normal, want, covid-, grandpar, high</code></pre>
+<pre><code>## 
+##  Topic 15: 
+##       The actual distancing is difficult. My mother has Stage 4 Lung Cancer and due to the risk,  we cannot visit her.
+##      Ongoing childcare, we have been using grandparents but do not want to overstay our welcome
+##      Making decisions related to our risk tolerance for COVID. Specifically involving visiting elderly parents.
+##      Lack of socialization. Fear of high risk family members getting Covid-19.
+##      Moving, high risk pregnancy</code></pre>
+</div>
+<div id="section-21" class="section level4">
+<h4>16-20</h4>
+<p><strong>Topic 16</strong></p>
+<pre><code>## Topic 16 Top Words:
+##       Highest Prob: stress, enough, virus, anxieti, catch, secur, better 
+##       FREX: stress, virus, catch, better, enough, surviv, corona 
+##       Lift: better, corona, gonna, readjust, stressanxieti, surviv, virus 
+##       Score: stress, enough, virus, anxieti, catch, secur, space</code></pre>
+<pre><code>## 
+##  Topic 16: 
+##       Ongoing uncertainty about job security and pay security and benefits security
+##      Anxiety and stress levels due to pandemic exposure.
+##      Managing stress from work, parenting, and the high amount of stress and crisis that is in our world
+##      My own anxiety prevents me from successfully handling my children&#39;s anxieties that have risen due to the pandemic. Not enough social interaction or support
+##      Small apartment, not enough living space, definitely not enough space for another lockdown</code></pre>
+<p><strong>Topic 17</strong></p>
+<pre><code>## Topic 17 Top Words:
+##       Highest Prob: famili, help, friend, see, support, miss, none 
+##       FREX: famili, friend, miss, none, visit, member, spend 
+##       Lift: border, disagr, famili, friend, germani, member, none 
+##       Score: famili, friend, see, none, miss, help, visit</code></pre>
+<pre><code>## 
+##  Topic 17: 
+##       Traveling out of state to see our families.  We are a military family and the unknown about when it is safe to see our extended family creates uncomfortable conversations with them.  Some extended family members do not take the virus seriously and are judging our concerns for traveling in the future.
+##      Missing friends and family members
+## 
+##      Missing nearby family and friends
+##      Not seeing other family and friends for hands on support with the baby.
+##      Connectedness to extended family and friends</code></pre>
+<p><strong>Topic 18</strong></p>
+<pre><code>## Topic 18 Top Words:
+##       Highest Prob: make, sure, uncertainti, meet, older, end, homeschool 
+##       FREX: make, sure, uncertainti, meet, choic, conflict, homeschool 
+##       Lift: acid, auto, choic, conflict, copar, foid, mileston 
+##       Score: make, sure, meet, uncertainti, homeschool, older, decis</code></pre>
+<pre><code>## 
+##  Topic 18: 
+##       Making ends meet , making sure they are learning
+##      Trying to figure out correct info to make informed decisions for my family.  There is a lot of conflicting info out there
+##      Making ends meet
+##      Making sure our finances cover all needs. Making sure my son is growing and hitting all his milestones
+##      Making ends meet</code></pre>
+<p><strong>Topic 19</strong></p>
+<pre><code>## Topic 19 Top Words:
+##       Highest Prob: covid, due, interact, outsid, expos, stuck, infect 
+##       FREX: stuck, infect, insid, exercis, expos, due, energi 
+##       Lift: expend, land, loot, pent, cooler, cream, infect 
+##       Score: covid, due, interact, outsid, expos, stuck, infect</code></pre>
+<pre><code>## 
+##  Topic 19: 
+##       We are in an area with significant smoke from wildfires. It is restricting our ability to go outside and my daughter to go to school. With no indoor public places open for children due to COVID, we are feeling trapped.
+##      Never getting a break from childcare and feeling burnt out as parents, the small size of our living space (720 sq ft rental) and long periods trapped inside together because of poor air quality due to smoke from wildfires, poor mental health because of lack of exercise and time outside
+##      Feeling stuck at home/ unable to do the activities that we enjoy because of closures and restrictions due to COVID and wildfire smoke
+##      Finding a safe and affordable location away from looting, rioting, fireworks, gunshots, protests,  homelessness epidemic, failed schools, overpriced housing and failed public institutions/government.  All of these negative trends have been significantly accelerated by the Covid crisis.  Urban centers are now VERY dangerous and VERY unhealthy places for people especially people with kids.  It is very clear that our child has been traumatized by a combination of being forced inside by the pandemic while watching protesters and rioters from the window.  He has a sound sensitivity and the gunshots and fireworks are pretty constant after dark.
+## 
+## Where to go though is the million $ question.  I have lived in the DC city core for 20+ years so it is very daunting to have to plan to evacuate your home you have loved for such a long time especially during a pandemic.  I wish I were joking or exaggerating.  I am not.  Even a good bit of the food supply chain continues to break down on a weekly basis.  It is insane.  Instead of fixing these issues, our mayor is running for Vice President and our city council has proposed raising taxes???????
+##      We are concerned about having to evacuate due to encroaching wildfires in our area.</code></pre>
+<p><strong>Topic 20</strong></p>
+<pre><code>## Topic 20 Top Words:
+##       Highest Prob: social, children, isol, distanc, develop, toddler, relationship 
+##       FREX: social, isol, develop, toddler, growth, academ, children 
+##       Lift: aspect, develop, illeg, isol, social, butterfli, growth 
+##       Score: social, children, isol, distanc, develop, toddler, academ</code></pre>
+<pre><code>## 
+##  Topic 20: 
+##       Social and emotional development of our child, such as learning social cues from other kids. Staying on top of age appropriate educational development.
+##      Interpersonal relationships between adults.  Learning and social development for kids.
+##      Social distancing and being isolated
+##      Social development and growth
+##      Being self-quarantined is becoming difficult because we have an only child who desires playtime with other children.</code></pre>
+</div>
+<div id="section-22" class="section level4">
+<h4>21-25</h4>
+<p><strong>Topic 21</strong></p>
+<pre><code>## Topic 21 Top Words:
+##       Highest Prob: like, peopl, around, look, don’t, mask, especi 
+##       FREX: peopl, mask, wear, around, real, especi, pregnant 
+##       Lift: deputi, war, cdc, china, contribut, crowd, floyd 
+##       Score: peopl, like, mask, wear, look, around, don’t</code></pre>
+<pre><code>## 
+##  Topic 21: 
+##       Not knowing what is true or not true on the news. Wearing a mask, especially when you feel out of breath when wearing it.
+##      my child only has contact with us. Whe we go to an appointment and have to wear mask screams and cries terrified of us with mask of others with mask. Does not like being with any one else cries uncontrollably
+##      Being able to protect ourselves from thieves when the economy gets worse and people get more desperate. Possible civil war if communism is pushed on people. Having to use deadly force if vaccines are pushed on my family. Having to organize to develop a black market local economy if people are no longer allowed access to stores without required vaccines, and organizing to develop our own economies to be able to avoid the requirements. The threat of communism is serious regardless of who wins the elections, civil war will happen in my town against anyone who pushes for communism, people are organizing and preparing for it.
+##      Wondering what school will look like in the fall for our kids and also for myself as a teacher. Also worrying about going to gatherings to celebrate people like graduation parties. We went to one outdoors and tried to stay distant but no one wore masks so I&#39;m a little nervous.
+##      The lack of widespread testing. No vaccine. People who refused to follow CDC guidelines and don’t wear masks or social distance.</code></pre>
+<p><strong>Topic 22</strong></p>
+<pre><code>## Topic 22 Top Words:
+##       Highest Prob: year, old, month, next, two, teach, three 
+##       FREX: year, old, month, next, upcom, four, enter 
+##       Lift: six, theyr, next, -year, awhil, chemic, count 
+##       Score: year, old, month, next, teach, two, write</code></pre>
+<pre><code>## 
+##  Topic 22: 
+##       My 4 year old is ADHD my 2 year old has asd and deaf in 1 ear
+##      Caring for a newborn while meeting the needs of a very energetic 5 year old with special needs. Also prospects of upcoming school year for the five year old.
+##      Distance learning for my 9 year old! And social skill for both my 9 year old and 3 three year old
+##      Keeping our three year old busy, how school will work next year for our three year old and ourselves; we are both educators
+##      Allergic to toxic chemicals and fragrances being stayed everywhere and do not agree with mandatory vaccinations</code></pre>
+<p><strong>Topic 23</strong></p>
+<pre><code>## Topic 23 Top Words:
+##       Highest Prob: concern, health, mental, well, issu, struggl, physic 
+##       FREX: health, mental, issu, concern, burden, declin, struggl 
+##       Lift: burden, declin, factori, health, issu, substanc, mental 
+##       Score: health, concern, mental, issu, burden, stabil, well</code></pre>
+<pre><code>## 
+##  Topic 23: 
+##       Parents’ mental health, kids’ mental health
+##      Mental health &amp; wellness, physical health
+##      Our biggest concern right now is my health, I&#39;m waiting on a formal diagnosis of a thyroid autoimmune disease.
+##      Delay in my spouse’s unemployment benefits 
+## Lack of socialization for my child
+## My mental and physical health 
+## Paying for mental and physical health appointments and procedures
+##      Getting mental health and marriage counseling .
+## The health of my mother, who does all childcare is troublesome.   She has 2 autoimmune diseases and we are concerned about exposing her</code></pre>
+<p><strong>Topic 24</strong></p>
+<pre><code>## Topic 24 Top Words:
+##       Highest Prob: kid, keep, activ, everyon, entertain, happi, occupi 
+##       FREX: everyon, entertain, happi, occupi, along, keep, kid 
+##       Lift: devic, dog, satisfi, beat, busyentertain, cranki, effici 
+##       Score: keep, kid, activ, entertain, everyon, happi, occupi</code></pre>
+<pre><code>## 
+##  Topic 24: 
+##       keeping everyone happy and involved in activities.
+##      Keeping kids active and engaged
+##      Keeping kids entertained and happy
+##      Keeping the kids happy and entertained
+##      keeping kids stimulated so they aren&#39;t bored and unruly</code></pre>
+<p><strong>Topic 25</strong></p>
+<pre><code>## Topic 25 Top Words:
+##       Highest Prob: learn, educ, virtual, remot, onlin, navig, behind 
+##       FREX: learn, educ, virtual, onlin, hybrid, track, grader 
+##       Lift: assign, digit, educ, facilit, grader, hybrid, kinder 
+##       Score: learn, educ, virtual, remot, onlin, kinder, class</code></pre>
+<pre><code>## 
+##  Topic 25: 
+##       #1. Enrollment to PreK for the next year. We are contractually committed to a program however we do not want to ensure the learning disruption that occurred this year again, should there be a second wave. #2 remote learning does not provide the value that we pay in the negotiated cost of private preK tuition #3 a large part of the value is the socialization component which may be reduced or eliminated if classes are modified or remote learning is deemed the only safe alternative. #4 home schooling- taking on a larger educator role at home and balancing the new dynamic that entails.
+##      Being successful at distance learning with a preschool, kindergartener and 1st grader. Finishing my Masters degree in Special Ed.
+##      Navigating on-line learning and ensuring he is getting an appropriate education.
+##      Navigating homeschooling; my children aren’t a private school with a remote learning option, and we are the only family in their classes that has opted for remote learning. We purchased a secular homeschool curriculum (because 5 &amp; 3 year olds don’t want to sit in front of an iPad), and check in with their classes a few times a week. We are learning what schooling looks like for us.
+##      Ensuring quality education/ learning experience within hybrid schedule.</code></pre>
+</div>
+<div id="section-23" class="section level4">
+<h4>26-30</h4>
+<p><strong>Topic 26</strong></p>
+<pre><code>## Topic 26 Top Words:
+##       Highest Prob: money, financi, safeti, emot, save, cost, insur 
+##       FREX: money, financi, safeti, cost, emot, insur, save 
+##       Lift: bathroom, dentist, failur, financi, healthier, known, net 
+##       Score: money, financi, safeti, save, emot, cost, insur</code></pre>
+<pre><code>## 
+##  Topic 26: 
+##       Saving money or not depleting all of savings
+##      Financial struggles, emotional pain
+##      emotional, financial stability
+##      financial and emotional wellbeing
+##      Money, financially stability</code></pre>
+<p><strong>Topic 27</strong></p>
+<pre><code>## Topic 27 Top Words:
+##       Highest Prob: get, daycar, back, sick, figur, routin, done 
+##       FREX: get, sick, daycar, routin, figur, done, workplac 
+##       Lift: “new, bedtim, courag, fault, get, normal”, sick 
+##       Score: get, sick, daycar, back, figur, routin, done</code></pre>
+<pre><code>## 
+##  Topic 27: 
+##       Whether or not to send our son back to daycare. Cases are blowing up and the stories of outbreaks at daycares freak me out, but our “new normal” is so exhausting!
+##      Challanges getting shopping done and what not with a high risk child. And concerns my son getting sick or my fiance bringing the sickness home from work.
+##      Routine and fear of getting sick
+##      Getting back into part time job routine where my 3 years has to go back to daycare
+##      Routines. Especially bedtime routines. Still a little anxiety as they go back to daycare. Separation anxiety.</code></pre>
+<p><strong>Topic 28</strong></p>
+<pre><code>## Topic 28 Top Words:
+##       Highest Prob: sinc, close, spous, everyth, limit, summer, unabl 
+##       FREX: limit, summer, unabl, problem, resourc, close, camp 
+##       Lift: audit, camp, dementia, discord, document, fli, plane 
+##       Score: sinc, close, limit, summer, problem, spous, everyth</code></pre>
+<pre><code>## 
+##  Topic 28: 
+##       We’ve been keeping to our strategy for not over eating or over using resources. But we are becoming concerned as we have been utilizing resources and many resources are losing funding. So it is scary and worrisome for me because there are only so many ways we can problem solve to stay afloat. Even in a tight community like ours, eventually people will need to stop helping others to sustain themselves.
+##      My husband’s work decided to do an insurance audit on every employee in the middle of a pandemic. We almost lost our insurance because I couldn’t get documents I needed due to COVID closures. I need to get my little one into the doctor for her vision and hearing screening for school and no one will see her. My husband was in the hospital and could have died in March and he has been unable to see a doctor because no doctors in our area are accepting new patients.
+##      My mother in law is on path towards either dementia or alheizmers. However she lives in Hawaii with a 2 week quarantine policy for visitors from the mainland. Had to cancel plans to check in on her twice from our home in California while the state kept the two week quarantine policy.
+##      Marital problems, anxiety, cabin fever, depression
+## 
+##      When things are going to open back up, minor money problems that can easily turn into major money problems if lock down continues indefinitely.</code></pre>
+<p><strong>Topic 29</strong></p>
+<pre><code>## Topic 29 Top Words:
+##       Highest Prob: pay, bill, employ, leav, medic, cut, debt 
+##       FREX: pay, bill, debt, paid, credit, card, electr 
+##       Lift: acquir, broke, card, electr, leftov, max, mount 
+##       Score: pay, bill, employ, debt, paid, cut, credit</code></pre>
+<pre><code>## 
+##  Topic 29: 
+##       Paying off medical debt, credit card debt
+##      Paying for bills such as credit cards.
+##      Credit card debt and paying it off quickly
+##      Mounting credit card bills and not being able to seek additional employment.
+##      Paying the higher electric bills</code></pre>
+<p><strong>Topic 30</strong></p>
+<pre><code>## Topic 30 Top Words:
+##       Highest Prob: child, daughter, lack, behavior, age, skill, becom 
+##       FREX: behavior, child, lack, child’, children’, tantrum, peer 
+##       Lift: escal, inact, lupus, toddler’, uncharacterist, violent, behavior 
+##       Score: child, lack, daughter, behavior, age, skill, child’</code></pre>
+<pre><code>## 
+##  Topic 30: 
+##       My child becoming very ornery or moody due to lack of socializing with other children her age
+##      Childs behavior and violent behavior
+##      Getting my work done when my child is home with me.  His lack of social opportunities.  His behavior and tantrums.
+##      Lack of socialization for our child. Difficulties in keeping up with my child with no school or outside distractions (like park or zoo), while being pregnant. My child&#39;s behavior and lack of listening.
+##      Biggest concern is the lack of social interaction for my child with similar age children. Also, the lack of exposure to new activities and venues.</code></pre>
+</div>
+<div id="section-24" class="section level4">
+<h4>31-34</h4>
+<p><strong>Topic 31</strong></p>
+<pre><code>## Topic 31 Top Words:
+##       Highest Prob: day, week, state, case, posit, relat, everi 
+##       FREX: week, relat, number, rise, state, per, case 
+##       Lift: exponenti, reschedul, absolut, averag, blame, campus, climat 
+##       Score: week, day, state, case, relat, posit, rise</code></pre>
+<pre><code>## 
+##  Topic 31: 
+##       Our biggest challenge is childcare and maintaining and income.  I am transitioning from a purely clinical position where I am currently able to telework due to the pandemic, to a faculty position where I am expected to be on campus and put my family at risk.  The Pandemic Unemployment Assistance (PUA) for independent contractors I have qualified for 3 weeks since the pandemic began, but my income has decreased greatly.  I typically made 1800-1900 per week before setting aside for taxes prior to the pandemic.  To qualify for PUA, I have to make less than 717$ per week.  I currently average 700-800$ per week due to cancellations and no-shows.
+## 
+## My grandparents watch my daughter one day per week.  I would like them to watch my daughter 2 days per week so that I can get my work done.  However, I think they are going to end up not watching her at all because the college I am going to work to plans to re-open face to face.  I don&#39;t blame them.  Every interaction we have with other people in-person amplifies our risks for contracting COVID-19 exponentially.
+##      I am trying to work from home as a 1099 independent contractor doing telepractice speech therapy.  I am working 7 days per week to see half my caseload, and half of the sessions that do occur are rescheduled 2 or 3 times.  This is very distressful to my daughter, who turns 3 this week. My husband is still working outside the home.  On Saturday, I gave in and asked my mother-in-law to help with childcare for 3 days a week, despite our county in our state still being under a stay-at-home order.  I needed to preserve my and my daughter&#39;s mental health.  Unfortunately, this is somewhat risky because my husband works in healthcare.
+##      Childcare. I’m scheduled to start a new job next month, a faculty position. I only have a babysitter 3 days per week. My mother-in-law isn’t available 5 days per week. The college plans to open in-person and my department has said it’s “all hands on deck” due to smaller class sizes and needed to give students personalized attention. I’m going to need to be on campus a lot. I’m hoping my grandparents will watch my daughter two days per week, as they did pre-covid, but at the same time it feels super risky due to their age and health histories and me being around groups of people
+## On campus.
+##      Safety. The amount of cases in our county and state are going up and at a higher rate these past couple of weeks.
+##      The numbers of positive cases in various states going up</code></pre>
+<p><strong>Topic 32</strong></p>
+<pre><code>## Topic 32 Top Words:
+##       Highest Prob: worri, pandem, life, futur, may, affect, hold 
+##       FREX: futur, worri, uncertain, pandem, life, condit, -law 
+##       Lift: amidst, stupid, sweep, tripl, america, domest, futur 
+##       Score: worri, pandem, futur, life, may, affect, laid</code></pre>
+<pre><code>## 
+##  Topic 32: 
+##       I am worry about the future of America. It has been so chaos recently. It make us lost the faith in America strength and humanity. The life become uncertain. I can not know what is coming...
+##      I just need a break. When I chose marriage and kids over my career, I did so without the idea of living in isolation. Not being able to physically see and connect with my peers has a huge impact on my mental health, which in turn negatively affects my ability to balance parenting, educating, housekeeping and all of the other domestic shit that feels thankless and endless. I&#39;ve watched the business that I&#39;ve worked so hard for disintegrate overnight. It&#39;s tough to cope with the fact that my life&#39;s investment in myself feels like a waste right now because I&#39;m stuck in a 1950&#39;s life that I&#39;d be just as capable of living without 11 years of college education and tens of thousands of dollars spent on a business that was supposed to be my balance to ask if the domestic shit I committed to. Now I&#39;m just a fucking housewife.
+##      I am worried about the coronavirus wiping out the stock market in the future.
+##      I believe I have been laid off from my job even though my employer never formally laid me off. I have also been consuming alcohol on almost a regular basis since the pandemic began in order to deal with daily life. This has affected me and my family negatively in many ways. I am trying to limit my alcohol intake but I believe I may have become dependent on alcohol and I’m really struggling with this issue. I am also worried about the pandemic relief benefits expiring at the end of this month. I rely on that income to help pay bills and pay for food for my family. I am also concerned about the safety of my elderly parents during the pandemic. If they were to become infected with COVID-19 I’m scared they won’t make it through. They both have medical issues.
+##      I worry about the near future and my firstborn starting kindergarten during a possible second outbreak of Covid-19.  I worry that this may negatively affect her education.</code></pre>
+<p><strong>Topic 33</strong></p>
+<pre><code>## Topic 33 Top Words:
+##       Highest Prob: childcar, find, can, return, schedul, bring, partner 
+##       FREX: childcar, return, find, flexibl, boredom, can, reliabl 
+##       Lift: popul, purpos, return, suitabl, childcar, flexibl, niec 
+##       Score: childcar, find, return, can, schedul, bring, partner</code></pre>
+<pre><code>## 
+##  Topic 33: 
+##       Loss of usual childcare. Previously had an au pair, by executive order has blocked those visas through end of 2020. Unsure how we will find similar childcare without spending a ton of money
+##      Finding childcare so I can go back to work / me finding a flexible work from home job so I can stay home but bring in income.
+##      Childcare while working. Can be flexible working from home some but are not using center childcare and grandparent is in vulnerable population so waiting for her to be caregiver
+##      Childcare, my oldest son returning to school and me finding childcare so I can find work.
+##      Finding non-parental childcare if the need arises</code></pre>
+<p><strong>Topic 34</strong></p>
+<pre><code>## Topic 34 Top Words:
+##       Highest Prob: need, also, still, provid, chang, overreach, compar 
+##       FREX: also, need, overreach, chang, provid, still, compar 
+##       Lift: overreach, also, chang, need, provid, still, decompress 
+##       Score: need, also, provid, overreach, still, chang, decompress</code></pre>
+<pre><code>## 
+##  Topic 34: 
+##       Working full time while attending to the needs of our children. being patient when they are constantly talking!  They are just being children and I am amazed at how well they cope.  We have out really good compared to most.  But I need alone time and it’s no where to be f puns. The children are constantly next to me because they want mom.  They need me.  My job needs me.  My students need me and I can’t find time / space to decompress
+##      Being unemployed and not knowing if I&#39;ll be employed at the end of the pandemic. If I need to change careers. What to do for childcare if I do need to change careers. My child has asthma.
+##      Right now it is difficult to engage in social learning and to provide educational needs of all my children as well as basic needs due to our income restrictions and social distancing because of covid 19. Also the stress of making our bill payments can be a bit overwhelming at times. We are thankful we can make these payments and provide a home for our family.
+##      Husband / partners need to learn English, husband / partners need to learn how to cook, husband / partners need to learn how to organize, husband / partners need to lose weight, family need of finding our own stable housing and having enough income to support ourselves, no savings and no credit cards to help in the event of a major car repair, accident, or any other kind of problem.
+##      I want my kids back in school. They need to be taught by their teachers. They need to see their peers. I need a break from them. They need a break from each other.</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="topic-correlations" class="section level1 tabset">
+<h1 class="tabset">Topic correlations</h1>
+<div id="section-25" class="section level2">
+<h2>27</h2>
+<p><img src="stm_open_files/figure-html/unnamed-chunk-102-1.png" width="672" /></p>
+</div>
+<div id="section-26" class="section level2">
+<h2>30</h2>
+<p><img src="stm_open_files/figure-html/unnamed-chunk-103-1.png" width="672" /></p>
+</div>
+<div id="section-27" class="section level2">
+<h2>34</h2>
+<p><img src="stm_open_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
+</div>
+</div>
+<div id="effects" class="section level1">
+<h1>Effects</h1>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
