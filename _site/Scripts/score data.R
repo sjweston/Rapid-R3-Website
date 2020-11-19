@@ -124,10 +124,10 @@ scored = scored %>%
 # repeat ------------------------------------------------
 
 scored = scored %>%
+  filter(Week > 0) %>%
   group_by(CaregiverID) %>%
-  summarize(returner = n(),
-            returner = ifelse(returner > 2, 1, 0)) %>%
-  ungroup()%>%
+  summarize(n = n()) %>%
+  mutate(returner = ifelse(n > 1, 1, 0)) %>%
   full_join(scored)
 
 # variables assessed only at baseline

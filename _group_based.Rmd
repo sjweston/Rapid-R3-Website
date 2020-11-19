@@ -399,7 +399,7 @@ average_by_week(lonely, group_f, "mental health problems")
 ```
 
 ```{r -group-based-41 }
-is.single <- params$subset == "single"
+is.single <- params$subset %in% c("single", "disability")
 
 if(is.single){
   single_header = print("### Text-based (average)")
