@@ -90,7 +90,7 @@ scored = scored %>%
     Week %% 2 == 0 ~ NA_real_,
     TRUE ~ Week
   )) %>%
-  filter(!is.na(Week)) 
+  filter(!is.na(Week))
 ```
 
 Since the beginning of the survey, `r prettyNum(n_groups, big.mark = ",")` `r str_remove(params$grp.name, " caregivers")` caregivers have participated in RAPID. 

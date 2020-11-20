@@ -1,0 +1,1679 @@
+---
+title: "Children with Disabilities Master File"
+author: "Sihong"
+date: "10/28/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, include = FALSE}
+library(here)
+library(knitr)
+library(kableExtra)
+library(readr)
+library(haven)
+library(BSDA)
+library(naniar)
+library(Rfast)
+library(RMediation)
+library(tidyverse)
+```
+
+
+```{r, echo=FALSE, message = FALSE}
+#Define functions
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+
+moe.m = function(sd,n){
+  moe = 1.96*sd/sqrt(n)
+  return(moe)}
+
+combine.cat = function(x, cols, id, newvar.name){
+  subset = x[,c(id, "Week", cols)]
+  names(subset) = c("id", "Week", paste0("X",1:length(cols)))
+  subset = suppressWarnings(gather(subset, "key", "value", -id, -Week))
+  subset = filter(subset, !is.na(value))
+  subset$key = gsub("X", "", subset$key)
+  subset = group_by(subset, id, Week)
+  subset = summarize(subset, newvar = paste(key, collapse = ",")) %>% ungroup()
+  names(subset) = c(id,"Week", newvar.name)
+  x = suppressMessages(full_join(x, subset))
+  return(x)
+}
+
+find_items = function(string, data2){
+  items = names(data2)
+  locations = which(grepl(string, items))
+  final = items[locations]
+  return(final)
+}
+
+my.max = function(x) ifelse (!all(is.na(x)), max(x,na.rm = TRUE), NA)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+#OR load master data file
+master = read_sav(here("data/MasterFile_groupings.sav"))
+
+master = filter(master, CaregiverID != "") 
+master = master %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == max(row_number()) & is.na (Exclude) == T) %>%
+  ungroup()
+
+#Score Child Disability Status
+master = combine.cat(x = master, 
+                       cols = find_items("HEALTH.005", master), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.005_cat")
+master <- master %>%
+   mutate (disability = case_when(
+     HEALTH.005_1 == 1 ~ 1,
+     HEALTH.005_2 == 1 ~ 1,
+     HEALTH.005_3 == 1 ~ 1,
+     HEALTH.005_4 == 1 ~ 1,
+     HEALTH.005_6 == 1 ~ 1,
+     HEALTH.005_5 == 1 ~ 0,
+     TRUE ~ NA_real_), 
+     month = case_when(
+     Week == 0 ~ "Pre-COVID",
+     Week >0 & Week <= 4 ~ "April",
+     Week >=5 & Week <=8 ~ "May",
+     Week >=9 & Week <=13 ~ "June",
+     Week >=14 & Week <=17 ~ "July",
+     Week >=18 & Week <=21 ~ "August",
+     Week >=22 & Week <=26 ~ "September",
+     Week >=27 ~ "October"), 
+     baseline = case_when (Week - BaselineWeek == 1 ~ 1, 
+                           Week - BaselineWeek > 1 ~ 0))
+
+master_dsb <- master %>%
+  group_by (CaregiverID) %>%
+  summarise (disability = my.max (disability))%>%
+  mutate (disability_cat = case_when (disability == 1 ~ "with disability", 
+                                       disability == 0 ~ "without disability"))
+
+master <- merge (x = master_dsb, y = master, by.x = "CaregiverID", by.y = "CaregiverID")
+
+master = master %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week))
+```
+
+
+```{r, echo=FALSE, message = FALSE}
+#Variables Needed for Analyses Lists
+
+total_weeks = max(master$Week, na.rm=T)
+
+#Domains of data need to pull: caregivers' mental health, children's behavioral outcomes, material hardship, health interrupted, childcare, social support
+
+cbp <- c("fussy", "fussy_current_some", "fussy_current_lots", "fear", "fear_current_some", "fear_current_lots")
+pmh <- c("depress", "depress_current_some", "depress_current_lots", "depress_increase", "anxiety", "anxiety_current_some", "anxiety_current_lots", "anxiety_increase", "stress", "stress_current_some", "stress_current_lots", "stress_increase", "lonely", "lonely_current_some", "lonely_current_lots")
+mh <- c ("mh_food", "mh_eviction", "mh_foreclose", "mh_utilities", "num_hardship")
+cc <- c("cc2_nonparental", "cc2_centerbased", "cc2_homebased", "cc2_paid", "cc2_unpaid", "lack_cc")
+hi <- c ("miss_vaccine_any", "missed_wellbaby", "delay_healthcare")
+
+
+```
+
+# Caregivers' Mental Health
+
+  * Depress (mean of the following items, ranged 0-3):\
+    - Little interest or pleasure in doing things\
+    - Feeling down, depressed, or hopeless\
+  * Anxiety (mean of the following items, ranged 0-3):\
+    - Feeling nervous, anxious, or on edge\
+    - Not being able to stop or control worrying\
+  * Stress (ranged 0-4):\
+    - Stress means a situation in which a person feels tense, restless, nervous or anxious, or is unable to sleep at night because his/her mind is troubled all the time. Do you feel this kind of stress before/after the COVID19 pandemic began? \
+  * Loneliness (ranged 0-4):\
+    - Prior to/Since COVID19 pandemic, please describe how often...I felt lonely\
+  * Note that all scores were transformed to range 0-1 for comparison. \
+    
+```{r, echo=FALSE, message = FALSE}
+#Score caregivers' mental health problems
+depress_pre = rowMeans(master[,find_items("PHQ.001.[a-b]$", master)], na.rm=T)
+depress_crt= rowMeans(master[,find_items("PHQ.002.[a-b]$", master)], na.rm=T)
+anxiety_pre = rowMeans(master[,find_items("GAD2.001.[a-b]$", master)], na.rm=T)
+anxiety_crt = rowMeans(master[,find_items("GAD2.002.[a-b]$", master)], na.rm=T)
+master <- master %>%
+  rowwise %>%
+  mutate (depress_pre = mean (PHQ.001.a, PHQ.001.b, na.rm = TRUE)/3*100,
+          depress_crt = mean (PHQ.002.a, PHQ.002.b, na.rm = TRUE)/3*100,
+          anxiety_pre = mean (GAD2.001.a, GAD2.001.b, na.rm = TRUE)/3*100,
+          anxiety_crt = mean (GAD2.002.a, GAD2.002.b, na.rm = TRUE)/3*100)%>%
+  ungroup () %>%
+  mutate (stress_pre = STRESS.001/4*100,
+          stress_crt = STRESS.002/4*100,
+          lonely_pre = LONE.001.a/4*100,
+          lonely_crt = LONE.001.b/4*100)%>%
+  rowwise %>%
+  mutate (total_pre = sum(depress_pre, anxiety_pre, stress_pre, lonely_pre, na.rm = TRUE)/4,
+          total_crt = sum(depress_crt, anxiety_crt, stress_crt, lonely_crt, na.rm = TRUE)/4)
+
+pmh <- master %>%
+  dplyr::select(CaregiverID,month,Week,  BaselineWeek, baseline, disability_cat, contains ("depress"),contains ("anxiety"), stress_pre, stress_crt, lonely_pre, lonely_crt, contains ("total"))
+
+```
+
+## Between-Subject Analyses (Group-Level Means)
+
+## Mean Scores Breakdown by Disability Groups
+
+  * Children with vs. without disability comparison: \
+    + During both pre-COVID and currently, caregivers of children with disability reported significantly higher mean levels of total mental health problems compared to caregivers of children without disability. \
+    + During both pre-COVID and currently, caregivers of children with disability reported significantly higher mean levels of depression, anxiety, stress, and loneliness, respectively, compared to caregivers of children without disability. \
+  * Pre-COVID vs. Current comparison:\
+    + For caregivers of children with or without disability, reported total mental health problems and specific symptoms (depression, anxiety, stress, and loneliness) all significantly increased from pre-COVID to currently. 
+
+```{r, echo=FALSE, message = FALSE}
+pmh_pre_m <- pmh %>%
+  filter (baseline == 1)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             depress = mean (depress_pre, na.rm = TRUE), 
+             anxiety = mean (anxiety_pre, na.rm = TRUE), 
+             stress = mean (stress_pre, na.rm = TRUE), 
+             lonely = mean (lonely_pre, na.rm = TRUE), 
+             total = mean (total_pre, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("depress","anxiety", "stress","lonely","total"), 
+                names_to = "problems", values_to = "mean") %>%
+  mutate (time = "a.pre-COVID")
+
+pmh_pre_sd <- pmh %>%
+  filter (baseline == 1)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             depress = sd (depress_pre, na.rm = TRUE), 
+             anxiety = sd (anxiety_pre, na.rm = TRUE), 
+             stress = sd (stress_pre, na.rm = TRUE), 
+             lonely = sd (lonely_pre, na.rm = TRUE), 
+             total = sd (total_pre, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("depress","anxiety", "stress","lonely","total"), 
+                names_to = "problems", values_to = "sd") %>%
+  mutate (time = "a.pre-COVID")
+
+pmh_pre = merge (x = pmh_pre_m, y = pmh_pre_sd,  by.x = c("problems", "n", "disability_cat", "time"), by.y = c("problems", "n", "disability_cat", "time"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+
+pmh_crt_m <- pmh %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week))%>%
+  ungroup() %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+          depress = mean (depress_crt, na.rm = TRUE), 
+          anxiety = mean (anxiety_crt, na.rm = TRUE), 
+          stress = mean (stress_crt, na.rm = TRUE), 
+          lonely = mean (lonely_crt, na.rm = TRUE), 
+          total = mean (total_crt, na.rm = TRUE))%>%
+  pivot_longer (cols = c("depress","anxiety", "stress","lonely","total"), 
+                names_to = "problems", values_to = "mean")  %>%
+  mutate (time = "b.current")
+
+pmh_crt_sd <- pmh %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week)) %>%
+  ungroup() %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+          depress = sd (depress_crt, na.rm = TRUE), 
+          anxiety = sd (anxiety_crt, na.rm = TRUE), 
+          stress = sd (stress_crt, na.rm = TRUE), 
+          lonely = sd (lonely_crt, na.rm = TRUE), 
+          total = sd (total_crt, na.rm = TRUE))%>%
+  pivot_longer (cols = c("depress","anxiety", "stress","lonely","total"), 
+                names_to = "problems", values_to = "sd")  %>%
+  mutate (time = "b.current")
+
+pmh_crt = merge (x = pmh_crt_m, y = pmh_crt_sd,  by.x = c("problems", "n", "disability_cat", "time"), by.y = c("problems", "n", "disability_cat", "time"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+pmh_merge <- rbind(pmh_pre, pmh_crt) 
+
+#Total Problems
+pmh_merge %>%
+  filter (problems == "total") %>%
+  ggplot(mapping = aes (x = disability_cat, y = mean, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+   ggtitle ("Total Problems")+
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~time)
+
+#Breakdown to Different Problems
+pmh_merge %>%
+  filter (problems != "total") %>%
+  ggplot(mapping = aes (x = disability_cat, y = mean, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                width = .3,
+                    position = position_dodge(1)) +
+   ggtitle ("Specific Problems")+
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (problems~time, nrow = 1)+
+  theme(axis.text.x = element_blank())
+  
+
+```
+
+### Mean Level Changes Over Time
+
+```{r, echo=FALSE, message = FALSE}
+pmh_trend <- pmh %>%
+  group_by (Week, disability_cat) %>%
+  summarise (n = n(),
+             depress_m = mean(depress_crt, na.rm = TRUE),
+             anxiety_m = mean(anxiety_crt, na.rm = TRUE),
+             stress_m = mean(stress_crt, na.rm = TRUE),
+             lonely_m = mean(lonely_crt, na.rm = TRUE),
+             total_probs_m = mean(total_crt, na.rm = TRUE),
+             depress_sd = sd(depress_crt, na.rm = TRUE),
+             anxiety_sd = sd(anxiety_crt, na.rm = TRUE),
+             stress_sd = sd(stress_crt, na.rm = TRUE),
+             lonely_sd = sd(lonely_crt, na.rm = TRUE),
+             total_probs_sd = sd(total_crt, na.rm = TRUE))%>%
+  mutate (moe_dep = map2_dbl(depress_sd, n, moe.m),
+          moe_anx = map2_dbl(anxiety_sd, n, moe.m),
+          moe_str = map2_dbl(stress_sd, n, moe.m),
+          moe_lon = map2_dbl(lonely_sd, n, moe.m),
+          moe_tot = map2_dbl(total_probs_sd, n, moe.m))
+
+pmh_pre <- pmh %>%
+  filter (baseline == 1) %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             depress_m = mean(depress_pre, na.rm = TRUE),
+             anxiety_m = mean(anxiety_pre, na.rm = TRUE),
+             stress_m = mean(stress_pre, na.rm = TRUE),
+             lonely_m = mean(lonely_pre, na.rm = TRUE),
+             total_probs_m = mean(total_pre, na.rm = TRUE),
+             depress_sd = sd(depress_pre, na.rm = TRUE),
+             anxiety_sd = sd(anxiety_pre, na.rm = TRUE),
+             stress_sd = sd(stress_pre, na.rm = TRUE),
+             lonely_sd = sd(lonely_pre, na.rm = TRUE),
+             total_probs_sd = sd(total_pre, na.rm = TRUE))%>%
+  mutate (moe_dep = map2_dbl(depress_sd, n, moe.m),
+          moe_anx = map2_dbl(anxiety_sd, n, moe.m),
+          moe_str = map2_dbl(stress_sd, n, moe.m),
+          moe_lon = map2_dbl(lonely_sd, n, moe.m),
+          moe_tot = map2_dbl(total_probs_sd, n, moe.m), 
+          Week = 0)
+
+pmh_trend <- rbind (pmh_pre, pmh_trend)
+
+pmh_trend %>%
+ filter ((Week %in% c(18, 20, 22, 24, 26, 28)) == FALSE )%>%
+ggplot( mapping = aes (x = Week, y = total_probs_m, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = total_probs_m-moe_tot, ymax = total_probs_m+moe_tot), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  labs (y = "Total Problems")+
+  scale_x_continuous(breaks = 0:total_weeks)
+
+
+pmh_trend %>%
+  filter (Week != 25) %>%
+ggplot( mapping = aes (x = Week, y = depress_m, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = depress_m-moe_dep, ymax = depress_m + moe_dep), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  labs (y = "Depression")+
+  scale_x_continuous(breaks = 0:total_weeks)
+
+pmh_trend %>%
+filter ((Week %in% c(18, 20, 22, 24, 26, 28)) == FALSE )%>%
+ggplot( mapping = aes (x = Week, y = anxiety_m, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = anxiety_m-moe_anx, ymax = anxiety_m + moe_anx), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  labs (y = "Anxiety")+
+  scale_x_continuous(breaks = 0:total_weeks)
+
+pmh_trend %>%
+filter ((Week %in% c(18, 20, 22, 24, 26, 28)) == FALSE )%>%
+ggplot( mapping = aes (x = Week, y = stress_m, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = stress_m-moe_str, ymax = stress_m + moe_str), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  labs (y = "Stress")+
+  scale_x_continuous(breaks = 0:total_weeks)
+
+pmh_trend %>%
+filter ((Week %in% c(18, 20, 22, 24, 26, 28)) == FALSE )%>%
+ggplot( mapping = aes (x = Week, y = lonely_m, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = lonely_m-moe_lon, ymax = lonely_m +moe_lon), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  geom_point()+
+  labs (y = "Loneliness")+
+  scale_x_continuous(breaks = 0:total_weeks)
+```
+
+## Within-Subject Analyses (Individual-Level Changes)
+
+  * Both caregivers of children with/without disability showed significant increases in mental health problems\
+  * Caregivers of children without disability showed significantly more increases in total mental health problem as well as anxiety levels, from pre- to post-COVID, compared to caregivers of children with disability (likely due to the ceiling effect among caregivers of children with disability)\
+  
+  
+```{r, echo=FALSE, message = FALSE}
+
+pmh_pre <- pmh %>%
+  filter (baseline == 1) %>%
+  dplyr::select (CaregiverID, disability_cat, Week, contains ("_pre"))
+
+pmh_crt <- pmh %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week)) %>%
+  ungroup() %>%
+  dplyr::select(CaregiverID, disability_cat, contains("_crt"))
+
+pmh_cg <- merge (pmh_pre, pmh_crt, by = c("CaregiverID", "disability_cat")) %>%
+  mutate (depress_cg = depress_crt - depress_pre,
+          anxiety_cg = anxiety_crt - anxiety_pre,
+          stress_cg = stress_crt - stress_pre,
+          lonely_cg = lonely_crt - lonely_pre,
+          total_cg = total_crt - total_pre)
+
+pmh_cg_m <- pmh_cg%>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             depress = mean(depress_cg, na.rm = TRUE),
+             anxiety = mean(anxiety_cg, na.rm = TRUE),
+             stress = mean(stress_cg, na.rm = TRUE),
+             lonely = mean(lonely_cg, na.rm = TRUE),
+             total_probs = mean(total_cg, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("depress", "anxiety", "stress", "lonely", "total_probs"), names_to = "probs", values_to = "mean")
+  
+pmh_cg_sd <- pmh_cg %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             depress = sd(depress_cg, na.rm = TRUE),
+             anxiety = sd(anxiety_cg, na.rm = TRUE),
+             stress = sd(stress_cg, na.rm = TRUE),
+             lonely = sd(lonely_cg, na.rm = TRUE),
+             total_probs = sd(total_cg, na.rm = TRUE))%>%
+  pivot_longer (cols = c("depress", "anxiety", "stress", "lonely", "total_probs"), names_to = "probs", values_to = "sd")
+
+pmh_cg_smy <- merge (x=pmh_cg_m, y=pmh_cg_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+#Total Problems
+pmh_cg_smy %>%
+  filter (probs == "total_probs") %>%
+  ggplot(mapping = aes (x = disability_cat, y = mean, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  ggtitle ("Total Problems")+
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))
+
+#Different Types
+pmh_cg_smy %>%
+  filter (probs != "total_probs") %>%
+  ggplot(mapping = aes (x = disability_cat, y = mean, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                width = .3,
+                    position = position_dodge(1)) +
+  ggtitle ("Specific Problems")+
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~probs, nrow = 1)+
+  theme(axis.text.x = element_blank())
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.t.test(x = pmh_cg$depress_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
+pairwise.t.test(x = pmh_cg$anxiety_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
+pairwise.t.test(x = pmh_cg$stress_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
+pairwise.t.test(x = pmh_cg$lonely_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
+pairwise.t.test(x = pmh_cg$total_cg, g = pmh_cg$disability_cat, p.adjust.method = "holm")
+
+```
+
+
+# Children's Behavioral Outcomes
+
+  * Externalizing Problems (ranged 0-2):\
+    + Fussy or defiant \
+  * Internalizing Problems (ranged 0-2):\
+    + Too fearful or anxious\
+    
+```{r, echo=FALSE, message = FALSE}
+#Score children's behavioral outcomes
+master <- master %>%
+  mutate (fussy_pre = CBCL.001.a/2*100,
+          fussy_crt = CBCL.002.a/2*100,
+          fear_pre = CBCL.001.b/2*100,
+          fear_crt = CBCL.002.b/2*100)
+
+cp <- master %>%
+  dplyr::select(CaregiverID,month,Week,  BaselineWeek, baseline, disability_cat, contains ("fussy"),contains ("fear"))
+
+```
+
+## Between-Subject Analyses (Group-Level Means)
+
+## Mean Scores Breakdown by Disability Groups
+
+  * Children with vs. without disability comparison: \
+    + During both pre-COVID and currently, caregivers of children with disability reported significantly higher mean levels of children behavioral problems, including externalizing and internalizing problems, compared to caregivers of children without disability. \
+  * Pre-COVID vs. Current comparison:\
+    + For families of children with or without disability, caregivers reported significant increases in children's mean levels of internalizing and externalizing problems from pre-COVID to currently. 
+
+```{r, echo=FALSE, message = FALSE}
+cp_pre_m <- cp %>%
+  filter (baseline == 1)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             fussy = mean (fussy_pre, na.rm = TRUE), 
+             fear = mean (fear_pre, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("fussy","fear"), 
+                names_to = "problems", values_to = "mean") %>%
+  mutate (time = "a.pre-COVID")
+
+cp_pre_sd <- cp %>%
+  filter (baseline == 1)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             fussy = sd (fussy_pre, na.rm = TRUE), 
+             fear = sd (fear_pre, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("fussy","fear"), 
+                names_to = "problems", values_to = "sd") %>%
+  mutate (time = "a.pre-COVID")
+
+
+cp_pre = merge (x = cp_pre_m, y = cp_pre_sd,  by.x = c("problems", "n", "disability_cat", "time"), by.y = c("problems", "n", "disability_cat", "time"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+
+cp_crt_m <- cp %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week))%>%
+  ungroup() %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             fussy = mean (fussy_crt, na.rm = TRUE), 
+             fear = mean (fear_crt, na.rm = TRUE))%>%
+  pivot_longer (cols = c("fussy","fear"), 
+                names_to = "problems", values_to = "mean") %>%
+  mutate (time = "b.current")
+
+cp_crt_sd <- cp %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week))%>%
+  ungroup() %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             fussy = sd (fussy_crt, na.rm = TRUE), 
+             fear = sd (fear_crt, na.rm = TRUE))%>%
+  pivot_longer (cols = c("fussy","fear"), 
+                names_to = "problems", values_to = "sd") %>%
+  mutate (time = "b.current")
+
+cp_crt = merge (x = cp_crt_m, y = cp_crt_sd,  by.x = c("problems", "n", "disability_cat", "time"), by.y = c("problems", "n", "disability_cat", "time"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+cp_merge <- rbind(cp_pre, cp_crt) 
+
+
+cp_merge %>%
+  ggplot(mapping = aes (x = disability_cat, y = mean, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (problems~time)
+
+
+```
+
+### Mean Level Changes Over Time
+
+```{r, echo=FALSE, message = FALSE}
+cp_trend <- cp %>%
+  group_by (Week, disability_cat) %>%
+  summarise (n = n(),
+             fussy_m = mean(fussy_crt, na.rm = TRUE),
+             fear_m = mean(fear_crt, na.rm = TRUE),
+             fussy_sd = sd(fussy_crt, na.rm = TRUE),
+             fear_sd = sd(fear_crt, na.rm = TRUE))%>%
+  mutate (moe_fussy = map2_dbl(fussy_sd, n, moe.m),
+          moe_fear = map2_dbl(fear_sd, n, moe.m))
+
+cp_pre <- cp %>%
+  filter (baseline == 1) %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             fussy_m = mean(fussy_pre, na.rm = TRUE),
+             fear_m = mean(fear_pre, na.rm = TRUE),
+             fussy_sd = sd(fussy_pre, na.rm = TRUE),
+             fear_sd = sd(fear_pre, na.rm = TRUE))%>%
+ mutate (moe_fussy = map2_dbl(fussy_sd, n, moe.m),
+          moe_fear = map2_dbl(fear_sd, n, moe.m), 
+          Week = 0)
+
+cp_trend <- rbind (cp_pre, cp_trend)
+
+cp_trend %>%
+  filter ((Week %in% c(18, 20, 22, 24, 26, 28)) == FALSE )%>%
+  ggplot( mapping = aes (x = Week, y = fussy_m, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = fussy_m-moe_fussy, ymax = fussy_m+moe_fussy), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  labs (y = "Externalizing Problems")+
+  scale_x_continuous(breaks = 0:total_weeks)
+
+cp_trend %>%
+  filter ((Week %in% c(18, 20, 22, 24, 26, 28)) == FALSE )%>%
+  ggplot( mapping = aes (x = Week, y = fear_m, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = fear_m-moe_fear, ymax = fear_m+moe_fear), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  labs (y = "Internalizing Problems")+
+  scale_x_continuous(breaks = 0:total_weeks)
+```
+
+## Within-Subject Analyses (Individual-Level Changes)
+
+  * Both caregivers of children with/without disability showed significant increases in mental health problems\
+  * Reported increases in children's internalizing and externalizing problems did not differ significantly by children's disability status\
+  
+```{r, echo=FALSE, message = FALSE}
+
+cp_pre <- cp %>%
+  filter (baseline == 1) %>%
+  dplyr::select (CaregiverID, disability_cat, Week, contains ("_pre"))
+
+cp_crt <- cp %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week)) %>%
+  ungroup() %>%
+  dplyr::select(CaregiverID, disability_cat, contains("_crt"))
+
+cp_cg <- merge (cp_pre, cp_crt, by = c("CaregiverID", "disability_cat")) %>%
+  mutate (fear_cg = fear_crt - fear_pre,
+          fussy_cg = fussy_crt - fussy_pre)
+
+cp_cg_m <- cp_cg%>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             fussy = mean(fussy_cg, na.rm = TRUE),
+             fear = mean(fear_cg, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("fussy", "fear"), names_to = "probs", values_to = "mean")
+  
+cp_cg_sd <- cp_cg %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             fussy = sd(fussy_cg, na.rm = TRUE),
+             fear = sd(fear_cg, na.rm = TRUE))%>%
+  pivot_longer (cols = c("fussy", "fear"), names_to = "probs", values_to = "sd")
+
+cp_cg_smy <- merge (x=cp_cg_m, y=cp_cg_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+
+cp_cg_smy %>%
+  filter (probs != "total_probs") %>%
+  ggplot(mapping = aes (x = disability_cat, y = mean, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                width = .3,
+                    position = position_dodge(1)) +
+  ggtitle ("Specific Problems")+
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black",  position = position_dodge(1))+
+  facet_wrap (~probs, nrow = 1)+
+  theme(axis.text.x = element_blank())
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.t.test(x = cp_cg$fussy_cg, g = cp_cg$disability_cat, p.adjust.method = "holm")
+pairwise.t.test(x = cp_cg$fear_cg, g = cp_cg$disability_cat, p.adjust.method = "holm")
+```
+
+# Material Hardship 
+  
+  * Questions asked at weeks 19, 21, 23, 25, 27, 29 follow-up surveys\
+  * Worries (mean scores were calculated, ranged from 1 to 5):\
+  - How worried are you about having enough money to pay for food to feed your household in the next month?\
+  - If you rent the place you currently live, how worried are you about being evicted in the next month?\
+  - If you own the home where you currently live, how worried are you about your mortgage being forceclosed in the next month?\
+  - How worried are you about your utilities being turned off in teh next month?\
+  - How worried are you about your household not being able to pay the full amount of the rent or mortgage or being late with a payment because your household cannot afford to pay in the next month?\
+  * Hardship (sum scores were calculated, ranged 0-5):\
+  - In the last 30 days, your household did not pay the full amount of the rent/mortgage or was late with a payment because your household could not afford to pay\
+  - In the last 30 days, you did not have enough money to pay for food or feed your household\
+  - In the last 30 days, you were evicted from the place you rented\
+  - In the last 30 days, your mortgage was forceclosed on \
+  - In th last 30 days, your household was not able to pay the full amount of gas, oil, or electricity bills\
+  - In the last 30 days, the gas or electric company turned off service, or the oil company would not deliver oil\
+
+
+```{r, echo=FALSE, message = FALSE}
+
+mh <- master %>%
+  dplyr::select(CaregiverID, month, Week,  BaselineWeek, baseline, disability_cat, contains ("MH."))%>%
+  filter (Week > 18 & baseline == 0 ) 
+
+mh <- replace_with_na (mh, replace = list (MH.001 = 6, MH.002 = 6, MH.003 = 6, MH.004 = 6, MH.005 = 6, MH.006 = 6, MH.007 = 2, MH.008 = 2, MH.009 = 2, MH.010 = 2, MH.011 = 2, MH.012 = 2))
+
+mh_19 <- mh %>%
+  filter (Week == 19)%>%
+  rowwise %>%
+  mutate (mh_worry = sum (MH.001, MH.002, MH.003, MH.004, na.rm = TRUE)/4, 
+          mh_hardship = sum (MH.007, MH.008, MH.009, MH.010, MH.011, MH.012, na.rm = FALSE))%>%
+  ungroup()%>%
+  mutate (mh_housepay = MH.007, 
+          mh_food = MH.008, 
+          mh_evict = MH.009,
+          mh_mortgage = MH.010, 
+          mh_bills = MH.011,
+          mh_turnoff = MH.012) %>%
+  dplyr::select (CaregiverID, month, Week, BaselineWeek, baseline, disability_cat, contains ("mh_"))
+
+mh_oth <- mh %>%
+  filter (Week != 19) %>%
+  rowwise %>%
+  mutate (mh_worry = sum (MH.001, MH.002, MH.003, MH.004, MH.005, MH.006, na.rm = TRUE)/6, 
+          mh_hardship = sum (MH.007, MH.008, MH.009, MH.010, MH.011, MH.012, na.rm = TRUE))%>%
+  ungroup()%>%
+  mutate (mh_housepay = MH.007, 
+          mh_food = MH.008, 
+          mh_evict = MH.009,
+          mh_mortgage = MH.010, 
+          mh_bills = MH.011,
+          mh_turnoff = MH.012) %>%
+  dplyr::select (CaregiverID, month, Week, BaselineWeek, baseline, disability_cat, contains ("mh_"))
+
+mh <- rbind (mh_19, mh_oth)
+mh_rct <- mh %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week)) %>%
+  ungroup ()
+```
+
+## Worries in Material Hardship
+
+  * Caregiver of children with disability reported higher levels of worry about material hardship compared to caregivers of children without disability. This difference was significant. \
+  
+```{r, echo=FALSE, message = FALSE}
+mh_wry <- mh_rct%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             worry_m = mean (mh_worry, na.rm = TRUE), 
+             worry_sd = sd (mh_worry, na.rm = TRUE)) %>%
+  mutate (moe = map2_dbl(worry_sd, n, moe.m))
+
+
+mh_wry %>%
+  ggplot(mapping = aes (x = disability_cat, y = worry_m, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (worry_m-moe), 
+                    ymax = (worry_m+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(worry_m,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+``` 
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.t.test(x = mh_rct$mh_worry, g = mh_rct$disability_cat, p.adjust.method = "holm")
+```
+
+
+## Experienced Material Hardship in the Past 30 Days
+
+### Total Score of Experienced Material Hardship (range 0-6)
+
+  * The mean levels of experienced material hardship were relatively low. Caregiver of children with disability reported experiencing more material hardship in the past 30 days compared to caregivers of children without disability. This difference was significant. \
+  
+```{r, echo=FALSE, message = FALSE}
+mh_exp <- mh_rct%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             hardship_m = mean (mh_hardship, na.rm = TRUE), 
+             hardship_sd = sd (mh_hardship, na.rm = TRUE)) %>%
+  mutate (moe = map2_dbl(hardship_sd, n, moe.m))
+
+
+mh_exp %>%
+  ggplot(mapping = aes (x = disability_cat, y = hardship_m, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (hardship_m-moe), 
+                    ymax = (hardship_m+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(hardship_m,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.t.test(x = mh_rct$mh_hardship, g = mh_rct$disability_cat, p.adjust.method = "holm")
+```
+
+### Percentage of Experienced Material Hardship Items
+
+  * Higher percentage of caregivers of children with disabilities reported experiencing material hardship in paying for utility bills (marginally significant), housing expenses, and food in the past 30 days, compared to caregivers of children without disabilities. But these differences were not statistically significant. \
+
+```{r, echo=FALSE, message = FALSE}
+mh_housepay <- mh_rct %>%
+  filter (is.na(mh_housepay) == FALSE)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             prop = sum (mh_housepay, na.rm = TRUE)/n) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p), 
+          hardship = "paying house expenses")
+
+mh_food <- mh_rct%>%
+  filter (is.na(mh_food) == FALSE)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             prop = sum (mh_food, na.rm = TRUE)/n) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p), 
+          hardship = "buying food")
+
+mh_evict <- mh_rct%>%
+  filter (is.na(mh_evict) == FALSE)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             prop = sum (mh_evict, na.rm = TRUE)/n) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p), 
+          hardship = "eviction")
+
+mh_mortgage <- mh_rct%>%
+  filter (is.na(mh_mortgage) == FALSE)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             prop = sum (mh_mortgage, na.rm = TRUE)/n) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p), 
+          hardship = "mortgage forceclosed")
+
+mh_bills <- mh_rct%>%
+  filter (is.na(mh_bills) == FALSE)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             prop = sum (mh_bills, na.rm = TRUE)/n) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p), 
+          hardship = "paying utility bills")
+
+mh_turnoff <- mh_rct%>%
+  filter (is.na(mh_turnoff) == FALSE)%>%
+  group_by (disability_cat)%>%
+  summarise (n = n(),
+             prop = sum (mh_turnoff, na.rm = TRUE)/n) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p), 
+          hardship = "utilities turned off")
+
+mh_exp_pct <- rbind (rbind (rbind (mh_housepay, mh_food), rbind(mh_evict, mh_mortgage)), rbind (mh_bills, mh_turnoff))
+
+mh_exp_pct %>%
+  ggplot(mapping = aes (y = hardship, x = prop*100, fill = disability_cat)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust= 0, hjust = -1, size = 3, color = "black",  position = position_dodge(1))
+```
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+mh_exp_pct <- mh_exp_pct %>%
+  mutate (count = round ( n * prop, 0))
+
+pairwise.prop.test(x = mh_exp_pct$count, n = mh_exp_pct$n, p.adjust.method = "holm")
+```
+
+# Health Interrupted
+```{r, echo=FALSE, message = FALSE}
+
+master$num_delay_healthcare = rowSums(master[,find_items("HEALTH.003.[a-f]$", master)],na.rm=T)
+master <- master %>%
+  mutate (delay_healthcare = ifelse(num_delay_healthcare > 0, 1, 0),
+          hc_barrier_cost = ifelse(HEALTH.003.a > 0, 1, 0),
+          hc_barrier_time = ifelse(HEALTH.003.b > 0, 1, 0),
+          hc_barrier_childcare = ifelse(HEALTH.003.c > 0, 1, 0),
+          hc_barrier_covid = ifelse(HEALTH.003.d > 0, 1, 0),
+          hc_barrier_family = ifelse(HEALTH.003.e > 0, 1, 0),
+          hc_barrier_family = ifelse(HEALTH.003.e > 0, 1, 0),
+          miss_wellbaby = ifelse(HEALTH.004 == 1, 1, 0),
+          miss_vaccine_any = case_when(
+                             HEALTH.009.b == 1 ~ 1, 
+                             HEALTH.009.b.2 == 1 ~ 1, 
+                             HEALTH.010.b == 1 ~ 1, 
+                             HEALTH.011.b == 1 ~ 1, 
+                             HEALTH.012.b == 1 ~ 1, 
+                             HEALTH.013.b == 1 ~ 1, 
+                             HEALTH.009.b == 0 ~ 0, 
+                             HEALTH.009.b.2 == 0 ~ 0, 
+                             HEALTH.010.b == 0 ~ 0, 
+                             HEALTH.011.b == 0 ~ 0, 
+                             HEALTH.012.b == 0 ~ 0, 
+                             HEALTH.013.b == 0 ~ 0, 
+                             HEALTH.004 != 1 ~ 0,
+                             TRUE ~ NA_real_))
+    
+master = combine.cat(x = master, 
+                       cols = find_items("HEALTH.004\\.a_.{1}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.004a_cat")
+master$missed_wb_cost = ifelse(grepl("1", master$HEALTH.004a_cat), 1, 0)
+master$missed_wb_time.away.from.work = ifelse(grepl("2", master$HEALTH.004a_cat), 1, 0)
+master$missed_wb_inability.find.childcare = ifelse(grepl("3", master$HEALTH.004a_cat), 1, 0)
+master$missed_wb_concern.for.covid = ifelse(grepl("4", master$HEALTH.004a_cat), 1, 0)
+master$missed_wb_caring.for.family = ifelse(grepl("5", master$HEALTH.004a_cat), 1, 0)
+master$missed_wb_vaccine.hesitancy = ifelse(grepl("6", master$HEALTH.004a_cat), 1, 0)
+master$missed_wb_other = ifelse(grepl("7", master$HEALTH.004a_cat), 1, 0)
+
+master <- master %>%
+  mutate (which_wellbaby_missed.1 = HEALTH.009.a,
+          which_wellbaby_missed.2 = HEALTH.010.a,
+          which_wellbaby_missed.3 = HEALTH.011.a,
+          which_wellbaby_missed.4 = HEALTH.012.a,
+          which_wellbaby_missed.5 = HEALTH.013.a)
+  
+health <- master %>%
+  dplyr::select (CaregiverID, disability_cat, Week, BaselineWeek, baseline, month, num_delay_healthcare, delay_healthcare, contains ("hc_barrier"), contains ("miss_", ), contains ("missed_wb_"), contains ("which_wellbaby_missed"))
+
+health_rct <- health %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week)) %>%
+  ungroup ()
+```
+
+## Delayed Healthcare
+  
+  * Significantly higher percentage of caregivers of children with disability reported delaying healthcare visits (64.57%) compared to caregivers of children without disabilities (50.38%)\
+  * Caregivers of children with disability reported significantly more number of delayed healthcare visits (M = 8.22) compared to caregivers of children without disabilities (M = 3.93)\
+  
+```{r, echo=FALSE, message = FALSE}
+health_pct <- health_rct %>%
+  filter (delay_healthcare != "NA") %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(), 
+             prop = sum (delay_healthcare, na.rm = TRUE)/n)%>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+health_m <- health_rct %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(), 
+             hcdelay_m = mean(num_delay_healthcare, na.rm = TRUE),
+             hcdelay_sd = sd (num_delay_healthcare, na.rm = TRUE))%>%
+  mutate (moe = map2_dbl(hcdelay_sd, n, moe.m))
+
+
+health_pct %>%
+  ggplot(mapping = aes (x = disability_cat, y = prop*100, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+health_m %>%
+  ggplot(mapping = aes (x = disability_cat, y = hcdelay_m, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (hcdelay_m-moe), 
+                    ymax = (hcdelay_m+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(hcdelay_m,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+```
+
+### Main Reasons for Delayed Healthcare
+
+  * Among caregivers who reported delayed healthcare, those of children with or without disabilities both reported one major barrier as concerns of exposure to COVID-19 (>80%). However, caregivers of children with disabilites reported significantly more other barriers, such as cost, unable to get time away from work, inability to find childcare, and caring for family members.\
+  
+```{r, echo=FALSE, message = FALSE}
+health_pct <- health_rct %>%
+  filter (delay_healthcare == 1) %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(), 
+             cost = sum (hc_barrier_cost, na.rm = TRUE)/n,
+             time_away_work = sum (hc_barrier_time, na.rm = TRUE)/n,
+             inability_find_childcare = sum (hc_barrier_childcare, na.rm = TRUE)/n,
+             covid = sum (hc_barrier_covid, na.rm = TRUE)/n,
+             caring_family = sum (hc_barrier_family, na.rm = TRUE)/n)%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family"), names_to = "barrier", values_to = "prop")%>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+
+health_pct %>%
+  ggplot(mapping = aes (y = barrier, x = prop*100, fill = disability_cat)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+```
+
+
+## Missing Well-baby/Well-Child Visits
+
+  * Significantly higher percentage of caregivers of children with disability reported missing well-baby visits (42.02%) compared to caregivers of children without disabilities (28.28%)\
+
+```{r, echo=FALSE, message = FALSE}
+health_pct <- health_rct %>%
+  filter (miss_wellbaby != "NA") %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(), 
+             prop = sum (miss_wellbaby, na.rm = TRUE)/n)%>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+
+health_pct %>%
+  ggplot(mapping = aes (x = disability_cat, y = prop*100, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+```
+
+### Which visits were missed
+
+```{r, echo=FALSE, message = FALSE}
+health_wb <- health %>%
+  mutate (missed_wb_1 = sum((which_wellbaby_missed.1 == 1) , (which_wellbaby_missed.2 == 1), (which_wellbaby_missed.3 == 1) , (which_wellbaby_missed.4 == 1) , (which_wellbaby_missed.5 == 1), na.rm = T), 
+          missed_wb_2 = sum((which_wellbaby_missed.1 == 2) , (which_wellbaby_missed.2 == 2), (which_wellbaby_missed.3 == 2) , (which_wellbaby_missed.4 == 2) , (which_wellbaby_missed.5 == 2), na.rm = T),
+          missed_wb_3 = sum((which_wellbaby_missed.1 == 3) , (which_wellbaby_missed.2 == 3), (which_wellbaby_missed.3 == 3) , (which_wellbaby_missed.4 == 3) , (which_wellbaby_missed.5 == 3), na.rm = T),
+          missed_wb_4 = sum((which_wellbaby_missed.1 == 4) , (which_wellbaby_missed.2 == 4), (which_wellbaby_missed.3 == 4) , (which_wellbaby_missed.4 == 4) , (which_wellbaby_missed.5 == 4), na.rm = T),
+          missed_wb_5 = sum((which_wellbaby_missed.1 == 5) , (which_wellbaby_missed.2 == 5), (which_wellbaby_missed.3 == 5) , (which_wellbaby_missed.4 == 5) , (which_wellbaby_missed.5 == 5), na.rm = T),
+          missed_wb_6 = sum((which_wellbaby_missed.1 == 6) , (which_wellbaby_missed.2 == 6), (which_wellbaby_missed.3 == 6) , (which_wellbaby_missed.4 == 6) , (which_wellbaby_missed.5 == 6), na.rm = T),
+          missed_wb_7 = sum((which_wellbaby_missed.1 == 7) , (which_wellbaby_missed.2 == 7), (which_wellbaby_missed.3 == 7) , (which_wellbaby_missed.4 == 7) , (which_wellbaby_missed.5 == 7), na.rm = T),
+          missed_wb_8 = sum((which_wellbaby_missed.1 == 8) , (which_wellbaby_missed.2 == 8), (which_wellbaby_missed.3 == 8) , (which_wellbaby_missed.4 == 8) , (which_wellbaby_missed.5 == 8), na.rm = T),
+          missed_wb_9 = sum((which_wellbaby_missed.1 == 9) , (which_wellbaby_missed.2 == 9), (which_wellbaby_missed.3 == 9) , (which_wellbaby_missed.4 == 9) , (which_wellbaby_missed.5 == 9), na.rm = T),
+          missed_wb_10 = sum((which_wellbaby_missed.1 == 10) , (which_wellbaby_missed.2 == 10), (which_wellbaby_missed.3 == 10) , (which_wellbaby_missed.4 == 10) , (which_wellbaby_missed.5 == 10), na.rm = T),
+          missed_wb_11 = sum((which_wellbaby_missed.1 == 11) , (which_wellbaby_missed.2 == 11), (which_wellbaby_missed.3 == 11) , (which_wellbaby_missed.4 == 11) , (which_wellbaby_missed.5 == 11), na.rm = T),
+          missed_wb_12 = sum((which_wellbaby_missed.1 == 12) , (which_wellbaby_missed.2 == 12), (which_wellbaby_missed.3 == 12) , (which_wellbaby_missed.4 == 12) , (which_wellbaby_missed.5 == 12), na.rm = T),
+          missed_wb_13 = sum((which_wellbaby_missed.1 == 13) , (which_wellbaby_missed.2 == 13), (which_wellbaby_missed.3 == 13) , (which_wellbaby_missed.4 == 13) , (which_wellbaby_missed.5 == 13), na.rm = T),
+          missed_wb_14 = sum((which_wellbaby_missed.1 == 14) , (which_wellbaby_missed.2 == 14), (which_wellbaby_missed.3 == 14) , (which_wellbaby_missed.4 == 14) , (which_wellbaby_missed.5 == 14), na.rm = T))
+
+#health_wb_c <- health_wb %>%
+#  mutate (missed_wb_1 = na_if (missed_wb_1, 0),
+#          missed_wb_2 = na_if (missed_wb_2, 0),
+#          missed_wb_3 = na_if (missed_wb_3, 0),
+#          missed_wb_4 = na_if (missed_wb_4, 0),
+#          missed_wb_5 = na_if (missed_wb_5, 0),
+#          missed_wb_6 = na_if (missed_wb_6, 0),
+#          missed_wb_7 = na_if (missed_wb_7, 0),
+#          missed_wb_8 = na_if (missed_wb_8, 0),
+#          missed_wb_9 = na_if (missed_wb_9, 0),
+#          missed_wb_10 = na_if (missed_wb_10, 0),
+#          missed_wb_11 = na_if (missed_wb_11, 0),
+#          missed_wb_12 = na_if (missed_wb_12, 0),
+#          missed_wb_13 = na_if (missed_wb_13, 0),
+#          missed_wb_14 = na_if (missed_wb_14, 0))
+
+
+health_wb_c <- health_wb %>%
+  group_by (CaregiverID)%>%
+  summarise (missed_wb_1 = my.max (missed_wb_1),
+             missed_wb_2 = my.max (missed_wb_2),
+             missed_wb_3 = my.max (missed_wb_3),
+             missed_wb_4 = my.max (missed_wb_4),
+             missed_wb_5 = my.max (missed_wb_5),
+             missed_wb_6 = my.max (missed_wb_6),
+             missed_wb_7 = my.max (missed_wb_7),
+             missed_wb_8 = my.max (missed_wb_8),
+             missed_wb_9 = my.max (missed_wb_9),
+             missed_wb_10 = my.max (missed_wb_10),
+             missed_wb_11 = my.max (missed_wb_11),
+             missed_wb_12 = my.max (missed_wb_12),
+             missed_wb_13 = my.max (missed_wb_13),
+             missed_wb_14 = my.max (missed_wb_14))
+
+
+health_wb_c <- health_wb_c %>%
+  rowwise %>%
+  mutate(missed_wb_tot = sum (missed_wb_1, missed_wb_2, missed_wb_3, missed_wb_4, missed_wb_5, missed_wb_6, missed_wb_7, missed_wb_8, missed_wb_9, missed_wb_10, missed_wb_11, missed_wb_12, missed_wb_13, missed_wb_14, na.rm = TRUE))
+
+health_wb_c <- merge (x = health_wb_c, y = master_dsb, by.x = "CaregiverID", by.y = "CaregiverID")
+
+health_wb_count <- health_wb_c %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(), 
+             total = mean (missed_wb_tot, na.rm = TRUE),
+             a.days3_5 = mean (missed_wb_1, na.rm = TRUE), 
+             b.mon_1 = mean (missed_wb_2, na.rm = TRUE), 
+             c.mon_2 = mean (missed_wb_3, na.rm = TRUE), 
+             d.mon_4 = mean (missed_wb_4, na.rm = TRUE), 
+             e.mon_6 = mean (missed_wb_5, na.rm = TRUE), 
+             f.mon_9 = mean (missed_wb_6, na.rm = TRUE), 
+             g.mon_12 = mean (missed_wb_7, na.rm = TRUE), 
+             h.mon_15 = mean (missed_wb_8, na.rm = TRUE), 
+             i.mon_18 = mean (missed_wb_9, na.rm = TRUE), 
+             j.mon_24 = mean (missed_wb_10, na.rm = TRUE), 
+             k.year_2.5 = mean (missed_wb_11, na.rm = TRUE), 
+             l.year_3 = mean (missed_wb_12, na.rm = TRUE), 
+             m.year_4 = mean (missed_wb_13, na.rm = TRUE), 
+             n.year_5 = mean (missed_wb_14, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("total", "a.days3_5", "b.mon_1", "c.mon_2", "d.mon_4", "e.mon_6", "f.mon_9", "g.mon_12", "h.mon_15", "i.mon_18", "j.mon_24", "k.year_2.5", "l.year_3", "m.year_4", "n.year_5"), names_to = "visits", values_to = "count")
+
+health_wb_sd <- health_wb_c %>%
+  group_by (disability_cat) %>%
+  summarise (total = sd (missed_wb_tot, na.rm = TRUE),
+             a.days3_5 = sd (missed_wb_1, na.rm = TRUE), 
+             b.mon_1 = sd (missed_wb_2, na.rm = TRUE), 
+             c.mon_2 = sd (missed_wb_3, na.rm = TRUE), 
+             d.mon_4 = sd (missed_wb_4, na.rm = TRUE), 
+             e.mon_6 = sd (missed_wb_5, na.rm = TRUE), 
+             f.mon_9 = sd (missed_wb_6, na.rm = TRUE), 
+             g.mon_12 = sd (missed_wb_7, na.rm = TRUE), 
+             h.mon_15 = sd (missed_wb_8, na.rm = TRUE), 
+             i.mon_18 = sd (missed_wb_9, na.rm = TRUE), 
+             j.mon_24 = sd (missed_wb_10, na.rm = TRUE), 
+             k.year_2.5 = sd (missed_wb_11, na.rm = TRUE), 
+             l.year_3 = sd (missed_wb_12, na.rm = TRUE), 
+             m.year_4 = sd (missed_wb_13, na.rm = TRUE), 
+             n.year_5 = sd (missed_wb_14, na.rm = TRUE)) %>%
+  pivot_longer (cols = c("total", "a.days3_5", "b.mon_1", "c.mon_2", "d.mon_4", "e.mon_6", "f.mon_9", "g.mon_12", "h.mon_15", "i.mon_18", "j.mon_24", "k.year_2.5", "l.year_3", "m.year_4", "n.year_5"), names_to = "visits", values_to = "sd")
+
+
+health_wb_count <- merge (x = health_wb_count, y = health_wb_sd, by.x = c("disability_cat", "visits"), by.y = c("disability_cat", "visits"))%>%
+   mutate (moe = map2_dbl(sd, n, moe.m))
+  
+health_wb_count %>%
+  filter (visits == "total") %>%
+  ggplot(mapping = aes (x = disability_cat, y = count, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (count-moe), 
+                    ymax = (count+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(count,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+
+health_wb_count %>%
+  filter (visits != "total") %>%
+  ggplot(mapping = aes (x = visits, y = count, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (count-moe), 
+                    ymax = (count+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(count,2)),vjust = -1, size = 3, color = "black",  position = position_dodge(1))+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+  
+```
+
+### Reasons for Missed Well-Baby Visits
+
+  * Among caregivers who reported missing well-baby visits, caregivers of children with disabilities reported significantly more barriers in cost, unable to get time away from work, inability to find childcare, and caring for family members. \
+  * Although majority caregivers in both groups reported concerns of COVID being one major reason for missing well-baby visits (>65%), smaller percentage of caregivers of children with disabilities reported this concern being the major reason (67%) compared to caregivers of children without disability (79%)\
+  
+```{r, echo=FALSE, message = FALSE}
+health_pct <- health_rct %>%
+  filter (miss_wellbaby == 1) %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(), 
+             caring_for_family = sum (missed_wb_caring.for.family, na.rm = TRUE)/n,
+             concern_covid = sum (missed_wb_concern.for.covid, na.rm = TRUE)/n,
+             cost = sum (missed_wb_cost, na.rm = TRUE)/n,
+             inability_find_childcare = sum (missed_wb_inability.find.childcare, na.rm = TRUE)/n,
+             time_away_work = sum (missed_wb_time.away.from.work, na.rm = TRUE)/n,
+             vaccine_hesitancy = sum (missed_wb_vaccine.hesitancy, na.rm = TRUE)/n)%>%
+  pivot_longer (cols = c("caring_for_family", "concern_covid", "cost", "inability_find_childcare", "time_away_work", "vaccine_hesitancy"), names_to = "reason", values_to = "prop")%>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+
+health_pct %>%
+  ggplot(mapping = aes (y = reason, x = prop*100, fill = disability_cat)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = 0.5, hjust = 1, size = 3, color = "black",  position = position_dodge(1))
+
+```
+
+## Missing Vaccine
+
+  * Significantly higher percentage of caregivers of children with disability reported missing vaccines (15.61%) compared to caregivers of children without disabilities (10.88%)\
+
+```{r, echo=FALSE, message = FALSE}
+health_pct <- health_rct %>%
+  filter (miss_vaccine_any != "NA") %>%
+  group_by (disability_cat)%>%
+  summarise (n = n(), 
+             prop = sum (miss_vaccine_any, na.rm = TRUE)/n)%>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+
+health_pct %>%
+  ggplot(mapping = aes (x = disability_cat, y = prop*100, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))
+
+```
+
+# Childcare
+```{r, echo=FALSE, message = FALSE}
+
+master <- master %>%
+  mutate (c_nonparental_pre.1 = POLICY.009.a, 
+          c_nonparental_pre.2 = POLICY.009.a.2,
+          c_nonparental_crt = POLICY.009.b,
+          c_center_pre.1 = POLICY.015_1,
+          c_unpaid_pre.1 = POLICY.015_2,
+          c_paid_pre.1 = POLICY.015_3,
+          c_home_pre.1 = POLICY.015_4,
+          c_center.2_pre = POLICY.015.2_1,
+          c_unpaid.2_pre = POLICY.015.2_2,
+          c_paid.2_pre = POLICY.015.2_3,
+          c_home.2_pre = POLICY.015.2_4,
+          c_center_crt = POLICY.016_1,
+          c_unpaid_crt = POLICY.016_2,
+          c_paid_crt = POLICY.016_3,
+          c_home_crt = POLICY.016_4, 
+          c_lackcc = POLICY.025)
+
+#Converge similar items (Week 9 & 10, for example, POLICY.009.a & POLICYL.009.a.2 were asked for different people)
+
+master$c_nonparental_pre=rowSums(cbind(master$c_nonparental_pre.1,master$c_nonparental_pre.2), na.rm = TRUE)
+master$c_center_pre=rowSums(cbind(master$c_center_pre.1,master$c_center.2_pre), na.rm = TRUE)
+master$c_paid_pre=rowSums(cbind(master$c_paid_pre.1,master$c_paid.2_pre), na.rm = TRUE)
+master$c_unpaid_pre=rowSums(cbind(master$c_unpaid_pre.1,master$c_unpaid.2_pre), na.rm = TRUE)
+master$c_home_pre=rowSums(cbind(master$c_home_pre.1,master$c_home.2_pre), na.rm = TRUE)
+
+master <- master%>%
+  mutate (c_nonparental_pre = (na_if (c_nonparental_pre, 0)),
+          c_center_pre = (na_if(c_center_pre,0)),
+          c_paid_pre = (na_if(c_paid_pre,0)),
+          c_unpaid_pre = (na_if(c_unpaid_pre,0)),
+          c_home_pre = (na_if(c_home_pre,0)))
+
+master <- master%>%
+  mutate (c_nonparental_pre = na_if (c_nonparental_pre, 3),
+          c_nonparental_crt = na_if (c_nonparental_crt, 3))
+
+master <- master%>%
+  mutate (c_nonparental_pre = case_when (
+                              c_nonparental_pre == 1 ~ 1,
+                              c_nonparental_pre == 2 ~ 0),
+          c_nonparental_crt = case_when (
+                              c_nonparental_crt == 1 ~ 1,
+                              c_nonparental_crt == 2 ~ 0),
+          c_noncenter_pre = case_when(c_unpaid_pre == 1 | c_paid_pre == 1 |c_home_pre == 1 ~ 1),
+          c_noncenter_crt = case_when(c_unpaid_crt == 1 | c_paid_crt == 1 |c_home_crt == 1 ~ 1))
+
+master <- master %>%
+  mutate (c_lackcc = na_if (c_lackcc, 3))
+
+cc <- master %>%
+  dplyr::select (CaregiverID, Week, BaselineWeek, baseline, disability_cat, c_nonparental_pre, c_center_pre, c_paid_pre, c_unpaid_pre, c_home_pre, c_nonparental_crt, c_center_crt, c_paid_crt, c_unpaid_crt, c_home_crt, c_lackcc)
+```
+
+## Rates of Using Non-parental Childcare 
+
+  * For both caregivers of children with and without disabilities, the usage of non-parental childcare significantly decreased from pre-COVID to May, and then slowly and gradually increased over time. \
+  * At most time-points, the percentage of using non-parental childcare did not differ significantly by children's disability status.\
+  * At Week 5 (early May), families of children with disabilities reported significantly higher percentage of using non-parental childcare compared to families of children without disabilities. \
+
+```{r, echo=FALSE, message = FALSE}
+cc_pre <- cc %>%
+  filter (c_nonparental_pre != "NA")%>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             prop = sum (c_nonparental_pre, na.rm = TRUE)/n) %>%
+   mutate (moe = map2_dbl(prop, n, moe.p),
+           Week = 0)
+
+cc_post <- cc %>%
+  filter (c_nonparental_crt != "NA") %>%
+  group_by (Week, disability_cat) %>%
+  summarise (n = n(),
+             prop = sum (c_nonparental_crt, na.rm = TRUE)/n) %>%
+   mutate (moe = map2_dbl(prop, n, moe.p))
+
+cc_np <- rbind (cc_pre, cc_post) 
+
+cc_np %>%
+  filter ((Week %in% c(13, 18, 20, 22, 24, 26, 28)) == FALSE )%>%
+  ggplot( mapping = aes (x = Week, y = prop*100, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = prop*100-moe*100, ymax = prop*100+moe*100), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  ylim (0,100)+
+  scale_x_continuous(breaks = 0:total_weeks)
+```
+
+## Rates of Using Center-based vs. Other Types of Childcare
+
+  * For caregivers of children with disabilities, the percentage of using center-based childcare kept decreasing from right-after COVID until June, and then slowly and gradually increased over time; Meanwhile, their percentage of using other types of childcare (home-based, paid, and unpaid) increased on Week 5 (early May), then decreased until June, and then slowly and gradually increased over time.\
+  * For caregivers of children without disabilities, the percentage of using center-based and other types of non-parental childcare decreased from pre-COVID to right after COVID, and then gradually and slowly increased over time.\
+  * At Week 5 (early May), families of children with disabilities reported significantly higher percentage of using center-based and other types of non-parental childcare compared to families of children without disabilities. \
+
+```{r, echo=FALSE, message = FALSE}
+cc <- cc %>%
+  mutate (c_other_pre = case_when (c_home_pre==1 | c_paid_pre==1 | c_unpaid_pre==1 ~ 1),
+          c_other_crt = case_when (c_home_crt==1 | c_paid_crt==1 | c_unpaid_crt==1 ~ 1))
+
+cc_pre_center <- cc %>%
+  filter (c_nonparental_pre != "NA")%>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             prop = sum (c_center_pre, na.rm = TRUE)/n) %>%
+   mutate (moe = map2_dbl(prop, n, moe.p),
+           Week = 0)
+
+cc_post_center <- cc %>%
+  filter (c_nonparental_crt != "NA") %>%
+  group_by (Week, disability_cat) %>%
+  summarise (n = n(),
+             prop = sum (c_center_crt, na.rm = TRUE)/n) %>%
+   mutate (moe = map2_dbl(prop, n, moe.p))
+
+cc_np_center <- rbind (cc_pre, cc_post) %>%
+  mutate (type = "center_based")
+
+cc_pre_other <- cc %>%
+  filter (c_nonparental_pre != "NA")%>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             prop = sum (c_other_pre, na.rm = TRUE)/n) %>%
+   mutate (moe = map2_dbl(prop, n, moe.p),
+           Week = 0)
+
+cc_post_other <- cc %>%
+  filter (c_nonparental_crt != "NA") %>%
+  group_by (Week, disability_cat) %>%
+  summarise (n = n(),
+             prop = sum (c_other_crt, na.rm = TRUE)/n) %>%
+   mutate (moe = map2_dbl(prop, n, moe.p))
+
+cc_np_other <- rbind (cc_pre_other, cc_post_other) %>%
+  mutate (type = "other types")
+
+cc_np <- rbind (cc_np_center, cc_np_other)
+
+cc_np %>%
+  filter ((Week %in% c(4, 13, 18, 20, 22, 24, 26, 28, 29)) == FALSE )%>%
+  ggplot( mapping = aes (x = Week, y = prop*100, fill = disability_cat)) +
+  geom_ribbon(aes(ymin = prop*100-moe*100, ymax = prop*100+moe*100), alpha = .3) +
+  geom_line() +
+  geom_point()+
+  ylim (0,50)+
+  scale_x_continuous(breaks = 0:total_weeks) +
+  facet_wrap (~type, nrow = 2)
+```
+
+## Caregivers' Abilities to Return to Work Because of Childcare
+  
+  * A higher percentage of caregivers of children with disabilities reported that they were concerned not able to return to work because of lacking appropriate childcare. But the difference was not statistically significant. \
+
+```{r, echo=FALSE, message = FALSE}
+cc_lack <- cc %>%
+  filter (is.na (c_lackcc) == FALSE) %>%
+  mutate (c_lackcc_rc = case_when (c_lackcc == 0 ~ "0.No",
+                                 c_lackcc == 1 ~ "1.Yes", 
+                                 c_lackcc == 2 ~ "2.Not sure"))%>%
+  count (disability_cat, c_lackcc_rc) %>%
+  group_by (disability_cat)%>%
+  mutate (prop = prop.table(n),
+          n_total = n/prop,
+            moe = map2_dbl(prop, n_total, moe.p))
+
+cc_lack %>%
+  ggplot (mapping = aes (x = c_lackcc_rc, y = prop*100, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge (1)) +
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = cc_lack$n, n = cc_lack$n_total, p.adjust.method = "holm")
+```
+
+# Social Support
+  
+  * Data based on special topics asked in weeks 15, 19, 21, 23\
+
+```{r, echo=FALSE, message = FALSE}
+ss <- master %>%
+  filter (Week %in% c (15, 19, 21, 23)) %>%
+  rowwise %>%
+  mutate (ss_total_crt = na_if(sum (SOCIALSUPP.001.a, SOCIALSUPP.001.b, SOCIALSUPP.001.c, SOCIALSUPP.001.d, SOCIALSUPP.001.e, SOCIALSUPP.001.f, SOCIALSUPP.001.g, SOCIALSUPP.001.h, SOCIALSUPP.001.i, SOCIALSUPP.001.j, SOCIALSUPP.001.k, SOCIALSUPP.001.l, SOCIALSUPP.001.m, SOCIALSUPP.001.n, SOCIALSUPP.001.o, SOCIALSUPP.001.p, SOCIALSUPP.001.q, SOCIALSUPP.001.r, SOCIALSUPP.001.s, na.rm = TRUE)/19, 0), 
+          ss_total_pre = na_if(sum (SOCIALSUPP.002.a, SOCIALSUPP.002.b, SOCIALSUPP.002.c, SOCIALSUPP.002.d, SOCIALSUPP.002.e, SOCIALSUPP.002.f, SOCIALSUPP.002.g, SOCIALSUPP.002.h, SOCIALSUPP.002.i, SOCIALSUPP.002.j, SOCIALSUPP.002.k, SOCIALSUPP.002.l, SOCIALSUPP.002.m, SOCIALSUPP.002.n, SOCIALSUPP.002.o, SOCIALSUPP.002.p, SOCIALSUPP.002.q, SOCIALSUPP.002.r, SOCIALSUPP.002.s, na.rm = TRUE)/19, 0),
+          ss_partner_pre = SOCIALSUPP.003.a_2,
+          ss_children_pre = SOCIALSUPP.003.b_2,
+          ss_parent_pre = SOCIALSUPP.003.c_2,
+          ss_othrelative_pre = SOCIALSUPP.003.d_2,
+          ss_friends_pre = SOCIALSUPP.003.e_2,
+          ss_neighbor_pre = SOCIALSUPP.003.f_2,
+          ss_coworker_pre = SOCIALSUPP.003.g_2,
+          ss_relgroup_pre = SOCIALSUPP.003.h_2,
+          ss_relfigure_pre = SOCIALSUPP.003.i_2,
+          ss_parentgroup_pre = SOCIALSUPP.003.j_2,
+          ss_professional_pre = SOCIALSUPP.003.k_2,
+          ss_ccprovider_pre = SOCIALSUPP.003.l_2,
+          ss_nanny_pre = SOCIALSUPP.003.m_2,
+          ss_partner_crt = SOCIALSUPP.003.a_1,
+          ss_children_crt = SOCIALSUPP.003.b_1,
+          ss_parent_crt = SOCIALSUPP.003.c_1,
+          ss_othrelative_crt = SOCIALSUPP.003.d_1,
+          ss_friends_crt = SOCIALSUPP.003.e_1,
+          ss_neighbor_crt = SOCIALSUPP.003.f_1,
+          ss_coworker_crt = SOCIALSUPP.003.g_1,
+          ss_relgroup_crt = SOCIALSUPP.003.h_1,
+          ss_relfigure_crt = SOCIALSUPP.003.i_1,
+          ss_parentgroup_crt = SOCIALSUPP.003.j_1,
+          ss_professional_crt = SOCIALSUPP.003.k_1,
+          ss_ccprovider_crt = SOCIALSUPP.003.l_1,
+          ss_nanny_crt = SOCIALSUPP.003.m_1) %>%
+  dplyr::select (CaregiverID, Week, BaselineWeek, baseline, disability_cat, contains("ss_"))
+
+
+```
+
+## Total Social Support Scores
+### Between-Subject Analyses (Group-Level Mean)
+
+  * Questions only asked at week 15\
+  * Families of children with disabilities reported significantly lower levels of social support compared to families of children without disabilities\
+  
+```{r, echo=FALSE, message = FALSE}
+ss_pre = ss %>%
+  filter (Week == 15) %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             ss_m = mean (ss_total_pre, na.rm = TRUE),
+             ss_sd = sd (ss_total_pre, na.rm = TRUE)) %>%
+ mutate (moe = map2_dbl(ss_sd, n, moe.m),
+         time = "a.pre-COVID")
+
+ss_crt = ss %>%
+  filter (Week == 15) %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             ss_m = mean (ss_total_crt, na.rm = TRUE),
+             ss_sd = sd (ss_total_crt, na.rm = TRUE)) %>%
+ mutate (moe = map2_dbl(ss_sd, n, moe.m), 
+         time = "b.Week 15")
+
+ss_total <- rbind (ss_pre, ss_crt)
+ss_total %>%
+  ggplot (mapping = aes (x = disability_cat, y = ss_m, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge (1)) +
+  geom_errorbar(aes(ymin = (ss_m-moe), 
+                    ymax = (ss_m+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(ss_m,2)),vjust = -1, color = "black",  position = position_dodge(1)) +
+  facet_wrap (~time)
+
+```
+
+### Within-Subject Analyses (Individual Pre-Post-COVID Changes)
+
+  * Families of children with and without disabilities both reported significantly decreased social support levels from pre- to post-COVID. The degrees of decreases across the two groups were comparable. Other categories of social support were comparable between two groups\
+
+```{r, echo=FALSE, message = FALSE}
+ss <- ss %>%
+  mutate (ss_cg = ss_total_crt - ss_total_pre)
+
+ss_cg = ss %>%
+  filter (Week == 15) %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             ss_m = mean (ss_cg, na.rm = TRUE),
+             ss_sd = sd (ss_cg, na.rm = TRUE)) %>%
+ mutate (moe = map2_dbl(ss_sd, n, moe.m))
+
+ss_cg %>%
+  ggplot (mapping = aes (x = disability_cat, y = ss_m, fill = disability_cat)) +
+  geom_bar (stat = "identity", position = position_dodge (1)) +
+  geom_errorbar(aes(ymin = (ss_m-moe), 
+                    ymax = (ss_m+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(ss_m,2)),vjust = -1, color = "black",  position = position_dodge(1)) 
+
+```
+
+## Available Social Support Resources for Caregivers
+  * Compared to caregivers of children without disabilities, caregivers of children of disabilities reported significantly higher percentage of seeking social support from physical/mental health professionals, babysitter/nanny, and childcare providers\
+  
+```{r, echo=FALSE, message = FALSE}
+ss_pre <- ss %>%
+  mutate (disability = case_when (disability_cat == "with disability" ~ 1, 
+                                  disability_cat == "without disability" ~ 0)) %>%
+  group_by (CaregiverID) %>%
+  summarise (disability = mean (disability, na.rm = T),
+          partner = my.max(ss_partner_pre),
+          children = my.max(ss_children_pre),
+          parent = my.max(ss_parent_pre),
+          otherrelatives = my.max(ss_othrelative_pre),
+          friends = my.max(ss_friends_pre),
+          neighbors = my.max(ss_neighbor_pre),
+          coworkers = my.max(ss_coworker_pre),
+          religongroup = my.max(ss_relgroup_pre),
+          religonfigure = my.max(ss_relfigure_pre),
+          parentgroup = my.max(ss_parentgroup_pre),
+          healthprofessional = my.max(ss_professional_pre),
+          childcareprovider = my.max(ss_ccprovider_pre),
+          nanny = my.max(ss_nanny_pre))%>%
+ungroup()%>%
+  mutate (disability_cat = case_when (disability == 1 ~ "with disability", 
+                                      disability == 0 ~ "without disability")) %>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+             partner = sum(partner, na.rm = T)/n,
+            children = sum(children, na.rm = T)/n,
+            parent = sum(parent, na.rm = T)/n,
+            otherrelatives = sum(otherrelatives, na.rm = T)/n,
+            friends = sum(friends, na.rm = T)/n,
+            neighbors = sum(neighbors, na.rm = T)/n,
+            coworkers = sum(coworkers, na.rm = T)/n,
+            religongroup = sum(religongroup, na.rm = T)/n,
+            religonfigure = sum(religonfigure, na.rm = T)/n,
+            parentgroup = sum(parentgroup, na.rm = T)/n,
+            healthprofessional = sum(healthprofessional, na.rm = T)/n,
+            childcareprovider = sum(childcareprovider, na.rm = T)/n,
+            nanny = sum(nanny, na.rm = T)/n) %>%
+  pivot_longer (col = c("partner", "children", "parent", "otherrelatives", "friends", "neighbors", "coworkers", "religongroup", "religonfigure", "parentgroup", "healthprofessional", "childcareprovider", "nanny"), names_to = "sources", values_to = "percent") %>%
+  mutate (moe = map2_dbl(percent, n, moe.p), 
+          time = "a.Pre-COVID")
+
+
+ss_crt <- ss %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week)) %>%
+  ungroup ()%>%
+  group_by (disability_cat) %>%
+  summarise (n = n(),
+          partner = sum(ss_partner_pre, na.rm = T)/n,
+          children = sum(ss_children_pre, na.rm = T)/n,
+          parent = sum(ss_parent_pre, na.rm = T)/n,
+          otherrelatives = sum(ss_othrelative_pre, na.rm = T)/n,
+          friends = sum(ss_friends_pre, na.rm = T)/n,
+          neighbors = sum(ss_neighbor_pre, na.rm = T)/n,
+          coworkers = sum(ss_coworker_pre, na.rm = T)/n,
+          religongroup = sum(ss_relgroup_pre, na.rm = T)/n,
+          religonfigure = sum(ss_relfigure_pre, na.rm = T)/n,
+          parentgroup = sum(ss_parentgroup_pre, na.rm = T)/n,
+          healthprofessional = sum(ss_professional_pre, na.rm = T)/n,
+          childcareprovider = sum(ss_ccprovider_pre, na.rm = T)/n,
+          nanny = sum(ss_nanny_pre, na.rm = T)/n)%>%
+  pivot_longer (col = c("partner", "children", "parent", "otherrelatives", "friends", "neighbors", "coworkers", "religongroup", "religonfigure", "parentgroup", "healthprofessional", "childcareprovider", "nanny"), names_to = "sources", values_to = "percent") %>%
+  mutate (moe = map2_dbl(percent, n, moe.p), 
+          time = "b.Post-COVID")
+
+ss_source <- rbind (ss_pre, ss_crt)
+
+ss_source %>%
+  ggplot (mapping = aes (x = percent*100, y = sources, fill = disability_cat)) +
+  geom_col(position = position_dodge (1)) +
+  geom_errorbar(aes(xmin = (percent*100-moe*100), 
+                    xmax = (percent*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  xlim (0,100)+
+  geom_text(aes(label = round(percent*100,2)), size = 3, hjust = -0.5, color = "black",  position = position_dodge(1)) +
+  facet_wrap (~time)
+```
+
+## Associations of Social Support and Mental Health Problems 
+
+
+  * Given that social support questions were only asked on week 15, the sample was decided by selecting all caregivers who responded to Week 15 surveys, and their subsequent two responses after Week 15. Final sample size of caregivers with children of special needs was 956 \
+  
+```{r, echo=FALSE, message = FALSE}
+ss <- master %>%
+  rowwise %>%
+  mutate (ss_total_crt = sum (SOCIALSUPP.001.a, SOCIALSUPP.001.b, SOCIALSUPP.001.c, SOCIALSUPP.001.d, SOCIALSUPP.001.e, SOCIALSUPP.001.f, SOCIALSUPP.001.g, SOCIALSUPP.001.h, SOCIALSUPP.001.i, SOCIALSUPP.001.j, SOCIALSUPP.001.k, SOCIALSUPP.001.l, SOCIALSUPP.001.m, SOCIALSUPP.001.n, SOCIALSUPP.001.o, SOCIALSUPP.001.p, SOCIALSUPP.001.q, SOCIALSUPP.001.r, SOCIALSUPP.001.s, na.rm = TRUE)/19, 
+          p_probs = total_crt,
+          c_probs = sum(fussy_crt, fear_crt, na.rm = T)/2)%>%
+  ungroup()%>%
+  dplyr::select (CaregiverID, Week, BaselineWeek, baseline, disability_cat, ss_total_crt, p_probs, c_probs)
+
+ss$ss_total_crt <- na_if (ss$ss_total_crt, 0)
+
+ss_ss <- ss %>%
+  dplyr::select (CaregiverID, Week, disability_cat, ss_total_crt, p_probs, c_probs)%>%
+  filter (Week == 15 & ss_total_crt != "NA")%>%
+  mutate (p_probs15 = p_probs,
+          c_probs15 = c_probs)%>%
+  dplyr::select (CaregiverID, Week, disability_cat, ss_total_crt, p_probs15, c_probs15)
+
+ss_CaregiverID <- ss_ss$CaregiverID
+  
+ss_probs <- ss %>%
+  filter (CaregiverID %in% ss_CaregiverID)%>%
+  filter (Week > 15)%>%
+  group_by (CaregiverID)%>%
+  filter (Week == min (Week)|Week == nth(Week, 2, descending = F))%>%
+  mutate (pWeek = case_when (Week == min(Week) ~ "P_fl1",
+                             Week == nth(Week, 2, descending = F) ~ "P_fl2"), 
+          cWeek = case_when (Week == min(Week) ~ "C_fl1",
+                             Week == nth(Week, 2, descending = F) ~ "C_fl2"))
+
+ss_pmh <- ss_probs %>%
+  dplyr::select (CaregiverID, p_probs, pWeek)%>%
+  pivot_wider (names_from = "pWeek", values_from = "p_probs")
+
+ss_cp <- ss_probs %>%
+  dplyr::select (CaregiverID,  c_probs, cWeek)%>%
+  pivot_wider (names_from = "cWeek", values_from = "c_probs")
+
+ss_final <- merge (x = ss_ss, y = merge(x = ss_pmh, y = ss_cp, by.x = "CaregiverID",  by.y = "CaregiverID"), by.x = "CaregiverID",  by.y = "CaregiverID", all.x = T)
+
+ss_final_dsb <- ss_final %>%
+  filter (disability_cat == "with disability")
+
+ss_final_ndsb <- ss_final %>%
+  filter (disability_cat == "without disability")
+```
+
+### Among Families of Children with Special Needs n = 107
+#### Associations Between Social Support & Follow-up Child Behavioral Problems
+  * Higher levels of social support at week 15 were linked to of children's decreased behavioral problems during the second subsequent response (B = -6.05, p <.05), after controlling for children's behavioral problems at week 15 (B = .60, p < .001).\
+  
+```{r, echo=FALSE, message = FALSE}
+ss_to_cprob <- lm (C_fl2 ~ c_probs15 + ss_total_crt, ss_final_dsb)
+summary(ss_to_cprob)
+
+```
+
+#### Mediation Analyses: Social Support & Subsequent Caregivers' Mental Health Problems & Subsequent Children's Behavioral Problems
+  
+  * Mediation model indicated:
+    + Significant path a (social support week 15 -> subsequent caregivers' mental health problems, B = -5.92, p < .01, controlling for caregivers' mental health problems at week 15)\
+    + Non-significant path b (caregivers' mental health problems from the subsequent response after week 15 -> children's behavioral problems from the second subsequent response after week 15, B = -.02, p = .83, controlling for children's behavioral problems from the subsequent response after week 15 and social support week 15)\
+    + The indirect effect was not significant: A*B = .12, 95%CI[-1.26, 1.55],.p > .05\
+
+#### Path a:
+```{r, echo=FALSE, message = FALSE}
+#path a: 
+ss_to_pprob <- lm (P_fl1 ~ p_probs15 + ss_total_crt, ss_final_dsb)
+summary(ss_to_pprob)
+
+```
+
+#### Path b:
+```{r, echo=FALSE, message = FALSE}
+#path a: 
+pprob_to_cprob <- lm (C_fl2 ~ P_fl1 + C_fl1 + ss_total_crt, ss_final_dsb)
+summary(pprob_to_cprob)
+
+```
+### Testing Indirect Effect using RMediation Method
+```{r, echo=FALSE, message = FALSE}
+medci(mu.x = -5.92, se.x = 1.94, mu.y = -.02, se.y = .11) 
+
+```
+
+### Among Families of Children without Special Needs n = 789
+#### Associations Between Social Support & Follow-up Child Behavioral Problems
+  * Higher levels of social support at week 15 were linked to of children's decreased behavioral problems during the second subsequent response (B = -3.73, p <.001), after controlling for children's behavioral problems at week 15 (B = .62, p < .001).\
+  
+```{r, echo=FALSE, message = FALSE}
+ss_to_cprob <- lm (C_fl2 ~ c_probs15 + ss_total_crt, ss_final_ndsb)
+summary(ss_to_cprob)
+
+```
+
+#### Mediation Analyses: Social Support & Subsequent Caregivers' Mental Health Problems & Subsequent Children's Behavioral Problems
+  
+  * Mediation model indicated:
+    + Significant path a (social support week 15 -> subsequent caregivers' mental health problems, B = -2.44, p < .01, controlling for caregivers' mental health problems at week 15)\
+    + Significant path b (caregivers' mental health problems from the subsequent response after week 15 -> children's behavioral problems from the second subsequent response after week 15, B = .19, p < .001, controlling for children's behavioral problems from the subsequent response after week 15 and social support week 15)\
+    + The indirect effect was not significant: A*B = -.46, 95%CI[-.80, -.20],.p < .001\
+
+#### Path a:
+```{r, echo=FALSE, message = FALSE}
+#path a: 
+ss_to_pprob <- lm (P_fl1 ~ p_probs15 + ss_total_crt, ss_final_ndsb)
+summary(ss_to_pprob)
+
+```
+
+#### Path b:
+```{r, echo=FALSE, message = FALSE}
+#path a: 
+pprob_to_cprob <- lm (C_fl2 ~ P_fl1 + C_fl1 + ss_total_crt, ss_final_ndsb)
+summary(pprob_to_cprob)
+
+```
+### Testing Indirect Effect using RMediation Method
+```{r, echo=FALSE, message = FALSE}
+medci(mu.x = -2.44, se.x = .62, mu.y = .19, se.y = .04) 
+
+```

@@ -531,13 +531,16 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       data$POLICY.025 == 2 ~ "Don't know")
   }
   
-  if(contains_items("HEALTH.005", data)){
-    data = combine.cat(x = data, 
-                       cols = find_items("HEALTH.005", data), 
-                       id = "CaregiverID",
-                       newvar.name = "HEALTH.005_cat")
-    newdata$disability = ifelse(grepl("[1-4]", data$HEALTH.005_cat), 1, 0)
-  }
+  
+    newdata$disability = case_when(
+      data$HEALTH.005_1 == 1 ~ 1,
+      data$HEALTH.005_2 == 1 ~ 1,
+      data$HEALTH.005_3 == 1 ~ 1,
+      data$HEALTH.005_4 == 1 ~ 1,
+      data$HEALTH.005_6 == 1 ~ 1,
+      data$HEALTH.005_5 == 1 ~ 0,
+      TRUE ~ NA_real_)
+  
   
   if(contains_items("HEALTH.001", data)){
     newdata$insurance = ifelse(data$HEALTH.001 == 1, 1, 0)
@@ -1189,14 +1192,6 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$fear_more = ifelse(fear_difference > 0, 1, 0)
   }
   
-  
-  if(contains_items("HEALTH.005", data)){
-    data = combine.cat(x = data, 
-                       cols = find_items("HEALTH.005_[0-9]{1}$", data), 
-                       id = "CaregiverID",
-                       newvar.name = "HEALTH.005_cat")
-    newdata$disability = ifelse(grepl("[1-4]", data$HEALTH.005_cat), 1, 0)
-  }
   
   if(contains_items("JOB.010", data)){
     data = combine.cat(x = data, 
