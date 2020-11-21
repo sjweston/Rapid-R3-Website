@@ -9,7 +9,10 @@ output:
 
 
 ```{r chunk 1, echo = F}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      cache = FALSE)
 options(knitr.kable.NA = '')
 ```
 
@@ -1356,28 +1359,28 @@ findThoughts(stmq1_34,
              n = 5)
 ```
 
-# Topic correlations{.tabset}
+## Topic correlations{.tabset}
 
-## 27
+### 27
 
 ```{r}
 plot(topicCorr(stmq1_27))
 ```
 
-## 30
+### 30
 
 ```{r}
 plot(topicCorr(stmq1_30))
 ```
 
-## 34
+### 34
 
 ```{r}
 plot(topicCorr(stmq1_34))
 ```
 
 
-# Effects
+## Effects{.tabset}
 
 ```{r}
 predict_27 <- estimateEffect(formula = 1:27 ~ race_ethnic + mental_health + poverty150 + s(Week, df = 6), 
@@ -1394,6 +1397,1525 @@ predict_34<- estimateEffect(formula = 1:34 ~ race_ethnic + mental_health + pover
                                stmobj = stmq1_34, 
                                metadata = out1$meta, 
                                uncertainty = "Global")
+```
+
+### 27
+
+```{r}
+effect_data27 = data.frame(
+  topic = 1:27
+)
+
+effect_data27$tables = summary(predict_27)$tables
+
+effect_data27 %>%
+  mutate(tables = map(tables, as.data.frame),
+         tables = map(tables, ~mutate(.x, term = rownames(.x)))) %>%
+  unnest(cols = c(tables)) %>%
+  filter(term == "mental_health") %>%
+  mutate(laby = case_when(
+    Estimate > 0 ~ Estimate + 1.96*`Std. Error` + .00003,
+    TRUE ~ Estimate - 1.96*`Std. Error` - .00003)) %>%
+  ggplot(aes(x = reorder(topic, Estimate), y = Estimate)) +
+  geom_hline(aes(yintercept = 0), color = "red", alpha = .3)+
+  geom_point() +
+  geom_errorbar(aes(ymin = Estimate - 1.96*`Std. Error`,
+                    ymax= Estimate + 1.96*`Std. Error`), 
+                width = .5, alpha = .3) + 
+  geom_text(aes(y = laby, label = topic)) +
+  scale_x_discrete(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Topic", y = "Relationship to Mental Health" ) +
+  coord_flip()+ 
+  theme_pubr()
+```
+
+
+### 30
+
+```{r}
+effect_data30 = data.frame(
+  topic = 1:30
+)
+
+effect_data30$tables = summary(predict_30)$tables
+
+effect_data30 %>%
+  mutate(tables = map(tables, as.data.frame),
+         tables = map(tables, ~mutate(.x, term = rownames(.x)))) %>%
+  unnest(cols = c(tables)) %>%
+  filter(term == "mental_health") %>%
+  mutate(laby = case_when(
+    Estimate > 0 ~ Estimate + 1.96*`Std. Error` + .00003,
+    TRUE ~ Estimate - 1.96*`Std. Error` - .00003)) %>%
+  ggplot(aes(x = reorder(topic, Estimate), y = Estimate)) +
+  geom_hline(aes(yintercept = 0), color = "red", alpha = .3)+
+  geom_point() +
+  geom_errorbar(aes(ymin = Estimate - 1.96*`Std. Error`,
+                    ymax= Estimate + 1.96*`Std. Error`), 
+                width = .5, alpha = .3) + 
+  geom_text(aes(y = laby, label = topic)) +
+  scale_x_discrete(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Topic", y = "Relationship to Mental Health" ) +
+  coord_flip()+ 
+  theme_pubr()
+```
+
+
+### 34
+
+```{r}
+effect_data34 = data.frame(
+  topic = 1:34
+)
+
+effect_data34$tables = summary(predict_34)$tables
+
+effect_data34 %>%
+  mutate(tables = map(tables, as.data.frame),
+         tables = map(tables, ~mutate(.x, term = rownames(.x)))) %>%
+  unnest(cols = c(tables)) %>%
+  filter(term == "mental_health") %>%
+  mutate(laby = case_when(
+    Estimate > 0 ~ Estimate + 1.96*`Std. Error` + .00003,
+    TRUE ~ Estimate - 1.96*`Std. Error` - .00003)) %>%
+  ggplot(aes(x = reorder(topic, Estimate), y = Estimate)) +
+  geom_hline(aes(yintercept = 0), color = "red", alpha = .3)+
+  geom_point() +
+  geom_errorbar(aes(ymin = Estimate - 1.96*`Std. Error`,
+                    ymax= Estimate + 1.96*`Std. Error`), 
+                width = .5, alpha = .3) + 
+  geom_text(aes(y = laby, label = topic)) +
+  scale_x_discrete(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Topic", y = "Relationship to Mental Health" ) +
+  coord_flip()+ 
+  theme_pubr()
+```
+
+
+# Question 2: What's helping
+
+```{r}
+open_ended2 = open_ended %>% filter(question == "2")
+
+
+processed2 <- textProcessor(open_ended2$response, metadata = open_ended2)
+out2 <- prepDocuments(processed2$documents, processed2$vocab, processed2$meta)
+docs2 <- out2$documents
+vocab2 <- out2$vocab
+meta2 <- out2$meta
+
+heldout2 = make.heldout(docs2, vocab2)
+```
+
+```{r, eval = F}
+set.seed(07312020)
+plan(multiprocess)
+
+many_models <- tibble(K =seq(5,90, by=5)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, 
+                                          heldout2$vocab, 
+                                          K = .,
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                                          data = meta2, 
+                                          verbose = FALSE)))
+k_result <- many_models %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),
+         residual = map(topic_model, checkResiduals, heldout2$documents),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+save(many_models, k_result, file = here("data/open2_many_models.Rdata"))
+
+
+k_result %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  filter(K < 65) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1, alpha = 0.7, show.legend = FALSE) +
+  geom_point()+
+  facet_wrap(~Metric, scales = "free_y") +
+  scale_x_continuous()+
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics") +
+  theme_pubclean()
+
+# looks like solution between 20 and 35 would be ideal
+
+many_models_v2 <- tibble(K =seq(20,35, by=1)) %>%
+  mutate(topic_model = future_map(K, ~stm(heldout2$documents, 
+                                          heldout2$vocab, 
+                                          K = .,
+                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                                          data = meta2, 
+                                          verbose = FALSE)))
+k_result_v2 <- many_models_v2 %>%
+  mutate(exclusivity = map(topic_model, exclusivity),
+         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),
+         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),
+         residual = map(topic_model, checkResiduals, heldout2$documents),
+         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),
+         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),
+         lbound = bound + lfact,
+         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
+
+save(many_models_v2, k_result_v2, file = here("data/open2_many_models_v2.Rdata"))
+
+k_result_v2 %>%
+  transmute(K,
+            `Lower bound` = lbound,
+            Residuals = map_dbl(residual, "dispersion"),
+            `Semantic coherence` = map_dbl(semantic_coherence, mean),
+            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~Metric, scales = "free_y") +
+  scale_x_continuous()+
+  labs(x = "K (number of topics)",
+       y = NULL,
+       title = "Model diagnostics by number of topics") +
+  theme_pubclean()
+
+```
+
+```{r, eval = F}
+stmq2_26 <- stm(documents = docs2, 
+                vocab = vocab2,
+                K = 27, 
+                prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                data = meta2, 
+                init.type = "Spectral")
+
+stmq2_30 <- stm(documents = docs2, 
+                vocab = vocab2,
+                K = 30, 
+                prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                data = meta2, 
+                init.type = "Spectral")
+
+stmq2_34 <- stm(documents = docs2, 
+                vocab = vocab2,
+                K = 34, 
+                prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
+                data = meta2, 
+                init.type = "Spectral")
+
+save(stmq2_26, stmq2_30, stmq2_34, file = here("data/stmq2_models.Rdata"))
+```
+
+```{r}
+load(here("data/stmq2_models.Rdata"))
+```
+
+Testing three solutions: 26, 30 and 34 topics
+
+## Most common topics{.tabset}
+
+### 26
+
+```{r}
+td_beta26 <- tidy(stmq2_26)
+td_gamma26 <- tidy(stmq2_26, matrix = "gamma")
+
+meta2 = meta2 %>%
+  mutate(document = row_number())
+
+top_terms26 <- td_beta26 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(7, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
+  unnest(cols = c(terms))
+
+gamma_terms26 <- td_gamma26 %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms26, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms26 %>%
+  top_n(20, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
+  scale_y_continuous(limits =c(0, .10))+
+  coord_flip() +
+  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 20 topics in 26 topic solution",
+       subtitle = "With the top words that contribute to each topic") +
+  theme_pubr()
+```
+
+### 30
+
+```{r}
+td_beta30 <- tidy(stmq2_30)
+td_gamma30 <- tidy(stmq2_30, matrix = "gamma")
+
+meta2 = meta2 %>%
+  mutate(document = row_number())
+
+top_terms30 <- td_beta30 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(7, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
+  unnest(cols = c(terms))
+
+gamma_terms30 <- td_gamma30 %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms30, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms30 %>%
+  top_n(20, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
+  scale_y_continuous(limits =c(0, .10))+
+  coord_flip() +
+  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 20 topics in 30 topic solution",
+       subtitle = "With the top words that contribute to each topic") +
+  theme_pubr()
+```
+
+### 34
+
+```{r}
+td_beta34 <- tidy(stmq2_34)
+td_gamma34 <- tidy(stmq2_34, matrix = "gamma")
+
+meta2 = meta2 %>%
+  mutate(document = row_number())
+
+top_terms34 <- td_beta34 %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(7, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>% 
+  unnest(cols = c(terms))
+
+gamma_terms34 <- td_gamma34 %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms34, by = "topic") %>%
+  mutate(topic = paste0("Topic ", topic),
+         topic = reorder(topic, gamma))
+
+gamma_terms34 %>%
+  top_n(20, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(hjust = 0, nudge_y = 0.0005, size = 3) +
+  scale_y_continuous(limits =c(0, .10))+
+  coord_flip() +
+  #theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  labs(x = NULL, y = expression(gamma),
+       title = "Top 20 topics in 34 topic solution",
+       subtitle = "With the top words that contribute to each topic") +
+  theme_pubr()
+```
+
+## Identify topics{.tabset}
+
+### 27{.tabset}
+
+#### 1-5
+
+**Topic 1: Defiance**
+
+```{r}
+topic_num = 1
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 2**
+
+```{r}
+topic_num = 2
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 3: Fall school plans**
+
+```{r}
+topic_num = 3
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 4: Relocating**
+
+```{r}
+topic_num = 4
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 5: Monotony and nerves**
+
+```{r}
+topic_num = 5
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 6-10
+
+**Topic 6: Balancing WFH and childcare**
+
+```{r}
+topic_num = 6
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 7: Keeping kids entertained**
+
+```{r}
+topic_num = 7
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 8: Social development of kids**
+
+```{r}
+topic_num = 8
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 9: Not being able to see family**
+
+```{r}
+topic_num = 9
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 10**
+
+```{r}
+topic_num = 10
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 11-15
+
+**Topic 11**
+
+```{r}
+topic_num = 11
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 12**
+
+```{r}
+topic_num = 12
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 13**
+
+```{r}
+topic_num = 13
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 14**
+
+```{r}
+topic_num = 14
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 15**
+
+```{r}
+topic_num = 15
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 16-20
+
+**Topic 16**
+
+```{r}
+topic_num = 16
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 17**
+
+```{r}
+topic_num = 17
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 18**
+
+```{r}
+topic_num = 18
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 19**
+
+```{r}
+topic_num = 19
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 20**
+
+```{r}
+topic_num = 20
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 21-25
+
+**Topic 21**
+
+```{r}
+topic_num = 21
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 22**
+
+```{r}
+topic_num = 22
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 23**
+
+```{r}
+topic_num = 23
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 24**
+
+```{r}
+topic_num = 24
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 25**
+
+```{r}
+topic_num = 25
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 26
+
+**Topic 26**
+
+```{r}
+topic_num = 26
+labelTopics(stmq2_26, topics = topic_num)
+findThoughts(stmq2_26, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+### 30{.tabset}
+
+#### 1-5
+
+**Topic 1**
+
+```{r}
+topic_num = 1
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 2**
+
+```{r}
+topic_num = 2
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 3**
+
+```{r}
+topic_num = 3
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 4**
+
+```{r}
+topic_num = 4
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 5**
+
+```{r}
+topic_num = 5
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 6-10
+
+**Topic 6**
+
+```{r}
+topic_num = 6
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 7**
+
+```{r}
+topic_num = 7
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 8**
+
+```{r}
+topic_num = 8
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 9**
+
+```{r}
+topic_num = 9
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 10**
+
+```{r}
+topic_num = 10
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 11-15
+
+**Topic 11**
+
+```{r}
+topic_num = 11
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 12**
+
+```{r}
+topic_num = 12
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 13**
+
+```{r}
+topic_num = 13
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 14**
+
+```{r}
+topic_num = 14
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 15**
+
+```{r}
+topic_num = 15
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 16-20
+
+**Topic 16**
+
+```{r}
+topic_num = 16
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 17**
+
+```{r}
+topic_num = 17
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 18**
+
+```{r}
+topic_num = 18
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 19**
+
+```{r}
+topic_num = 19
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 20**
+
+```{r}
+topic_num = 20
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 21-25
+
+**Topic 21**
+
+```{r}
+topic_num = 21
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 22**
+
+```{r}
+topic_num = 22
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 23**
+
+```{r}
+topic_num = 23
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 24**
+
+```{r}
+topic_num = 24
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 25**
+
+```{r}
+topic_num = 25
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 26-30
+
+**Topic 26**
+
+```{r}
+topic_num = 26
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 27**
+
+```{r}
+topic_num = 27
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 28**
+
+```{r}
+topic_num = 28
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 29**
+
+```{r}
+topic_num = 29
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 30**
+
+```{r}
+topic_num = 30
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+### 34{.tabset}
+
+#### 1-5
+
+**Topic 1**
+
+```{r}
+topic_num = 1
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 2**
+
+```{r}
+topic_num = 2
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 3**
+
+```{r}
+topic_num = 3
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 4**
+
+```{r}
+topic_num = 4
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 5**
+
+```{r}
+topic_num = 5
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 6-10
+
+**Topic 6**
+
+```{r}
+topic_num = 6
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 7**
+
+```{r}
+topic_num = 7
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 8**
+
+```{r}
+topic_num = 8
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 9**
+
+```{r}
+topic_num = 9
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 10**
+
+```{r}
+topic_num = 10
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 11-15
+
+**Topic 11**
+
+```{r}
+topic_num = 11
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 12**
+
+```{r}
+topic_num = 12
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 13**
+
+```{r}
+topic_num = 13
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 14**
+
+```{r}
+topic_num = 14
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 15**
+
+```{r}
+topic_num = 15
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 16-20
+
+**Topic 16**
+
+```{r}
+topic_num = 16
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 17**
+
+```{r}
+topic_num = 17
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 18**
+
+```{r}
+topic_num = 18
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 19**
+
+```{r}
+topic_num = 19
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 20**
+
+```{r}
+topic_num = 20
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 21-25
+
+**Topic 21**
+
+```{r}
+topic_num = 21
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 22**
+
+```{r}
+topic_num = 22
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 23**
+
+```{r}
+topic_num = 23
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 24**
+
+```{r}
+topic_num = 24
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 25**
+
+```{r}
+topic_num = 25
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 26-30
+
+**Topic 26**
+
+```{r}
+topic_num = 26
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 27**
+
+```{r}
+topic_num = 27
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 28**
+
+```{r}
+topic_num = 28
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 29**
+
+```{r}
+topic_num = 29
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 30**
+
+```{r}
+topic_num = 30
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+#### 31-34
+
+**Topic 31**
+
+```{r}
+topic_num = 31
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 32**
+
+```{r}
+topic_num = 32
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 33**
+
+```{r}
+topic_num = 33
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+**Topic 34**
+
+```{r}
+topic_num = 34
+labelTopics(stmq2_34, topics = topic_num)
+findThoughts(stmq2_34, 
+             texts = out2$meta$response, 
+             topics = topic_num, 
+             n = 5)
+```
+
+# Topic correlations{.tabset}
+
+## 27
+
+```{r}
+plot(topicCorr(stmq2_26))
+```
+
+## 30
+
+```{r}
+plot(topicCorr(stmq2_34))
+```
+
+## 34
+
+```{r}
+plot(topicCorr(stmq2_34))
+```
+
+
+# Effects{.tabset}
+
+```{r}
+predict_26 <- estimateEffect(formula = 1:26 ~ race_ethnic + mental_health + poverty150 + s(Week, df = 6), 
+                               stmobj = stmq2_26, 
+                               metadata = out2$meta, 
+                               uncertainty = "Global")
+
+predict_30 <- estimateEffect(formula = 1:30 ~ race_ethnic + mental_health + poverty150 + s(Week, df = 6),  
+                               stmobj = stmq2_34, 
+                               metadata = out2$meta, 
+                               uncertainty = "Global")
+
+predict_34<- estimateEffect(formula = 1:34 ~ race_ethnic + mental_health + poverty150 + s(Week, df = 6), 
+                               stmobj = stmq2_34, 
+                               metadata = out2$meta, 
+                               uncertainty = "Global")
+```
+
+## 27
+
+```{r}
+effect_data26 = data.frame(
+  topic = 1:26
+)
+
+effect_data26$tables = summary(predict_26)$tables
+
+effect_data26 %>%
+  mutate(tables = map(tables, as.data.frame),
+         tables = map(tables, ~mutate(.x, term = rownames(.x)))) %>%
+  unnest(cols = c(tables)) %>%
+  filter(term == "mental_health") %>%
+  mutate(laby = case_when(
+    Estimate > 0 ~ Estimate + 1.96*`Std. Error` + .00003,
+    TRUE ~ Estimate - 1.96*`Std. Error` - .00003)) %>%
+  ggplot(aes(x = reorder(topic, Estimate), y = Estimate)) +
+  geom_hline(aes(yintercept = 0), color = "red", alpha = .3)+
+  geom_point() +
+  geom_errorbar(aes(ymin = Estimate - 1.96*`Std. Error`,
+                    ymax= Estimate + 1.96*`Std. Error`), 
+                width = .5, alpha = .3) + 
+  geom_text(aes(y = laby, label = topic)) +
+  scale_x_discrete(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Topic", y = "Relationship to Mental Health" ) +
+  coord_flip()+ 
+  theme_pubr()
+```
+
+
+## 30
+
+```{r}
+effect_data30 = data.frame(
+  topic = 1:30
+)
+
+effect_data30$tables = summary(predict_30)$tables
+
+effect_data30 %>%
+  mutate(tables = map(tables, as.data.frame),
+         tables = map(tables, ~mutate(.x, term = rownames(.x)))) %>%
+  unnest(cols = c(tables)) %>%
+  filter(term == "mental_health") %>%
+  mutate(laby = case_when(
+    Estimate > 0 ~ Estimate + 1.96*`Std. Error` + .00003,
+    TRUE ~ Estimate - 1.96*`Std. Error` - .00003)) %>%
+  ggplot(aes(x = reorder(topic, Estimate), y = Estimate)) +
+  geom_hline(aes(yintercept = 0), color = "red", alpha = .3)+
+  geom_point() +
+  geom_errorbar(aes(ymin = Estimate - 1.96*`Std. Error`,
+                    ymax= Estimate + 1.96*`Std. Error`), 
+                width = .5, alpha = .3) + 
+  geom_text(aes(y = laby, label = topic)) +
+  scale_x_discrete(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Topic", y = "Relationship to Mental Health" ) +
+  coord_flip()+ 
+  theme_pubr()
+```
+
+
+## 34
+
+```{r}
+effect_data34 = data.frame(
+  topic = 1:34
+)
+
+effect_data34$tables = summary(predict_34)$tables
+
+effect_data34 %>%
+  mutate(tables = map(tables, as.data.frame),
+         tables = map(tables, ~mutate(.x, term = rownames(.x)))) %>%
+  unnest(cols = c(tables)) %>%
+  filter(term == "mental_health") %>%
+  mutate(laby = case_when(
+    Estimate > 0 ~ Estimate + 1.96*`Std. Error` + .00003,
+    TRUE ~ Estimate - 1.96*`Std. Error` - .00003)) %>%
+  ggplot(aes(x = reorder(topic, Estimate), y = Estimate)) +
+  geom_hline(aes(yintercept = 0), color = "red", alpha = .3)+
+  geom_point() +
+  geom_errorbar(aes(ymin = Estimate - 1.96*`Std. Error`,
+                    ymax= Estimate + 1.96*`Std. Error`), 
+                width = .5, alpha = .3) + 
+  geom_text(aes(y = laby, label = topic)) +
+  scale_x_discrete(breaks = NULL) +
+  scale_y_continuous(breaks = NULL) +
+  labs(x = "Topic", y = "Relationship to Mental Health" ) +
+  coord_flip()+ 
+  theme_pubr()
 ```
 
 
