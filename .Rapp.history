@@ -47,76 +47,7 @@ vocab2 <- out2$vocab#
 meta2 <- out2$meta#
 #
 heldout2 = make.heldout(docs2, vocab2)
-load(here("data/open2_many_models.Rdata"))
-k_result %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  filter(K < 65) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1, alpha = 0.7, show.legend = FALSE) +#
-  geom_point()#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous()+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
-k_result %>%#
-  transmute(K,#
-            `Lower bound` = lbound,#
-            Residuals = map_dbl(residual, "dispersion"),#
-            `Semantic coherence` = map_dbl(semantic_coherence, mean),#
-            `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")) %>%#
-  gather(Metric, Value, -K) %>%#
-  filter(K < 65) %>%#
-  ggplot(aes(K, Value, color = Metric)) +#
-  geom_line(size = 1, alpha = 0.7, show.legend = FALSE) +#
-  geom_point()+#
-  facet_wrap(~Metric, scales = "free_y") +#
-  scale_x_continuous()+#
-  labs(x = "K (number of topics)",#
-       y = NULL,#
-       title = "Model diagnostics by number of topics") +#
-  theme_pubclean()
-many_models_v2 <- tibble(K =seq(20,35, by=1)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout1$documents, #
-                                          heldout1$vocab, #
-                                          K = .,#
-                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta1, #
-                                          verbose = FALSE)))#
-k_result_v2 <- many_models_v2 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout1$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout1$missing),#
-         residual = map(topic_model, checkResiduals, heldout1$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))#
-#
-save(many_models_v2, k_result_v2, file = here("data/open2_many_models_v2.Rdata"))
-many_models_v2 <- tibble(K =seq(20,35, by=1)) %>%#
-  mutate(topic_model = future_map(K, ~stm(heldout2$documents, #
-                                          heldout2$vocab, #
-                                          K = .,#
-                                          prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
-                                          data = meta2, #
-                                          verbose = FALSE)))
-k_result_v2 <- many_models_v2 %>%#
-  mutate(exclusivity = map(topic_model, exclusivity),#
-         semantic_coherence = map(topic_model, semanticCoherence, heldout2$documents),#
-         eval_heldout = map(topic_model, eval.heldout, heldout2$missing),#
-         residual = map(topic_model, checkResiduals, heldout2$documents),#
-         bound =  map_dbl(topic_model, function(x) max(x$convergence$bound)),#
-         lfact = map_dbl(topic_model, function(x) lfactorial(x$settings$dim$K)),#
-         lbound = bound + lfact,#
-         iterations = map_dbl(topic_model, function(x) length(x$convergence$bound)))
-save(many_models_v2, k_result_v2, file = here("data/open2_many_models_v2.Rdata"))
+load(here("data/open2_many_models_v2.Rdata"))
 k_result_v2 %>%#
   transmute(K,#
             `Lower bound` = lbound,#
@@ -132,3 +63,25 @@ k_result_v2 %>%#
        y = NULL,#
        title = "Model diagnostics by number of topics") +#
   theme_pubclean()
+stmq2_26 <- stm(documents = docs2, #
+                vocab = vocab2,#
+                K = 27, #
+                prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                data = meta2, #
+                init.type = "Spectral")#
+#
+stmq2_30 <- stm(documents = docs2, #
+                vocab = vocab2,#
+                K = 30, #
+                prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                data = meta2, #
+                init.type = "Spectral")#
+#
+stmq2_34 <- stm(documents = docs2, #
+                vocab = vocab2,#
+                K = 34, #
+                prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),#
+                data = meta2, #
+                init.type = "Spectral")#
+#
+save(stmq2_26, stmq2_30, stmq2_34, file = here("data/stmq2_models.Rdata"))
