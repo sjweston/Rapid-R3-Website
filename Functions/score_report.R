@@ -651,7 +651,12 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   
   if(contains_items("HEALTH.003", data)) {
     num_delay_healthcare = rowSums(data[,find_items("HEALTH.003.[a-f]$", data)],na.rm=T)
-    newdata$delay_healthcare = ifelse(num_delay_healthcare > 0, 1, 0)
+    newdata$delay_healthcare = case_when(
+      num_delay_healthcare > 0 ~ 1,
+      data$HEALTH.003.2 == 1 ~ 1,
+      data$HEALTH.003.2 == 2 ~ 0,
+      data$HEALTH.003.2 == 3 ~ 0,
+      TRUE ~ 0)
     newdata$hc_barrier_cost = ifelse(data$HEALTH.003.a > 0, 1, 0)
     newdata$hc_barrier_time = ifelse(data$HEALTH.003.b > 0, 1, 0)
     newdata$hc_barrier_childcare = ifelse(data$HEALTH.003.c > 0, 1, 0)

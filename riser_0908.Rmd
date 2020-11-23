@@ -8,7 +8,7 @@ output:
 
 
 ```{r riser1-1, echo = F}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = FALSE)
 options(knitr.kable.NA = '')
 ```
 
@@ -32,7 +32,7 @@ source(here("Functions/pomp.R"))
 source(here("Functions/core_funs.R"))
 ```
 
-```{r}
+```{r riser-0908-1}
 dates = scored %>%
   group_by(Week) %>%
   summarize(start = min(Date),
@@ -40,7 +40,7 @@ dates = scored %>%
 ```
 
 
-```{r}
+```{r riser-0908-2}
 scored = scored %>%
   mutate(poverty200 = ifelse(is.na(poverty200), poverty200s, poverty200)) %>%
   mutate(num_adults = household_size-num_children_raw) %>%
@@ -97,7 +97,8 @@ scored = scored_full %>%
   group_by(Week) %>%
   mutate(Date = case_when(
     !is.na(Date) ~ min(Date),
-    TRUE ~ as.Date("2020-08-01")))
+    TRUE ~ as.Date("2020-08-01"))) %>%
+  ungroup()
 
 date_labels = scored %>%
   group_by(Date) %>%
@@ -110,7 +111,7 @@ date_labels = scored %>%
 
 These analyses are based on responses collected from `r papaja::printnum(n_care, format = "d")` caregivers between the dates of `r date.min` and `r date.max`. These caregivers represent a range of voices: `r papaja::printnum(perc.black)`\% are Black/African American, `r papaja::printnum(perc.latinx)`\% are LatinX, (`r papaja::printnum(perc.bl)`\% report being both Black/African American and LatinX,) and `r papaja::printnum(perc.fpl)`\% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are *not* weighted.
 
-```{r}
+```{r riser-0908-3}
 black_data = filter(scored, black == "Black") 
 
 n_care = length(unique(black_data$CaregiverID))
@@ -132,7 +133,7 @@ Demographics by income for Black respondents:
 
 ## Black Caregivers
 
-```{r, results = 'asis'}
+```{r riser-0908-4, results = 'asis'}
 black_caregivers %>%
   select(income, children, household, adults, employDecrease) %>%
   summarize_all(list(mean = ~mean(.x, na.rm=T),
@@ -153,7 +154,7 @@ black_caregivers %>%
   kable_styling(full_width = T)
 ```
 
-```{r}
+```{r riser-0908-5}
 black_caregivers %>%
   select(income, children, household, adults, employDecrease) %>%
   gather("variable", "value") %>%
@@ -170,7 +171,7 @@ black_caregivers %>%
 
 ## Black x federal poverty level (FPL)
 
-```{r, results = 'asis'}
+```{r riser-0908-6, results = 'asis'}
 black_caregivers %>%
   filter(!is.na(poverty200)) %>%
   mutate(poverty200 = factor(poverty200, 
@@ -197,7 +198,7 @@ black_caregivers %>%
   group_rows("200xFPL", 6, 10) 
 ```
 
-```{r}
+```{r riser-0908-7}
 black_caregivers %>%
   filter(!is.na(poverty200)) %>%
   mutate(poverty200 = factor(poverty200, 
@@ -217,20 +218,21 @@ black_caregivers %>%
 
 ## Black vs Non-Black
 
-```{r}
+```{r riser-0908-8}
 plot = scored %>%
   filter(!is.na(black)) %>%
-  select(CaregiverID, black, access_telehealth_self, access_telehealth_child, access_mentalhealth) %>%
+  select(CaregiverID, black, access_telehealth_self, 
+         access_telehealth_child, access_mentalhealth) %>%
   gather("variable", "value", -CaregiverID) %>%
   group_by(CaregiverID, variable) %>%
   filter(!is.na(value)) %>%
   summarize_all(max, na.rm=T) %>%
   spread(variable, value) %>% 
   ungroup() %>%
-  mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
+  mutate_at(vars(starts_with("access")), as.numeric) %>%
   group_by(black) %>%
   summarize_at(vars(access_telehealth_self, access_telehealth_child, access_mentalhealth), 
-               list(mean = ~100*mean(.x, na.rm=T),
+               list(mean = ~mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   gather("variable", "value", -black) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
@@ -240,10 +242,13 @@ plot = scored %>%
                            levels = c("access_telehealth_self",
                                       "access_telehealth_child",
                                       "access_mentalhealth"),
-                           labels = c("Parenting support",
-                                      "Fitness classes",
-                                      "Educational courses"))) %>%
+                           labels = c("Telehealth (self)",
+                                      "Telehealth (child)",
+                                      "Mental health"))) %>%
   spread(stat, value) %>%
+  mutate(moe = map2_dbl(percent, N, moe.p),
+         cv = map_dbl(N, ~qt(.975,.x-1))) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
   ggplot(aes(x = variable, 
              y = percent, 
              fill = black,
@@ -253,8 +258,10 @@ plot = scored %>%
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
              )) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(x = NULL, y = "Percent", fill = NULL) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe*cv, ymax = percent+moe*cv), 
+                position = position_dodge(1), width = .5)+
+  labs(x = NULL, y = "Percent", fill = NULL) + 
   theme_pubclean()
   
 ggplotly(plot)
@@ -262,19 +269,21 @@ ggplotly(plot)
 
 ## Race/ethnicity
 
-```{r}
+```{r riser-0908-9}
 plot = scored %>%
   filter(!is.na(race)) %>%
-  select(CaregiverID, race, access_telehealth_self, access_telehealth_child, access_mentalhealth) %>%
-  gather("variable", "value", -CaregiverID, -race) %>%
-  group_by(CaregiverID, race, variable) %>%
+  select(CaregiverID, race, access_telehealth_self, 
+         access_telehealth_child, access_mentalhealth) %>%
+  gather("variable", "value", -CaregiverID) %>%
+  group_by(CaregiverID, variable) %>%
   filter(!is.na(value)) %>%
   summarize_all(max, na.rm=T) %>%
   spread(variable, value) %>% 
   ungroup() %>%
+  mutate_at(vars(starts_with("access")), as.numeric) %>%
   group_by(race) %>%
   summarize_at(vars(access_telehealth_self, access_telehealth_child, access_mentalhealth), 
-               list(mean = ~100*mean(.x, na.rm=T),
+               list(mean = ~mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   gather("variable", "value", -race) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
@@ -284,10 +293,13 @@ plot = scored %>%
                            levels = c("access_telehealth_self",
                                       "access_telehealth_child",
                                       "access_mentalhealth"),
-                           labels = c("Parenting support",
-                                      "Fitness classes",
-                                      "Educational courses"))) %>%
+                           labels = c("Telehealth (self)",
+                                      "Telehealth (child)",
+                                      "Mental health"))) %>%
   spread(stat, value) %>%
+  mutate(moe = map2_dbl(percent, N, moe.p),
+         cv = map_dbl(N, ~qt(.975,.x-1))) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
   ggplot(aes(x = variable, 
              y = percent, 
              fill = race,
@@ -297,8 +309,10 @@ plot = scored %>%
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
              )) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(x = NULL, y = "Percent", fill = NULL) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe*cv, ymax = percent+moe*cv), 
+                position = position_dodge(1), width = .5)+
+  labs(x = NULL, y = "Percent", fill = NULL) + 
   theme_pubclean()
   
 ggplotly(plot)
@@ -306,23 +320,22 @@ ggplotly(plot)
 
 ## Black by income
 
-
-```{r}
+```{r riser-0908-10}
 plot = scored %>%
   filter(!is.na(black) & !is.na(poverty200)) %>%
-  select(CaregiverID, black, poverty200, 
-         access_telehealth_self, access_telehealth_child, access_mentalhealth) %>%
+  select(CaregiverID, black, poverty200, access_telehealth_self, 
+         access_telehealth_child, access_mentalhealth) %>%
   gather("variable", "value", -CaregiverID) %>%
   group_by(CaregiverID, variable) %>%
   filter(!is.na(value)) %>%
   summarize_all(max, na.rm=T) %>%
   spread(variable, value) %>% 
   ungroup() %>%
-  mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
   mutate_at(vars(poverty200), factor, labels = c("above Poverty", "200xFPL")) %>%
+  mutate_at(vars(starts_with("access")), as.numeric) %>%
   group_by(black, poverty200) %>%
   summarize_at(vars(access_telehealth_self, access_telehealth_child, access_mentalhealth), 
-               list(mean = ~100*mean(.x, na.rm=T),
+               list(mean = ~mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   gather("variable", "value", -black, -poverty200) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
@@ -332,23 +345,27 @@ plot = scored %>%
                            levels = c("access_telehealth_self",
                                       "access_telehealth_child",
                                       "access_mentalhealth"),
-                           labels = c("Parenting support",
-                                      "Fitness classes",
-                                      "Educational courses"))) %>%
+                           labels = c("Telehealth (self)",
+                                      "Telehealth (child)",
+                                      "Mental health"))) %>%
   spread(stat, value) %>%
+  mutate(moe = map2_dbl(percent, N, moe.p),
+         cv = map_dbl(N, ~qt(.975,.x-1))) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
   ggplot(aes(x = variable, 
              y = percent, 
              fill = poverty200,
              text = paste0(
-               "\nGroup: ", black,
-               "\nIncome: ", poverty200,
+               "\nGroup: ", poverty200,
                "\nVariable: ", variable,
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
              )) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe*cv, ymax = percent+moe*cv), 
+                position = position_dodge(1), width = .3)+
+  labs(x = NULL, y = "Percent", fill = NULL) + 
   facet_wrap(~black) + 
-  labs(x = NULL, y = "Percent", fill = NULL) +
   theme_pubclean()
   
 ggplotly(plot)
@@ -359,7 +376,7 @@ ggplotly(plot)
 
 ## Black vs Non-Black
 
-```{r}
+```{r riser-0908-11}
 plot = scored %>%
   filter(!is.na(black)) %>%
   mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
@@ -375,9 +392,9 @@ plot = scored %>%
                            levels = c("access_telehealth_self",
                                       "access_telehealth_child",
                                       "access_mentalhealth"),
-                           labels = c("Parenting support",
-                                      "Fitness classes",
-                                      "Educational courses"))) %>%
+                           labels = c("Telehealth (self)",
+                                      "Telehealth (child)",
+                                      "Mental health"))) %>%
   spread(stat, value) %>%
   filter(!is.na(percent)) %>% 
   ggplot(aes(x = Week, 
@@ -399,7 +416,7 @@ ggplotly(plot)
 
 ## Race/ethnicty
 
-```{r}
+```{r riser-0908-12}
 plot = scored %>%
   filter(!is.na(race)) %>%
   group_by(race, Week) %>%
@@ -414,9 +431,9 @@ plot = scored %>%
                            levels = c("access_telehealth_self",
                                       "access_telehealth_child",
                                       "access_mentalhealth"),
-                           labels = c("Parenting support",
-                                      "Fitness classes",
-                                      "Educational courses"))) %>%
+                           labels = c("Telehealth (self)",
+                                      "Telehealth (child)",
+                                      "Mental health"))) %>%
   spread(stat, value) %>%
   filter(!is.na(percent)) %>% 
   ggplot(aes(x = Week, 
@@ -439,7 +456,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Black x income
 
-```{r}
+```{r riser-0908-13}
 plot = scored %>%
   filter(!is.na(black) & !is.na(poverty200)) %>%
   group_by(black, poverty200, Week) %>%
@@ -455,9 +472,9 @@ plot = scored %>%
                            levels = c("access_telehealth_self",
                                       "access_telehealth_child",
                                       "access_mentalhealth"),
-                           labels = c("Parenting support",
-                                      "Fitness classes",
-                                      "Educational courses")),
+                           labels = c("Telehealth (self)",
+                                      "Telehealth (child)",
+                                      "Mental health")),
          black = factor(black, labels = c("non-Black", "Black")),
          poverty200 = factor(poverty200, labels = c("above Poverty", "200xFPL"))) %>%
   spread(stat, value) %>%
@@ -485,20 +502,21 @@ ggplotly(plot, tooltip = "text")
 
 ## Black vs Non-Black
 
-```{r}
+```{r riser-0908-14}
 plot = scored %>%
   filter(!is.na(black)) %>%
-  select(CaregiverID, black, access_parenting, access_fitness, access_education) %>%
+  select(CaregiverID, black, access_parenting, 
+         access_fitness, access_education) %>%
   gather("variable", "value", -CaregiverID) %>%
   group_by(CaregiverID, variable) %>%
   filter(!is.na(value)) %>%
   summarize_all(max, na.rm=T) %>%
   spread(variable, value) %>% 
   ungroup() %>%
-  mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
+  mutate_at(vars(starts_with("access")), as.numeric) %>%
   group_by(black) %>%
-  summarize_at(vars(access_parenting, access_fitness, access_education), 
-               list(mean = ~100*mean(.x, na.rm=T),
+  summarize_at(vars(starts_with("access")), 
+               list(mean = ~mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   gather("variable", "value", -black) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
@@ -512,6 +530,9 @@ plot = scored %>%
                                       "Fitness classes",
                                       "Educational courses"))) %>%
   spread(stat, value) %>%
+  mutate(moe = map2_dbl(percent, N, moe.p),
+         cv = map_dbl(N, ~qt(.975,.x-1))) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
   ggplot(aes(x = variable, 
              y = percent, 
              fill = black,
@@ -521,8 +542,10 @@ plot = scored %>%
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
              )) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(x = NULL, y = "Percent", fill = NULL) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe*cv, ymax = percent+moe*cv), 
+                position = position_dodge(1), width = .5)+
+  labs(x = NULL, y = "Percent", fill = NULL) + 
   theme_pubclean()
   
 ggplotly(plot)
@@ -530,19 +553,22 @@ ggplotly(plot)
 
 ## Race/ethnicity
 
-```{r}
+
+```{r riser-0908-15}
 plot = scored %>%
   filter(!is.na(race)) %>%
-  select(CaregiverID, race, access_parenting, access_fitness, access_education) %>%
-  gather("variable", "value", -CaregiverID, -race) %>%
-  group_by(CaregiverID, race, variable) %>%
+  select(CaregiverID, race, access_parenting, 
+         access_fitness, access_education) %>%
+  gather("variable", "value", -CaregiverID) %>%
+  group_by(CaregiverID, variable) %>%
   filter(!is.na(value)) %>%
   summarize_all(max, na.rm=T) %>%
   spread(variable, value) %>% 
   ungroup() %>%
+  mutate_at(vars(starts_with("access")), as.numeric) %>%
   group_by(race) %>%
-  summarize_at(vars(access_parenting, access_fitness, access_education), 
-               list(mean = ~100*mean(.x, na.rm=T),
+  summarize_at(vars(starts_with("access")), 
+               list(mean = ~mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   gather("variable", "value", -race) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
@@ -556,6 +582,9 @@ plot = scored %>%
                                       "Fitness classes",
                                       "Educational courses"))) %>%
   spread(stat, value) %>%
+  mutate(moe = map2_dbl(percent, N, moe.p),
+         cv = map_dbl(N, ~qt(.975,.x-1))) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
   ggplot(aes(x = variable, 
              y = percent, 
              fill = race,
@@ -565,8 +594,10 @@ plot = scored %>%
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
              )) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(x = NULL, y = "Percent", fill = NULL) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe*cv, ymax = percent+moe*cv), 
+                position = position_dodge(1), width = .5)+
+  labs(x = NULL, y = "Percent", fill = NULL) + 
   theme_pubclean()
   
 ggplotly(plot)
@@ -574,28 +605,28 @@ ggplotly(plot)
 
 ## Black by income
 
-```{r}
+```{r riser-0908-16}
 plot = scored %>%
   filter(!is.na(black) & !is.na(poverty200)) %>%
-  select(CaregiverID, black, poverty200, 
-         access_parenting, access_fitness, access_education) %>%
+  select(CaregiverID, black, poverty200, access_parenting, 
+         access_fitness, access_education) %>%
   gather("variable", "value", -CaregiverID) %>%
   group_by(CaregiverID, variable) %>%
   filter(!is.na(value)) %>%
   summarize_all(max, na.rm=T) %>%
   spread(variable, value) %>% 
   ungroup() %>%
-  mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
   mutate_at(vars(poverty200), factor, labels = c("above Poverty", "200xFPL")) %>%
+  mutate_at(vars(starts_with("access")), as.numeric) %>%
   group_by(black, poverty200) %>%
-  summarize_at(vars(access_parenting, access_fitness, access_education), 
-               list(mean = ~100*mean(.x, na.rm=T),
+  summarize_at(vars(starts_with("access")),
+               list(mean = ~mean(.x, na.rm=T),
                     N = ~length(which(!is.na(.x))))) %>% 
   gather("variable", "value", -black, -poverty200) %>%
   mutate(stat = ifelse(grepl("_N", variable), "N", "percent"),
          variable = str_remove(variable, "_mean"),
          variable = str_remove(variable, "_N")) %>% 
-  mutate(variable = factor(variable,
+   mutate(variable = factor(variable,
                            levels = c("access_parenting",
                                       "access_fitness",
                                       "access_education"),
@@ -603,19 +634,23 @@ plot = scored %>%
                                       "Fitness classes",
                                       "Educational courses"))) %>%
   spread(stat, value) %>%
+  mutate(moe = map2_dbl(percent, N, moe.p),
+         cv = map_dbl(N, ~qt(.975,.x-1))) %>%
+  mutate_at(vars(percent, moe), ~100*.x) %>%
   ggplot(aes(x = variable, 
              y = percent, 
              fill = poverty200,
              text = paste0(
-               "\nGroup: ", black,
-               "\nIncome: ", poverty200,
+               "\nGroup: ", poverty200,
                "\nVariable: ", variable,
                "\nN: ", N,
                "\nPercent: ", round(percent,1))
              )) +
-  geom_bar(stat = "identity", position = "dodge") +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  geom_errorbar(aes(ymin = percent-moe*cv, ymax = percent+moe*cv), 
+                position = position_dodge(1), width = .3)+
+  labs(x = NULL, y = "Percent", fill = NULL) + 
   facet_wrap(~black) + 
-  labs(x = NULL, y = "Percent", fill = NULL) +
   theme_pubclean()
   
 ggplotly(plot)
@@ -626,7 +661,7 @@ ggplotly(plot)
 
 ## Black vs Non-Black
 
-```{r}
+```{r riser-0908-17}
 plot = scored %>%
   filter(!is.na(black)) %>%
   mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
@@ -666,7 +701,7 @@ ggplotly(plot)
 
 ## Race/ethnicty
 
-```{r}
+```{r riser-0908-18}
 plot = scored %>%
   filter(!is.na(race)) %>%
   group_by(race, Week) %>%
@@ -706,7 +741,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Black x income
 
-```{r}
+```{r riser-0908-19}
 plot = scored %>%
   filter(!is.na(black) & !is.na(poverty200)) %>%
   group_by(black, poverty200, Week) %>%
@@ -753,8 +788,15 @@ ggplotly(plot, tooltip = "text")
 
 ## Black vs non-Black
 
-```{r}
+```{r riser-0908-20}
 plot = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
   filter(!is.na(black)) %>%
   group_by(black, Week) %>%
   summarize(percent = 100*mean(delay_healthcare,na.rm=T),
@@ -781,8 +823,15 @@ ggplotly(plot, tooltip = "text")
 
 ## Race/ethnicity
 
-```{r}
+```{r riser-0908-21}
 plot = scored %>%
+ mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
   filter(!is.na(race)) %>%
   group_by(race, Week) %>%
   summarize(percent = 100*mean(delay_healthcare,na.rm=T),
@@ -808,8 +857,15 @@ ggplotly(plot, tooltip = "text")
 
 ## Black by income
 
-```{r}
+```{r riser-0908-22}
 plot = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
   filter(!is.na(black) & !is.na(poverty200)) %>%
   group_by(black, poverty200, Week) %>%
   summarize(percent = 100*mean(delay_healthcare,na.rm=T),
@@ -840,7 +896,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Black vs non-Black
 
-```{r}
+```{r riser-0908-23}
 plot = scored %>%
   filter(!is.na(black)) %>%
   filter(delay_healthcare == 1) %>%
@@ -883,7 +939,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Race/ethnicity
 
-```{r}
+```{r riser-0908-24}
 plot = scored %>%
   filter(!is.na(race)) %>%
   filter(delay_healthcare == 1) %>%
@@ -925,7 +981,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Black x income
 
-```{r}
+```{r riser-0908-25}
 plot = scored %>%
   filter(!is.na(black) & !is.na(poverty200)) %>%
   filter(delay_healthcare == 1) %>%
@@ -974,7 +1030,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Black vs non-Black
 
-```{r}
+```{r riser-0908-26}
 plot = scored %>%
   filter(!is.na(difficulty_basics_cat)) %>%
   filter(!is.na(black_cat)) %>%
@@ -1006,7 +1062,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Race/ethnicity
 
-```{r}
+```{r riser-0908-27}
 plot = scored %>%
   filter(!is.na(difficulty_basics_cat)) %>%
   filter(!is.na(race_ethnic)) %>%
@@ -1041,7 +1097,7 @@ ggplotly(plot, tooltip = "text")
 
 ## Black by income
 
-```{r}
+```{r riser-0908-28}
 plot = scored %>%
   filter(!is.na(difficulty_basics_cat)) %>%
   filter(!is.na(black_cat)) %>%
@@ -1072,3 +1128,115 @@ plot = scored %>%
 
 ggplotly(plot, tooltip = "text")
 ```
+
+# Mental health{.tabset}
+
+## Caregiver
+
+```{r}
+plot = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
+  mutate(Date = case_when(
+    Week == 0 ~ as.Date("2020-03-01"),
+    TRUE ~ Date)) %>%
+  filter(black == "Black") %>%
+  select(Week, Date, anxiety_current_some, depress_current_some, lonely_current_some, stress_current_some) %>%
+  gather(variable, value, -Week, -Date) %>%
+  filter(!is.na(value)) %>%
+  group_by(Week, variable) %>%
+  summarize(
+    Date = min(Date, na.rm = T),
+    n = n(),
+            percent = round(mean(value)*100,2)) %>%
+  mutate(variable = str_remove(variable, "_current_some")) %>%
+  ggplot(aes(x = Date, y = percent, color = variable)) +
+  geom_line() +
+  labs(title = "Caregivers reporting some or a lot of ___",
+       caption = "March 1 is used to represent retrospective reports of pre-pandemic mental health")+
+  theme_pubr()
+
+ggplotly(plot)
+```
+
+## Child
+
+```{r}
+plot = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
+  mutate(Date = case_when(
+    Week == 0 ~ as.Date("2020-03-01"),
+    TRUE ~ Date)) %>%
+  filter(black == "Black") %>%
+  select(Week, Date, fussy_current_some, fear_current_some) %>%
+  gather(variable, value, -Week, -Date) %>%
+  filter(!is.na(value)) %>%
+  group_by(Week, variable) %>%
+  summarize(
+    Date = min(Date, na.rm = T),
+    n = n(),
+            percent = round(mean(value)*100,2)) %>%
+  mutate(variable = str_remove(variable, "_current_some")) %>%
+  ggplot(aes(x = Date, y = percent, color = variable)) +
+  geom_line() +
+  labs(title = "Caregivers reporting some or a lot of ___",
+       caption = "March 1 is used to represent retrospective reports of pre-pandemic mental health")+
+  theme_pubr()
+
+ggplotly(plot)
+```
+
+# Childcare
+
+  * Pre-pandemic: retrospective report
+  * Spring: through May 31
+  * Summer: through August 31
+  * Fall: through current survey (Nov 5)
+
+```{r}
+plot = scored %>%
+  select(CaregiverID, Week, Date, black, poverty200, starts_with("cc2_")) %>%
+  dplyr::filter(!is.na(black)) %>%
+  dplyr::filter(!is.na(poverty200)) %>%
+  dplyr::filter(!is.na(cc2_nonparental)) %>%
+  select(-cc2_expected_change) %>%
+  gather(variable, value, starts_with("cc2_")) %>%
+  mutate(variable = str_remove(variable, "cc2_")) %>%
+  mutate(season = case_when(
+    Week == 0 ~ "Pre-pandemic",
+    Date < as.Date("2020-06-01") ~ "Spring",
+    Date < as.Date("2020-09-01") ~ "Summer",
+    TRUE ~ "Fall"
+  ),
+  season = factor(season, levels = c("Pre-pandemic", "Spring", "Summer", "Fall"))) %>%
+  
+  group_by(CaregiverID, season) %>%
+  filter(Week == max(Week)) %>%
+  filter(!is.na(value)) %>%
+  group_by(season, variable, black, poverty200) %>%
+  summarize(n = n(),
+            percent = mean(value)) %>%
+  mutate(moe = map2_dbl(percent, n, moe.p),
+         cv = map_dbl(n, ~qt(.975, .x-1)),
+         poverty200 = factor(poverty200, labels = c("above Poverty", "200xFPL"))) %>%
+  mutate_at(vars(percent, moe), ~round(100*.x,2)) %>%
+  ggplot(aes(x = variable, y = percent, group = poverty200, fill = poverty200)) +
+  geom_bar(stat = "identity", position = position_dodge(1)) +
+  coord_flip() +
+  facet_grid(season~black) +
+  theme_pubr()
+
+ggplotly(plot)
+```
+
