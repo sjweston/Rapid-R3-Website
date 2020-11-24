@@ -48,16 +48,22 @@ master = read_sav(
 data(zipcode)
 
 response_table = master %>%
-  mutate(State = map(DEMO.001, identify_state)) %>%
-  select(CaregiverID, Week, starts_with("OPEN"), State, FPL.150, RaceGroup, CaregiverAge) %>%
+  mutate(State = map(DEMO.001, identify_state),
+         child_age03 = case_when(
+           DEMO.004.a.2 >= 1 ~ "Yes",
+           !is.na(DEMO.004.a.2) ~ "No",
+           TRUE ~ NA_character_)) %>%
+  select(CaregiverID, Week, starts_with("OPEN"), State, FPL.150, RaceGroup, CaregiverAge,
+         child_age03) %>%
   arrange(Week) %>%
   group_by(CaregiverID) %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%
-  mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge), na.locf0) %>%
+  mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge, child_age03), na.locf0) %>%
   ungroup() %>%
   select(-CaregiverID) %>%
   rename(canuse = OPEN.006,
-         `Below 1.5xFPL` = FPL.150) %>%
+         `Below 1.5xFPL` = FPL.150,
+         `Child 0-3` = child_age03) %>%
   gather("Question", "Response", starts_with("OPEN")) %>%
   filter(Response != "")
 

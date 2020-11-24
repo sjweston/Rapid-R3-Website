@@ -1320,6 +1320,11 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       newdata$household_size = data$DEMO.005
   }
   
+  newdata$child_age03 = case_when(
+    data$DEMO.004.a.2 >= 1 ~ 1,
+    !is.na(data$DEMO.004.a.2) ~ 0,
+    TRUE ~ NA_real_)
+  
   newdata$num_parents = case_when(
     data$DEMO.011.a == 1 ~ 2,
     data$DEMO.011.a == 2 ~ 1,
