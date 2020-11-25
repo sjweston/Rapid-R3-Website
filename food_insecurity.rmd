@@ -1,0 +1,1844 @@
+---
+title: "Food Insecurity"
+author: "Sihong"
+date: "11/13/2020"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = T)
+```
+
+```{r packages, include = FALSE}
+library(here)
+library(knitr)
+library(readr)
+library(haven)
+library(tidyverse)
+```
+
+
+```{r, echo=FALSE, message = FALSE}
+#Define functions
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+
+moe.m = function(sd,n){
+  moe = 1.96*sd/sqrt(n)
+  return(moe)}
+
+combine.cat = function(x, cols, id, newvar.name){
+  subset = x[,c(id, "Week", cols)]
+  names(subset) = c("id", "Week", paste0("X",1:length(cols)))
+  subset = suppressWarnings(gather(subset, "key", "value", -id, -Week))
+  subset = filter(subset, !is.na(value))
+  subset$key = gsub("X", "", subset$key)
+  subset = group_by(subset, id, Week)
+  subset = summarise(subset, newvar = paste(key, collapse = ",")) %>% ungroup()
+  names(subset) = c(id,"Week", newvar.name)
+  x = suppressMessages(full_join(x, subset))
+  return(x)
+}
+
+find_items = function(string, data2){
+  items = names(data2)
+  locations = which(grepl(string, items))
+  final = items[locations]
+  return(final)
+}
+
+my.max = function(x) ifelse (!all(is.na(x)), max(x,na.rm = TRUE), NA)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+#OR load master data file
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/Week 31 MasterFile/MasterFile_groupings.sav"))
+
+# Remove cases should be excluded
+master <- master %>%
+  filter ( CaregiverID != "" & is.na(Exclude) == T)
+
+master = master %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup()
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+#Code demographics
+master <- master %>%
+  mutate (month = case_when(
+                  Week == 0 ~ "Pre-COVID",
+                  Week >0 & Week <= 4 ~ "April",
+                  Week >=5 & Week <=8 ~ "May",
+                  Week >=9 & Week <=13 ~ "June",
+                  Week >=14 & Week <=17 ~ "July",
+                  Week >=18 & Week <=21 ~ "August",
+                  Week >=22 & Week <=26 ~ "September",
+                  Week >=27 ~ "October"), 
+           baseline = case_when (Week - BaselineWeek == 1 ~ 1, 
+                                 Week - BaselineWeek > 1 ~ 0))
+
+##Race/ethnicity - 1 = black, 2 = latinx, 3 = white
+
+master <- master %>%
+    mutate(
+      minority = ifelse(RaceGroup != 5, 1, 0),
+      black = ifelse(RaceGroup == 3, 1, 0),
+      native = ifelse(RaceGroup == 1, 1, 0),
+      asian = ifelse(RaceGroup == 2, 1, 0),
+      hawaii = ifelse(RaceGroup == 4, 1, 0),
+      white = ifelse(RaceGroup == 5, 1, 0),
+      other_race = ifelse(RaceGroup %in% c(6, 7), 1, 0))
+
+master <- master %>%
+      mutate(latinx = case_when(
+        DEMO.008 == 1 ~ 1,
+        DEMO.008 == 0 ~ 0,
+        DEMO.008.2 == 0 ~ 0,
+        DEMO.008.2 == 1 ~ 1,
+        DEMO.008.2 == 2 ~ 1,
+        TRUE ~ NA_real_))
+
+master <- master %>%
+mutate (race_ethnic = case_when(
+      black == 1 ~ "1",
+      latinx == 1 ~ "2",
+      !is.na(black) ~ "3",
+      !is.na(latinx) ~ "3",
+      TRUE ~ NA_character_))  
+
+##Povertyline - 0 = high income, 1 = low income
+master <- master %>%
+  mutate (poverty_cat = FPL.150)
+
+#Material hardship
+master <- master %>%
+  combine.cat(cols = find_items("FSTR.002_.{1}$", master), 
+              id = "CaregiverID",
+              newvar.name = "FSTR.002_cat")
+  
+
+master <- master %>%
+  mutate (diff_pay_food = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("1", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_), 
+          diff_pay_utilities = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("3", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_house = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("2", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_healthcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("4", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_social = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("5", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_emotional = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("6", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_childcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("7", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_other = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("8", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_))
+
+master <- master %>%
+  rowwise() %>%
+  mutate(material_hardship = case_when(
+    Week == 0 ~ NA_real_,
+    TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
+  ungroup() %>%
+  mutate(num_hardship = material_hardship,
+    material_hardship = ifelse(material_hardship > 0, 1, 0)) 
+
+## Children with special needs
+master <- combine.cat(x = master, 
+                       cols = find_items("HEALTH.005_[0-9]{1}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.005_cat")
+master <- master %>%
+   mutate (disability = case_when (HEALTH.005_1 == 1 ~ 1,
+                                   HEALTH.005_2 == 1 ~ 1,
+                                   HEALTH.005_3 == 1 ~ 1,
+                                   HEALTH.005_4 == 1 ~ 1,
+                                   HEALTH.005_5 == 1 ~ 0,
+                                   HEALTH.005_6 == 1 ~ 1,
+                                   TRUE ~ NA_real_))
+
+
+## Single parent status
+master <- master %>%
+  mutate (single = case_when (
+                   DEMO.002 %in% c(3,4,5,7,8)~1, 
+                   DEMO.011 %in% c(2,4)~1,
+                   !is.na(DEMO.002)~0,
+                   !is.na(DEMO.011)~0,
+                   TRUE ~ NA_real_))
+                     
+## Employment status
+master <- combine.cat (x = master,
+                       cols = find_items ("JOB.010_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.010_cat")
+  
+master$JOB.010_cat = gsub("10", "0", master$JOB.010_cat)
+master$working_pre = ifelse (grepl("[1,2,6]", master$JOB.010_cat), 1, 0)
+master = combine.cat (x = master,
+                       cols = find_items ("JOB.008_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.008_cat")
+master$JOB.008_cat = gsub("10", "0", master$JOB.008_cat)
+master <- master %>%
+  mutate (work_status = case_when(
+                        grepl ("1", JOB.008_cat) ~ "1", 
+                        grepl ("2", JOB.008_cat) ~ "1", 
+                        grepl ("3", JOB.008_cat) ~ "0", 
+                        grepl ("4", JOB.008_cat) ~ "0", 
+                        grepl ("5", JOB.008_cat) ~ "1", 
+                        JOB.008.2 == 1 ~ "1",
+                        JOB.008.2 %in% c(2,3) ~ "0",
+                        TRUE~NA_character_),
+          work_status_pre = case_when(
+                        grepl ("1", JOB.010_cat) ~ "1", 
+                        grepl ("2", JOB.010_cat) ~ "1", 
+                        grepl ("3", JOB.010_cat) ~ "0", 
+                        grepl ("4", JOB.010_cat) ~ "0", 
+                        grepl ("5", JOB.010_cat) ~ "1", 
+                        TRUE~NA_character_))
+#1 = stable employed 2 = became unemployed 3 = became employed4 = stable unemployed
+
+master_dem <- master %>%
+  group_by (CaregiverID) %>%
+  summarise (BaselineWeek = my.max (BaselineWeek),
+             race_ethnic = my.max(race_ethnic),
+             poverty_cat = my.max(poverty_cat),
+             material_hardship = my.max(material_hardship),
+             disability = my.max (disability),
+             single = my.max (single),
+             work_status = my.max (work_status),
+             work_status_pre = my.max (work_status_pre))%>%
+  mutate ( ep_change = case_when(
+                        work_status == 1 & work_status_pre == 1 ~ "1", 
+                        work_status == 1 & work_status_pre == 0 ~ "2", 
+                        work_status == 0 & work_status_pre == 1 ~ "3", 
+                        work_status == 0 & work_status_pre == 0 ~ "4", 
+                        TRUE~NA_character_))%>%
+  mutate (race_ethnic = case_when (
+                        race_ethnic == 1 ~ "Black", 
+                        race_ethnic == 2 ~ "Latinx", 
+                        race_ethnic == 3 ~ "White", 
+                        TRUE~NA_character_),
+          poverty_cat = case_when (
+                        poverty_cat == 1 ~ "Low income", 
+                        poverty_cat == 0 ~ "High income", 
+                        TRUE~NA_character_),
+          material_hardship = case_when (
+                        material_hardship == 1 ~ "With material hardship", 
+                        material_hardship == 0 ~ "Without material hardship", 
+                        TRUE~NA_character_),
+          disability = case_when (
+                        disability == 1 ~ "With disability", 
+                        disability == 0 ~ "Without disability", 
+                        TRUE~NA_character_),
+          single = case_when (
+                        single == 1 ~ "Single parent", 
+                        single == 0 ~ "Dual parent", 
+                        TRUE~NA_character_),
+          work_status = case_when (
+                        work_status == 1 ~ "Employed", 
+                        work_status == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          work_status_pre = case_when (
+                        work_status_pre == 1 ~ "Employed", 
+                        work_status_pre == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          ep_change = case_when (
+                        ep_change == 1 ~ "Stable employed", 
+                        ep_change == 2 ~ "Became employed", 
+                        ep_change == 3 ~ "Became unemployed",
+                        ep_change == 4 ~ "Stable unemployed",
+                        TRUE~NA_character_))
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Extract food insecurity data and calculate for sum scores- from followup data in 19, 21, 23, 25, 27, 31
+fi <- master %>%
+  select (CaregiverID, Week, baseline, starts_with ("FI"))%>%
+  filter (Week %in% c(19, 21, 23, 25, 27, 31) & baseline == 0)%>%
+  mutate (FI.001.a = na_if(FI.001.a, 4),
+          FI.001.b = na_if(FI.001.b, 4),
+          FI.002.a = na_if(FI.002.a, 4),
+          FI.002.b = na_if(FI.002.b, 4),
+          FI.003.a = na_if(FI.003.a, 3),
+          FI.003.b = na_if(FI.003.b, 3),
+          FI.004.a = na_if(FI.004.a, 4),
+          FI.004.b = na_if(FI.004.b, 4),
+          FI.005.a = na_if(FI.005.a, 3),
+          FI.005.b = na_if(FI.005.b, 3),
+          FI.006.a = na_if(FI.006.a, 3),
+          FI.006.b = na_if(FI.006.b, 3))%>%
+  mutate (FI.001.a_r = case_when (FI.001.a %in% c(1, 2) ~ 1, 
+                                  FI.001.a == 3 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.001.b_r = case_when (FI.001.b %in% c(1, 2) ~ 1, 
+                                  FI.001.b == 3 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.002.a_r = case_when (FI.002.a %in% c(1, 2) ~ 1, 
+                                  FI.002.a == 3 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.002.b_r = case_when (FI.002.b %in% c(1, 2) ~ 1, 
+                                  FI.002.b == 3 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.003.a_r = case_when (FI.003.a == 1 ~ 1, 
+                                  FI.003.a == 2 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.003.b_r = case_when (FI.003.b == 1 ~ 1, 
+                                  FI.003.b == 2 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.004.a_r = case_when (FI.004.a %in% c(1, 2) ~ 1, 
+                                  FI.004.a == 3 ~ 0,
+                                  FI.003.a_r == 0 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.004.b_r = case_when (FI.004.b %in% c(1, 2) ~ 1, 
+                                  FI.004.b == 3 ~ 0,
+                                  FI.003.b_r == 0 ~ 0,
+                                  TRUE ~ NA_real_),
+          FI.005.a_r = case_when (FI.005.a == 1 ~ 1, 
+                                  FI.005.a == 2 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.005.b_r = case_when (FI.005.b == 1 ~ 1, 
+                                  FI.005.b == 2 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.006.a_r = case_when (FI.006.a == 1 ~ 1, 
+                                  FI.006.a == 2 ~ 0,
+                                  TRUE ~ NA_real_), 
+          FI.006.b_r = case_when (FI.006.b == 1 ~ 1, 
+                                  FI.006.b == 2 ~ 0,
+                                  TRUE ~ NA_real_)) %>%
+  rowwise%>%
+  mutate (fi_raw_pre = sum(FI.001.a_r,FI.002.a_r,FI.003.a_r,FI.004.a_r,FI.005.a_r,FI.006.a_r, na.rm = T), 
+          fi_raw_crt = sum(FI.001.b_r,FI.002.b_r,FI.003.b_r,FI.004.b_r,FI.005.b_r,FI.006.b_r, na.rm = T),
+          fi_cg_raw = fi_raw_crt-fi_raw_pre) %>%
+  ungroup()%>%
+  mutate (fi_cat3_pre = case_when (fi_raw_pre %in% c(0,1) ~ 1, #high security/low food insecurity
+                                  fi_raw_pre %in% c(2, 3, 4) ~ 2, # low security/high food insecurity
+                                  fi_raw_pre %in% c(5, 6) ~ 3, # very low security/extremely high food insecurity
+                                  TRUE ~ NA_real_), 
+          fi_cat3_crt = case_when (fi_raw_crt %in% c(0,1) ~ 1, 
+                                  fi_raw_crt %in% c(2, 3, 4) ~ 2, 
+                                  fi_raw_crt %in% c(5, 6) ~ 3,
+                                  TRUE ~ NA_real_), 
+          fi_cat2_pre = case_when (fi_raw_pre %in% c(0,1) ~ 0, #secure
+                                  fi_raw_pre %in% c(2, 3, 4, 5, 6) ~ 1, # insecure
+                                  TRUE ~ NA_real_), 
+          fi_cat2_crt = case_when (fi_raw_crt %in% c(0,1) ~ 0, 
+                                  fi_raw_crt %in% c(2, 3, 4, 5, 6) ~ 1,
+                                  TRUE ~ NA_real_), 
+          fi_cat_cg = case_when (fi_cat2_pre == 0 & fi_cat2_crt == 1 ~ 1, # 1= became insecure
+                                 fi_cat2_pre == 0 & fi_cat2_crt == 0 ~ 2, # 2 = stay secure,
+                                 fi_cat2_pre == 1 & fi_cat2_crt == 1 ~ 3, # 3 = stay insecure
+                                 fi_cat2_pre == 1 & fi_cat2_crt == 0 ~ 4))# 4 = became secure
+
+fi <- fi %>%
+  select(CaregiverID, Week, baseline,starts_with ("fi_"), contains ("FI.") )
+
+fi <- merge (x = master_dem, y = fi, by.x = c("CaregiverID"), by.y = c("CaregiverID"), all.y = T)
+fi_rct <- fi%>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week))%>%
+  ungroup()
+
+```
+
+# Food Insecurity Descriptive Analyses -  Percentage of Food Insecurity Families
+  * Questions: For these following statements, please indicate whether the statement was often true, sometimes true, or never true for your household prior to/since the coronavirus (COVID-19) pandemic:\
+    + The food that we bought just didn't last, and we didn't have money to get more (often true/sometimes true/never true)\
+    + We couldn't afford to eat balanced meals (often true/sometimes true/never true)\
+    + Did you or other adult in your household ever cut the size of your meal or skip meals because there wasn't enough money for food? (yes/no) - if yes, how often did this happen? (almost every month/some months but not every month/in only 1 or 2 months)\
+    + Did you ever eat less than you felt you should because there wasn't enough money for food? (yes/no)\
+    + Were you ever hungry but didn't eat because there wasn't enough money for food? (yes/no)\
+  * Note. Food insecurity data were collected on weeks 19, 21, 23, 25, 27, & 31 follow-up surveys. \
+  
+## Between-Subject Analyses{.tabset}
+
+  * Note: analyses based on participants' most recent responses\
+  
+### Overall
+
+  * Significantly higher percentage of families reported experiencing food insecurity currently (27.61%) compared to pre-COVID-19 (20.72%)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  summarise (n = n(),
+             a.pre_covid = sum(fi_cat2_pre, na.rm = T)/n, 
+             b.current = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  pivot_longer (cols = c("a.pre_covid", "b.current"), names_to = "time", values_to = "prop")%>%
+  mutate (count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+fi_pct %>%
+  ggplot(mapping = aes (x = time, y = prop*100, fill = time)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+
+#### Item-Level Descriptives
+
+  * Item 1: The food that we bought just didn't last, and we didn't have money to get more (coded as 1 = often/sometimes true, 0 = never true)\
+  * Item 2: We couldn't afford to eat balanced meals (coded as 1 = often/sometimes true, 0 = never true)\
+  * Item 3: Did you or other adult in your household ever cut the size of your meal or skip meals because there wasn't enough money for food? (coded as 1 = yes, 0 = no)\
+  * Item 4: Frequency of item 3 (coded as 1 = almost every month / some months but not every month, and 0 = only 1 or 2 months)\
+  * Item 5: Did you ever eat less than you felt you should because there wasn't enough money for food? (coded as 1 = yes, 0 = no)\
+  * Item 6: Were you ever hungry but didn't eat because there wasn't enough money for food? (coded as 1 = yes, 0 = no)\
+  
+  * Results showed that all items had significant increases from pre-COVID to current situation. \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  summarise (n = n(),
+             I1_food_not_last_pre = sum(FI.001.a_r, na.rm = T)/n, 
+             I1_food_not_last_crt = sum(FI.001.b_r, na.rm = T)/n,
+             I2_not_balanced_meal_pre = sum(FI.002.a_r, na.rm = T)/n, 
+             I2_not_balanced_meal_crt = sum(FI.002.b_r, na.rm = T)/n,
+             I3_cut_skip_meal_pre = sum(FI.003.a_r, na.rm = T)/n, 
+             I3_cut_skip_meal_crt = sum(FI.003.b_r, na.rm = T)/n,
+             I4_freq_cut_skip_pre = sum(FI.004.a_r, na.rm = T)/n, 
+             I4_freq_cut_skip_crt = sum(FI.004.b_r, na.rm = T)/n,
+             I5_eat_less_pre = sum(FI.005.a_r, na.rm = T)/n, 
+             I5_eat_less_crt = sum(FI.005.b_r, na.rm = T)/n,
+             I6_hungry_pre = sum(FI.006.a_r, na.rm = T)/n, 
+             I6_hungry_crt = sum(FI.006.b_r, na.rm = T)/n) 
+
+fi_pre <- fi_pct %>%
+  select (n, ends_with ("pre"))%>%
+  rename(I1_food_not_last = I1_food_not_last_pre,
+         I2_not_balanced_meal = I2_not_balanced_meal_pre,
+         I3_cut_skip_meal = I3_cut_skip_meal_pre,
+         I4_freq_cut_skip = I4_freq_cut_skip_pre,
+         I5_eat_less = I5_eat_less_pre,
+         I6_hungry = I6_hungry_pre)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "pre_COVID",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+  
+
+fi_crt <- fi_pct %>%
+  select (n, ends_with ("crt"))%>%
+  rename(I1_food_not_last = I1_food_not_last_crt,
+         I2_not_balanced_meal = I2_not_balanced_meal_crt,
+         I3_cut_skip_meal = I3_cut_skip_meal_crt,
+         I4_freq_cut_skip = I4_freq_cut_skip_crt,
+         I5_eat_less = I5_eat_less_crt,
+         I6_hungry = I6_hungry_crt)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "Current",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+  
+fi_item_pct <- rbind (fi_pre, fi_crt)
+
+fi_item_pct %>%
+  ggplot(mapping = aes (y = items, x = prop*100, fill = time)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, color = "black", size =3, position = position_dodge(1))
+```
+
+
+### By Race/Ethnicity Groups
+
+  * During both pre-COVID-19 and current situation, significantly smaller percentage of White families experienced food insecurity compared to Black and Latinx families\
+  * The percentage of food insecurity in Black, Latinx, and White families all increased from pre-COVID to current. However, only White families' increases were statistically significant.\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (race_ethnic != "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             a.pre_covid = sum(fi_cat2_pre, na.rm = T)/n, 
+             b.current = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  pivot_longer (cols = c("a.pre_covid", "b.current"), names_to = "time", values_to = "prop")%>%
+  mutate (count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+fi_pct %>%
+  ggplot(mapping = aes (x = race_ethnic, y = prop*100, fill = race_ethnic)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time)
+```
+    
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+  
+#### Item-Level Descriptives
+  * Lower percentage of White families reported experiencing the six items of food insecurity compared to Black and/or Latinx families. The differences were specifically significant (or marginally significant) between White and Black families. \
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (race_ethnic != "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             I1_food_not_last_pre = sum(FI.001.a_r, na.rm = T)/n, 
+             I1_food_not_last_crt = sum(FI.001.b_r, na.rm = T)/n,
+             I2_not_balanced_meal_pre = sum(FI.002.a_r, na.rm = T)/n, 
+             I2_not_balanced_meal_crt = sum(FI.002.b_r, na.rm = T)/n,
+             I3_cut_skip_meal_pre = sum(FI.003.a_r, na.rm = T)/n, 
+             I3_cut_skip_meal_crt = sum(FI.003.b_r, na.rm = T)/n,
+             I4_freq_cut_skip_pre = sum(FI.004.a_r, na.rm = T)/n, 
+             I4_freq_cut_skip_crt = sum(FI.004.b_r, na.rm = T)/n,
+             I5_eat_less_pre = sum(FI.005.a_r, na.rm = T)/n, 
+             I5_eat_less_crt = sum(FI.005.b_r, na.rm = T)/n,
+             I6_hungry_pre = sum(FI.006.a_r, na.rm = T)/n, 
+             I6_hungry_crt = sum(FI.006.b_r, na.rm = T)/n) 
+
+fi_pre <- fi_pct %>%
+  select (n, race_ethnic, ends_with ("pre"))%>%
+  rename(I1_food_not_last = I1_food_not_last_pre,
+         I2_not_balanced_meal = I2_not_balanced_meal_pre,
+         I3_cut_skip_meal = I3_cut_skip_meal_pre,
+         I4_freq_cut_skip = I4_freq_cut_skip_pre,
+         I5_eat_less = I5_eat_less_pre,
+         I6_hungry = I6_hungry_pre)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "pre_COVID",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+  
+
+fi_crt <- fi_pct %>%
+  select (n,race_ethnic, ends_with ("crt"))%>%
+  rename(I1_food_not_last = I1_food_not_last_crt,
+         I2_not_balanced_meal = I2_not_balanced_meal_crt,
+         I3_cut_skip_meal = I3_cut_skip_meal_crt,
+         I4_freq_cut_skip = I4_freq_cut_skip_crt,
+         I5_eat_less = I5_eat_less_crt,
+         I6_hungry = I6_hungry_crt)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "Current",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+  
+fi_item_pct <- rbind (fi_pre, fi_crt)
+
+fi_item_pct %>%
+  ggplot(mapping = aes (y = race_ethnic, x = prop*100, fill = race_ethnic)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (time~items, nrow = 2)
+```  
+
+### By Poverty Level
+
+  * During both pre-COVID-19 and current situation, significantly larger percentage of low-income families experienced food insecurity compared to high-income families\
+  * The percentage of food insecurity in low-income and high-income families both significantly increased from pre-COVID to current. \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (poverty_cat != "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(),
+             a.pre_covid = sum(fi_cat2_pre, na.rm = T)/n, 
+             b.current = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  pivot_longer (cols = c("a.pre_covid", "b.current"), names_to = "time", values_to = "prop")%>%
+  mutate (count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+fi_pct %>%
+  ggplot(mapping = aes (x = poverty_cat, y = prop*100, fill = poverty_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time)
+```
+    
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+
+#### Item-Level Descriptives
+  * Significantly higher percentage of low-income families reported experiencing the six items of food insecurity compared to high-income families\
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (poverty_cat != "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(),
+             I1_food_not_last_pre = sum(FI.001.a_r, na.rm = T)/n, 
+             I1_food_not_last_crt = sum(FI.001.b_r, na.rm = T)/n,
+             I2_not_balanced_meal_pre = sum(FI.002.a_r, na.rm = T)/n, 
+             I2_not_balanced_meal_crt = sum(FI.002.b_r, na.rm = T)/n,
+             I3_cut_skip_meal_pre = sum(FI.003.a_r, na.rm = T)/n, 
+             I3_cut_skip_meal_crt = sum(FI.003.b_r, na.rm = T)/n,
+             I4_freq_cut_skip_pre = sum(FI.004.a_r, na.rm = T)/n, 
+             I4_freq_cut_skip_crt = sum(FI.004.b_r, na.rm = T)/n,
+             I5_eat_less_pre = sum(FI.005.a_r, na.rm = T)/n, 
+             I5_eat_less_crt = sum(FI.005.b_r, na.rm = T)/n,
+             I6_hungry_pre = sum(FI.006.a_r, na.rm = T)/n, 
+             I6_hungry_crt = sum(FI.006.b_r, na.rm = T)/n) 
+
+fi_pre <- fi_pct %>%
+  select (n, poverty_cat, ends_with ("pre"))%>%
+  rename(I1_food_not_last = I1_food_not_last_pre,
+         I2_not_balanced_meal = I2_not_balanced_meal_pre,
+         I3_cut_skip_meal = I3_cut_skip_meal_pre,
+         I4_freq_cut_skip = I4_freq_cut_skip_pre,
+         I5_eat_less = I5_eat_less_pre,
+         I6_hungry = I6_hungry_pre)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "pre_COVID",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+  
+
+fi_crt <- fi_pct %>%
+  select (n,poverty_cat, ends_with ("crt"))%>%
+  rename(I1_food_not_last = I1_food_not_last_crt,
+         I2_not_balanced_meal = I2_not_balanced_meal_crt,
+         I3_cut_skip_meal = I3_cut_skip_meal_crt,
+         I4_freq_cut_skip = I4_freq_cut_skip_crt,
+         I5_eat_less = I5_eat_less_crt,
+         I6_hungry = I6_hungry_crt)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "Current",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+  
+fi_item_pct <- rbind (fi_pre, fi_crt)
+
+fi_item_pct %>%
+  ggplot(mapping = aes (y = items, x = prop*100, fill = poverty_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time, nrow = 2)
+```  
+
+### By Poverty Level & Race/Ethnicity
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (poverty_cat != "NA" & race_ethnic != "NA")%>%
+  group_by (poverty_cat, race_ethnic)%>%
+  summarise (n = n(),
+             a.pre_covid = sum(fi_cat2_pre, na.rm = T)/n, 
+             b.current = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  pivot_longer (cols = c("a.pre_covid", "b.current"), names_to = "time", values_to = "prop")%>%
+  mutate (count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+fi_pct %>%
+  ggplot(mapping = aes (x = time, y = prop*100, fill = poverty_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~race_ethnic)
+```
+    
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+
+### By Material Hardship Status
+
+  * During both pre-COVID-19 and current situation, significantly larger percentage of families with material hardship experienced food insecurity compared to families without material hardship\
+  * The percentage of food insecurity in families with material hardship significantly increased from pre-COVID to current. \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (material_hardship != "NA")%>%
+  group_by (material_hardship)%>%
+  summarise (n = n(),
+             a.pre_covid = sum(fi_cat2_pre, na.rm = T)/n, 
+             b.current = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  pivot_longer (cols = c("a.pre_covid", "b.current"), names_to = "time", values_to = "prop")%>%
+  mutate (count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+fi_pct %>%
+  ggplot(mapping = aes (x = material_hardship, y = prop*100, fill = material_hardship)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time)
+```
+    
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+
+#### Item-Level Descriptives
+  * Significantly higher percentage of families with material hardship reported experiencing the six items of food insecurity compared to families without material hardship\
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (material_hardship != "NA")%>%
+  group_by (material_hardship)%>%
+  summarise (n = n(),
+             I1_food_not_last_pre = sum(FI.001.a_r, na.rm = T)/n, 
+             I1_food_not_last_crt = sum(FI.001.b_r, na.rm = T)/n,
+             I2_not_balanced_meal_pre = sum(FI.002.a_r, na.rm = T)/n, 
+             I2_not_balanced_meal_crt = sum(FI.002.b_r, na.rm = T)/n,
+             I3_cut_skip_meal_pre = sum(FI.003.a_r, na.rm = T)/n, 
+             I3_cut_skip_meal_crt = sum(FI.003.b_r, na.rm = T)/n,
+             I4_freq_cut_skip_pre = sum(FI.004.a_r, na.rm = T)/n, 
+             I4_freq_cut_skip_crt = sum(FI.004.b_r, na.rm = T)/n,
+             I5_eat_less_pre = sum(FI.005.a_r, na.rm = T)/n, 
+             I5_eat_less_crt = sum(FI.005.b_r, na.rm = T)/n,
+             I6_hungry_pre = sum(FI.006.a_r, na.rm = T)/n, 
+             I6_hungry_crt = sum(FI.006.b_r, na.rm = T)/n) 
+
+fi_pre <- fi_pct %>%
+  select (n, material_hardship, ends_with ("pre"))%>%
+  rename(I1_food_not_last = I1_food_not_last_pre,
+         I2_not_balanced_meal = I2_not_balanced_meal_pre,
+         I3_cut_skip_meal = I3_cut_skip_meal_pre,
+         I4_freq_cut_skip = I4_freq_cut_skip_pre,
+         I5_eat_less = I5_eat_less_pre,
+         I6_hungry = I6_hungry_pre)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "pre_COVID",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+  
+
+fi_crt <- fi_pct %>%
+  select (n,material_hardship, ends_with ("crt"))%>%
+  rename(I1_food_not_last = I1_food_not_last_crt,
+         I2_not_balanced_meal = I2_not_balanced_meal_crt,
+         I3_cut_skip_meal = I3_cut_skip_meal_crt,
+         I4_freq_cut_skip = I4_freq_cut_skip_crt,
+         I5_eat_less = I5_eat_less_crt,
+         I6_hungry = I6_hungry_crt)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "Current",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+  
+fi_item_pct <- rbind (fi_pre, fi_crt)
+
+fi_item_pct %>%
+  ggplot(mapping = aes (y = items, x = prop*100, fill = material_hardship)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time, nrow = 2)
+```  
+
+### By Single Parent Status
+
+  * During both pre-COVID-19 and current situation, significantly larger percentage of single-parent families  experienced food insecurity compared to dual-parent families\
+  * The percentage of food insecurity in dual-parent families significantly increased from pre-COVID to current; the increase of food insecurity percentage in single-parent household was marginally significant \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (single != "NA")%>%
+  group_by (single )%>%
+  summarise (n = n(),
+             a.pre_covid = sum(fi_cat2_pre, na.rm = T)/n, 
+             b.current = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  pivot_longer (cols = c("a.pre_covid", "b.current"), names_to = "time", values_to = "prop")%>%
+  mutate (count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+fi_pct %>%
+  ggplot(mapping = aes (x = single, y = prop*100, fill = single )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time)
+```
+    
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+
+#### Item-Level Descriptives
+  * Significantly higher percentage of single-parent household reported experiencing the six items of food insecurity compared to dual-parent household\
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (single != "NA")%>%
+  group_by (single)%>%
+  summarise (n = n(),
+             I1_food_not_last_pre = sum(FI.001.a_r, na.rm = T)/n, 
+             I1_food_not_last_crt = sum(FI.001.b_r, na.rm = T)/n,
+             I2_not_balanced_meal_pre = sum(FI.002.a_r, na.rm = T)/n, 
+             I2_not_balanced_meal_crt = sum(FI.002.b_r, na.rm = T)/n,
+             I3_cut_skip_meal_pre = sum(FI.003.a_r, na.rm = T)/n, 
+             I3_cut_skip_meal_crt = sum(FI.003.b_r, na.rm = T)/n,
+             I4_freq_cut_skip_pre = sum(FI.004.a_r, na.rm = T)/n, 
+             I4_freq_cut_skip_crt = sum(FI.004.b_r, na.rm = T)/n,
+             I5_eat_less_pre = sum(FI.005.a_r, na.rm = T)/n, 
+             I5_eat_less_crt = sum(FI.005.b_r, na.rm = T)/n,
+             I6_hungry_pre = sum(FI.006.a_r, na.rm = T)/n, 
+             I6_hungry_crt = sum(FI.006.b_r, na.rm = T)/n) 
+
+fi_pre <- fi_pct %>%
+  select (n, single, ends_with ("pre"))%>%
+  rename(I1_food_not_last = I1_food_not_last_pre,
+         I2_not_balanced_meal = I2_not_balanced_meal_pre,
+         I3_cut_skip_meal = I3_cut_skip_meal_pre,
+         I4_freq_cut_skip = I4_freq_cut_skip_pre,
+         I5_eat_less = I5_eat_less_pre,
+         I6_hungry = I6_hungry_pre)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "pre_COVID",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+  
+
+fi_crt <- fi_pct %>%
+  select (n,single, ends_with ("crt"))%>%
+  rename(I1_food_not_last = I1_food_not_last_crt,
+         I2_not_balanced_meal = I2_not_balanced_meal_crt,
+         I3_cut_skip_meal = I3_cut_skip_meal_crt,
+         I4_freq_cut_skip = I4_freq_cut_skip_crt,
+         I5_eat_less = I5_eat_less_crt,
+         I6_hungry = I6_hungry_crt)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "Current",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+  
+fi_item_pct <- rbind (fi_pre, fi_crt)
+
+fi_item_pct %>%
+  ggplot(mapping = aes (y = items, x = prop*100, fill = single)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time, nrow = 2)
+```  
+
+### By Children with Special Needs Status
+
+  * During both pre-COVID-19 and current situation, significantly larger percentage of families of children with special needs experienced food insecurity compared to families of children without special needs \
+  * The percentage of food insecurity in families of children without special needs significantly increased from pre-COVID to current; the increase of food insecurity percentage in families of children with special needs was marginally significant \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (disability != "NA")%>%
+  group_by (disability )%>%
+  summarise (n = n(),
+             a.pre_covid = sum(fi_cat2_pre, na.rm = T)/n, 
+             b.current = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  pivot_longer (cols = c("a.pre_covid", "b.current"), names_to = "time", values_to = "prop")%>%
+  mutate (count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+fi_pct %>%
+  ggplot(mapping = aes (x = disability, y = prop*100, fill = disability )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time)
+```
+    
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+
+#### Item-Level Descriptives
+  * Significantly higher percentage of families of children with special needs reported experiencing the six items of food insecurity compared to families of children without special needs\
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct <- fi_rct %>%
+  filter (disability != "NA")%>%
+  group_by (disability)%>%
+  summarise (n = n(),
+             I1_food_not_last_pre = sum(FI.001.a_r, na.rm = T)/n, 
+             I1_food_not_last_crt = sum(FI.001.b_r, na.rm = T)/n,
+             I2_not_balanced_meal_pre = sum(FI.002.a_r, na.rm = T)/n, 
+             I2_not_balanced_meal_crt = sum(FI.002.b_r, na.rm = T)/n,
+             I3_cut_skip_meal_pre = sum(FI.003.a_r, na.rm = T)/n, 
+             I3_cut_skip_meal_crt = sum(FI.003.b_r, na.rm = T)/n,
+             I4_freq_cut_skip_pre = sum(FI.004.a_r, na.rm = T)/n, 
+             I4_freq_cut_skip_crt = sum(FI.004.b_r, na.rm = T)/n,
+             I5_eat_less_pre = sum(FI.005.a_r, na.rm = T)/n, 
+             I5_eat_less_crt = sum(FI.005.b_r, na.rm = T)/n,
+             I6_hungry_pre = sum(FI.006.a_r, na.rm = T)/n, 
+             I6_hungry_crt = sum(FI.006.b_r, na.rm = T)/n) 
+
+fi_pre <- fi_pct %>%
+  select (n, disability, ends_with ("pre"))%>%
+  rename(I1_food_not_last = I1_food_not_last_pre,
+         I2_not_balanced_meal = I2_not_balanced_meal_pre,
+         I3_cut_skip_meal = I3_cut_skip_meal_pre,
+         I4_freq_cut_skip = I4_freq_cut_skip_pre,
+         I5_eat_less = I5_eat_less_pre,
+         I6_hungry = I6_hungry_pre)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "pre_COVID",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+  
+
+fi_crt <- fi_pct %>%
+  select (n,disability, ends_with ("crt"))%>%
+  rename(I1_food_not_last = I1_food_not_last_crt,
+         I2_not_balanced_meal = I2_not_balanced_meal_crt,
+         I3_cut_skip_meal = I3_cut_skip_meal_crt,
+         I4_freq_cut_skip = I4_freq_cut_skip_crt,
+         I5_eat_less = I5_eat_less_crt,
+         I6_hungry = I6_hungry_crt)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "Current",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+  
+fi_item_pct <- rbind (fi_pre, fi_crt)
+
+fi_item_pct %>%
+  ggplot(mapping = aes (y = items, x = prop*100, fill = disability)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time, nrow = 2)
+```  
+
+### By Caregivers' Employment Status
+
+  * During both pre-COVID-19 and current situation, significantly larger percentage of unemployed caregivers reported food insecurity compared to employed caregivers\
+  * The percentage of food insecurity in families with employed caregivers significantly increased from pre-COVID to current; the increase of food insecurity percentage in families with unemployed caregivers was positive but not statistically significant (due to the small sample size of unemployed caregiers during pre-COVID) \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pct_pre <- fi %>%
+  filter (work_status_pre != "NA")%>%
+  group_by (work_status_pre) %>%
+  summarise (n = n(),
+             prop = sum(fi_cat2_pre, na.rm = T)/n)%>%
+  mutate (time = "a.pre-COVID", 
+          count = n*prop, 
+          moe = map2_dbl(prop, n, moe.p), 
+          work_status = work_status_pre)%>%
+  select (work_status, n, prop, time, count, moe)
+
+fi_pct_crt <- fi_rct %>%
+  filter (work_status != "NA")%>%
+  group_by (work_status)%>%
+  summarise (n = n(),
+             prop = sum(fi_cat2_crt, na.rm = T)/n) %>%
+  mutate (count = n*prop, 
+          time = "b.current", 
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_pct <- rbind (fi_pct_pre, fi_pct_crt)
+
+fi_pct %>%
+  ggplot(mapping = aes (x = work_status, y = prop*100, fill = work_status )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time)
+```
+    
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_pct$count, n = fi_pct$n, p.adjust.method = "holm")
+```
+
+#### Item-Level Descriptives
+  * Significantly higher percentage of unemployed caregivers reported experiencing the six items of food insecurity compared to employed caregivers\
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pre <- fi_rct %>%
+  filter (work_status_pre != "NA")%>%
+  group_by (work_status_pre) %>%
+   summarise (n = n(),
+             I1_food_not_last = sum(FI.001.a_r, na.rm = T)/n, 
+             I2_not_balanced_meal= sum(FI.002.a_r, na.rm = T)/n, 
+             I3_cut_skip_meal = sum(FI.003.a_r, na.rm = T)/n,
+             I4_freq_cut_skip = sum(FI.004.a_r, na.rm = T)/n, 
+             I5_eat_less = sum(FI.005.a_r, na.rm = T)/n, 
+             I6_hungry= sum(FI.006.a_r, na.rm = T)/n)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "pre_COVID",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))%>%
+  rename(work_status = work_status_pre)
+  
+fi_crt <- fi_rct %>%
+  filter (work_status != "NA")%>%
+  group_by (work_status) %>%
+   summarise (n = n(),
+             I1_food_not_last = sum(FI.001.b_r, na.rm = T)/n, 
+             I2_not_balanced_meal= sum(FI.002.b_r, na.rm = T)/n, 
+             I3_cut_skip_meal = sum(FI.003.b_r, na.rm = T)/n,
+             I4_freq_cut_skip = sum(FI.004.b_r, na.rm = T)/n, 
+             I5_eat_less = sum(FI.005.b_r, na.rm = T)/n, 
+             I6_hungry= sum(FI.006.b_r, na.rm = T)/n)%>%
+  pivot_longer (cols = c("I1_food_not_last", "I2_not_balanced_meal", "I3_cut_skip_meal", "I4_freq_cut_skip", "I5_eat_less", "I6_hungry"), names_to = "items", values_to = "prop")%>%
+  mutate (time = "Current",
+          count = n*prop) %>%
+  mutate (moe = map2_dbl(prop, n, moe.p))
+
+  
+fi_item_pct <- rbind (fi_pre, fi_crt)
+
+fi_item_pct %>%
+  ggplot(mapping = aes (y = items, x = prop*100, fill = work_status)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, color = "black", size =3, position = position_dodge(1))+
+  facet_wrap (~time, nrow = 2)
+```  
+
+### Trend of Change Over Time
+
+  * Overall, the percentage of families reporting food insecurity fluctuated but showed an increasing trend from pre-COVID to Week 19 (August 10th) to Week 31 (November 19th)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+fi_pre <- fi_rct %>%
+  summarise (n = n(),
+             prop = sum(fi_cat2_pre, na.rm = T)/n)%>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p), 
+          Week = "0")
+fi_trend <- fi %>%
+  group_by (Week) %>%
+  filter (fi_cat2_crt != "NA")%>%
+  summarise (n = n(),
+             prop = sum(fi_cat2_crt, na.rm = T)/n)%>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_trend <- rbind (fi_pre, fi_trend)
+
+fi_trend %>%
+ ggplot( mapping = aes (x = Week, y = prop*100, group = 1)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = prop*100-moe*100, ymax = prop*100+moe*100), alpha = .3) +
+  geom_line() +
+  geom_text(aes(label = round(prop*100,2)),vjust = 1.5, size = 3, color = "black",  position = position_dodge(1))
+
+```
+
+## Within-Subject Analayses - Changes from Pre- to Post-COVID{.tabset}
+
+  * Note: based on participants' most recent responses\
+  
+### Overall
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cg <- fi_rct %>%
+  mutate (became_insecure = ifelse (fi_cat_cg == 1, 1, 0),
+          stable_insecure = ifelse (fi_cat_cg == 3, 1, 0),
+          became_secure = ifelse (fi_cat_cg == 4, 1, 0),
+          stable_secure = ifelse (fi_cat_cg == 2, 1, 0))%>%
+  summarise (n = n(),
+             became_insecure = sum (became_insecure, na.rm = T)/n, 
+             stable_insecure = sum (stable_insecure, na.rm = T)/n, 
+             became_secure = sum (became_secure, na.rm = T)/n, 
+             stable_secure = sum (stable_secure, na.rm = T)/n)%>%
+  pivot_longer (col = c("became_insecure", "stable_insecure", "became_secure", "stable_secure"), names_to = "condition", values_to = "prop") %>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_cg %>%
+  ggplot(mapping = aes (x = condition, y = prop*100, fill = condition )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1))
+
+```
+
+
+### By Race/Ethnicity Groups
+  * Significantly higher percentage of White families reported remaining high food security status compared to Black and Latinx families; significantly low percentage of White families reported remaining high food insecurity status compared to Black and Latinx families\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cg <- fi_rct %>%
+  mutate (became_insecure = ifelse (fi_cat_cg == 1, 1, 0),
+          stable_insecure = ifelse (fi_cat_cg == 3, 1, 0),
+          became_secure = ifelse (fi_cat_cg == 4, 1, 0),
+          stable_secure = ifelse (fi_cat_cg == 2, 1, 0))%>%
+  filter (race_ethnic != "NA") %>%
+  group_by (race_ethnic) %>%
+  summarise (n = n(),
+             became_insecure = sum (became_insecure, na.rm = T)/n, 
+             stable_insecure = sum (stable_insecure, na.rm = T)/n, 
+             became_secure = sum (became_secure, na.rm = T)/n, 
+             stable_secure = sum (stable_secure, na.rm = T)/n)%>%
+  pivot_longer (col = c("became_insecure", "stable_insecure", "became_secure", "stable_secure"), names_to = "condition", values_to = "prop") %>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_cg %>%
+  ggplot(mapping = aes (x = race_ethnic, y = prop*100, fill = race_ethnic )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  facet_wrap (~condition)
+
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_cg$count, n = fi_cg$n, p.adjust.method = "holm")
+```
+
+### By Poverty Level
+  * Compared to high-income families, there were significantly higher percentage of low-income families reporting remaining high food insecurity status,and significantly lower percentage of low-income families reporting remaining high food security status. \
+  * Additionally, a small but significantly higher percentage of low-income families also reported becoming food insecure, and becoming secure, compared to high-income families \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cg <- fi_rct %>%
+  mutate (became_insecure = ifelse (fi_cat_cg == 1, 1, 0),
+          stable_insecure = ifelse (fi_cat_cg == 3, 1, 0),
+          became_secure = ifelse (fi_cat_cg == 4, 1, 0),
+          stable_secure = ifelse (fi_cat_cg == 2, 1, 0))%>%
+  filter (poverty_cat != "NA") %>%
+  group_by (poverty_cat) %>%
+  summarise (n = n(),
+             became_insecure = sum (became_insecure, na.rm = T)/n, 
+             stable_insecure = sum (stable_insecure, na.rm = T)/n, 
+             became_secure = sum (became_secure, na.rm = T)/n, 
+             stable_secure = sum (stable_secure, na.rm = T)/n)%>%
+  pivot_longer (col = c("became_insecure", "stable_insecure", "became_secure", "stable_secure"), names_to = "condition", values_to = "prop") %>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_cg %>%
+  ggplot(mapping = aes (x = poverty_cat, y = prop*100, fill = poverty_cat )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  facet_wrap (~condition)
+
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_cg$count, n = fi_cg$n, p.adjust.method = "holm")
+```
+
+### By Material Hardship Status
+  * Compared to families without material hardship, there were significantly higher percentage of families with material hardship reporting remaining high food insecurity status and becoming food insecure, and significantly lower percentage of families with material hardship reporting high remaining food security status. \
+  * Additionally, a small but significantly higher percentage of families with material hardship also reported becoming food secure, compared to families without material hardship\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cg <- fi_rct %>%
+  mutate (became_insecure = ifelse (fi_cat_cg == 1, 1, 0),
+          stable_insecure = ifelse (fi_cat_cg == 3, 1, 0),
+          became_secure = ifelse (fi_cat_cg == 4, 1, 0),
+          stable_secure = ifelse (fi_cat_cg == 2, 1, 0))%>%
+  filter (material_hardship != "NA") %>%
+  group_by (material_hardship) %>%
+  summarise (n = n(),
+             became_insecure = sum (became_insecure, na.rm = T)/n, 
+             stable_insecure = sum (stable_insecure, na.rm = T)/n, 
+             became_secure = sum (became_secure, na.rm = T)/n, 
+             stable_secure = sum (stable_secure, na.rm = T)/n)%>%
+  pivot_longer (col = c("became_insecure", "stable_insecure", "became_secure", "stable_secure"), names_to = "condition", values_to = "prop") %>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_cg %>%
+  ggplot(mapping = aes (x = material_hardship, y = prop*100, fill = material_hardship )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  facet_wrap (~condition)
+
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_cg$count, n = fi_cg$n, p.adjust.method = "holm")
+```
+
+### By Single Parent Status
+  * Compared to dual-parent families, there were significantly higher percentage of single-parent families reporting remaining high food insecurity status, and significantly lower percentage of single-parent families reporting remaining high food security status. \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cg <- fi_rct %>%
+  mutate (became_insecure = ifelse (fi_cat_cg == 1, 1, 0),
+          stable_insecure = ifelse (fi_cat_cg == 3, 1, 0),
+          became_secure = ifelse (fi_cat_cg == 4, 1, 0),
+          stable_secure = ifelse (fi_cat_cg == 2, 1, 0))%>%
+  filter (single != "NA") %>%
+  group_by (single) %>%
+  summarise (n = n(),
+             became_insecure = sum (became_insecure, na.rm = T)/n, 
+             stable_insecure = sum (stable_insecure, na.rm = T)/n, 
+             became_secure = sum (became_secure, na.rm = T)/n, 
+             stable_secure = sum (stable_secure, na.rm = T)/n)%>%
+  pivot_longer (col = c("became_insecure", "stable_insecure", "became_secure", "stable_secure"), names_to = "condition", values_to = "prop") %>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_cg %>%
+  ggplot(mapping = aes (x = single, y = prop*100, fill = single )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  facet_wrap (~condition)
+
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_cg$count, n = fi_cg$n, p.adjust.method = "holm")
+```
+
+### By Children's Special Needs Status
+  * Compared to families of children without special needs, there were significantly higher percentage of families of children with special needs reporting remaining high food insecurity status, and significantly lower percentage of families of children with special needs reporting remaining high food security status. \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cg <- fi_rct %>%
+  mutate (became_insecure = ifelse (fi_cat_cg == 1, 1, 0),
+          stable_insecure = ifelse (fi_cat_cg == 3, 1, 0),
+          became_secure = ifelse (fi_cat_cg == 4, 1, 0),
+          stable_secure = ifelse (fi_cat_cg == 2, 1, 0))%>%
+  filter (disability != "NA") %>%
+  group_by (disability) %>%
+  summarise (n = n(),
+             became_insecure = sum (became_insecure, na.rm = T)/n, 
+             stable_insecure = sum (stable_insecure, na.rm = T)/n, 
+             became_secure = sum (became_secure, na.rm = T)/n, 
+             stable_secure = sum (stable_secure, na.rm = T)/n)%>%
+  pivot_longer (col = c("became_insecure", "stable_insecure", "became_secure", "stable_secure"), names_to = "condition", values_to = "prop") %>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_cg %>%
+  ggplot(mapping = aes (x = disability, y = prop*100, fill = disability )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  facet_wrap (~condition)
+
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_cg$count, n = fi_cg$n, p.adjust.method = "holm")
+```
+
+### By Caregivers' Post-COVID Employment Status
+  * Compared to employed caregivers, there were significantly higher percentage of unemployed caregivers reporting remaining high food insecurity status or becoming food insecure, and significantly lower percentage of unemployed caregivers reporting remaining high food security status. \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cg <- fi_rct %>%
+  mutate (became_insecure = ifelse (fi_cat_cg == 1, 1, 0),
+          stable_insecure = ifelse (fi_cat_cg == 3, 1, 0),
+          became_secure = ifelse (fi_cat_cg == 4, 1, 0),
+          stable_secure = ifelse (fi_cat_cg == 2, 1, 0))%>%
+  filter (work_status != "NA") %>%
+  group_by (work_status) %>%
+  summarise (n = n(),
+             became_insecure = sum (became_insecure, na.rm = T)/n, 
+             stable_insecure = sum (stable_insecure, na.rm = T)/n, 
+             became_secure = sum (became_secure, na.rm = T)/n, 
+             stable_secure = sum (stable_secure, na.rm = T)/n)%>%
+  pivot_longer (col = c("became_insecure", "stable_insecure", "became_secure", "stable_secure"), names_to = "condition", values_to = "prop") %>%
+  mutate (count = n*prop,
+          moe = map2_dbl(prop, n, moe.p))
+
+fi_cg %>%
+  ggplot(mapping = aes (x = work_status, y = prop*100, fill = work_status )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  facet_wrap (~condition)
+
+```
+
+```{r, results='hide', echo = FALSE, message=FALSE, warning = FALSE}
+pairwise.prop.test(x = fi_cg$count, n = fi_cg$n, p.adjust.method = "holm")
+```
+
+# Association Analyses - Food Security & Mental Health
+
+## Caregivers' Mental Health{.tabset}
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Extract and Code Caregivers' Mental Health Problems
+depress_pre = rowMeans(master[,find_items("PHQ.001.[a-b]$", master)], na.rm=T)
+depress_crt= rowMeans(master[,find_items("PHQ.002.[a-b]$", master)], na.rm=T)
+anxiety_pre = rowMeans(master[,find_items("GAD2.001.[a-b]$", master)], na.rm=T)
+anxiety_crt = rowMeans(master[,find_items("GAD2.002.[a-b]$", master)], na.rm=T)
+master <- master %>%
+  rowwise %>%
+  mutate (depress_pre = mean (PHQ.001.a, PHQ.001.b, na.rm = TRUE)/3*100,
+          depress_crt = mean (PHQ.002.a, PHQ.002.b, na.rm = TRUE)/3*100,
+          anxiety_pre = mean (GAD2.001.a, GAD2.001.b, na.rm = TRUE)/3*100,
+          anxiety_crt = mean (GAD2.002.a, GAD2.002.b, na.rm = TRUE)/3*100)%>%
+  ungroup () %>%
+  mutate (stress_pre = STRESS.001/4*100,
+          stress_crt = STRESS.002/4*100,
+          lonely_pre = LONE.001.a/4*100,
+          lonely_crt = LONE.001.b/4*100)%>%
+  rowwise %>%
+  mutate (total_pre = sum(depress_pre, anxiety_pre, stress_pre, lonely_pre, na.rm = TRUE)/4,
+          total_crt = sum(depress_crt, anxiety_crt, stress_crt, lonely_crt, na.rm = TRUE)/4)
+
+pmh <- master %>%
+  select(CaregiverID,month, Week, baseline, contains ("depress"),contains ("anxiety"), stress_pre, stress_crt, lonely_pre, lonely_crt, contains ("total"))
+
+pmh_pre <- pmh %>%
+  group_by (CaregiverID) %>%
+  summarise (depress_pre = mean(depress_pre, na.rm = T),
+             anxiety_pre = mean(anxiety_pre, na.rm = T),
+             stress_pre = mean(stress_pre, na.rm = T),
+             lonely_pre = mean(lonely_pre, na.rm = T))%>%
+  ungroup()%>%
+  rowwise ()%>%
+  mutate (total_pre = sum(depress_pre, anxiety_pre, stress_pre, lonely_pre, na.rm = TRUE)/4)
+
+#Select pmh_crt only for weeks after 19 & those who had responses in food insecurity
+fi_id <- fi_rct $ CaregiverID
+pmh_crt <- pmh %>%
+  select (CaregiverID, Week, month, baseline, depress_crt, anxiety_crt, stress_crt, lonely_crt, total_crt)%>%
+  filter (Week >= 19 & baseline == 0 & CaregiverID %in% fi_id)
+
+
+```
+
+
+### Caregivers' Mental Health Breakdown by Low & High Food Security Status
+  
+  * Note: analyses done based on most recent responses; mental health problems ranged 0-100\
+  * Caregivers in families experiencing high food insecurity reported higher levels of total mental health problems, compared to caregivers in families not experiencing food insecurity.\
+  * Caregivers in families experiencing high food insecurity reported higher levels of depression, anxiety, loneliness, and stress, compared to caregivers in families not experiencing food insecurity.\
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Merge pmh with fi data - merge based on fi so that every case has fi data for cross-sectional analyses
+fi_pmh <- merge (x = fi, y = pmh_crt, by.x = c("CaregiverID", "Week", "baseline"), by.y = c("CaregiverID", "Week", "baseline"), all.x = T)
+fi_pmh_rct <- fi_pmh %>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()
+fi_pmh <- merge (x = fi_pmh, y = pmh_pre, by.x = "CaregiverID",  by.y = "CaregiverID")
+```
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pmh_m <- fi_pmh_rct %>%
+  mutate (food_insecurity = case_when (fi_cat2_crt == 0 ~ "Low Food Insecurity",
+                                       fi_cat2_crt == 1 ~ "High Food Insecurity"))%>%
+  group_by (food_insecurity) %>%
+  summarise (n = n(), depress = mean(depress_crt, na.rm = T), 
+             anxiety = mean(anxiety_crt, na.rm = T), 
+             stress = mean(stress_crt, na.rm = T), 
+             lonely = mean(lonely_crt, na.rm = T), 
+             total = mean(total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("depress", "anxiety", "stress", "lonely", "total"), names_to = "problems", values_to = "mean")
+             
+ fi_pmh_sd <- fi_pmh_rct %>%
+  mutate (food_insecurity = case_when (fi_cat2_crt == 0 ~ "Low Food Insecurity",
+                                       fi_cat2_crt == 1 ~ "High Food Insecurity"))%>%
+  group_by (food_insecurity) %>%
+  summarise (depress = sd(depress_crt, na.rm = T), 
+             anxiety = sd(anxiety_crt, na.rm = T), 
+             stress = sd(stress_crt, na.rm = T), 
+             lonely = sd(lonely_crt, na.rm = T), 
+             total = sd(total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("depress", "anxiety", "stress", "lonely", "total"), names_to = "problems", values_to = "sd")
+              
+fi_pmh_m <- merge (x = fi_pmh_m, y = fi_pmh_sd, by.x = c("problems", "food_insecurity"),  by.y = c("problems", "food_insecurity"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+fi_pmh_m %>%
+  filter (problems == "total")%>%
+  ggplot(mapping = aes (x = food_insecurity, y = mean, fill = food_insecurity )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  ggtitle (label = "Total problems")
+
+fi_pmh_m %>%
+  filter (problems != "total")%>%
+  ggplot(mapping = aes (x = food_insecurity, y = mean, fill = food_insecurity )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  ggtitle (label = "Specific problems")+
+  facet_wrap (~problems)
+
+```
+
+### Cross-Sectional Correlations between Food Insecurity Raw Scores & Caregivers' Mental Health
+
+  * Food insecurity raw score was significantly and positively correlated with caregivers' mental health problems, including depression, anxiety, loneliness, stress, and total problems\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+library(Hmisc)
+library(corrplot)
+
+fi_pmh_corr <- fi_pmh_rct %>%
+  select(fi_raw_crt, total_crt, depress_crt, anxiety_crt, stress_crt, lonely_crt)
+
+fi_pmh_corr_smy <- rcorr(as.matrix(fi_pmh_corr))
+fi_pmh_corr_smy
+
+fi_pmh_corr_smy2 <- fi_pmh_corr_smy$r
+
+corrplot(fi_pmh_corr_smy2, type = "upper",order = "original", tl.col = "black")
+```
+
+### Food Insecurity Raw Score Predicting Subsequent Caregivers' Mental Health Problems
+ 
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_pmh <- merge (x = fi, y = pmh_crt, by.x = c("CaregiverID", "Week", "baseline"), by.y = c("CaregiverID", "Week", "baseline"), all.x = T)%>%
+  rename (Week_fi = Week)
+
+#Extracting the first subsequent response (after fi response) on caregivers' mental health - do it by week and then merge
+fi_19 <- fi_pmh %>%
+  filter (Week_fi == 19)
+fi_21 <- fi_pmh %>%
+  filter (Week_fi == 21)
+fi_23 <- fi_pmh %>%
+  filter (Week_fi == 23)
+fi_25 <- fi_pmh %>%
+  filter (Week_fi == 25)
+fi_27 <- fi_pmh %>%
+  filter (Week_fi == 27)
+fi_31 <- fi_pmh %>%
+  filter (Week_fi == 31)
+
+pmh_fl <- pmh_crt %>%
+  rename (Week_fl = Week,
+          depress_fl = depress_crt,
+          anxiety_fl = anxiety_crt,
+          stress_fl = stress_crt,
+          lonely_fl = lonely_crt,
+          total_fl = total_crt)
+pmh_19fl <- pmh_fl %>%
+  filter (CaregiverID %in% fi_19$CaregiverID & Week_fl > 19)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+pmh_21fl <- pmh_fl %>%
+  filter (CaregiverID %in% fi_21$CaregiverID & Week_fl > 21)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+pmh_23fl <- pmh_fl %>%
+  filter (CaregiverID %in% fi_23$CaregiverID & Week_fl > 23)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+pmh_25fl <- pmh_fl %>%
+  filter (CaregiverID %in% fi_25$CaregiverID & Week_fl > 25)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+pmh_27fl <- pmh_fl %>%
+  filter (CaregiverID %in% fi_27$CaregiverID & Week_fl > 27)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+pmh_31fl <- pmh_fl %>%
+  filter (CaregiverID %in% fi_31$CaregiverID & Week_fl > 31)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+
+fi_pmh_19 <- merge (x = fi_19, y = pmh_19fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_pmh_21 <- merge (x = fi_21, y = pmh_21fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_pmh_23 <- merge (x = fi_23, y = pmh_23fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_pmh_25 <- merge (x = fi_25, y = pmh_25fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_pmh_27 <- merge (x = fi_27, y = pmh_27fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_pmh_31 <- merge (x = fi_31, y = pmh_31fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+
+fi_pmh_fl <- rbind(fi_pmh_19, fi_pmh_21, fi_pmh_23, fi_pmh_25, fi_pmh_27, fi_pmh_31)
+  
+```
+
+ * Food insecurity significantly predicted increased total mental health problems among caregivers during the subsequent response(b = .84, p < .001), controlling for the current total mental health problems score (b = .76, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_ptprobs <- lm (total_fl ~ fi_raw_crt + total_crt, fi_pmh_fl)
+summary(fi_to_ptprobs)
+```
+
+ * Food insecurity significantly predicted increased depressive symptoms among caregivers during the subsequent response(b = 1.78, p < .001), controlling for the current depressive symptoms score (b = .60, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_pdepress <- lm (depress_fl ~ fi_raw_crt + depress_crt, fi_pmh_fl)
+summary(fi_to_pdepress)
+```
+
+ * Food insecurity significantly predicted increased anxiety symptoms among caregivers during the subsequent response(b = 1.22, p < .001), controlling for the current anxiety symptoms score (b = .60, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_panxiety <- lm (anxiety_fl ~ fi_raw_crt + anxiety_crt, fi_pmh_fl)
+summary(fi_to_panxiety)
+```
+
+ * Food insecurity significantly predicted increased stress among caregivers during the subsequent response(b = 1.40, p < .001), controlling for the current stress score (b = .62, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_pstress <- lm (stress_fl ~ fi_raw_crt + stress_crt, fi_pmh_fl)
+summary(fi_to_pstress)
+```
+
+ * Food insecurity significantly predicted increased loneliness among caregivers during the subsequent response (b = .63, p < .001), controlling for the current loneliness score (b = .76, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_plonely <- lm (lonely_fl ~ fi_raw_crt + lonely_crt, fi_pmh_fl)
+summary(fi_to_plonely)
+```
+
+## Children' Mental Health{.tabset}
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Extract and Code Children' Mental Health Problems
+master <- master %>%
+  mutate (fussy_pre = CBCL.001.a/2*100,
+          fussy_crt = CBCL.002.a/2*100,
+          fear_pre = CBCL.001.b/2*100,
+          fear_crt = CBCL.002.b/2*100)
+
+cp <- master %>%
+  select(CaregiverID,month,Week,  BaselineWeek, baseline, contains ("fussy"),contains ("fear"))%>%
+  mutate (ctotal_pre = sum(fussy_pre,fear_pre, na.rm = T)/2,
+          ctotal_crt = sum(fussy_crt,fear_crt, na.rm = T)/2)
+
+#Select cp_crt only for weeks after 19 & those who had responses in food insecurity
+cp_crt <- cp %>%
+  select (CaregiverID, Week, baseline, fussy_crt, fear_crt, ctotal_crt )%>%
+  filter (Week >= 19 & baseline == 0 & CaregiverID %in% fi_id)
+
+```
+
+### Children's Mental Health Breakdown by Low & High Food Security Status
+  
+  * Note: analyses done based on most recent responses; mental health problems ranged 0-100\
+  * Caregivers in families experiencing high food insecurity reported higher levels of children's total mental health problems, compared to caregivers in families not experiencing food insecurity.\
+  * Caregivers in families experiencing high food insecurity reported higher levels of children's fussiness/defiance and fear/anxiety, compared to caregivers in families not experiencing food insecurity.\
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Merge pmh with fi data - merge based on fi so that every case has fi data for cross-sectional analyses
+fi_cp <- merge (x = fi, y = cp_crt, by.x = c("CaregiverID", "Week", "baseline"), by.y = c("CaregiverID", "Week", "baseline"), all.x = T)
+fi_cp_rct <- fi_cp %>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()
+```
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cp_m <- fi_cp_rct %>%
+  mutate (food_insecurity = case_when (fi_cat2_crt == 0 ~ "Low Food Insecurity",
+                                       fi_cat2_crt == 1 ~ "High Food Insecurity"))%>%
+  group_by (food_insecurity) %>%
+  summarise (n = n(), 
+             fussy = mean(fussy_crt, na.rm = T), 
+             fear = mean(fear_crt, na.rm = T), 
+             total = mean(ctotal_crt, na.rm = T))%>%
+  pivot_longer (cols = c("fussy", "fear", "total"), names_to = "problems", values_to = "mean")
+             
+ fi_cp_sd <- fi_cp_rct %>%
+  mutate (food_insecurity = case_when (fi_cat2_crt == 0 ~ "Low Food Insecurity",
+                                       fi_cat2_crt == 1 ~ "High Food Insecurity"))%>%
+  group_by (food_insecurity) %>%
+  summarise (fussy = sd(fussy_crt, na.rm = T), 
+             fear = sd(fear_crt, na.rm = T), 
+             total = sd(ctotal_crt, na.rm = T))%>%
+  pivot_longer (cols = c("fussy", "fear", "total"), names_to = "problems", values_to = "sd")
+             
+              
+fi_cp_m <- merge (x = fi_cp_m, y = fi_cp_sd, by.x = c("problems", "food_insecurity"),  by.y = c("problems", "food_insecurity"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m))
+
+fi_cp_m %>%
+  filter (problems == "total")%>%
+  ggplot(mapping = aes (x = food_insecurity, y = mean, fill = food_insecurity )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  ggtitle (label = "Total problems")
+
+fi_cp_m %>%
+  filter (problems != "total")%>%
+  ggplot(mapping = aes (x = food_insecurity, y = mean, fill = food_insecurity )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size =3, position = position_dodge(1)) +
+  ggtitle (label = "Specific problems")+
+  facet_wrap (~problems)
+
+```
+
+### Cross-Sectional Correlations between Food Insecurity Raw Scores & Children' Mental Health
+
+  * Food insecurity raw score was significantly and positively correlated with children' mental health problems, including fussiness/defiance, fear/anxiety, and total problems\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+fi_cp_corr <- fi_cp_rct %>%
+  select(fi_raw_crt, ctotal_crt, fussy_crt, fear_crt)
+
+fi_cp_corr_smy <- rcorr(as.matrix(fi_cp_corr))
+fi_cp_corr_smy
+
+fi_cp_corr_smy2 <- fi_cp_corr_smy$r
+
+corrplot(fi_cp_corr_smy2, type = "upper",order = "original", tl.col = "black")
+```
+
+
+### Food Insecurity Raw Score Predicting Subsequent Caregivers' Mental Health Problems
+ 
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_cp <- merge (x = fi, y = cp_crt, by.x = c("CaregiverID", "Week", "baseline"), by.y = c("CaregiverID", "Week", "baseline"), all.x = T)%>%
+  rename (Week_fi = Week)
+
+#Extracting the first subsequent response (after fi response) on caregivers' mental health - do it by week and then merge
+fi_19 <- fi_cp %>%
+  filter (Week_fi == 19)
+fi_21 <- fi_cp %>%
+  filter (Week_fi == 21)
+fi_23 <- fi_cp %>%
+  filter (Week_fi == 23)
+fi_25 <- fi_cp %>%
+  filter (Week_fi == 25)
+fi_27 <- fi_cp %>%
+  filter (Week_fi == 27)
+fi_31 <- fi_cp %>%
+  filter (Week_fi == 31)
+
+cp_fl <- cp_crt %>%
+  rename (Week_fl = Week,
+          fussy_fl = fussy_crt,
+          fear_fl = fear_crt,
+          ctotal_fl = ctotal_crt)
+cp_19fl <- cp_fl %>%
+  filter (CaregiverID %in% fi_19$CaregiverID & Week_fl > 19)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+cp_21fl <- cp_fl %>%
+  filter (CaregiverID %in% fi_21$CaregiverID & Week_fl > 21)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+cp_23fl <- cp_fl %>%
+  filter (CaregiverID %in% fi_23$CaregiverID & Week_fl > 23)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+cp_25fl <- cp_fl %>%
+  filter (CaregiverID %in% fi_25$CaregiverID & Week_fl > 25)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+cp_27fl <- cp_fl %>%
+  filter (CaregiverID %in% fi_27$CaregiverID & Week_fl > 27)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+cp_31fl <- cp_fl %>%
+  filter (CaregiverID %in% fi_31$CaregiverID & Week_fl > 31)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl == min (Week_fl))
+
+fi_cp_19 <- merge (x = fi_19, y = cp_19fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_cp_21 <- merge (x = fi_21, y = cp_21fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_cp_23 <- merge (x = fi_23, y = cp_23fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_cp_25 <- merge (x = fi_25, y = cp_25fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_cp_27 <- merge (x = fi_27, y = cp_27fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+fi_cp_31 <- merge (x = fi_31, y = cp_31fl, by.x = c("CaregiverID", "baseline"), by.y = c("CaregiverID", "baseline"), all.x = T)
+
+fi_cp_fl <- rbind(fi_cp_19, fi_cp_21, fi_cp_23, fi_cp_25, fi_cp_27, fi_cp_31)
+  
+```
+
+ * Food insecurity significantly predicted increased total mental health problems among children during the subsequent response(b = 1.09, p < .001), controlling for the current total mental health problems score (b = .65, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_ctprobs <- lm (ctotal_fl ~ fi_raw_crt + ctotal_crt, fi_cp_fl)
+summary(fi_to_ctprobs)
+```
+
+ * Food insecurity significantly predicted increased fussiness/defiance among children during the subsequent response(b = 1.17, p < .001), controlling for the current fussiness/defiance score (b = .59, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_cfussy <- lm (fussy_fl ~ fi_raw_crt + fussy_crt, fi_cp_fl)
+summary(fi_to_cfussy)
+```
+
+ * Food insecurity significantly predicted increased fear/anxiety among children during the subsequent response(b = 1.35, p < .001), controlling for the current fear/anxiety score (b = .59, p < .001)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_cfear <- lm (fear_fl ~ fi_raw_crt + fear_crt, fi_cp_fl)
+summary(fi_to_cfear)
+```
+
+## Mediation Analyses: Food Insecurity -> Caregivers' Mental Health -> Children's Mental Health{.tabset}
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+library(Rfast)
+#fi_pmh_fl can be used directly 
+#Recode cp_fl data to include the first & the second subsequent response 
+##Keep fi_cp_fl that include current & first subsequent cp response
+##Extreact fi_cp_fl2 to include the second subsequent cp response
+cp_fl2 <- cp_crt %>%
+  rename (Week_fl2 = Week,
+          fussy_fl2 = fussy_crt,
+          fear_fl2 = fear_crt,
+          ctotal_fl2 = ctotal_crt)
+cp_19fl2 <- cp_fl2 %>%
+  filter (CaregiverID %in% fi_19$CaregiverID & Week_fl2 > 19)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl2 == nth(Week_fl2, 2, descending = F))%>%
+  mutate (Week_fi = 19)
+cp_21fl2 <- cp_fl2 %>%
+  filter (CaregiverID %in% fi_21$CaregiverID & Week_fl2 > 21)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl2 == nth(Week_fl2, 2, descending = F))%>%
+  mutate (Week_fi = 21)
+cp_23fl2 <- cp_fl2 %>%
+  filter (CaregiverID %in% fi_23$CaregiverID & Week_fl2 > 23)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl2 == nth(Week_fl2, 2, descending = F))%>%
+  mutate (Week_fi = 23)
+cp_25fl2 <- cp_fl2 %>%
+  filter (CaregiverID %in% fi_25$CaregiverID & Week_fl2 > 25)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl2 == nth(Week_fl2, 2, descending = F))%>%
+  mutate (Week_fi = 25)
+cp_27fl2 <- cp_fl2 %>%
+  filter (CaregiverID %in% fi_27$CaregiverID & Week_fl2 > 27)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl2 == nth(Week_fl2, 2, descending = F))%>%
+  mutate (Week_fi = 27)
+cp_31fl2 <- cp_fl2 %>%
+  filter (CaregiverID %in% fi_31$CaregiverID & Week_fl2 > 31)%>%
+  group_by (CaregiverID)%>%
+  filter (Week_fl2 == nth(Week_fl2, 2, descending = F))%>%
+  mutate (Week_fi = 31)
+
+fi_cp_fl2 <- rbind(cp_19fl2, cp_21fl2, cp_23fl2, cp_25fl2,cp_27fl2, cp_31fl2 )
+
+fi_cp_fl2 <- merge (x = fi_cp_fl, y = fi_cp_fl2, by.x = c("CaregiverID", "baseline", "Week_fi"), by.y = c("CaregiverID", "baseline", "Week_fi"), all.x = T)%>%
+  select("CaregiverID", "Week_fi", contains ("fussy"), contains ("fear"), contains ("ctotal"))
+
+#Merge caregivers' and children's mental health problems files 
+fi_pmh_cp <- merge (x = fi_pmh_fl, y = fi_cp_fl2, by.x = c("CaregiverID", "Week_fi"), by.y = c("CaregiverID", "Week_fi"))
+```
+
+### Path c (direct effect): food insecurity -> children's mental health problems at second subsequent response
+  * Food insecurity significantly predicted increased total mental health problems among children during the second subsequent response(b = 1.27, p < .001), controlling for the current total mental health problems score (b = .65, p < .001)\
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_ctotal2 <- lm (ctotal_fl2 ~ fi_raw_crt + ctotal_crt, fi_pmh_cp)
+summary(fi_to_ctotal2)
+```
+
+### Path a: food insecurity -> caregivers's mental health problems at first subsequent response
+  * Food insecurity significantly predicted increased total mental health problems among children during the second subsequent response(b = .84, p < .001), controlling for the current total mental health problems score (b = .76, p < .001)\
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fi_to_ptotal1 <- lm (total_fl ~ fi_raw_crt + total_crt, fi_pmh_cp)
+summary(fi_to_ptotal1)
+```
+
+### Path b: caregivers' mental health problems at first subsequent response -> children's mental health problems at second subsequent response
+  * Caregivers' mental health problems at the first subsequent response significantly predicted increased total mental health problems among children during the second subsequent response(b = .15, p < .001), controlling for children's total mental health problems score at the first subsequent response (b = .64, p < .001) and current food insecurity (path c': b = .77, p < .01)\
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+ptotal1_to_ctotal2 <- lm (ctotal_fl2 ~ total_fl + ctotal_fl + fi_raw_crt, fi_pmh_cp)
+summary(ptotal1_to_ctotal2)
+```
+
+
+### Testing Indirect Effect using RMediation Method
+  * Indirect effect was statistically significant: a*b = .126, 95%CI[.08, .18], p <.001 
+```{r, echo=FALSE, message = FALSE}
+library (RMediation)
+medci(mu.x = .84, se.x = .14, mu.y = .15, se.y = .02) 
+
+```
