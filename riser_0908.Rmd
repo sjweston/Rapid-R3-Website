@@ -1197,6 +1197,42 @@ plot = scored %>%
 ggplotly(plot)
 ```
 
+<!-- ## Pre-pandemic levels -->
+
+<!-- ```{r} -->
+<!-- plot = scored %>% -->
+<!--   filter(!is.na(black)) %>% -->
+<!--   filter(Week == 0) %>% -->
+<!--   select(black, fussy, fear) %>% -->
+<!--   group_by(black) %>% -->
+<!--   summarise(across( -->
+<!--     where(is.numeric), -->
+<!--     list(m = mean, s = sd, n = ~length(which(!is.na(.x)))), -->
+<!--     na.rm=T)) %>% -->
+<!--   gather(variable, value, -black) %>% -->
+<!--   separate(variable, into = c("variable", "stat")) %>% -->
+<!--   spread(stat, value) %>% -->
+<!--   mutate(se = s/sqrt(n), -->
+<!--          moe = qt(.975, n-1)*se) %>% -->
+<!--   ggplot(aes(x = variable, y = m, group = black, -->
+<!--              text = paste0( -->
+<!--                "Group:", black, -->
+<!--                "\nMean:", papaja::printnum(m), -->
+<!--                "\n95% CI low:", papaja::printnum(m-moe), -->
+<!--                "\n95% CI high:", papaja::printnum(m+moe) -->
+<!--              ))) + -->
+<!--   geom_errorbar(aes(ymin = m-moe, ymax = m+moe), -->
+<!--                 position = position_dodge(1), -->
+<!--                 width = .3) + -->
+<!--   geom_point(aes(color = black), position = position_dodge(1)) + -->
+<!--   labs(x = NULL, y = "Average rating (out of 100)", color = NULL) + -->
+<!--   theme_pubr() -->
+
+<!-- ggplotly(plot, tooltip = "text") -->
+<!-- ``` -->
+
+
+
 # Childcare
 
   * Pre-pandemic: retrospective report
@@ -1220,7 +1256,6 @@ plot = scored %>%
     TRUE ~ "Fall"
   ),
   season = factor(season, levels = c("Pre-pandemic", "Spring", "Summer", "Fall"))) %>%
-  
   group_by(CaregiverID, season) %>%
   filter(Week == max(Week)) %>%
   filter(!is.na(value)) %>%
@@ -1229,14 +1264,129 @@ plot = scored %>%
             percent = mean(value)) %>%
   mutate(moe = map2_dbl(percent, n, moe.p),
          cv = map_dbl(n, ~qt(.975, .x-1)),
-         poverty200 = factor(poverty200, labels = c("above Poverty", "200xFPL"))) %>%
+         poverty200 = factor(poverty200, labels = c("above Poverty", "200xFPL"))) 
+
+plot = plot %>%
   mutate_at(vars(percent, moe), ~round(100*.x,2)) %>%
-  ggplot(aes(x = variable, y = percent, group = poverty200, fill = poverty200)) +
+  ggplot(aes(x = variable, y = percent, group = poverty200, fill = poverty200,
+             text = paste0(
+               "Race:", black,
+               "\nPoverty status:", poverty200,
+               "\nPercent:", papaja::printnum(percent),
+               "\nN:", n
+             ))) +
   geom_bar(stat = "identity", position = position_dodge(1)) +
   coord_flip() +
   facet_grid(season~black) +
   theme_pubr()
 
-ggplotly(plot)
+ggplotly(plot, tooltip = "text")
 ```
 
+# Material hardship{.tabset}
+
+## Black vs non-Black
+
+```{r }
+plot = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
+  filter(!is.na(black)) %>%
+  group_by(black, Week) %>%
+  summarize(percent = 100*mean(material_hardship,na.rm=T),
+            N = length(which(!is.na(material_hardship)))) %>%
+  ungroup() %>%
+  filter(!is.nan(percent)) %>%
+  mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
+  ggplot(aes(x = Week,
+             y = percent, 
+             color = black,
+             group = 1,
+             text = paste0(
+               "Week: ", Week,
+               "\nGroup: ", black,
+               "\nN: ", N,
+               "\npercent: ", round(percent,1)
+             ))) +
+  geom_line() +
+  labs(color = NULL)+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Race/ethnicity
+
+```{r }
+plot = scored %>%
+ mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
+  filter(!is.na(race)) %>%
+  group_by(race, Week) %>%
+  summarize(percent = 100*mean(material_hardship,na.rm=T),
+            N = length(which(!is.na(material_hardship)))) %>%
+  ungroup() %>%
+  filter(!is.nan(percent)) %>%
+  ggplot(aes(x = Week,
+             y = percent, 
+             color = race,
+             group = 1,
+             text = paste0(
+               "Week: ", Week,
+               "\nGroup: ", race,
+               "\nN: ", N,
+               "\npercent: ", round(percent,1)
+             ))) +
+  geom_line() +
+  labs(color = NULL)+
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```
+
+## Black by income
+
+```{r }
+plot = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week)) %>%
+  filter(!is.na(black) & !is.na(poverty200)) %>%
+  group_by(black, poverty200, Week) %>%
+  summarize(percent = 100*mean(material_hardship,na.rm=T),
+            N = length(which(!is.na(material_hardship)))) %>%
+  ungroup() %>%
+  filter(!is.nan(percent)) %>%
+  mutate_at(vars(black), factor, labels = c("non-Black", "Black")) %>%
+  mutate_at(vars(poverty200), factor, labels = c("above Poverty", "200xFPL")) %>%
+  ggplot(aes(x = Week,
+             y = percent, 
+             color = poverty200,
+             group = 1,
+             text = paste0(
+               "Week: ", Week,
+               "\nGroup: ", black,
+               "\nN: ", N,
+               "\npercent: ", round(percent,1)
+             ))) +
+  geom_line() +
+  labs(color = NULL)+
+  facet_wrap(~black, nrow = 2) +
+  theme_pubclean()
+
+ggplotly(plot, tooltip = "text")
+```

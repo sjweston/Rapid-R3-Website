@@ -12,7 +12,7 @@ library(jsonlite)
 library(readr)
 library(zoo) # for rolling averages and sums!
 
-#load(here("../../Data Management R3/R Data/scored.Rdata"))
+load(here("../../Data Management R3/R Data/scored.Rdata"))
 
 scored_in_environ = length(which(grepl("scored", ls()))) > 0
 
@@ -142,15 +142,18 @@ scored = scored %>%
                       "single", "disability", "work_status", 
                       "child_age03", "child_age45", "num_children_age03", "num_children_age45", "num_children_age612", 
                       "current_income", "poverty100", "poverty125", "poverty150", "poverty200"), 
-            na.locf0) %>% # carry these variables down through NA's
-  arrange(desc(Week)) %>%
+            ~case_when(
+              is.na(.x) ~ lag(.x),
+              TRUE ~ .x)) %>% # carry these variables down through NA's
   mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
                       "race_cat", "black", "white", "minority", "native", "asian",
                       "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
                       "zip", "state", "region", "insurance_type", "childinsurance_type",
                       "single", "disability",  "work_status", 
                       "poverty100", "poverty125", "poverty150", "poverty200"), 
-            na.locf0) %>% # carry these variables down through NA's
+            ~case_when(
+              is.na(.x) ~ lead(.x),
+              TRUE ~ .x)) %>% # carry these variables down through NA's
   ungroup()
 
 

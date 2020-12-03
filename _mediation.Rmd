@@ -72,10 +72,15 @@ library(lavaan)
 scored_long = scored %>%
   filter(!is.infinite(poverty150)) %>%
   rename(income_decreased = income_decreaed) %>%
-  select(CaregiverID, Week, wellbeing, child_wellbeing, 
+  select(CaregiverID, Week, 
+         wellbeing, child_wellbeing, 
          income_decreased, material_hardship, 
-         social_support,  income_decreased_group, poverty150) %>%
-  gather(key, value, -CaregiverID, -Week, -social_support, -income_decreased_group, -poverty150) %>%
+         food, social_support,
+         income_decreased_group, poverty150) %>%
+  gather(key, value, 
+         -CaregiverID, -Week, 
+         -social_support, -income_decreased_group,
+         -poverty150) %>%
   unite(key, key, Week) %>%
   spread(key, value)
 ```
@@ -210,6 +215,44 @@ total := indirect + i3*i1 + i1*c1
 "
 
 test = sem(material_wellbeing_model, data = scored_long, missing='fiml', fixed.x=F)
+
+summary(test, fit.measures = T, standardized = T)
+
+```
+
+## Food insecurity
+
+```{r}
+
+food_insecurity_model = "
+
+child_wellbeing_21 ~ p1*wellbeing_19 + c1*child_wellbeing_19 + i1*food_19
+child_wellbeing_23 ~ p1*wellbeing_21 + c1*child_wellbeing_21 + i1*food_21
+child_wellbeing_25 ~ p1*wellbeing_23 + c1*child_wellbeing_23 + i1*food_23
+child_wellbeing_27 ~ p1*wellbeing_25 + c1*child_wellbeing_25 + i1*food_25
+child_wellbeing_31 ~ p1*wellbeing_27 + c1*child_wellbeing_27 + i1*food_27
+
+wellbeing_21 ~ p2*wellbeing_19 + c2*child_wellbeing_19 + i2*food_19
+wellbeing_23 ~ p2*wellbeing_21 + c2*child_wellbeing_21 + i2*food_21
+wellbeing_25 ~ p2*wellbeing_23 + c2*child_wellbeing_23 + i2*food_23
+wellbeing_27 ~ p2*wellbeing_25 + c2*child_wellbeing_25 + i2*food_25
+wellbeing_31 ~ p2*wellbeing_27 + c2*child_wellbeing_27 + i2*food_27
+
+food_21 ~ p3*wellbeing_19 + c3*child_wellbeing_19 + i3*food_19
+food_23 ~ p3*wellbeing_21 + c3*child_wellbeing_21 + i3*food_21
+food_25 ~ p3*wellbeing_23 + c3*child_wellbeing_23 + i3*food_23
+food_27 ~ p3*wellbeing_25 + c3*child_wellbeing_25 + i3*food_25
+food_31 ~ p3*wellbeing_27 + c3*child_wellbeing_27 + i3*food_27
+
+
+# mediation
+indirect := i2*p1
+
+# total
+total := indirect + i3*i1 + i1*c1
+"
+
+test = sem(food_insecurity_model, data = scored_long, missing='fiml', fixed.x=F)
 
 summary(test, fit.measures = T, standardized = T)
 
