@@ -27,7 +27,7 @@ source(here("Functions/fpl.R"))
 if(!scored_in_environ){
 
 data(zipcode)
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
 
 master = filter(master, CaregiverID != "") 
 master = master %>%
