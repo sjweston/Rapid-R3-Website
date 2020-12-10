@@ -504,7 +504,7 @@ week1 = scored %>%
   filter(Week == min(Week)) %>%
   filter(!is.na(single))
 
-chisq.test(week1$single, week1$income_decreaed)
+stats::chisq.test(week1$single, week1$income_decreaed)
 week1 %>%
   ungroup()%>%
   select(single, income_decreaed) %>%
@@ -517,7 +517,7 @@ week1 %>%
 ## Lost non-family childcare
 
 ```{r}
-chisq.test(week1$single, week1$decrease_nonfamilyCC)
+stats::chisq.test(week1$single, week1$decrease_nonfamilyCC)
 week1 %>%
   ungroup()%>%
   select(single, decrease_nonfamilyCC) %>%
@@ -530,7 +530,7 @@ week1 %>%
 ## Trouble paying for basics
 
 ```{r}
-chisq.test(week1$single, week1$difficulty_basics)
+stats::chisq.test(week1$single, week1$difficulty_basics)
 week1 %>%
   ungroup()%>%
   select(single, difficulty_basics) %>%
@@ -543,7 +543,7 @@ week1 %>%
 ## Delayed healthcare
 
 ```{r}
-chisq.test(week1$single, week1$delay_healthcare)
+stats::chisq.test(week1$single, week1$delay_healthcare)
 week1 %>%
   ungroup()%>%
   select(single, delay_healthcare) %>%

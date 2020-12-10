@@ -6,34 +6,28 @@ output:
     toc_float: TRUE
 ---
 
-```{r wellbeing-states-1, echo = F}
+```{r mh-by-region-1, echo = F}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, cache = TRUE)
 options(knitr.kable.NA = '')
 ```
 
-```{r wellbeing-states-2 }
-library(conflicted)
+```{r mh-by-region-2 }
 library(here)
 library(ggpubr)
-conflict_prefer("group_rows", "kableExtra")
-conflict_prefer("select", "dplyr")
-conflict_prefer("filter", "dplyr")
-conflict_prefer("lag", "dplyr")
-conflict_prefer("map", "purrr")
 library(plotly)
 ```
 
-```{r wellbeing-states-3 }
+```{r mh-by-region-3 }
 source(here("Scripts/score data.R")) 
 ```
 
-```{r wellbeing-states-4 }
+```{r mh-by-region-4 }
 source(here("Functions/pomp.R"))
 ```
 
 <!-- Prep data -->
 
-```{r social-support2-1}
+```{r mh-by-region-5 }
 dates = master %>%
   group_by(Week) %>%
   summarize(start = min(StartDate),
@@ -41,7 +35,7 @@ dates = master %>%
 ```
 
 
-```{r social-support2-2}
+```{r mh-by-region-6 }
 scored = scored %>%
   select(CaregiverID, Week, single, income,
          contains("poverty"), work_status, black,
@@ -66,7 +60,7 @@ scored = scored %>%
   ))
 ```
 
-```{r}
+```{r mh-by-region-7, eval = F}
 mh_state = scored %>%
   filter(!is.na(census_region)) %>%
   mutate(mh_all = ifelse(mh_all > 0, 1, 0)) %>%

@@ -65,7 +65,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
 
   }
   
-  newdata$age = factor(data$CaregiverAge,
+  if(contains_items("CaregiverAge", data)){
+    newdata$age = factor(data$CaregiverAge,
                        labels = c("18-24",
                                   "24-30",
                                   "30-36",
@@ -74,7 +75,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
                                   "46-50",
                                   "50-56",
                                   "56-60",
-                                  "60+" ))
+                                  "60+" ))}
   
   newdata$language = data$UserLanguage
   
