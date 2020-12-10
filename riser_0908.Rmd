@@ -1197,6 +1197,43 @@ plot = scored %>%
 ggplotly(plot)
 ```
 
+
+```{r}
+plot = scored %>%
+  mutate(
+    Week = case_when(
+      Week < 17 ~ Week,
+      Week >= 17 & Week %% 2 == 0 ~ Week-1,
+      Week >= 17 & Week %%2 != 0 ~Week)
+  ) %>%
+  filter(!is.na(Week) & !is.na(poverty200)) %>%
+  mutate(Date = case_when(
+    Week == 0 ~ as.Date("2020-03-01"),
+    TRUE ~ Date)) %>%
+  filter(black == "Black") %>%
+  select(Week, Date, poverty200, fussy_current_some, fear_current_some) %>%
+  gather(variable, value, -Week, -Date, -poverty200) %>%
+  filter(!is.na(value)) %>%
+  group_by(poverty200, Week, variable) %>%
+  summarize(
+    Date = min(Date, na.rm = T),
+    n = n(),
+            percent = round(mean(value)*100,2)) %>%
+  ungroup() %>%
+  mutate(variable = str_remove(variable, "_current_some"),
+         poverty200 = factor(poverty200, 
+                             labels = c("Above 2x FPL",
+                                       "At or below 2x FPL"))) %>%
+  ggplot(aes(x = Date, y = percent, color = poverty200)) +
+  geom_line() +
+  labs(title = "Caregivers reporting some or a lot of ___",
+       caption = "March 1 is used to represent retrospective reports of pre-pandemic mental health")+
+  facet_wrap(~variable)+
+  theme_pubr()
+
+ggplotly(plot)
+```
+
 <!-- ## Pre-pandemic levels -->
 
 <!-- ```{r} -->
