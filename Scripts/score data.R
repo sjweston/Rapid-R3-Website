@@ -27,7 +27,7 @@ source(here("Functions/fpl.R"))
 if(!scored_in_environ){
 
 data(zipcode)
-master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile.sav"))
+master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
 master = filter(master, CaregiverID != "") 
 master = master %>%
@@ -135,25 +135,14 @@ scored = scored %>%
 scored = scored %>%
   group_by(CaregiverID) %>%
   arrange(Week) %>%
-  mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
-                      "race_cat", "black", "white", "minority", "native", "asian",
-                      "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
-                      "zip", "state", "region", "insurance_type", "childinsurance_type",
-                      "single", "disability", "work_status", 
-                      "child_age03", "child_age45", "num_children_age03", "num_children_age45", "num_children_age612", 
-                      "current_income", "poverty100", "poverty125", "poverty150", "poverty200"), 
-            ~case_when(
-              is.na(.x) ~ lag(.x),
-              TRUE ~ .x)) %>% # carry these variables down through NA's
-  mutate_at(.vars = c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
-                      "race_cat", "black", "white", "minority", "native", "asian",
-                      "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
-                      "zip", "state", "region", "insurance_type", "childinsurance_type",
-                      "single", "disability",  "work_status", 
-                      "poverty100", "poverty125", "poverty150", "poverty200"), 
-            ~case_when(
-              is.na(.x) ~ lead(.x),
-              TRUE ~ .x)) %>% # carry these variables down through NA's
+  fill(all_of(c("language","income", "household_size", "num_parents", "num_children_raw", "gender", 
+                "race_cat", "black", "white", "minority", "native", "asian",
+                "hawaii", "other_race", "latinx", "age", "edu", "edu_cat",
+                "zip", "state", "region", "insurance_type", "childinsurance_type",
+                "single", "disability", "work_status", 
+                "child_age03", "child_age45", "num_children_age03", "num_children_age45", "num_children_age612", 
+                "current_income", "poverty100", "poverty125", "poverty150", "poverty200")),
+       .direction = "downup") %>%
   ungroup()
 
 

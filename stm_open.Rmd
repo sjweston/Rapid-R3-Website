@@ -1379,6 +1379,32 @@ plot(topicCorr(stmq1_30))
 plot(topicCorr(stmq1_34))
 ```
 
+### All sets
+
+```{r}
+td_gamma27_wide = td_gamma27 %>%
+  mutate(topic = paste0("s27_", topic)) %>%
+  spread(topic, gamma)
+td_gamma30_wide = td_gamma30 %>%
+  mutate(topic = paste0("s30_", topic)) %>%
+  spread(topic, gamma)
+td_gamma34_wide = td_gamma34 %>%
+  mutate(topic = paste0("s34_", topic)) %>%
+  spread(topic, gamma)
+
+td_challenge_wide = td_gamma27_wide %>%
+  full_join(td_gamma30_wide) %>%
+  full_join(td_gamma34_wide) 
+
+cor_challenge = td_challenge_wide%>%
+  cor(., use = "pairwise") 
+
+cor_challenge = corrplot::corrplot(cor_challenge, order = "hclust")
+
+write.csv(cor_challenge, file = here("STM files/challenge_correlations.csv"))
+```
+
+
 
 ## Effects{.tabset}
 
@@ -1594,7 +1620,7 @@ k_result_v2 %>%
 ```{r, eval = F}
 stmq2_26 <- stm(documents = docs2, 
                 vocab = vocab2,
-                K = 27, 
+                K = 26, 
                 prevalence =~ race_ethnic + poverty150 + mental_health + s(Week),
                 data = meta2, 
                 init.type = "Spectral")
@@ -2803,6 +2829,30 @@ plot(topicCorr(stmq2_34))
 plot(topicCorr(stmq2_34))
 ```
 
+# All
+
+```{r}
+td_gamma26_wide = td_gamma26 %>%
+  mutate(topic = paste0("s26_", topic)) %>%
+  spread(topic, gamma)
+td_gamma30_wide = td_gamma30 %>%
+  mutate(topic = paste0("s30_", topic)) %>%
+  spread(topic, gamma)
+td_gamma34_wide = td_gamma34 %>%
+  mutate(topic = paste0("s34_", topic)) %>%
+  spread(topic, gamma)
+
+td_helping_wide = td_gamma26_wide %>%
+  full_join(td_gamma30_wide) %>%
+  full_join(td_gamma34_wide) 
+
+cor_helping = td_helping_wide %>%
+  cor(., use = "pairwise") 
+
+cor_helping = corrplot::corrplot(cor_helping, order = "hclust")
+
+write.csv(cor_helping, file = here("STM files/helping_correlations.csv"))
+```
 
 # Effects{.tabset}
 

@@ -828,6 +828,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     newdata$lone_increase = ifelse(lone_change > 0, 1, 0)
   }
   
+  if(contains_items("allyearly2019", data)){
     newdata$income = data$allyearly2019
     newdata$income.cat = case_when(
       newdata$income < 20000 ~ "< 20k",
@@ -839,17 +840,21 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       newdata$income < 200000 ~ "150k-200k",
       !is.na(newdata$income) ~ "200k+",
       TRUE ~ NA_character_)
+    
     newdata$income.cat = factor(newdata$income.cat, 
                             levels = c("< 20k","20k-40k","40k-60k","60k-80k",
                               "80k-100k","100k-150k","150k-200k","200k+"))
     newdata$lowincome = ifelse(newdata$income < 40000, 1, 0)
+  }
   
   
   newdata$JOB.002 = data$JOB.002
-  newdata$STATE_CODED = data$STATE_CODED
-  newdata$income = data$allyearlyCurrent
+  if(contains_items("STATE_CODED", data)){newdata$STATE_CODED = data$STATE_CODED}
+  if(contains_items("allyearlyCurrent", data)){
+    newdata$income = data$allyearlyCurrent
+    newdata$current_income = data$allyearlyCurrent}
   
-  newdata$current_income = data$allyearlyCurrent
+  
   
   if(contains_items("JOB.005", data)){
     data = combine.cat(x = data, 
@@ -1327,9 +1332,10 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
     TRUE ~ NA_real_)
   
   newdata$num_parents = case_when(
-    data$DEMO.011.a == 1 ~ 2,
-    data$DEMO.011.a == 2 ~ 1,
-    data$DEMO.011.a == 3 ~ 0,
+    data$DEMO.011 == 1 ~ 2,
+    data$DEMO.011 == 2 ~ 1,
+    data$DEMO.011 == 3 ~ 1,
+    !is.na(data$DEMO.011) ~ 0,
     TRUE ~ NA_real_
   )
   
@@ -1372,7 +1378,8 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   #     TRUE ~ NA_character_)
   #   }
   
-  newdata$race_cat = case_when(
+  if(contains_items("RaceGroup", data)){
+    newdata$race_cat = case_when(
           data$RaceGroup == "1" ~ "American Indian/Alaska Native",
           data$RaceGroup == "2" ~ "Asian",
           data$RaceGroup == "3" ~ "Black/African American",
@@ -1381,6 +1388,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
           data$RaceGroup == "6" ~ "Other race",
           data$RaceGroup == "7" ~ "Multiple races",
           TRUE ~ NA_character_)
+  
   newdata = newdata %>%
     mutate(
       minority = ifelse(race_cat != "White/Caucasian", 1, 0),
@@ -1390,6 +1398,7 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
       hawaii = ifelse(race_cat == "Native Hawaiian/Pacific Islander", 1, 0),
       white = ifelse(race_cat == "White/Caucasian", 1, 0),
       other_race = ifelse(race_cat %in% c("Other race", "Multiple races"), 1, 0))
+  }
   
   if(contains_items("DEMO.008", data)){
     data = data %>%
