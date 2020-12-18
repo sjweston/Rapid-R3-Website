@@ -28,6 +28,7 @@ library(papaja)
 library(zoo)
 library(ggpubr)
 library(lme4)
+library(broom.mixed)
 ```
 
 
@@ -113,7 +114,7 @@ trend_week_binary(variable = "anxiety",
 model = lmer(anxiety ~ Week*poverty150 + (1|CaregiverID), 
              data = scored, control = control)
 
-broom::tidy(model) %>%
+broom.mixed::tidy(model) %>%
   mutate(p.value = pt(abs(statistic), 
                       df = nrow(model@frame)-2, 
                       lower.tail = F)*2) %>%
