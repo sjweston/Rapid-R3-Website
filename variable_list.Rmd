@@ -18,11 +18,16 @@ load(here("allvariables.Rdata"))
 
 ```{r, eval = F}
 
+library(haven)
+
 # this code is in the script that scores the dataset -- the code printed here is not evaluated, but just copied over so others can see how I made the table.
 
 master = read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
 
 # get variable names and levels -------------------------------------------
+
+master = master %>%
+  filter(!is.na(Week))
 
 max.week = max(master$Week)
 
@@ -37,12 +42,13 @@ master.data = data.frame(Variable = master.names,
            Responses = unlist(master.levels), stringsAsFactors = F)
 
 num_responses = function(x){length(which(!is.na(x)))}
+
 master.num = master %>%
   group_by(Week) %>%
   summarize_all(num_responses) %>%
   gather("Variable", "num_responses",-Week) %>%
-  mutate(Week = paste0("Week", Week),
-         Week = factor(Week, levels = paste0("Week", c(1:max.week)))) %>%
+  mutate(Week = str_pad(Week, 2, pad = "0")) %>%
+  mutate(Week = paste0("Week", Week)) %>%
   spread(Week, num_responses)
 
 master.data = full_join(master.data, master.num)
