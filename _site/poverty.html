@@ -13,7 +13,7 @@
 
 <title>Low income households</title>
 
-<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -26,6 +26,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -38,7 +40,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      </style>
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -375,9 +377,6 @@ div.tocify {
       <a href="demographics.html">Demographics</a>
     </li>
     <li>
-      <a href="notebook.html">Notebook</a>
-    </li>
-    <li>
       <a href="trend_mental.html">Caregiver mental health</a>
     </li>
     <li>
@@ -447,9 +446,6 @@ div.tocify {
       <a href="hotspots.html">covid Hotspots</a>
     </li>
     <li>
-      <a href="open_ended.html">Open-ended responses</a>
-    </li>
-    <li>
       <a href="school_childcare.html">School reopening</a>
     </li>
     <li class="dropdown-submenu">
@@ -488,9 +484,6 @@ div.tocify {
           <a href="propensity.html">Effect of childcare (prop score)</a>
         </li>
         <li>
-          <a href="open_childcare.html">Open-ended childcare</a>
-        </li>
-        <li>
           <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
         </li>
         <li>
@@ -501,9 +494,6 @@ div.tocify {
         </li>
         <li>
           <a href="childcare_trends.html">Follow-up on trends</a>
-        </li>
-        <li>
-          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
         </li>
       </ul>
     </li>
@@ -550,7 +540,7 @@ div.tocify {
       <a href="state_AZ_report.html">Arizona</a>
     </li>
     <li>
-      <a href="state_CA_report.html">Califorina</a>
+      <a href="state_CA_report.html">California</a>
     </li>
     <li>
       <a href="state_FL_report.html">Florida</a>
@@ -587,6 +577,9 @@ div.tocify {
     </li>
     <li>
       <a href="state_WA_report.html">Washington</a>
+    </li>
+    <li>
+      <a href="state_WI_report.html">Wisconsin</a>
     </li>
   </ul>
 </li>
@@ -872,10 +865,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
-2.86
+2.94
 </td>
 <td style="text-align:left;">
-2.41
+2.33
 </td>
 </tr>
 <tr>
@@ -960,10 +953,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
--2.14
+-2.13
 </td>
 <td style="text-align:left;">
-3.09
+3.24
 </td>
 </tr>
 <tr>
@@ -993,10 +986,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
-0.77
+0.72
 </td>
 <td style="text-align:left;">
-2.52
+2.43
 </td>
 </tr>
 <tr>
@@ -1106,10 +1099,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--2.17
+-2.15
 </td>
 <td style="text-align:left;">
--2.73
+-2.76
 </td>
 </tr>
 <tr>
@@ -1194,10 +1187,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-1.17
+1.34
 </td>
 <td style="text-align:left;">
--2.79
+-2.84
 </td>
 </tr>
 <tr>
@@ -1227,10 +1220,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
--0.82
+-0.80
 </td>
 <td style="text-align:left;">
--2.77
+-2.81
 </td>
 </tr>
 <tr>
@@ -1421,10 +1414,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
-0.43
+0.48
 </td>
 <td style="text-align:left;">
-4.16
+4.04
 </td>
 </tr>
 <tr>
@@ -1509,10 +1502,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
--2.21
+-2.07
 </td>
 <td style="text-align:left;">
-4.81*
+4.71*
 </td>
 </tr>
 <tr>
@@ -1542,10 +1535,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
-1.89
+1.97
 </td>
 <td style="text-align:left;">
-4.01
+3.89
 </td>
 </tr>
 <tr>
@@ -1655,10 +1648,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--2.45
+-2.43
 </td>
 <td style="text-align:left;">
--1.11
+-1.21
 </td>
 </tr>
 <tr>
@@ -1743,10 +1736,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-0.36
+0.48
 </td>
 <td style="text-align:left;">
--1.29
+-1.25
 </td>
 </tr>
 <tr>
@@ -1776,10 +1769,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
--0.76
+-0.66
 </td>
 <td style="text-align:left;">
--1.17
+-1.28
 </td>
 </tr>
 <tr>
@@ -1970,10 +1963,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
-0.98
+1.00
 </td>
 <td style="text-align:left;">
-2.98
+2.94
 </td>
 </tr>
 <tr>
@@ -2058,7 +2051,7 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
--2.49
+-2.50
 </td>
 <td style="text-align:left;">
 3.40
@@ -2091,10 +2084,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
-1.00
+1.01
 </td>
 <td style="text-align:left;">
-2.94
+2.90
 </td>
 </tr>
 <tr>
@@ -2204,10 +2197,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--3.81
+-3.75
 </td>
 <td style="text-align:left;">
--2.10
+-2.22
 </td>
 </tr>
 <tr>
@@ -2292,10 +2285,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-2.17
+2.25
 </td>
 <td style="text-align:left;">
--2.63
+-2.81
 </td>
 </tr>
 <tr>
@@ -2325,10 +2318,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
-0.60
+0.66
 </td>
 <td style="text-align:left;">
--2.32
+-2.45
 </td>
 </tr>
 <tr>
@@ -2519,10 +2512,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--6.48
+-6.52
 </td>
 <td style="text-align:left;">
-4.30
+4.23
 </td>
 </tr>
 <tr>
@@ -2607,10 +2600,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-3.14
+3.20
 </td>
 <td style="text-align:left;">
-3.89
+3.90
 </td>
 </tr>
 <tr>
@@ -2640,10 +2633,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
--3.01
+-2.76
 </td>
 <td style="text-align:left;">
-4.24
+4.13
 </td>
 </tr>
 <tr>
@@ -2756,7 +2749,7 @@ black
 1.75
 </td>
 <td style="text-align:left;">
--1.99
+-2.04
 </td>
 </tr>
 <tr>
@@ -2841,10 +2834,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
--3.84
+-3.79
 </td>
 <td style="text-align:left;">
--1.43
+-1.50
 </td>
 </tr>
 <tr>
@@ -2874,10 +2867,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
--1.46
+-1.40
 </td>
 <td style="text-align:left;">
--1.80
+-1.85
 </td>
 </tr>
 <tr>
@@ -3068,10 +3061,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--3.02
+-2.90
 </td>
 <td style="text-align:left;">
-4.19
+3.92
 </td>
 </tr>
 <tr>
@@ -3156,10 +3149,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-1.03
+1.02
 </td>
 <td style="text-align:left;">
-3.64
+3.90
 </td>
 </tr>
 <tr>
@@ -3189,10 +3182,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
-0.17
+0.34
 </td>
 <td style="text-align:left;">
-3.97
+3.69
 </td>
 </tr>
 <tr>
@@ -3302,10 +3295,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--6.63*
+-6.60*
 </td>
 <td style="text-align:left;">
-0.93
+0.90
 </td>
 </tr>
 <tr>
@@ -3390,10 +3383,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-6.89*
+7.06*
 </td>
 <td style="text-align:left;">
-0.11
+0.17
 </td>
 </tr>
 <tr>
@@ -3423,10 +3416,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
--0.46
+-0.49
 </td>
 <td style="text-align:left;">
-0.63
+0.61
 </td>
 </tr>
 <tr>
@@ -3617,10 +3610,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--2.98
+-2.89
 </td>
 <td style="text-align:left;">
-2.59
+2.49
 </td>
 </tr>
 <tr>
@@ -3705,10 +3698,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-2.18
+2.14
 </td>
 <td style="text-align:left;">
-2.70
+2.76
 </td>
 </tr>
 <tr>
@@ -3738,10 +3731,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
-2.61
+2.54
 </td>
 <td style="text-align:left;">
-2.19
+2.11
 </td>
 </tr>
 <tr>
@@ -3851,10 +3844,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--0.38
+-0.36
 </td>
 <td style="text-align:left;">
-1.48
+1.46
 </td>
 </tr>
 <tr>
@@ -3939,10 +3932,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
--3.70
+-3.44
 </td>
 <td style="text-align:left;">
-2.14
+1.95
 </td>
 </tr>
 <tr>
@@ -3972,10 +3965,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
--1.30
+-1.31
 </td>
 <td style="text-align:left;">
-1.56
+1.54
 </td>
 </tr>
 <tr>
@@ -4205,7 +4198,7 @@ support_decrease
 </div>
 <div id="testing-predictors-of-well-being-in-this-demo" class="section level2">
 <h2>Testing predictors of well-being in this demo</h2>
-<table class="table" style="margin-left: auto; margin-right: auto;">
+<table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
 <tr>
 <th style="text-align:left;">
@@ -4335,7 +4328,7 @@ Caregiver anxiety
 0.013
 </td>
 <td style="text-align:right;">
-0.675
+0.688
 </td>
 </tr>
 <tr>
@@ -4656,7 +4649,7 @@ Child externalzing
 0.014
 </td>
 <td style="text-align:right;">
-0.688
+0.702
 </td>
 </tr>
 <tr>
@@ -4729,7 +4722,7 @@ Caregiver stress
 0.013
 </td>
 <td style="text-align:right;">
-0.647
+0.651
 </td>
 </tr>
 <tr>
@@ -5226,13 +5219,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
--6.05
+-5.97
 </td>
 <td style="text-align:right;">
-4.68
+4.67
 </td>
 <td style="text-align:right;">
-0.197
+0.202
 </td>
 <td style="text-align:right;">
 1.000
@@ -5243,13 +5236,13 @@ Caregiver anxiety
 Caregiver depression
 </td>
 <td style="text-align:right;">
-0.77
+0.82
 </td>
 <td style="text-align:right;">
 4.68
 </td>
 <td style="text-align:right;">
-0.870
+0.860
 </td>
 <td style="text-align:right;">
 1.000
@@ -5260,13 +5253,13 @@ Caregiver depression
 Caregiver stress
 </td>
 <td style="text-align:right;">
-1.64
+1.66
 </td>
 <td style="text-align:right;">
-4.95
+4.94
 </td>
 <td style="text-align:right;">
-0.741
+0.737
 </td>
 <td style="text-align:right;">
 1.000
@@ -5277,13 +5270,13 @@ Caregiver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
--2.29
+-2.13
 </td>
 <td style="text-align:right;">
-5.16
+5.17
 </td>
 <td style="text-align:right;">
-0.658
+0.681
 </td>
 <td style="text-align:right;">
 1.000
@@ -5294,13 +5287,13 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-5.89
+5.98
 </td>
 <td style="text-align:right;">
-5.13
+5.12
 </td>
 <td style="text-align:right;">
-0.251
+0.245
 </td>
 <td style="text-align:right;">
 1.000
@@ -5316,13 +5309,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
-1.74
+1.98
 </td>
 <td style="text-align:right;">
 3.88
 </td>
 <td style="text-align:right;">
-0.654
+0.610
 </td>
 <td style="text-align:right;">
 1.000
@@ -5333,13 +5326,13 @@ Caregiver anxiety
 Caregiver depression
 </td>
 <td style="text-align:right;">
--3.32
+-3.40
 </td>
 <td style="text-align:right;">
-3.89
+3.88
 </td>
 <td style="text-align:right;">
-0.394
+0.382
 </td>
 <td style="text-align:right;">
 1.000
@@ -5350,13 +5343,13 @@ Caregiver depression
 Caregiver stress
 </td>
 <td style="text-align:right;">
--1.77
+-1.54
 </td>
 <td style="text-align:right;">
 4.09
 </td>
 <td style="text-align:right;">
-0.666
+0.708
 </td>
 <td style="text-align:right;">
 1.000
@@ -5367,13 +5360,13 @@ Caregiver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
-4.63
+4.81
 </td>
 <td style="text-align:right;">
 4.34
 </td>
 <td style="text-align:right;">
-0.288
+0.268
 </td>
 <td style="text-align:right;">
 1.000
@@ -5384,13 +5377,13 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
--0.24
+-0.05
 </td>
 <td style="text-align:right;">
-4.28
+4.27
 </td>
 <td style="text-align:right;">
-0.955
+0.991
 </td>
 <td style="text-align:right;">
 1.000
@@ -5398,7 +5391,7 @@ Child internalizing
 </tr>
 <tr grouplength="5">
 <td colspan="5" style="border-bottom: 1px solid;">
-<strong> Caregivers of children with disabilities (N = 63)</strong>
+<strong> Caregivers of children with disabilities (N = 64)</strong>
 </td>
 </tr>
 <tr>
@@ -5406,13 +5399,13 @@ Child internalizing
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
-8.50
+8.29
 </td>
 <td style="text-align:right;">
-4.38
+4.34
 </td>
 <td style="text-align:right;">
-0.053
+0.057
 </td>
 <td style="text-align:right;">
 1.000
@@ -5423,16 +5416,16 @@ Caregiver anxiety
 Caregiver depression
 </td>
 <td style="text-align:right;">
-15.61
+14.78
 </td>
 <td style="text-align:right;">
-4.33
+4.30
 </td>
 <td style="text-align:right;">
-0.000
+0.001
 </td>
 <td style="text-align:right;">
-0.026
+0.046
 </td>
 </tr>
 <tr>
@@ -5440,16 +5433,16 @@ Caregiver depression
 Caregiver stress
 </td>
 <td style="text-align:right;">
-11.65
+11.30
 </td>
 <td style="text-align:right;">
-4.63
+4.59
 </td>
 <td style="text-align:right;">
-0.012
+0.014
 </td>
 <td style="text-align:right;">
-0.647
+0.709
 </td>
 </tr>
 <tr>
@@ -5457,13 +5450,13 @@ Caregiver stress
 Child externalzing
 </td>
 <td style="text-align:right;">
-9.03
+8.04
 </td>
 <td style="text-align:right;">
-4.89
+4.86
 </td>
 <td style="text-align:right;">
-0.066
+0.099
 </td>
 <td style="text-align:right;">
 1.000
@@ -5474,10 +5467,10 @@ Child externalzing
 Child internalizing
 </td>
 <td style="text-align:right;">
-23.46
+22.58
 </td>
 <td style="text-align:right;">
-4.74
+4.71
 </td>
 <td style="text-align:right;">
 0.000
@@ -5579,12 +5572,12 @@ Child internalizing
 </tbody>
 <tfoot>
 <tr>
-<td style="padding: 0; border: 0;" colspan="100%">
+<td style="padding: 0; " colspan="100%">
 <span style="font-style: italic;">Note: </span>
 </td>
 </tr>
 <tr>
-<td style="padding: 0; border: 0;" colspan="100%">
+<td style="padding: 0; " colspan="100%">
 <sup></sup> Coefficients estimated using a multi-level model in which responses are nested within caregivers. In the case of binary predictors, we report the number (N) of participants who fall into the category listed. p-values are adjusted using a Holm correction
 </td>
 </tr>
@@ -5785,10 +5778,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--2.98
+-2.89
 </td>
 <td style="text-align:left;">
-2.59
+2.49
 </td>
 </tr>
 <tr>
@@ -5873,10 +5866,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
-2.18
+2.14
 </td>
 <td style="text-align:left;">
-2.70
+2.76
 </td>
 </tr>
 <tr>
@@ -5906,10 +5899,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
-2.61
+2.54
 </td>
 <td style="text-align:left;">
-2.19
+2.11
 </td>
 </tr>
 <tr>
@@ -6019,10 +6012,10 @@ access_online
 black
 </td>
 <td style="text-align:left;">
--0.38
+-0.36
 </td>
 <td style="text-align:left;">
-1.48
+1.46
 </td>
 </tr>
 <tr>
@@ -6107,10 +6100,10 @@ insurance
 latinx
 </td>
 <td style="text-align:left;">
--3.70
+-3.44
 </td>
 <td style="text-align:left;">
-2.14
+1.95
 </td>
 </tr>
 <tr>
@@ -6140,10 +6133,10 @@ lost_free_lunch
 minority
 </td>
 <td style="text-align:left;">
--1.30
+-1.31
 </td>
 <td style="text-align:left;">
-1.56
+1.54
 </td>
 </tr>
 <tr>
@@ -6176,7 +6169,7 @@ support_decrease
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
