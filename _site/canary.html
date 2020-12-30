@@ -13,7 +13,7 @@
 
 <title>Canary in the coal mine</title>
 
-<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -26,6 +26,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -38,7 +40,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      </style>
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -375,9 +377,6 @@ div.tocify {
       <a href="demographics.html">Demographics</a>
     </li>
     <li>
-      <a href="notebook.html">Notebook</a>
-    </li>
-    <li>
       <a href="trend_mental.html">Caregiver mental health</a>
     </li>
     <li>
@@ -447,9 +446,6 @@ div.tocify {
       <a href="hotspots.html">covid Hotspots</a>
     </li>
     <li>
-      <a href="open_ended.html">Open-ended responses</a>
-    </li>
-    <li>
       <a href="school_childcare.html">School reopening</a>
     </li>
     <li class="dropdown-submenu">
@@ -488,9 +484,6 @@ div.tocify {
           <a href="propensity.html">Effect of childcare (prop score)</a>
         </li>
         <li>
-          <a href="open_childcare.html">Open-ended childcare</a>
-        </li>
-        <li>
           <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
         </li>
         <li>
@@ -501,9 +494,6 @@ div.tocify {
         </li>
         <li>
           <a href="childcare_trends.html">Follow-up on trends</a>
-        </li>
-        <li>
-          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
         </li>
       </ul>
     </li>
@@ -550,7 +540,7 @@ div.tocify {
       <a href="state_AZ_report.html">Arizona</a>
     </li>
     <li>
-      <a href="state_CA_report.html">Califorina</a>
+      <a href="state_CA_report.html">California</a>
     </li>
     <li>
       <a href="state_FL_report.html">Florida</a>
@@ -587,6 +577,9 @@ div.tocify {
     </li>
     <li>
       <a href="state_WA_report.html">Washington</a>
+    </li>
+    <li>
+      <a href="state_WI_report.html">Wisconsin</a>
     </li>
   </ul>
 </li>
@@ -677,7 +670,7 @@ div.tocify {
 
 <div id="representativeness-disclaimer" class="section level1">
 <h1>Representativeness disclaimer</h1>
-<p>These analyses are based on responses collected from 1036 caregivers between the dates of June 01, 2020 and June 04, 2020. These caregivers represent a range of voices: 8.49% are Black/African American, 21.24% are LatinX, and 25.79% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are <em>not</em> weighted.</p>
+<p>These analyses are based on responses collected from 1035 caregivers between the dates of June 01, 2020 and June 04, 2020. These caregivers represent a range of voices: 8.50% are Black/African American, 21.16% are LatinX, and 30.57% live at or below 1.5 times the federal poverty line. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are <em>not</em> weighted.</p>
 </div>
 <div id="descriptives" class="section level1">
 <h1>Descriptives</h1>
@@ -760,7 +753,7 @@ Knowing we have access to childcare
 Not being so socially isolated
 </td>
 <td style="text-align:right;">
-257
+256
 </td>
 </tr>
 </tbody>
@@ -784,7 +777,7 @@ Freq
 POC (non Asian)
 </td>
 <td style="text-align:right;">
-471
+470
 </td>
 </tr>
 <tr>
@@ -792,7 +785,7 @@ POC (non Asian)
 White
 </td>
 <td style="text-align:right;">
-1481
+1476
 </td>
 </tr>
 </tbody>
@@ -816,7 +809,7 @@ Freq
 POC
 </td>
 <td style="text-align:right;">
-591
+590
 </td>
 </tr>
 <tr>
@@ -824,7 +817,7 @@ POC
 White
 </td>
 <td style="text-align:right;">
-1481
+1476
 </td>
 </tr>
 </tbody>
@@ -848,7 +841,7 @@ Freq
 Non-white
 </td>
 <td style="text-align:right;">
-591
+590
 </td>
 </tr>
 <tr>
@@ -856,7 +849,7 @@ Non-white
 White
 </td>
 <td style="text-align:right;">
-1481
+1476
 </td>
 </tr>
 </tbody>
@@ -880,7 +873,7 @@ Freq
 Above 1.5 x FPL
 </td>
 <td style="text-align:right;">
-1272
+878
 </td>
 </tr>
 <tr>
@@ -888,7 +881,7 @@ Above 1.5 x FPL
 Below 1.5 x FPL
 </td>
 <td style="text-align:right;">
-442
+328
 </td>
 </tr>
 </tbody>
@@ -941,7 +934,7 @@ Week
 1
 </td>
 <td style="text-align:right;">
-2072
+2070
 </td>
 <td style="text-align:right;">
 4.50
@@ -970,13 +963,13 @@ conflict_total
 2
 </td>
 <td style="text-align:right;">
-2069
+2067
 </td>
 <td style="text-align:right;">
 1.14
 </td>
 <td style="text-align:right;">
-0.87
+0.85
 </td>
 <td style="text-align:right;">
 0
@@ -999,10 +992,10 @@ conflict_parent
 3
 </td>
 <td style="text-align:right;">
-1922
+1920
 </td>
 <td style="text-align:right;">
-0.75
+0.74
 </td>
 <td style="text-align:right;">
 1.00
@@ -1028,13 +1021,13 @@ conflict_child
 4
 </td>
 <td style="text-align:right;">
-2065
+2063
 </td>
 <td style="text-align:right;">
-1.27
+1.28
 </td>
 <td style="text-align:right;">
-0.98
+0.97
 </td>
 <td style="text-align:right;">
 0
@@ -1057,13 +1050,13 @@ cohesive
 5
 </td>
 <td style="text-align:right;">
-2064
+2062
 </td>
 <td style="text-align:right;">
-4.57
+4.58
 </td>
 <td style="text-align:right;">
-0.71
+0.70
 </td>
 <td style="text-align:right;">
 0
@@ -1086,7 +1079,7 @@ black
 6
 </td>
 <td style="text-align:right;">
-2072
+2066
 </td>
 <td style="text-align:right;">
 0.08
@@ -1115,7 +1108,7 @@ latinx
 7
 </td>
 <td style="text-align:right;">
-2070
+2051
 </td>
 <td style="text-align:right;">
 0.21
@@ -1237,7 +1230,7 @@ White_Pre
 POC_Pre
 </td>
 <td style="text-align:left;">
-.014
+.027
 </td>
 </tr>
 <tr>
@@ -1291,7 +1284,7 @@ Below 1.5 x FPL_Post
 Above 1.5 x FPL_Post
 </td>
 <td style="text-align:left;">
-.432
+.940
 </td>
 </tr>
 <tr>
@@ -1302,7 +1295,7 @@ Below 1.5 x FPL_Pre
 Above 1.5 x FPL_Pre
 </td>
 <td style="text-align:left;">
-.964
+.940
 </td>
 </tr>
 <tr>
@@ -1313,7 +1306,7 @@ Below 1.5 x FPL_Pre
 Below 1.5 x FPL_Post
 </td>
 <td style="text-align:left;">
-.002
+.049
 </td>
 </tr>
 </tbody>
@@ -1357,22 +1350,22 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
-0.36
+0.34
 </td>
 <td style="text-align:right;">
-16.42
+13.83
 </td>
 <td style="text-align:left;">
 &lt; .001
 </td>
 <td style="text-align:right;">
-971
+501
 </td>
 <td style="text-align:right;">
-0.32
+0.29
 </td>
 <td style="text-align:right;">
-0.4
+0.39
 </td>
 <td style="text-align:left;">
 One Sample t-test
@@ -1425,28 +1418,28 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
--0.1
+-0.07
 </td>
 <td style="text-align:right;">
 0.29
 </td>
 <td style="text-align:right;">
-0.38
+0.37
 </td>
 <td style="text-align:right;">
--2.07
+-1.5
 </td>
 <td style="text-align:left;">
-.039
+.134
 </td>
 <td style="text-align:right;">
-535.57
+424.82
 </td>
 <td style="text-align:right;">
--0.19
+-0.17
 </td>
 <td style="text-align:right;">
--0.01
+0.02
 </td>
 <td style="text-align:left;">
 Welch Two Sample t-test
@@ -1535,7 +1528,7 @@ POC_Pre
 POC_Post
 </td>
 <td style="text-align:left;">
-.324
+.283
 </td>
 </tr>
 <tr>
@@ -1546,7 +1539,7 @@ White_Post
 POC_Post
 </td>
 <td style="text-align:left;">
-.034
+.035
 </td>
 </tr>
 <tr>
@@ -1557,7 +1550,7 @@ White_Pre
 POC_Pre
 </td>
 <td style="text-align:left;">
-.581
+.593
 </td>
 </tr>
 <tr>
@@ -1600,7 +1593,7 @@ Above 1.5 x FPL_Pre
 Above 1.5 x FPL_Post
 </td>
 <td style="text-align:left;">
-.001
+.139
 </td>
 </tr>
 <tr>
@@ -1611,7 +1604,7 @@ Below 1.5 x FPL_Post
 Above 1.5 x FPL_Post
 </td>
 <td style="text-align:left;">
-&gt; .999
+.495
 </td>
 </tr>
 <tr>
@@ -1622,7 +1615,7 @@ Below 1.5 x FPL_Pre
 Above 1.5 x FPL_Pre
 </td>
 <td style="text-align:left;">
-&gt; .999
+.736
 </td>
 </tr>
 <tr>
@@ -1633,7 +1626,7 @@ Below 1.5 x FPL_Pre
 Below 1.5 x FPL_Post
 </td>
 <td style="text-align:left;">
-.055
+.093
 </td>
 </tr>
 </tbody>
@@ -1677,22 +1670,22 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
-0.25
+0.26
 </td>
 <td style="text-align:right;">
-8.41
+7.28
 </td>
 <td style="text-align:left;">
 &lt; .001
 </td>
 <td style="text-align:right;">
-884
+452
 </td>
 <td style="text-align:right;">
 0.19
 </td>
 <td style="text-align:right;">
-0.3
+0.33
 </td>
 <td style="text-align:left;">
 One Sample t-test
@@ -1745,28 +1738,28 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
--0.13
+-0.18
 </td>
 <td style="text-align:right;">
-0.15
+0.14
 </td>
 <td style="text-align:right;">
-0.28
+0.33
 </td>
 <td style="text-align:right;">
--2.11
+-2.63
 </td>
 <td style="text-align:left;">
-.036
+.009
 </td>
 <td style="text-align:right;">
-444.47
+413.9
 </td>
 <td style="text-align:right;">
--0.26
+-0.32
 </td>
 <td style="text-align:right;">
--0.01
+-0.05
 </td>
 <td style="text-align:left;">
 Welch Two Sample t-test
@@ -1882,7 +1875,7 @@ White_Pre
 POC_Pre
 </td>
 <td style="text-align:left;">
-.019
+.013
 </td>
 </tr>
 <tr>
@@ -1945,22 +1938,22 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
-0.4
+0.36
 </td>
 <td style="text-align:right;">
-16.75
+13.86
 </td>
 <td style="text-align:left;">
 &lt; .001
 </td>
 <td style="text-align:right;">
-968
+500
 </td>
 <td style="text-align:right;">
-0.35
+0.31
 </td>
 <td style="text-align:right;">
-0.45
+0.41
 </td>
 <td style="text-align:left;">
 One Sample t-test
@@ -2013,28 +2006,28 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
--0.08
+-0.05
 </td>
 <td style="text-align:right;">
-0.34
+0.33
 </td>
 <td style="text-align:right;">
-0.42
+0.38
 </td>
 <td style="text-align:right;">
--1.66
+-0.91
 </td>
 <td style="text-align:left;">
-.098
+.363
 </td>
 <td style="text-align:right;">
-517.86
+389.63
 </td>
 <td style="text-align:right;">
--0.19
+-0.16
 </td>
 <td style="text-align:right;">
-0.02
+0.06
 </td>
 <td style="text-align:left;">
 Welch Two Sample t-test
@@ -2093,7 +2086,7 @@ Post
 Pre
 </td>
 <td style="text-align:left;">
-.625
+.520
 </td>
 </tr>
 </tbody>
@@ -2136,7 +2129,7 @@ White_Post
 POC_Post
 </td>
 <td style="text-align:left;">
-.001
+&lt; .001
 </td>
 </tr>
 <tr>
@@ -2210,22 +2203,22 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
-0.01
+-0.04
 </td>
 <td style="text-align:right;">
-0.59
+-1.75
 </td>
 <td style="text-align:left;">
-.554
+.080
 </td>
 <td style="text-align:right;">
-968
+502
 </td>
 <td style="text-align:right;">
--0.02
+-0.08
 </td>
 <td style="text-align:right;">
-0.04
+0
 </td>
 <td style="text-align:left;">
 One Sample t-test
@@ -2278,28 +2271,28 @@ alternative
 <tbody>
 <tr>
 <td style="text-align:right;">
-0
+0.05
 </td>
 <td style="text-align:right;">
-0.01
-</td>
-<td style="text-align:right;">
-0.01
+-0.01
 </td>
 <td style="text-align:right;">
 -0.06
 </td>
+<td style="text-align:right;">
+0.98
+</td>
 <td style="text-align:left;">
-.951
+.326
 </td>
 <td style="text-align:right;">
-406.79
+344.47
 </td>
 <td style="text-align:right;">
--0.09
+-0.05
 </td>
 <td style="text-align:right;">
-0.08
+0.14
 </td>
 <td style="text-align:left;">
 Welch Two Sample t-test
@@ -2410,7 +2403,7 @@ two.sided
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

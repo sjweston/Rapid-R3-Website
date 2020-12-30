@@ -15,7 +15,7 @@
 
 <title>Children with Disabilities</title>
 
-<script src="site_libs/header-attrs-2.4/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
@@ -28,6 +28,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
+<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -38,7 +40,7 @@
   div.column{display: inline-block; vertical-align: top; width: 50%;}
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
-      </style>
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -375,9 +377,6 @@ div.tocify {
       <a href="demographics.html">Demographics</a>
     </li>
     <li>
-      <a href="notebook.html">Notebook</a>
-    </li>
-    <li>
       <a href="trend_mental.html">Caregiver mental health</a>
     </li>
     <li>
@@ -447,9 +446,6 @@ div.tocify {
       <a href="hotspots.html">covid Hotspots</a>
     </li>
     <li>
-      <a href="open_ended.html">Open-ended responses</a>
-    </li>
-    <li>
       <a href="school_childcare.html">School reopening</a>
     </li>
     <li class="dropdown-submenu">
@@ -488,9 +484,6 @@ div.tocify {
           <a href="propensity.html">Effect of childcare (prop score)</a>
         </li>
         <li>
-          <a href="open_childcare.html">Open-ended childcare</a>
-        </li>
-        <li>
           <a href="Return-to-Previous-Childcare.html">Returning to previous childcare</a>
         </li>
         <li>
@@ -501,9 +494,6 @@ div.tocify {
         </li>
         <li>
           <a href="childcare_trends.html">Follow-up on trends</a>
-        </li>
-        <li>
-          <a href="0prelim_may29.html">Expectations for future childcare (spring)</a>
         </li>
       </ul>
     </li>
@@ -550,7 +540,7 @@ div.tocify {
       <a href="state_AZ_report.html">Arizona</a>
     </li>
     <li>
-      <a href="state_CA_report.html">Califorina</a>
+      <a href="state_CA_report.html">California</a>
     </li>
     <li>
       <a href="state_FL_report.html">Florida</a>
@@ -587,6 +577,9 @@ div.tocify {
     </li>
     <li>
       <a href="state_WA_report.html">Washington</a>
+    </li>
+    <li>
+      <a href="state_WI_report.html">Wisconsin</a>
     </li>
   </ul>
 </li>
@@ -936,8 +929,8 @@ div.tocify {
 <li>At Week 5 (early May), families of children with disabilities reported significantly higher percentage of using center-based and other types of non-parental childcare compared to families of children without disabilities.<br />
 </li>
 </ul>
-<pre><code>## Warning: Removed 2 row(s) containing missing values (geom_path).</code></pre>
-<pre><code>## Warning: Removed 2 rows containing missing values (geom_point).</code></pre>
+<pre><code>## Warning: Removed 3 row(s) containing missing values (geom_path).</code></pre>
+<pre><code>## Warning: Removed 4 rows containing missing values (geom_point).</code></pre>
 <p><img src="children_with_disability_files/figure-html/children-with-disability-30-1.png" width="672" /></p>
 </div>
 <div id="caregivers-abilities-to-return-to-work-because-of-childcare" class="section level2">
@@ -1004,20 +997,20 @@ div.tocify {
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -51.802 -13.831  -1.802  16.282  46.258 
+## -52.307 -14.133  -1.211  16.206  45.753 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  34.47161    9.46356   3.643 0.000442 ***
-## c_probs15     0.62106    0.06688   9.286 6.06e-15 ***
-## ss_total_crt -5.11233    2.28747  -2.235 0.027790 *  
+## (Intercept)  35.49717    9.42959   3.764 0.000288 ***
+## c_probs15     0.61560    0.06679   9.217 7.15e-15 ***
+## ss_total_crt -5.20468    2.28000  -2.283 0.024651 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 20.9 on 94 degrees of freedom
-##   (23 observations deleted due to missingness)
-## Multiple R-squared:  0.5392, Adjusted R-squared:  0.5294 
-## F-statistic: 54.99 on 2 and 94 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 20.91 on 96 degrees of freedom
+##   (21 observations deleted due to missingness)
+## Multiple R-squared:  0.5324, Adjusted R-squared:  0.5227 
+## F-statistic: 54.66 on 2 and 96 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="mediation-analyses-social-support-subsequent-caregivers-mental-health-problems-subsequent-childrens-behavioral-problems" class="section level4">
 <h4>Mediation Analyses: Social Support &amp; Subsequent Caregivers’ Mental Health Problems &amp; Subsequent Children’s Behavioral Problems</h4>
@@ -1064,21 +1057,21 @@ div.tocify {
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -54.619 -12.649  -1.557  13.594  50.757 
+## -55.550 -13.931  -1.591  16.213  50.024 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  27.83596   12.49074   2.229   0.0283 *  
-## P_fl1         0.07202    0.11293   0.638   0.5252    
-## C_fl1         0.65958    0.08566   7.700 1.43e-11 ***
-## ss_total_crt -4.56688    2.62585  -1.739   0.0853 .  
+## (Intercept)  28.00291   12.59380   2.224   0.0285 *  
+## P_fl1         0.09748    0.11323   0.861   0.3914    
+## C_fl1         0.62971    0.08490   7.417 4.98e-11 ***
+## ss_total_crt -4.38340    2.64081  -1.660   0.1002    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 21.22 on 93 degrees of freedom
-##   (23 observations deleted due to missingness)
-## Multiple R-squared:  0.5296, Adjusted R-squared:  0.5145 
-## F-statistic: 34.91 on 3 and 93 DF,  p-value: 3.337e-15</code></pre>
+## Residual standard error: 21.43 on 95 degrees of freedom
+##   (21 observations deleted due to missingness)
+## Multiple R-squared:  0.5138, Adjusted R-squared:  0.4985 
+## F-statistic: 33.47 on 3 and 95 DF,  p-value: 7.508e-15</code></pre>
 </div>
 </div>
 <div id="testing-indirect-effect-using-rmediation-method" class="section level3">
@@ -1106,20 +1099,20 @@ div.tocify {
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -75.980 -12.280  -1.652  13.297  74.571 
+## -75.384 -12.503  -1.849  13.496  74.350 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  26.84814    3.99982   6.712 4.25e-11 ***
-## c_probs15     0.61968    0.03181  19.481  &lt; 2e-16 ***
-## ss_total_crt -3.87121    0.92804  -4.171 3.45e-05 ***
+## (Intercept)   26.9954     3.9841   6.776 2.80e-11 ***
+## c_probs15      0.6098     0.0317  19.234  &lt; 2e-16 ***
+## ss_total_crt  -3.7980     0.9250  -4.106 4.54e-05 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 20.57 on 636 degrees of freedom
-##   (133 observations deleted due to missingness)
-## Multiple R-squared:  0.4342, Adjusted R-squared:  0.4324 
-## F-statistic:   244 on 2 and 636 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 20.67 on 644 degrees of freedom
+##   (121 observations deleted due to missingness)
+## Multiple R-squared:  0.4247, Adjusted R-squared:  0.4229 
+## F-statistic: 237.7 on 2 and 644 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="mediation-analyses-social-support-subsequent-caregivers-mental-health-problems-subsequent-childrens-behavioral-problems-1" class="section level4">
 <h4>Mediation Analyses: Social Support &amp; Subsequent Caregivers’ Mental Health Problems &amp; Subsequent Children’s Behavioral Problems</h4>
@@ -1143,20 +1136,20 @@ div.tocify {
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -47.169  -8.270  -0.525   8.683  48.966 
+## -47.160  -8.298  -0.466   8.681  48.962 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  18.18565    2.94020   6.185 1.05e-09 ***
-## p_probs15     0.72885    0.02401  30.360  &lt; 2e-16 ***
-## ss_total_crt -2.53590    0.62135  -4.081 4.99e-05 ***
+## (Intercept)  18.21203    2.94112   6.192 1.00e-09 ***
+## p_probs15     0.72813    0.02405  30.280  &lt; 2e-16 ***
+## ss_total_crt -2.53206    0.62222  -4.069 5.24e-05 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 13.3 on 712 degrees of freedom
-##   (57 observations deleted due to missingness)
-## Multiple R-squared:  0.6673, Adjusted R-squared:  0.6664 
-## F-statistic:   714 on 2 and 712 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 13.31 on 711 degrees of freedom
+##   (54 observations deleted due to missingness)
+## Multiple R-squared:  0.6652, Adjusted R-squared:  0.6643 
+## F-statistic: 706.4 on 2 and 711 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div id="path-b-1" class="section level4">
 <h4>Path b:</h4>
@@ -1166,21 +1159,21 @@ div.tocify {
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -55.805 -11.490  -1.627  11.105  93.079 
+## -55.395 -11.535  -1.727  11.415  92.645 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  13.84607    4.72459   2.931   0.0035 ** 
-## P_fl1         0.17993    0.04141   4.345 1.62e-05 ***
-## C_fl1         0.59386    0.03249  18.279  &lt; 2e-16 ***
-## ss_total_crt -1.84277    0.98557  -1.870   0.0620 .  
+## (Intercept)  14.11073    4.71217   2.995  0.00285 ** 
+## P_fl1         0.17055    0.04136   4.124 4.22e-05 ***
+## C_fl1         0.59184    0.03244  18.244  &lt; 2e-16 ***
+## ss_total_crt -1.79046    0.98223  -1.823  0.06879 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 19.96 on 635 degrees of freedom
-##   (133 observations deleted due to missingness)
-## Multiple R-squared:  0.468,  Adjusted R-squared:  0.4655 
-## F-statistic: 186.2 on 3 and 635 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 20.02 on 643 degrees of freedom
+##   (121 observations deleted due to missingness)
+## Multiple R-squared:  0.4612, Adjusted R-squared:  0.4586 
+## F-statistic: 183.4 on 3 and 643 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <div id="testing-indirect-effect-using-rmediation-method-1" class="section level3">
@@ -1208,7 +1201,7 @@ div.tocify {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
