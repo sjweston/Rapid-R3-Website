@@ -7,6 +7,7 @@ params:
   num: "1"
   title: "Open ended Challenges"
   question: "What are the biggest challenges and concerns for you and your family right now?"
+  variable: "OPEN.001"
 ---
 
 ```{r setup, include=FALSE}
@@ -53,7 +54,7 @@ response_table = master %>%
            DEMO.004.a.2 >= 1 ~ "Yes",
            !is.na(DEMO.004.a.2) ~ "No",
            TRUE ~ NA_character_)) %>%
-  select(CaregiverID, Week, starts_with("OPEN"), State, FPL.150, RaceGroup, CaregiverAge,
+  select(CaregiverID, Week, starts_with(params$variable), State, FPL.150, RaceGroup, CaregiverAge,
          child_age03) %>%
   arrange(Week) %>%
   group_by(CaregiverID) %>%
@@ -61,10 +62,7 @@ response_table = master %>%
   mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge, child_age03), na.locf0) %>%
   ungroup() %>%
   select(-CaregiverID) %>%
-  rename(canuse = OPEN.006,
-         `Below 1.5xFPL` = FPL.150,
-         `Child 0-3` = child_age03) %>%
-  gather("Question", "Response", starts_with("OPEN")) %>%
+  gather("Question", "Response", starts_with(params$variable)) %>%
   filter(Response != "")
 
 ```
@@ -75,7 +73,7 @@ response_table = master %>%
 
 ```{r open-1-5, results = 'asis'}
 response_table %>%
-  filter(grepl(params$num, Question)) %>%
+  filter(grepl(params$variable, Question)) %>%
   select(-Question) %>%
   datatable(filter = "top", rownames = F, 
             options = list(autoWidth = T))
@@ -86,10 +84,10 @@ response_table %>%
 ```{r open-1-6}
 bigrams <- master %>%
   filter(UserLanguage == "EN") %>%
-  select(CaregiverID, starts_with("OPEN")) %>%
-  gather("Question", "Response", starts_with("OPEN")) %>%
+  select(CaregiverID, starts_with(params$variable)) %>%
+  gather("Question", "Response", starts_with(params$variable)) %>%
   filter(Response != "")%>%
-  filter(grepl(params$num, Question)) %>%
+  filter(grepl(params$variable, Question)) %>%
   unnest_tokens(bigram, Response, token = "ngrams", n = 2)
   
   bigrams <- bigrams %>%
