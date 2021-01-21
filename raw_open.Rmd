@@ -48,17 +48,14 @@ master = master %>%
            DEMO.004.a.2 >= 1 ~ "Yes",
            !is.na(DEMO.004.a.2) ~ "No",
            TRUE ~ NA_character_)) %>%
-  select(CaregiverID, Week, starts_with("OPEN"), State, FPL.150, RaceGroup, CaregiverAge, child_age03) %>%
+  select(CaregiverID, Week, OPEN.001, OPEN.002, OPEN.003, OPEN.004, OPEN.005, OPEN.007, OPEN.008, OPEN.009, POLICY.030, State, FPL.150, RaceGroup, CaregiverAge, child_age03) %>%
   arrange(Week) %>%
   group_by(CaregiverID) %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%
   mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge, child_age03), na.locf0) %>%
   ungroup() %>%
   select(-CaregiverID) %>%
-  rename(canuse = OPEN.006,
-         `Below 1.5xFPL` = FPL.150,
-         `Child 0-3` = child_age03) %>%
-  gather("Question", "Response", starts_with("OPEN")) %>%
+  gather("Question", "Response", OPEN.001, OPEN.002, OPEN.003, OPEN.004, OPEN.005, OPEN.007, OPEN.008, OPEN.009, POLICY.030) %>%
   filter(Response != "")
 
 ```
@@ -143,6 +140,17 @@ master %>%
   filter(grepl("9", Question)) %>%
   select(-Question) %>%
   datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+
+# Q10: When thinking about the people/center that provides your childcare right now, what role, significant contribution or niche do they serve for you and your family?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("POLICY.030", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F,
             options = list(autoWidth = T))
 ```
 
