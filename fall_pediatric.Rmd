@@ -1,0 +1,505 @@
+---
+title: "Vaccines and well-child visits in fall 2020"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r usda-1, echo = F}
+knitr::opts_chunk$set(echo = FALSE, 
+                      warning = FALSE, 
+                      message = FALSE, 
+                      fig.width=12)
+options(knitr.kable.NA = '')
+```
+
+These analyses were based on data provided by 1,875 caregivers between November 1 and December 3, 2020. 
+
+# Machine learning models
+
+## Well-child visits
+
+Bars represent the size of coefficient estimates, which are in odds ratios units. Odds ratios greater than 1 indicate that being high on this variable makes one more likely to attend a well-child visit. Predictors are standardized before being entered into the model, facilitating comparison within model. 
+
+```{r, fig.width = 8, fig.height = 10}
+library(tidyverse)
+library(tidymodels)
+library(here)
+library(psych)
+library(ggpubr)
+load(here("../../Data Management R3/R Data/vaccine/fitted_wellchild.Rdata"))
+
+variable_imp_plot = fit_vip %>%
+  mutate(Variable = case_when(
+    Variable == "flu2019" ~ "Vaccinated child in 2019",
+    Variable == "numchild_X3." ~ "Three vs one child",
+    Variable == "depression" ~ "Parent depression",
+    Variable == "numchild_X2" ~ "Two vs one child",
+    Variable == "infant" ~ "Infant in house",
+    Variable == "childfearful" ~ "Child fearfulness",
+    Variable == "anxiety" ~ "Parent anxiety",
+    Variable == "stress" ~ "Parent stress",
+    Variable == "SPI27WellBeing" ~ "Trait Well-being",
+    Variable == "education" ~ "Education",
+    Variable == "insurance_Private" ~ "Insurance (private vs none)",
+    Variable == "insurance_Public" ~ "Insurance (public vs none)",
+    Variable == "numadults_X2" ~ "Two vs one adults",
+    Variable == "newcases" ~ "COVID incidence",
+    Variable == "SPI27Irritability" ~ "Irritability",
+    Variable == "SPI27Authoritarianism" ~ "Authoritarianism",
+    Variable == "SPI27Industry" ~ "Industry",
+    Variable == "numadults_X3." ~ "Three vs one adults",
+    Variable == "young" ~ "Young Parent",
+    Variable == "employmentchange" ~ "Employment decreased",
+    Variable == "employment_Other" ~ "Retired/Student/Homemaker",
+    Variable == "employment_Unemployed" ~ "Unemployed",
+    Variable == "SPI27Creativity" ~ "Creativity",
+    Variable == "SPI27Impulsivity" ~ "Impulsivity",
+    Variable == "childfussy" ~ "Child fussiness",
+    Variable == "poverty" ~ "Below 1.5 x FPL",
+    Variable == "SPI27Conservatism" ~ "Conservatism",
+    Variable == "SPI27Anxiety" ~ "Trait Anxiety",
+    Variable == "SPI27Adaptability" ~ "Adaptability",
+    Variable == "SPI27Sociability" ~ "Sociability",
+    Variable == "SPI27Charisma" ~ "Charisma",
+    Variable == "SPI27EasyGoingness" ~ "EasyGoingness",
+    Variable == "race_Other" ~ "Other race (vs Black)",
+    Variable == "race_White" ~ "White (vs Black)",
+    Variable == "SPI27Humor" ~ "Humor",
+    Variable == "SPI27Compassion" ~ "Compassion",
+    Variable == "SPI27Order" ~ "Order",    
+    Variable == "SPI27Perfectionism" ~ "Perfectionism",    
+    Variable == "SPI27SensationSeeking" ~ "Sensation Seeking",
+    Variable == "SPI27Trust" ~ "Trust",
+    Variable == "lonely" ~ "Parent loneliness",
+    Variable == "SPI27Intellect" ~ "Intellect",
+    Variable == "SPI27EmotionalStability" ~ "Emotional Stability",
+    Variable == "ethnicity_Not.Hispanic" ~ "Not vs Hispanic/Latinx",
+    Variable == "SPI27ArtAppreciation" ~ "Art Appreciation",
+    Variable == "SPI27Introspection" ~ "Introspection",
+    Variable == "SPI27Creativity" ~ "Creativity",
+    Variable == "SPI27EmotionalExpressiveness" ~ "Emotional Expressiveness",
+    Variable == "SPI27Honesty" ~ "Honesty",
+    Variable == "SPI27AttentionSeeking" ~ "Attention Seeking",
+    Variable == "SPI27Adaptability" ~ "Adaptability",
+    Variable == "totalcases" ~ "COVID prevalence")) %>%
+  mutate(odds = exp(Importance)-1) %>%
+  ggplot(aes(x = odds, y = reorder(Variable, abs(Importance)), fill = Sign)) +
+  geom_col() +
+  scale_fill_brewer(palette = "Dark2") +
+  scale_x_continuous(breaks = c(seq(-.4,.2,.2)),
+                     labels = 1+c(seq(-.4,.2,.2))) +
+  guides(fill = F) +
+  labs("Variables predict not missing well-child visit") +
+  labs(y = NULL, x = "Odds Ratio") +
+  theme_pubr()
+
+variable_imp_plot
+```
+
+
+## Flu vaccine
+
+Bars represent the size of coefficient estimates, which are in odds ratios units. Odds ratios greater than 1 indicate that being high on this variable makes one more likely to vaccinate against the flu. Predictors are standardized before being entered into the model, facilitating comparison within model. 
+
+```{r, fig.width = 8, fig.height = 10}
+
+load(here("../../Data Management R3/R Data/vaccine/fitted_flu.Rdata"))
+
+variable_imp_plot = fit_vip %>%
+  mutate(Variable = case_when(
+  Variable == "flu2019" ~ "Vaccinated child in 2019",
+  Variable == "numchild_X3." ~ "Three vs one child",
+  Variable == "depression" ~ "Caregiver depression",
+  Variable == "numchild_X2" ~ "Two vs one child",
+  Variable == "childfearful" ~ "Child fearfulness",
+  Variable == "anxiety" ~ "Caregiver anxiety",
+  Variable == "stress" ~ "Caregiver stress",
+  Variable == "SPI27WellBeing" ~ "Well-being",
+  Variable == "education" ~ "Education",
+  Variable == "insurance_Private" ~ "Insurance (private vs none)",
+  Variable == "insurance_Public" ~ "Insurance (public vs none)",
+  Variable == "numadults_X2" ~ "Two vs one adults",
+  Variable == "newcases" ~ "COVID incidence",
+  Variable == "SPI27Authoritarianism" ~ "Authoritarianism",
+  Variable == "SPI27Industry" ~ "Industry",
+  Variable == "numadults_X3." ~ "Three vs one adults",
+  Variable == "young" ~ "Young caregiver",
+  Variable == "employmentchange" ~ "Employment decreased",
+  Variable == "employment_Other" ~ "Retired/Student/Homemaker",
+  Variable == "employment_Unemployed" ~ "Unemployed",
+  Variable == "SPI27Creativity" ~ "Creativity",
+  Variable == "SPI27Impulsivity" ~ "Impulsivity",
+  Variable == "childfussy" ~ "Child fussiness",
+  Variable == "poverty" ~ "Below 1.5 x FPL",
+  Variable == "SPI27Conservatism" ~ "Conservatism",
+  Variable == "SPI27Charisma" ~ "Charisma",
+  Variable == "SPI27EasyGoingness" ~ "EasyGoingness",
+  Variable == "race_Other" ~ "Other race (vs Black)",
+  Variable == "race_White" ~ "White (vs Black)")) %>%
+  mutate(odds = exp(Importance)-1) %>%
+  ggplot(aes(x = odds, y = reorder(Variable, abs(Importance)), fill = Sign)) +
+  geom_col() +
+  scale_x_continuous(breaks = c(0,1,2),
+                     labels = 1+c(0,1,2)) +
+  scale_fill_brewer(palette = "Dark2") +
+  guides(fill = F) +
+  labs("Variables predict not missing well-child visit") +
+  labs(y = NULL, x = "Odds Ratio") +
+  theme_pubr()
+
+```
+
+# Zero-order associations
+
+```{r}
+library(here)
+library(tidyverse)
+library(here)
+library(arsenal) 
+library(ggpubr)
+
+load(here("../../Data Management R3/R Data/vaccine/cleaned_gen_category.Rdata"))
+load(here("../../Data Management R3/R Data/vaccine/pers_fall.Rdata"))
+
+alldata = data %>% # add personality
+  full_join(pers_fall)  %>%
+  select(-flu_2019, -child_older_1year) %>%
+  group_by(CaregiverID) %>%
+  filter(Week == max(Week)) %>%
+  ungroup() %>%
+  mutate(missing_pers = ifelse(
+    CaregiverID %in% pers_fall$CaregiverID, 0, 1)) %>%
+  filter(Date >= "2020-11-01") 
+
+alldata = alldata %>% 
+  filter(missing_pers == 0) %>%
+  mutate(wellchild_f = factor(wellchild, labels = c("Missed", "Attended"))) %>%
+  mutate(flu_f = factor(flu, labels = c("Did not vaccinate", "Vaccinated"))) %>%
+  mutate(income_f = factor(poverty, labels = c("Above 1.5 x FPL", "Below 1.5 x FPL")))
+```
+
+
+## Well-child visits{.tabset}
+
+### Age
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(wellchild_f, age) %>%
+  summarise(n = n()) %>%
+  group_by(wellchild_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(age) & !is.na(wellchild_f)) %>%
+  ggplot(aes(x = age, y = percent, fill = wellchild_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by age") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Education
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(wellchild_f, education) %>%
+  summarise(n = n()) %>%
+  group_by(wellchild_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(education) & !is.na(wellchild_f)) %>%
+  ggplot(aes(x = education, y = percent, fill = wellchild_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by educational attainment") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Number of children
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(wellchild_f, num_child) %>%
+  summarise(n = n()) %>%
+  group_by(wellchild_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(num_child) & !is.na(wellchild_f)) %>%
+  ggplot(aes(x = num_child, y = percent, fill = wellchild_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by number of children") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Race
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(wellchild_f, race) %>%
+  summarise(n = n()) %>%
+  group_by(wellchild_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(race) & !is.na(wellchild_f)) %>%
+  ggplot(aes(x = race, y = percent, fill = wellchild_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by race") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Ethnicity
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(wellchild_f, ethnicity) %>%
+  summarise(n = n()) %>%
+  group_by(wellchild_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(ethnicity) & !is.na(wellchild_f)) %>%
+  ggplot(aes(x = ethnicity, y = percent, fill = wellchild_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by ethnicity") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Income
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(wellchild_f, income_f) %>%
+  summarise(n = n()) %>%
+  group_by(wellchild_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(income_f) & !is.na(wellchild_f)) %>%
+  ggplot(aes(x = income_f, y = percent, fill = wellchild_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by 2019 income") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Insurance
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(wellchild_f, insurance) %>%
+  summarise(n = n()) %>%
+  group_by(wellchild_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(insurance) & !is.na(wellchild_f)) %>%
+  ggplot(aes(x = insurance, y = percent, fill = wellchild_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by child insurance") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Personality
+
+```{r, fig.width=6, fig.height=9}
+moe.fun = function(x, na.rm=T){
+  if(na.rm){ 
+    n = length(which(!is.na(x)))
+  } else n = length(x)
+  sd = sd(x, na.rm=T)
+  se = sd/sqrt(n)
+  cv = qt(.975, df = n-1)
+  moe = se*cv
+  return(moe)
+}
+
+alldata %>%
+  filter(!is.na(wellchild_f)) %>%
+  gather(trait, tscore, starts_with("SPI")) %>%
+  group_by(trait) %>%
+  nest() %>%
+  mutate(ttest = map(data, ~t.test(tscore~wellchild_f, data = .x))) %>%
+  mutate(clean = map(ttest, broom::tidy)) %>%
+  select(-data, -ttest) %>%
+  unnest(cols = c(clean)) %>% 
+  mutate(fillv = case_when(
+    p.value < .05 & estimate > 0 ~ "1",
+    p.value < .05 & estimate < 0 ~ "2",
+    TRUE ~ "3"
+  )) %>%
+  mutate(trait = str_remove(trait, "SPI27")) %>%
+  ggplot(aes(x = trait,  y = estimate)) +
+    geom_bar(stat = "identity", aes(fill = fillv)) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  geom_hline(aes(yintercept = 0)) +
+  scale_y_continuous("", breaks = c(-.3, .3), labels = c("More likley\nto attend WC", "Less likely\nto attend WC"))+
+  guides(fill = F)+
+  labs(x = NULL) +
+  coord_flip() +
+  theme_pubr()
+```
+
+## Flu vaccines{.tabset}
+
+### Age
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(flu_f, age) %>%
+  summarise(n = n()) %>%
+  group_by(flu_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(age) & !is.na(flu_f)) %>%
+  ggplot(aes(x = age, y = percent, fill = flu_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by age") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Education
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(flu_f, education) %>%
+  summarise(n = n()) %>%
+  group_by(flu_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(education) & !is.na(flu_f)) %>%
+  ggplot(aes(x = education, y = percent, fill = flu_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by educational attainment") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Number of children
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(flu_f, num_child) %>%
+  summarise(n = n()) %>%
+  group_by(flu_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(num_child) & !is.na(flu_f)) %>%
+  ggplot(aes(x = num_child, y = percent, fill = flu_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by number of children") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Race
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(flu_f, race) %>%
+  summarise(n = n()) %>%
+  group_by(flu_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(race) & !is.na(flu_f)) %>%
+  ggplot(aes(x = race, y = percent, fill = flu_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by race") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Ethnicity
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(flu_f, ethnicity) %>%
+  summarise(n = n()) %>%
+  group_by(flu_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(ethnicity) & !is.na(flu_f)) %>%
+  ggplot(aes(x = ethnicity, y = percent, fill = flu_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by ethnicity") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Income
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(flu_f, income_f) %>%
+  summarise(n = n()) %>%
+  group_by(flu_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(income_f) & !is.na(flu_f)) %>%
+  ggplot(aes(x = income_f, y = percent, fill = flu_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by 2019 income") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Insurance
+
+```{r, fig.height=5, fig.width=5}
+alldata %>%
+  group_by(flu_f, insurance) %>%
+  summarise(n = n()) %>%
+  group_by(flu_f) %>%
+  mutate(percent = n/sum(n)) %>%
+  filter(!is.na(insurance) & !is.na(flu_f)) %>%
+  ggplot(aes(x = insurance, y = percent, fill = flu_f)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = NULL, y = NULL, fill = "Well-child visit", 
+       title = "Percent of caregivers by child insurance") +
+  theme_pubclean() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Personality
+
+```{r, fig.width=6, fig.height=9}
+moe.fun = function(x, na.rm=T){
+  if(na.rm){ 
+    n = length(which(!is.na(x)))
+  } else n = length(x)
+  sd = sd(x, na.rm=T)
+  se = sd/sqrt(n)
+  cv = qt(.975, df = n-1)
+  moe = se*cv
+  return(moe)
+}
+
+alldata %>%
+  filter(!is.na(flu_f)) %>%
+  gather(trait, tscore, starts_with("SPI")) %>%
+  group_by(trait) %>%
+  nest() %>%
+  mutate(ttest = map(data, ~t.test(tscore~flu_f, data = .x))) %>%
+  mutate(clean = map(ttest, broom::tidy)) %>%
+  select(-data, -ttest) %>%
+  unnest(cols = c(clean)) %>% 
+  mutate(fillv = case_when(
+    p.value < .05 & estimate > 0 ~ "1",
+    p.value < .05 & estimate < 0 ~ "2",
+    TRUE ~ "3"
+  )) %>%
+  mutate(trait = str_remove(trait, "SPI27")) %>%
+  ggplot(aes(x = trait,  y = estimate)) +
+    geom_bar(stat = "identity", aes(fill = fillv)) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  geom_hline(aes(yintercept = 0)) +
+  scale_y_continuous("", breaks = c(-.3, .3), labels = c("More likley\nto attend WC", "Less likely\nto attend WC"))+
+  guides(fill = F)+
+  labs(x = NULL) +
+  coord_flip() +
+  theme_pubr()
+```
+
