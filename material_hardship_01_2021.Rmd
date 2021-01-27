@@ -61,7 +61,8 @@ master <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 Mas
 
 # Remove cases should be excluded
 master <- master %>%
-  filter ( CaregiverID != "" & is.na(Exclude) == T)
+  filter ( CaregiverID != "" & is.na(Exclude) == T)%>%
+  filter (is.na(Week) == F)
 
 master = master %>%
   group_by(CaregiverID, Week) %>%
