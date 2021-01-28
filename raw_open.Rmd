@@ -48,7 +48,8 @@ master = master %>%
            DEMO.004.a.2 >= 1 ~ "Yes",
            !is.na(DEMO.004.a.2) ~ "No",
            TRUE ~ NA_character_)) %>%
-  select(CaregiverID, Week, OPEN.001, OPEN.002, OPEN.003, OPEN.004, OPEN.005, OPEN.007, OPEN.008, OPEN.009, POLICY.030, State, FPL.150, RaceGroup, CaregiverAge, child_age03) %>%
+  select(CaregiverID, Week, OPEN.001, OPEN.002, OPEN.003, OPEN.004, OPEN.006, OPEN.005, OPEN.007, OPEN.008, OPEN.009, POLICY.030, State, FPL.150, RaceGroup, CaregiverAge, child_age03) %>%
+  filter(OPEN.006 == 1) %>%
   arrange(Week) %>%
   group_by(CaregiverID) %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%

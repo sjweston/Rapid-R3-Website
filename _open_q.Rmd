@@ -55,7 +55,8 @@ response_table = master %>%
            !is.na(DEMO.004.a.2) ~ "No",
            TRUE ~ NA_character_)) %>%
   select(CaregiverID, Week, starts_with(params$variable), State, FPL.150, RaceGroup, CaregiverAge,
-         child_age03) %>%
+         child_age03, OPEN.006) %>%
+  filter(OPEN.006 == 1) %>%
   arrange(Week) %>%
   group_by(CaregiverID) %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%
