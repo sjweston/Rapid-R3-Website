@@ -62,7 +62,9 @@ response_table = master %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%
   mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge, child_age03), na.locf0) %>%
   ungroup() %>%
-  select(-CaregiverID) %>%
+  select(-CaregiverID, -OPEN.006) %>%
+  rename(`Below 1.5xFPL` = FPL.150,
+         `Child 0-3` = child_age03) %>%
   gather("Question", "Response", starts_with(params$variable)) %>%
   filter(Response != "")
 

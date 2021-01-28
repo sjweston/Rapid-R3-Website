@@ -55,7 +55,9 @@ master = master %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%
   mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge, child_age03), na.locf0) %>%
   ungroup() %>%
-  select(-CaregiverID) %>%
+  select(-CaregiverID, -OPEN.006) %>%
+  rename(`Below 1.5xFPL` = FPL.150,
+         `Child 0-3` = child_age03) %>%
   gather("Question", "Response", OPEN.001, OPEN.002, OPEN.003, OPEN.004, OPEN.005, OPEN.007, OPEN.008, OPEN.009, POLICY.030) %>%
   filter(Response != "")
 
