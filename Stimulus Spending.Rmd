@@ -121,7 +121,76 @@ mutate (race_ethnic = case_when(
 
 ##Povertyline - 0 = high income, 1 = low income
 master <- master %>%
-  mutate (poverty_cat = FPL.150)
+  mutate (poverty_100 = FPL.100, 
+          poverty_200 = FPL.200, 
+          poverty_3c = case_when (FPL == 1 ~ 1,
+                                  FPL %in% c(2,3,4)~ 2,
+                                  FPL == 5 ~ 3))
+
+master <- master %>%
+  mutate (FPL_line = case_when (STATE_CODED == 1 & JOB.002 == 1 ~ 12760,
+                                STATE_CODED == 1 & JOB.002 == 2 ~ 17240,
+                                STATE_CODED == 1 & JOB.002 == 3 ~ 21720,
+                                STATE_CODED == 1 & JOB.002 == 4 ~ 26200,
+                                STATE_CODED == 1 & JOB.002 == 5 ~ 30680,
+                                STATE_CODED == 1 & JOB.002 == 6 ~ 35160,
+                                STATE_CODED == 1 & JOB.002 == 7 ~ 39640,
+                                STATE_CODED == 1 & JOB.002 == 8 ~ 44120,
+                                STATE_CODED == 1 & JOB.002 == 9 ~ 48600,
+                                STATE_CODED == 1 & JOB.002 == 10 ~ 53080,
+                                STATE_CODED == 1 & JOB.002 == 11 ~ 57560,
+                                STATE_CODED == 1 & JOB.002 == 12 ~ 62040,
+                                STATE_CODED == 1 & JOB.002 == 13 ~ 66520,
+                                STATE_CODED == 1 & JOB.002 == 14 ~ 71000,
+                                STATE_CODED == 1 & JOB.002 == 15 ~ 75480,
+                                STATE_CODED == 1 & JOB.002 == 16 ~ 79960,
+                                STATE_CODED == 1 & JOB.002 == 17 ~ 84440,
+                                STATE_CODED == 1 & JOB.002 == 18 ~ 88920,
+                                STATE_CODED == 1 & JOB.002 == 19 ~ 93400,
+                                STATE_CODED == 1 & JOB.002 == 20 ~ 97880,
+                                STATE_CODED == 1 & JOB.002 == 21 ~ 102360, 
+                                STATE_CODED == 2 & JOB.002 == 1 ~ 15950,
+                                STATE_CODED == 2 & JOB.002 == 2 ~ 21550,
+                                STATE_CODED == 2 & JOB.002 == 3 ~ 27150,
+                                STATE_CODED == 2 & JOB.002 == 4 ~ 32750,
+                                STATE_CODED == 2 & JOB.002 == 5 ~ 38350,
+                                STATE_CODED == 2 & JOB.002 == 6 ~ 43950,
+                                STATE_CODED == 2 & JOB.002 == 7 ~ 49550,
+                                STATE_CODED == 2 & JOB.002 == 8 ~ 55150,
+                                STATE_CODED == 2 & JOB.002 == 9 ~ 60750,
+                                STATE_CODED == 2 & JOB.002 == 10 ~ 66350,
+                                STATE_CODED == 2 & JOB.002 == 11 ~ 71950,
+                                STATE_CODED == 2 & JOB.002 == 12 ~ 77550,
+                                STATE_CODED == 2 & JOB.002 == 13 ~ 83150,
+                                STATE_CODED == 2 & JOB.002 == 14 ~ 88750,
+                                STATE_CODED == 2 & JOB.002 == 15 ~ 94350,
+                                STATE_CODED == 2 & JOB.002 == 16 ~ 99950,
+                                STATE_CODED == 2 & JOB.002 == 17 ~ 105550,
+                                STATE_CODED == 2 & JOB.002 == 18 ~ 111150,
+                                STATE_CODED == 2 & JOB.002 == 19 ~ 116750,
+                                STATE_CODED == 2 & JOB.002 == 20 ~ 122350,
+                                STATE_CODED == 2 & JOB.002 == 21 ~ 127950,
+                                STATE_CODED == 3 & JOB.002 == 1 ~ 14680,
+                                STATE_CODED == 3 & JOB.002 == 2 ~ 19830,
+                                STATE_CODED == 3 & JOB.002 == 3 ~ 24980,
+                                STATE_CODED == 3 & JOB.002 == 4 ~ 30130,
+                                STATE_CODED == 3 & JOB.002 == 5 ~ 35280,
+                                STATE_CODED == 3 & JOB.002 == 6 ~ 40430,
+                                STATE_CODED == 3 & JOB.002 == 7 ~ 45580,
+                                STATE_CODED == 3 & JOB.002 == 8 ~ 50730,
+                                STATE_CODED == 3 & JOB.002 == 9 ~ 55880,
+                                STATE_CODED == 3 & JOB.002 == 10 ~ 61030,
+                                STATE_CODED == 3 & JOB.002 == 11 ~ 66180,
+                                STATE_CODED == 3 & JOB.002 == 12 ~ 71330,
+                                STATE_CODED == 3 & JOB.002 == 13 ~ 76480,
+                                STATE_CODED == 3 & JOB.002 == 14 ~ 81630,
+                                STATE_CODED == 3 & JOB.002 == 15 ~ 86780,
+                                STATE_CODED == 3 & JOB.002 == 16 ~ 91930,
+                                STATE_CODED == 3 & JOB.002 == 17 ~ 97080,
+                                STATE_CODED == 3 & JOB.002 == 18 ~ 102230,
+                                STATE_CODED == 3 & JOB.002 == 19 ~ 107380,
+                                STATE_CODED == 3 & JOB.002 == 20 ~ 112530,
+                                STATE_CODED == 3 & JOB.002 == 21 ~ 117680))
 
 #Material hardship
 master <- master %>%
@@ -237,8 +306,14 @@ master_dem <- master %>%
   group_by (CaregiverID) %>%
   summarise (BaselineWeek = my.max (BaselineWeek),
              race_ethnic = my.max(race_ethnic),
-             poverty_cat = my.max(poverty_cat),
+             poverty_100 = my.max(poverty_100),
+             poverty_200 = my.max(poverty_200),
+             poverty_3c = my.min(poverty_3c),
+             income19 = my.min (allyearly2019),
+             FPL_line = my.min (FPL_line),
              disability = my.max (disability),
+             num_hm = my.max (JOB.002),
+             num_cd = my.max (DEMO.003),
              single = my.max (single),
              work_status = my.max (work_status),
              work_status_pre = my.max (work_status_pre), 
@@ -248,15 +323,26 @@ master_dem <- master %>%
                         work_status == 1 & work_status_pre == 0 ~ "2", 
                         work_status == 0 & work_status_pre == 1 ~ "3", 
                         work_status == 0 & work_status_pre == 0 ~ "4", 
-                        TRUE~NA_character_))%>%
+                        TRUE~NA_character_), 
+           num_adult = num_hm - num_cd, 
+           FPL_pct = income19/FPL_line)%>%
   mutate (race_ethnic = case_when (
                         race_ethnic == 1 ~ "Black", 
                         race_ethnic == 2 ~ "Latinx", 
                         race_ethnic == 3 ~ "White", 
                         TRUE~NA_character_),
-          poverty_cat = case_when (
-                        poverty_cat == 1 ~ "Below 150%FPL", 
-                        poverty_cat == 0 ~ "Above 150%FPL", 
+          poverty_100 = case_when (
+                        poverty_100 == 1 ~ "Below 100%FPL", 
+                        poverty_100 == 0 ~ "Above 100%FPL", 
+                        TRUE~NA_character_),
+          poverty_200 = case_when (
+                        poverty_200 == 1 ~ "Below 200%FPL", 
+                        poverty_200 == 0 ~ "Above 200%FPL", 
+                        TRUE~NA_character_),
+          poverty_3c = case_when (
+                        poverty_3c == 1 ~ "1.Below 100%FPL", 
+                        poverty_3c == 2 ~ "2.100-200%FPL", 
+                        poverty_3c == 3 ~ "3.Above 200%FPL", 
                         TRUE~NA_character_),
           disability = case_when (
                         disability == 1 ~ "With disability", 
@@ -466,14 +552,16 @@ stimulus_smy %>%
 
 ## By poverty level
 
+### By 100%FPL
+
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 stimulus_1 <- stimulus_rct %>%
   mutate (a.received = ifelse (STIM.001 == 1, 1, 0), 
           b.not_but_expect = ifelse (STIM.001 == 2, 1, 0), 
           c.not_donot_expect = ifelse (STIM.001 == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              a.received = sum (a.received, na.rm = T)/n, 
              b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
@@ -490,8 +578,8 @@ stimulus_2 <- stimulus_rct %>%
           b.not_but_expect = ifelse (STIM.002 == 2, 1, 0), 
           c.not_donot_expect = ifelse (STIM.002 == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              a.received = sum (a.received, na.rm = T)/n, 
              b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
@@ -508,8 +596,8 @@ unemployment <- stimulus_rct %>%
           b.not_but_expect = ifelse (STIM.003 == 2, 1, 0), 
           c.not_donot_expect = ifelse (STIM.003 == 3, 1, 0),
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              a.received = sum (a.received, na.rm = T)/n, 
              b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
@@ -525,7 +613,7 @@ unemployment <- stimulus_rct %>%
 stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
 
 stimulus_smy %>%
-  ggplot(mapping = aes (y = poverty_cat, x = prop*100, fill = poverty_cat)) +
+  ggplot(mapping = aes (y = poverty_100, x = prop*100, fill = poverty_100)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -538,7 +626,7 @@ stimulus_smy %>%
 
 ```
 
-## By poverty level & race/ethnicity
+### By 200%FPL
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 stimulus_1 <- stimulus_rct %>%
@@ -546,8 +634,8 @@ stimulus_1 <- stimulus_rct %>%
           b.not_but_expect = ifelse (STIM.001 == 2, 1, 0), 
           c.not_donot_expect = ifelse (STIM.001 == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA" & race_ethnic != "NA")%>%
-  group_by (poverty_cat, race_ethnic)%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
   summarise (n = n(),
              a.received = sum (a.received, na.rm = T)/n, 
              b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
@@ -564,8 +652,8 @@ stimulus_2 <- stimulus_rct %>%
           b.not_but_expect = ifelse (STIM.002 == 2, 1, 0), 
           c.not_donot_expect = ifelse (STIM.002 == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA" & race_ethnic != "NA")%>%
-  group_by (poverty_cat, race_ethnic)%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
   summarise (n = n(),
              a.received = sum (a.received, na.rm = T)/n, 
              b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
@@ -582,8 +670,8 @@ unemployment <- stimulus_rct %>%
           b.not_but_expect = ifelse (STIM.003 == 2, 1, 0), 
           c.not_donot_expect = ifelse (STIM.003 == 3, 1, 0),
           )%>%
-  filter (poverty_cat != "NA" & race_ethnic != "NA")%>%
-  group_by (poverty_cat, race_ethnic)%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
   summarise (n = n(),
              a.received = sum (a.received, na.rm = T)/n, 
              b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
@@ -599,7 +687,155 @@ unemployment <- stimulus_rct %>%
 stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
 
 stimulus_smy %>%
-  ggplot(mapping = aes (y = race_ethnic, x = prop*100, fill = poverty_cat)) +
+  ggplot(mapping = aes (y = poverty_200, x = prop*100, fill = poverty_200)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  facet_wrap (stimulus~which, nrow = 3)
+
+
+```
+
+### Three categories: Below 100%FPL, 100-200%FPL, and above 200%FPL
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_1 <- stimulus_rct %>%
+  mutate (a.received = ifelse (STIM.001 == 1, 1, 0), 
+          b.not_but_expect = ifelse (STIM.001 == 2, 1, 0), 
+          c.not_donot_expect = ifelse (STIM.001 == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             a.received = sum (a.received, na.rm = T)/n, 
+             b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
+             c.not_donot_expect = sum (c.not_donot_expect, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.received", "b.not_but_expect", "c.not_donot_expect"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+   mutate (a.received = ifelse (STIM.002 == 1, 1, 0), 
+          b.not_but_expect = ifelse (STIM.002 == 2, 1, 0), 
+          c.not_donot_expect = ifelse (STIM.002 == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             a.received = sum (a.received, na.rm = T)/n, 
+             b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
+             c.not_donot_expect = sum (c.not_donot_expect, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.received", "b.not_but_expect", "c.not_donot_expect"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+unemployment <- stimulus_rct %>%
+   mutate (a.received = ifelse (STIM.003 == 1, 1, 0), 
+          b.not_but_expect = ifelse (STIM.003 == 2, 1, 0), 
+          c.not_donot_expect = ifelse (STIM.003 == 3, 1, 0),
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             a.received = sum (a.received, na.rm = T)/n, 
+             b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
+             c.not_donot_expect = sum (c.not_donot_expect, na.rm = T)/n, 
+             )%>%
+  pivot_longer (cols = c("a.received", "b.not_but_expect", "c.not_donot_expect"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "unemployment bonus")
+
+stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
+
+stimulus_smy %>%
+  ggplot(mapping = aes (y = poverty_3c, x = prop*100, fill = poverty_3c)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  facet_wrap (stimulus~which, nrow = 3)
+
+
+```
+
+## By poverty level (3 categories) & race/ethnicity
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_1 <- stimulus_rct %>%
+  mutate (a.received = ifelse (STIM.001 == 1, 1, 0), 
+          b.not_but_expect = ifelse (STIM.001 == 2, 1, 0), 
+          c.not_donot_expect = ifelse (STIM.001 == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA" & race_ethnic != "NA")%>%
+  group_by (poverty_3c, race_ethnic)%>%
+  summarise (n = n(),
+             a.received = sum (a.received, na.rm = T)/n, 
+             b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
+             c.not_donot_expect = sum (c.not_donot_expect, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.received", "b.not_but_expect", "c.not_donot_expect"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+   mutate (a.received = ifelse (STIM.002 == 1, 1, 0), 
+          b.not_but_expect = ifelse (STIM.002 == 2, 1, 0), 
+          c.not_donot_expect = ifelse (STIM.002 == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA" & race_ethnic != "NA")%>%
+  group_by (poverty_3c, race_ethnic)%>%
+  summarise (n = n(),
+             a.received = sum (a.received, na.rm = T)/n, 
+             b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
+             c.not_donot_expect = sum (c.not_donot_expect, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.received", "b.not_but_expect", "c.not_donot_expect"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+unemployment <- stimulus_rct %>%
+   mutate (a.received = ifelse (STIM.003 == 1, 1, 0), 
+          b.not_but_expect = ifelse (STIM.003 == 2, 1, 0), 
+          c.not_donot_expect = ifelse (STIM.003 == 3, 1, 0),
+          )%>%
+  filter (poverty_3c != "NA" & race_ethnic != "NA")%>%
+  group_by (poverty_3c, race_ethnic)%>%
+  summarise (n = n(),
+             a.received = sum (a.received, na.rm = T)/n, 
+             b.not_but_expect = sum (b.not_but_expect, na.rm = T)/n, 
+             c.not_donot_expect = sum (c.not_donot_expect, na.rm = T)/n, 
+             )%>%
+  pivot_longer (cols = c("a.received", "b.not_but_expect", "c.not_donot_expect"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "unemployment bonus")
+
+stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
+
+stimulus_smy %>%
+  ggplot(mapping = aes (y = race_ethnic, x = prop*100, fill = poverty_3c)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -756,6 +992,7 @@ stimulus_smy %>%
 ```
 
 ## By poverty level
+### By 100%FPL
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 stimulus_1 <- stimulus_rct %>%
   filter (STIM.001==1)%>%
@@ -763,8 +1000,8 @@ stimulus_1 <- stimulus_rct %>%
           b.mostly_saved = ifelse (STIM.001.a == 2, 1, 0), 
           c.mostly_pay_off_debt = ifelse (STIM.001.a == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
              b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
@@ -782,8 +1019,8 @@ stimulus_2 <- stimulus_rct %>%
           b.mostly_saved = ifelse (STIM.002.a == 2, 1, 0), 
           c.mostly_pay_off_debt = ifelse (STIM.002.a == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
              b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
@@ -801,8 +1038,8 @@ unemployment <- stimulus_rct %>%
           b.mostly_saved = ifelse (STIM.003.a == 2, 1, 0), 
           c.mostly_pay_off_debt = ifelse (STIM.003.a == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
              b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
@@ -817,7 +1054,7 @@ unemployment <- stimulus_rct %>%
 stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
 
 stimulus_smy %>%
-  ggplot(mapping = aes (y = poverty_cat, x = prop*100, fill = poverty_cat)) +
+  ggplot(mapping = aes (y = poverty_100, x = prop*100, fill = poverty_100)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -828,7 +1065,7 @@ stimulus_smy %>%
   facet_wrap (stimulus~which, nrow = 3)
 ```
 
-## By poverty level & race/ethnicity
+### By 200%FPL
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 stimulus_1 <- stimulus_rct %>%
   filter (STIM.001==1)%>%
@@ -836,8 +1073,8 @@ stimulus_1 <- stimulus_rct %>%
           b.mostly_saved = ifelse (STIM.001.a == 2, 1, 0), 
           c.mostly_pay_off_debt = ifelse (STIM.001.a == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA" & race_ethnic != "NA")%>%
-  group_by (poverty_cat, race_ethnic)%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
   summarise (n = n(),
              a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
              b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
@@ -855,8 +1092,8 @@ stimulus_2 <- stimulus_rct %>%
           b.mostly_saved = ifelse (STIM.002.a == 2, 1, 0), 
           c.mostly_pay_off_debt = ifelse (STIM.002.a == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA" & race_ethnic != "NA")%>%
-  group_by (poverty_cat, race_ethnic)%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
   summarise (n = n(),
              a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
              b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
@@ -874,8 +1111,8 @@ unemployment <- stimulus_rct %>%
           b.mostly_saved = ifelse (STIM.003.a == 2, 1, 0), 
           c.mostly_pay_off_debt = ifelse (STIM.003.a == 3, 1, 0)
           )%>%
-  filter (poverty_cat != "NA" & race_ethnic != "NA")%>%
-  group_by (poverty_cat, race_ethnic)%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
   summarise (n = n(),
              a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
              b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
@@ -890,7 +1127,153 @@ unemployment <- stimulus_rct %>%
 stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
 
 stimulus_smy %>%
-  ggplot(mapping = aes (y = race_ethnic, x = prop*100, fill = poverty_cat)) +
+  ggplot(mapping = aes (y = poverty_200, x = prop*100, fill = poverty_200)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  facet_wrap (stimulus~which, nrow = 3)
+```
+
+### By 3 categories
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_1 <- stimulus_rct %>%
+  filter (STIM.001==1)%>%
+  mutate (a.mostly_spent = ifelse (STIM.001.a == 1, 1, 0), 
+          b.mostly_saved = ifelse (STIM.001.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.001.a == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
+             b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_spent", "b.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+  filter (STIM.002==1)%>%
+  mutate (a.mostly_spent = ifelse (STIM.002.a == 1, 1, 0), 
+          b.mostly_saved = ifelse (STIM.002.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.002.a == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
+             b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_spent", "b.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+unemployment <- stimulus_rct %>%
+  filter (STIM.003==1)%>%
+  mutate (a.mostly_spent = ifelse (STIM.003.a == 1, 1, 0), 
+          b.mostly_saved = ifelse (STIM.003.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.003.a == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
+             b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_spent", "b.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "unemployment")
+
+stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
+
+stimulus_smy %>%
+  ggplot(mapping = aes (y = poverty_3c, x = prop*100, fill = poverty_3c)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  facet_wrap (stimulus~which, nrow = 3)
+```
+
+## By poverty level (3 categories) & race/ethnicity
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_1 <- stimulus_rct %>%
+  filter (STIM.001==1)%>%
+  mutate (a.mostly_spent = ifelse (STIM.001.a == 1, 1, 0), 
+          b.mostly_saved = ifelse (STIM.001.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.001.a == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA" & race_ethnic != "NA")%>%
+  group_by (poverty_3c, race_ethnic)%>%
+  summarise (n = n(),
+             a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
+             b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_spent", "b.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+  filter (STIM.002==1)%>%
+  mutate (a.mostly_spent = ifelse (STIM.002.a == 1, 1, 0), 
+          b.mostly_saved = ifelse (STIM.002.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.002.a == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA" & race_ethnic != "NA")%>%
+  group_by (poverty_3c, race_ethnic)%>%
+  summarise (n = n(),
+             a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
+             b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_spent", "b.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+unemployment <- stimulus_rct %>%
+  filter (STIM.003==1)%>%
+  mutate (a.mostly_spent = ifelse (STIM.003.a == 1, 1, 0), 
+          b.mostly_saved = ifelse (STIM.003.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.003.a == 3, 1, 0)
+          )%>%
+  filter (poverty_3c != "NA" & race_ethnic != "NA")%>%
+  group_by (poverty_3c, race_ethnic)%>%
+  summarise (n = n(),
+             a.mostly_spent = sum (a.mostly_spent, na.rm = T)/n, 
+             b.mostly_saved = sum (b.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_spent", "b.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "unemployment")
+
+stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
+
+stimulus_smy %>%
+  ggplot(mapping = aes (y = race_ethnic, x = prop*100, fill = poverty_3c)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -899,6 +1282,164 @@ stimulus_smy %>%
   geom_text(aes(label = round(prop*100,2)),vjust = 0, hjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
   labs (y = "Percentage")+
   facet_wrap (stimulus~which, nrow = 3)
+```
+
+### Explore: Where most people start putting money into saving
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_rct <- stimulus_rct %>%
+  mutate (FPL_pct_c = case_when (FPL_pct < 1 ~ "1.Below 100%FPL",
+                                 FPL_pct >= 1 & FPL_pct < 2 ~ "2.100-200%FPL",
+                                 FPL_pct >= 2 & FPL_pct < 3 ~ "3.200-300%FPL",
+                                 FPL_pct >= 3 & FPL_pct < 4 ~ "4.300-400%FPL",
+                                 FPL_pct >= 4 & FPL_pct < 5 ~ "5.400-500%FPL",
+                                 FPL_pct >= 5 & FPL_pct < 7 ~ "6.500-700%FPL",
+                                 FPL_pct >= 8  ~ "7.Above 800%FPL"))
+
+stimulus_1 <- stimulus_rct %>%
+  filter (STIM.001==1)%>%
+  mutate (b.mostly_spent = ifelse (STIM.001.a == 1, 1, 0), 
+          a.mostly_saved = ifelse (STIM.001.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.001.a == 3, 1, 0)
+          )%>%
+  filter (FPL_pct_c != "NA")%>%
+  group_by (FPL_pct_c)%>%
+  summarise (n = n(),
+             b.mostly_spent = sum (b.mostly_spent, na.rm = T)/n, 
+             a.mostly_saved = sum (a.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("b.mostly_spent", "a.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+  filter (STIM.002==1)%>%
+  mutate (b.mostly_spent = ifelse (STIM.002.a == 1, 1, 0), 
+          a.mostly_saved = ifelse (STIM.002.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.002.a == 3, 1, 0)
+          )%>%
+  filter (FPL_pct_c != "NA")%>%
+  group_by (FPL_pct_c)%>%
+  summarise (n = n(),
+             b.mostly_spent = sum (b.mostly_spent, na.rm = T)/n, 
+             a.mostly_saved = sum (a.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("b.mostly_spent", "a.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+unemployment <- stimulus_rct %>%
+  filter (STIM.003==1)%>%
+  mutate (b.mostly_spent = ifelse (STIM.003.a == 1, 1, 0), 
+          a.mostly_saved = ifelse (STIM.003.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.003.a == 3, 1, 0)
+          )%>%
+  filter (FPL_pct_c != "NA")%>%
+  group_by (FPL_pct_c)%>%
+  summarise (n = n(),
+             b.mostly_spent = sum (b.mostly_spent, na.rm = T)/n, 
+             a.mostly_saved = sum (a.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("b.mostly_spent", "a.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "unemployment")
+
+stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
+
+
+stimulus_smy %>%
+  ggplot(mapping = aes (x = FPL_pct_c, y = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = "stack")+
+  geom_text(aes(label = round(prop*100,2)),size = 2, color = "black",  position = "stack")+
+  labs (y = "Percentage")+
+  facet_wrap (~which, nrow = 3)+ 
+  theme(axis.text.x = element_text(angle = 30))+
+  ggtitle (label = "Accounting for All Three Conditions")
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_rct <- stimulus_rct %>%
+  mutate (FPL_pct_c = case_when (FPL_pct < 1 ~ "1.Below 100%FPL",
+                                 FPL_pct >= 1 & FPL_pct < 2 ~ "2.100-200%FPL",
+                                 FPL_pct >= 2 & FPL_pct < 3 ~ "3.200-300%FPL",
+                                 FPL_pct >= 3 & FPL_pct < 4 ~ "4.300-400%FPL",
+                                 FPL_pct >= 4 & FPL_pct < 5 ~ "5.400-500%FPL",
+                                 FPL_pct >= 5 & FPL_pct < 7 ~ "6.500-700%FPL",
+                                 FPL_pct >= 8  ~ "7.Above 800%FPL"))
+
+stimulus_1 <- stimulus_rct %>%
+  filter (STIM.001==1)%>%
+  mutate (b.mostly_spent = ifelse (STIM.001.a == 1, 1, 0), 
+          a.mostly_saved = ifelse (STIM.001.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.001.a == 3, 1, 0)
+          )%>%
+  filter (FPL_pct_c != "NA" & b.mostly_spent != 1)%>%
+  group_by (FPL_pct_c)%>%
+  summarise (n = n(),
+             a.mostly_saved = sum (a.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+  filter (STIM.002==1)%>%
+  mutate (b.mostly_spent = ifelse (STIM.002.a == 1, 1, 0), 
+          a.mostly_saved = ifelse (STIM.002.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.002.a == 3, 1, 0)
+          )%>%
+  filter (FPL_pct_c != "NA" & b.mostly_spent != 1)%>%
+  group_by (FPL_pct_c)%>%
+  summarise (n = n(),
+             a.mostly_saved = sum (a.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+unemployment <- stimulus_rct %>%
+  filter (STIM.003==1)%>%
+  mutate (b.mostly_spent = ifelse (STIM.003.a == 1, 1, 0), 
+          a.mostly_saved = ifelse (STIM.003.a == 2, 1, 0), 
+          c.mostly_pay_off_debt = ifelse (STIM.003.a == 3, 1, 0)
+          )%>%
+  filter (FPL_pct_c != "NA"& b.mostly_spent != 1) %>%
+  group_by (FPL_pct_c)%>%
+  summarise (n = n(),
+             a.mostly_saved = sum (a.mostly_saved, na.rm = T)/n, 
+             c.mostly_pay_off_debt = sum (c.mostly_pay_off_debt, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.mostly_saved", "c.mostly_pay_off_debt"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "unemployment")
+
+stimulus_smy <- rbind (stimulus_1, stimulus_2, unemployment)
+
+
+stimulus_smy %>%
+  ggplot(mapping = aes (x = FPL_pct_c, y = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = "stack")+
+  geom_text(aes(label = round(prop*100,2)),size = 2, color = "black",  position = "stack")+
+  labs (y = "Percentage")+
+  facet_wrap (~which, nrow = 3)+ 
+  theme(axis.text.x = element_text(angle = 30))+
+  ggtitle (label = "Excluding Mostly Spent Category")
 ```
 
 # 3. What the families spent stimulus check on
@@ -1208,6 +1749,8 @@ unemployment %>%
 ```
 
 ## By poverty level
+
+### By 100%FPL
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 stimulus_1 <- stimulus_rct %>%
   filter (STIM.001==1)%>%
@@ -1225,8 +1768,8 @@ stimulus_1 <- stimulus_rct %>%
           saving_investment = ifelse (STIM.001.b_12 == 1, 1, 0),
           other = ifelse (STIM.001.b_13 == 1, 1, 0),
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              food = sum (food, na.rm = T)/n, 
              clothing = sum (clothing, na.rm = T)/n, 
@@ -1264,8 +1807,8 @@ stimulus_2 <- stimulus_rct %>%
           saving_investment = ifelse (STIM.002.b_12 == 1, 1, 0),
           other = ifelse (STIM.002.b_13 == 1, 1, 0),
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              food = sum (food, na.rm = T)/n, 
              clothing = sum (clothing, na.rm = T)/n, 
@@ -1304,8 +1847,8 @@ unemployment <- stimulus_rct %>%
           saving_investment = ifelse (STIM.003.b_12 == 1, 1, 0),
           other = ifelse (STIM.003.b_13 == 1, 1, 0),
           )%>%
-  filter (poverty_cat != "NA")%>%
-  group_by (poverty_cat)%>%
+  filter (poverty_100 != "NA")%>%
+  group_by (poverty_100)%>%
   summarise (n = n(),
              food = sum (food, na.rm = T)/n, 
              clothing = sum (clothing, na.rm = T)/n, 
@@ -1337,7 +1880,7 @@ stimulus_1 %>%
   geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
   labs (y = "Percentage")+
   ggtitle("first stimulus check")+
-  facet_wrap (~poverty_cat, ncol = 2)
+  facet_wrap (~poverty_100, ncol = 2)
 
 stimulus_2 %>%
   ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
@@ -1349,7 +1892,7 @@ stimulus_2 %>%
   geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
   labs (y = "Percentage")+
   ggtitle("second stimulus check")+
-  facet_wrap (~poverty_cat, ncol = 2)
+  facet_wrap (~poverty_100, ncol = 2)
 
 unemployment %>%
   ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
@@ -1361,5 +1904,319 @@ unemployment %>%
   geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
   labs (y = "Percentage")+
   ggtitle("unemployment")+
-  facet_wrap (~poverty_cat, ncol = 2)
+  facet_wrap (~poverty_100, ncol = 2)
+```
+
+### By 200%FPL
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_1 <- stimulus_rct %>%
+  filter (STIM.001==1)%>%
+  mutate (food = ifelse (STIM.001.b_1 == 1, 1, 0),
+          clothing = ifelse (STIM.001.b_2 == 1, 1, 0),
+          supplies_personal_care = ifelse (STIM.001.b_3 == 1, 1, 0),
+          household_items = ifelse (STIM.001.b_4 == 1, 1, 0),
+          recreational = ifelse (STIM.001.b_5 == 1, 1, 0),
+          rent = ifelse (STIM.001.b_6 == 1, 1, 0),
+          mortgage = ifelse (STIM.001.b_7 == 1, 1, 0),
+          utilities = ifelse (STIM.001.b_8 == 1, 1, 0),
+          vehicle_pay = ifelse (STIM.001.b_9 == 1, 1, 0),
+          credit_card_loans = ifelse (STIM.001.b_10 == 1, 1, 0),
+          donations = ifelse (STIM.001.b_11 == 1, 1, 0),
+          saving_investment = ifelse (STIM.001.b_12 == 1, 1, 0),
+          other = ifelse (STIM.001.b_13 == 1, 1, 0),
+          )%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
+  summarise (n = n(),
+             food = sum (food, na.rm = T)/n, 
+             clothing = sum (clothing, na.rm = T)/n, 
+             supplies_personal_care = sum (supplies_personal_care, na.rm = T)/n,
+             household_items = sum (household_items, na.rm = T)/n, 
+             recreational = sum (recreational, na.rm = T)/n, 
+             rent = sum (rent, na.rm = T)/n, 
+             mortgage = sum (mortgage, na.rm = T)/n, 
+             utilities = sum (utilities, na.rm = T)/n, 
+             vehicle_pay = sum (vehicle_pay, na.rm = T)/n, 
+             credit_card_loans = sum (credit_card_loans, na.rm = T)/n, 
+             donations = sum (donations, na.rm = T)/n, 
+             saving_investment = sum (saving_investment, na.rm = T)/n, 
+             other = sum (other, na.rm = T)/n)%>%
+  pivot_longer (cols = c("food", "clothing", "supplies_personal_care", "household_items", "recreational", "rent", "mortgage", "utilities", "vehicle_pay", "credit_card_loans", "donations", "saving_investment", "other"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+  filter (STIM.002==1)%>%
+  mutate (food = ifelse (STIM.002.b_1 == 1, 1, 0),
+          clothing = ifelse (STIM.002.b_2 == 1, 1, 0),
+          supplies_personal_care = ifelse (STIM.002.b_3 == 1, 1, 0),
+          household_items = ifelse (STIM.002.b_4 == 1, 1, 0),
+          recreational = ifelse (STIM.002.b_5 == 1, 1, 0),
+          rent = ifelse (STIM.002.b_6 == 1, 1, 0),
+          mortgage = ifelse (STIM.002.b_7 == 1, 1, 0),
+          utilities = ifelse (STIM.002.b_8 == 1, 1, 0),
+          vehicle_pay = ifelse (STIM.002.b_9 == 1, 1, 0),
+          credit_card_loans = ifelse (STIM.002.b_10 == 1, 1, 0),
+          donations = ifelse (STIM.002.b_11 == 1, 1, 0),
+          saving_investment = ifelse (STIM.002.b_12 == 1, 1, 0),
+          other = ifelse (STIM.002.b_13 == 1, 1, 0),
+          )%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
+  summarise (n = n(),
+             food = sum (food, na.rm = T)/n, 
+             clothing = sum (clothing, na.rm = T)/n, 
+             supplies_personal_care = sum (supplies_personal_care, na.rm = T)/n,
+             household_items = sum (household_items, na.rm = T)/n, 
+             recreational = sum (recreational, na.rm = T)/n, 
+             rent = sum (rent, na.rm = T)/n, 
+             mortgage = sum (mortgage, na.rm = T)/n, 
+             utilities = sum (utilities, na.rm = T)/n, 
+             vehicle_pay = sum (vehicle_pay, na.rm = T)/n, 
+             credit_card_loans = sum (credit_card_loans, na.rm = T)/n, 
+             donations = sum (donations, na.rm = T)/n, 
+             saving_investment = sum (saving_investment, na.rm = T)/n, 
+             other = sum (other, na.rm = T)/n) %>%
+  pivot_longer (cols = c("food", "clothing", "supplies_personal_care", "household_items", "recreational", "rent", "mortgage", "utilities", "vehicle_pay", "credit_card_loans", "donations", "saving_investment", "other"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+
+unemployment <- stimulus_rct %>%
+  filter (STIM.003==1)%>%
+  mutate (food = ifelse (STIM.003.b_1 == 1, 1, 0),
+          clothing = ifelse (STIM.003.b_2 == 1, 1, 0),
+          supplies_personal_care = ifelse (STIM.003.b_3 == 1, 1, 0),
+          household_items = ifelse (STIM.003.b_4 == 1, 1, 0),
+          recreational = ifelse (STIM.003.b_5 == 1, 1, 0),
+          rent = ifelse (STIM.003.b_6 == 1, 1, 0),
+          mortgage = ifelse (STIM.003.b_7 == 1, 1, 0),
+          utilities = ifelse (STIM.003.b_8 == 1, 1, 0),
+          vehicle_pay = ifelse (STIM.003.b_9 == 1, 1, 0),
+          credit_card_loans = ifelse (STIM.003.b_10 == 1, 1, 0),
+          donations = ifelse (STIM.003.b_11 == 1, 1, 0),
+          saving_investment = ifelse (STIM.003.b_12 == 1, 1, 0),
+          other = ifelse (STIM.003.b_13 == 1, 1, 0),
+          )%>%
+  filter (poverty_200 != "NA")%>%
+  group_by (poverty_200)%>%
+  summarise (n = n(),
+             food = sum (food, na.rm = T)/n, 
+             clothing = sum (clothing, na.rm = T)/n, 
+             supplies_personal_care = sum (supplies_personal_care, na.rm = T)/n,
+             household_items = sum (household_items, na.rm = T)/n, 
+             recreational = sum (recreational, na.rm = T)/n, 
+             rent = sum (rent, na.rm = T)/n, 
+             mortgage = sum (mortgage, na.rm = T)/n, 
+             utilities = sum (utilities, na.rm = T)/n, 
+             vehicle_pay = sum (vehicle_pay, na.rm = T)/n, 
+             credit_card_loans = sum (credit_card_loans, na.rm = T)/n, 
+             donations = sum (donations, na.rm = T)/n, 
+             saving_investment = sum (saving_investment, na.rm = T)/n, 
+             other = sum (other, na.rm = T)/n) %>%
+  pivot_longer (cols = c("food", "clothing", "supplies_personal_care", "household_items", "recreational", "rent", "mortgage", "utilities", "vehicle_pay", "credit_card_loans", "donations", "saving_investment", "other"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+stimulus_1 %>%
+  ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  ggtitle("first stimulus check")+
+  facet_wrap (~poverty_200, ncol = 2)
+
+stimulus_2 %>%
+  ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  ggtitle("second stimulus check")+
+  facet_wrap (~poverty_200, ncol = 2)
+
+unemployment %>%
+  ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  ggtitle("unemployment")+
+  facet_wrap (~poverty_200, ncol = 2)
+```
+
+### By 3 categories
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+stimulus_1 <- stimulus_rct %>%
+  filter (STIM.001==1)%>%
+  mutate (food = ifelse (STIM.001.b_1 == 1, 1, 0),
+          clothing = ifelse (STIM.001.b_2 == 1, 1, 0),
+          supplies_personal_care = ifelse (STIM.001.b_3 == 1, 1, 0),
+          household_items = ifelse (STIM.001.b_4 == 1, 1, 0),
+          recreational = ifelse (STIM.001.b_5 == 1, 1, 0),
+          rent = ifelse (STIM.001.b_6 == 1, 1, 0),
+          mortgage = ifelse (STIM.001.b_7 == 1, 1, 0),
+          utilities = ifelse (STIM.001.b_8 == 1, 1, 0),
+          vehicle_pay = ifelse (STIM.001.b_9 == 1, 1, 0),
+          credit_card_loans = ifelse (STIM.001.b_10 == 1, 1, 0),
+          donations = ifelse (STIM.001.b_11 == 1, 1, 0),
+          saving_investment = ifelse (STIM.001.b_12 == 1, 1, 0),
+          other = ifelse (STIM.001.b_13 == 1, 1, 0),
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             food = sum (food, na.rm = T)/n, 
+             clothing = sum (clothing, na.rm = T)/n, 
+             supplies_personal_care = sum (supplies_personal_care, na.rm = T)/n,
+             household_items = sum (household_items, na.rm = T)/n, 
+             recreational = sum (recreational, na.rm = T)/n, 
+             rent = sum (rent, na.rm = T)/n, 
+             mortgage = sum (mortgage, na.rm = T)/n, 
+             utilities = sum (utilities, na.rm = T)/n, 
+             vehicle_pay = sum (vehicle_pay, na.rm = T)/n, 
+             credit_card_loans = sum (credit_card_loans, na.rm = T)/n, 
+             donations = sum (donations, na.rm = T)/n, 
+             saving_investment = sum (saving_investment, na.rm = T)/n, 
+             other = sum (other, na.rm = T)/n)%>%
+  pivot_longer (cols = c("food", "clothing", "supplies_personal_care", "household_items", "recreational", "rent", "mortgage", "utilities", "vehicle_pay", "credit_card_loans", "donations", "saving_investment", "other"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "first stimulus check")
+
+stimulus_2 <- stimulus_rct %>%
+  filter (STIM.002==1)%>%
+  mutate (food = ifelse (STIM.002.b_1 == 1, 1, 0),
+          clothing = ifelse (STIM.002.b_2 == 1, 1, 0),
+          supplies_personal_care = ifelse (STIM.002.b_3 == 1, 1, 0),
+          household_items = ifelse (STIM.002.b_4 == 1, 1, 0),
+          recreational = ifelse (STIM.002.b_5 == 1, 1, 0),
+          rent = ifelse (STIM.002.b_6 == 1, 1, 0),
+          mortgage = ifelse (STIM.002.b_7 == 1, 1, 0),
+          utilities = ifelse (STIM.002.b_8 == 1, 1, 0),
+          vehicle_pay = ifelse (STIM.002.b_9 == 1, 1, 0),
+          credit_card_loans = ifelse (STIM.002.b_10 == 1, 1, 0),
+          donations = ifelse (STIM.002.b_11 == 1, 1, 0),
+          saving_investment = ifelse (STIM.002.b_12 == 1, 1, 0),
+          other = ifelse (STIM.002.b_13 == 1, 1, 0),
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             food = sum (food, na.rm = T)/n, 
+             clothing = sum (clothing, na.rm = T)/n, 
+             supplies_personal_care = sum (supplies_personal_care, na.rm = T)/n,
+             household_items = sum (household_items, na.rm = T)/n, 
+             recreational = sum (recreational, na.rm = T)/n, 
+             rent = sum (rent, na.rm = T)/n, 
+             mortgage = sum (mortgage, na.rm = T)/n, 
+             utilities = sum (utilities, na.rm = T)/n, 
+             vehicle_pay = sum (vehicle_pay, na.rm = T)/n, 
+             credit_card_loans = sum (credit_card_loans, na.rm = T)/n, 
+             donations = sum (donations, na.rm = T)/n, 
+             saving_investment = sum (saving_investment, na.rm = T)/n, 
+             other = sum (other, na.rm = T)/n) %>%
+  pivot_longer (cols = c("food", "clothing", "supplies_personal_care", "household_items", "recreational", "rent", "mortgage", "utilities", "vehicle_pay", "credit_card_loans", "donations", "saving_investment", "other"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+
+unemployment <- stimulus_rct %>%
+  filter (STIM.003==1)%>%
+  mutate (food = ifelse (STIM.003.b_1 == 1, 1, 0),
+          clothing = ifelse (STIM.003.b_2 == 1, 1, 0),
+          supplies_personal_care = ifelse (STIM.003.b_3 == 1, 1, 0),
+          household_items = ifelse (STIM.003.b_4 == 1, 1, 0),
+          recreational = ifelse (STIM.003.b_5 == 1, 1, 0),
+          rent = ifelse (STIM.003.b_6 == 1, 1, 0),
+          mortgage = ifelse (STIM.003.b_7 == 1, 1, 0),
+          utilities = ifelse (STIM.003.b_8 == 1, 1, 0),
+          vehicle_pay = ifelse (STIM.003.b_9 == 1, 1, 0),
+          credit_card_loans = ifelse (STIM.003.b_10 == 1, 1, 0),
+          donations = ifelse (STIM.003.b_11 == 1, 1, 0),
+          saving_investment = ifelse (STIM.003.b_12 == 1, 1, 0),
+          other = ifelse (STIM.003.b_13 == 1, 1, 0),
+          )%>%
+  filter (poverty_3c != "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(),
+             food = sum (food, na.rm = T)/n, 
+             clothing = sum (clothing, na.rm = T)/n, 
+             supplies_personal_care = sum (supplies_personal_care, na.rm = T)/n,
+             household_items = sum (household_items, na.rm = T)/n, 
+             recreational = sum (recreational, na.rm = T)/n, 
+             rent = sum (rent, na.rm = T)/n, 
+             mortgage = sum (mortgage, na.rm = T)/n, 
+             utilities = sum (utilities, na.rm = T)/n, 
+             vehicle_pay = sum (vehicle_pay, na.rm = T)/n, 
+             credit_card_loans = sum (credit_card_loans, na.rm = T)/n, 
+             donations = sum (donations, na.rm = T)/n, 
+             saving_investment = sum (saving_investment, na.rm = T)/n, 
+             other = sum (other, na.rm = T)/n) %>%
+  pivot_longer (cols = c("food", "clothing", "supplies_personal_care", "household_items", "recreational", "rent", "mortgage", "utilities", "vehicle_pay", "credit_card_loans", "donations", "saving_investment", "other"), names_to = "stimulus", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          which = "second stimulus check")
+
+stimulus_1 %>%
+  ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  ggtitle("first stimulus check")+
+  facet_wrap (~poverty_3c, ncol = 2)
+
+stimulus_2 %>%
+  ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  ggtitle("second stimulus check")+
+  facet_wrap (~poverty_3c, ncol = 2)
+
+unemployment %>%
+  ggplot(mapping = aes (y =  reorder(stimulus, -prop), x = prop*100, fill = stimulus)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage")+
+  ggtitle("unemployment")+
+  facet_wrap (~poverty_3c, ncol = 3)
 ```
