@@ -455,6 +455,12 @@ $(document).ready(function () {
     <li>
       <a href="Workforce.html">Workforce</a>
     </li>
+    <li>
+      <a href="COVID-Infection.html">COVID Infection</a>
+    </li>
+    <li>
+      <a href="Vaccine.html">Vaccine</a>
+    </li>
   </ul>
 </li>
 <li class="dropdown">
@@ -614,9 +620,46 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>library(here)
-library(openintro)
-source(here(&quot;Scripts/score data.R&quot;))</code></pre>
+<pre class="r"><code>library(here)</code></pre>
+<pre><code>## here() starts at /Users/pnovak2/src/Rapid-R3-Website</code></pre>
+<pre class="r"><code>library(openintro)</code></pre>
+<pre><code>## Loading required package: airports</code></pre>
+<pre><code>## Loading required package: cherryblossom</code></pre>
+<pre><code>## Loading required package: usdata</code></pre>
+<pre class="r"><code>source(here(&quot;Scripts/score data.R&quot;))</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
+## ✓ tibble  3.0.6     ✓ dplyr   1.0.4
+## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
+## ✓ readr   1.4.0     ✓ forcats 0.5.0</code></pre>
+<pre><code>## ── Conflicts ───────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>## 
+## Attaching package: &#39;kableExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     group_rows</code></pre>
+<pre><code>## 
+## Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
+<pre><code>## 
+## Attaching package: &#39;jsonlite&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     flatten</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
 <pre class="r"><code>states = scored %&gt;% 
   group_by(CaregiverID) %&gt;% 
   filter(Week == max(Week)) %&gt;%
@@ -657,8 +700,19 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
 ## 
   |                                                                                                           
   |....                                                                                                 |   4%
-## label: state-specific-2
+## label: state-specific-2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
 ## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre><code>## 
   |                                                                                                           
   |.....                                                                                                |   5%
 ##   ordinary text without R code
@@ -751,8 +805,11 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
 ## 
   |                                                                                                           
   |.......................                                                                              |  22%
-## label: state-specific-4
-## 
+## label: state-specific-4</code></pre>
+<pre><code>## Warning: `group_by_()` was deprecated in dplyr 0.7.0.
+## Please use `group_by()` instead.
+## See vignette(&#39;programming&#39;) for more help</code></pre>
+<pre><code>## 
   |                                                                                                           
   |........................                                                                             |  23%
 ##   ordinary text without R code
@@ -1130,10 +1187,10 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_AZ_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d33e2633e1.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d33e1818a7.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_AZ_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec37d6e484.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec7d34b2bf.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
-## Output created: state_AZ_report.html
-## 
+## Output created: state_AZ_report.html</code></pre>
+<pre><code>## 
 ## 
 ## processing file: state_specific.Rmd</code></pre>
 <pre><code>## 
@@ -1639,7 +1696,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_CA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d3389a0fac.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d3a7b023c.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_CA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec67843e5e.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec1b1ac26a.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_CA_report.html
 ## 
@@ -2140,7 +2197,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_FL_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d3105ea093.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d334801b4a.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_FL_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec4453cc2.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec5d97e6be.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_FL_report.html
 ## 
@@ -2649,7 +2706,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_GA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d37f6e9802.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d335bdecaa.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_GA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec6ce34884.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec3dae09f5.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_GA_report.html
 ## 
@@ -3158,7 +3215,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_IL_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d342ce6fb.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d31ff06ae1.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_IL_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec544ebeab.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec7dc7f7ca.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_IL_report.html
 ## 
@@ -3659,7 +3716,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_MI_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d3a9deff1.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d36f3bca9.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_MI_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec7b906643.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec4529f815.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_MI_report.html
 ## 
@@ -4160,7 +4217,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_NC_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d317a473ea.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d32db613c6.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_NC_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-streceecd4a3.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec5e7c20fc.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_NC_report.html
 ## 
@@ -4669,7 +4726,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_NY_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d335b30de7.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d37e55d43b.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_NY_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec26744295.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec1abf57ec.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_NY_report.html
 ## 
@@ -5170,7 +5227,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_OH_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d321e6fc87.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d343cd1474.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_OH_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec6308f20a.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec604aa151.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_OH_report.html
 ## 
@@ -5671,7 +5728,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_OR_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d31426fbca.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d3b5c951c.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_OR_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec79c6a2d.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec2dfeb442.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_OR_report.html
 ## 
@@ -6172,7 +6229,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_PA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d324c8068.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d36c822d05.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_PA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec3de0ade9.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec69b9bbbb.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_PA_report.html
 ## 
@@ -6673,7 +6730,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_TX_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d36973dbc8.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d335625d8e.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_TX_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec2b69d9e.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec2325f176.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_TX_report.html
 ## 
@@ -7174,7 +7231,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_VA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d3191a7225.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d3173be803.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_VA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec48dc1657.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec693ecf1f.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_VA_report.html
 ## 
@@ -7683,7 +7740,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_WA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d36afb9361.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d32a88fc26.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_WA_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec6cc5259c.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec3285c8e.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_WA_report.html
 ## 
@@ -8192,7 +8249,7 @@ source(here(&quot;Scripts/score data.R&quot;))</code></pre>
   |.....................................................................................................| 100%
 ##   ordinary text without R code</code></pre>
 <pre><code>## output file: state_specific.knit.md</code></pre>
-<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_WI_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d31047fb01.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpcAgnJg/rmarkdown-strd2d365b00700.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
+<pre><code>## /usr/local/bin/pandoc +RTS -K512m -RTS state_specific.utf8.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output state_WI_report.html --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /usr/local/lib/R/4.0/site-library/rmarkdown/rmarkdown/lua/latex-div.lua --email-obfuscation none --self-contained --standalone --section-divs --table-of-contents --toc-depth 3 --variable toc_float=1 --variable toc_selectors=h1,h2,h3 --variable toc_collapsed=1 --variable toc_smooth_scroll=1 --variable toc_print=1 --template /usr/local/lib/R/4.0/site-library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --include-before-body /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec3a156c36.html --variable navbar=1 --variable body_padding=51 --variable header_padding=56 --variable &#39;theme:bootstrap&#39; --include-in-header /var/folders/qr/n72b0rk556vfj6t94m6c6rl00000gq/T//RtmpbHTi6r/rmarkdown-strec54736b04.html --mathjax --variable &#39;mathjax-url:https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&#39;</code></pre>
 <pre><code>## 
 ## Output created: state_WI_report.html</code></pre>
 <pre class="r"><code>source(here(&quot;Scripts/score data.R&quot;))
