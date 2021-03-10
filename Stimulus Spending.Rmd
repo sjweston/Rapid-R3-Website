@@ -701,7 +701,6 @@ stimulus_smy %>%
 ```
 
 
-
 ```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show='hide'}
 
 ### Three categories: Below 100%FPL, 100-200%FPL, and above 200%FPL
@@ -775,7 +774,6 @@ stimulus_smy %>%
 
 
 ```
-
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show='hide'}
 
@@ -1294,7 +1292,7 @@ stimulus_rct <- stimulus_rct %>%
                                  FPL_pct >= 2 & FPL_pct < 3 ~ "3.200-300%FPL",
                                  FPL_pct >= 3 & FPL_pct < 4 ~ "4.300-400%FPL",
                                  FPL_pct >= 4 & FPL_pct < 5 ~ "5.400-500%FPL",
-                                 FPL_pct >= 5 & FPL_pct < 7 ~ "6.500-700%FPL",
+                                 FPL_pct >= 5 & FPL_pct < 8 ~ "6.500-800%FPL",
                                  FPL_pct >= 8  ~ "7.Above 800%FPL"))
 
 stimulus_1 <- stimulus_rct %>%
@@ -1859,6 +1857,8 @@ unemployment %>%
 
 ## By poverty level
 ### By Full Spectrum of Poverty Level
+  * Note that "above 800%FPL has very small sample size (n < 40)\
+  
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 stimulus_1 <- stimulus_rct %>%
   filter (STIM.001==1)%>%
@@ -1959,6 +1959,72 @@ unemployment %>%
   facet_wrap (~FPL_pct_c, ncol = 7)+
   theme(legend.position = "none") 
 ```
+#### Line graphs
+  * Note that "above 800%FPL has very small sample size (n < 40)\
+  * X axis indicates %of FPL in the order of: below 100%FPL, 100-200%FPL, 200-300%FPL, 300-400%FPL, 400-500%FPL, 500-800%FPL, and above 800%FPL\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+stimulus_1 %>%
+  mutate (FPL_pct_cn = as.numeric(case_when (FPL_pct_c == "1.Below 100%FPL" ~ 1,
+                                             FPL_pct_c == "2.100-200%FPL" ~ 2,
+                                             FPL_pct_c == "3.200-300%FPL" ~ 3,
+                                             FPL_pct_c == "4.300-400%FPL" ~ 4,
+                                             FPL_pct_c == "5.400-500%FPL" ~ 5,
+                                             FPL_pct_c == "6.500-800%FPL" ~ 6,
+                                             FPL_pct_c == "7.Above 800%FPL" ~ 7)))%>%
+  ggplot(mapping = aes (x = FPL_pct_cn, y = prop*100, fill = stimulus)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  labs (y = "Percentage")+
+  ggtitle("first stimulus check")+
+  scale_x_discrete('FPL_pct_cn', 
+                   c("1", "2", "3", "4", "5", "6", "7"), 
+                   c("Below 100%FPL", "100-200%FPL", "200-300%FPL", "300-400%FPL", "400-500%FPL", "500-800%FPL", "Above 800%FPL"))+
+  facet_wrap(~stimulus, ncol = 4)+
+  theme(legend.position = "none")
+
+stimulus_2 %>%
+  mutate (FPL_pct_cn = as.numeric(case_when (FPL_pct_c == "1.Below 100%FPL" ~ 1,
+                                             FPL_pct_c == "2.100-200%FPL" ~ 2,
+                                             FPL_pct_c == "3.200-300%FPL" ~ 3,
+                                             FPL_pct_c == "4.300-400%FPL" ~ 4,
+                                             FPL_pct_c == "5.400-500%FPL" ~ 5,
+                                             FPL_pct_c == "6.500-800%FPL" ~ 6,
+                                             FPL_pct_c == "7.Above 800%FPL" ~ 7)))%>%
+  ggplot(mapping = aes (x = FPL_pct_cn, y = prop*100, fill = stimulus)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  labs (y = "Percentage")+
+  ggtitle("second stimulus check")+
+  scale_x_discrete(breaks=stimulus_2$FPL_pct_cn, labels=stimulus_2$FPL_pct_c)+
+  facet_wrap(~stimulus, ncol = 4)+
+  theme(legend.position = "none")
+
+unemployment %>%
+  mutate (FPL_pct_cn = as.numeric(case_when (FPL_pct_c == "1.Below 100%FPL" ~ 1,
+                                             FPL_pct_c == "2.100-200%FPL" ~ 2,
+                                             FPL_pct_c == "3.200-300%FPL" ~ 3,
+                                             FPL_pct_c == "4.300-400%FPL" ~ 4,
+                                             FPL_pct_c == "5.400-500%FPL" ~ 5,
+                                             FPL_pct_c == "6.500-800%FPL" ~ 6,
+                                             FPL_pct_c == "7.Above 800%FPL" ~ 7)))%>%
+  ggplot(mapping = aes (x = FPL_pct_cn, y = prop*100, fill = stimulus)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  labs (y = "Percentage")+
+  ggtitle("unemployment")+
+  scale_x_discrete(breaks=unemployment$FPL_pct_cn, labels=unemployment$FPL_pct_c)+
+  facet_wrap(~stimulus, ncol = 4)+
+  theme(legend.position = "none")
+  
+
+
+```
+
 
 ### By Three Categories: Below 200%FPL, 200-400%FPL, above 400%FPL
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
