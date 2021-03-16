@@ -58,7 +58,10 @@ my.min = function(x) ifelse (!all(is.na(x)), min(x,na.rm = TRUE), NA)
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE, include=FALSE}
 #OR load master data file
-master <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings.sav"))
+master_2020 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2020.sav"))
+master_2021 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2021.sav"))
+
+master <- full_join (master_2020, master_2021)
 
 # Remove cases should be excluded
 master <- master %>%
@@ -122,7 +125,7 @@ mutate (race_ethnic = case_when(
 
 ##Povertyline - 0 = high income, 1 = low income
 master <- master %>%
-  mutate (poverty_cat = FPL.150)
+  mutate (poverty_cat = FPL.2019.UM.150)
 
 #Material hardship
 master <- master %>%
@@ -293,8 +296,8 @@ master_dem <- master %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf <- master %>%
-  select (CaregiverID, Week, StartDate, contains ("WKFORCE"))%>%
-  filter (Week %in% c(33, 37, 41, 45))
+  select (CaregiverID, Week, StartDate, contains ("WKFORCE"), JOB.008.2)%>%
+  filter (Week %in% c(33, 37, 41, 45, 47))
 
 wkf <- merge (x = wkf, y = master_dem, by.x = "CaregiverID", by.y = "CaregiverID", all.x = T)
 
@@ -317,20 +320,32 @@ wkf_rct <- wkf_f %>%
 ```
 
 # 0. Sample Disclaimer
-  * This set of analyses on stimulus spending is based on responses collected from 2,495 FEMALE caregivers between the dates of November 17th, 2020 and February 20th, 2021. These caregivers represent a range of voices: 8.38% are Black/African American, 11.95% are Latinx, and 25.32% live at or below 1.5 times the federal poverty line.  Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are not weighted. \
+  * This set of analyses on stimulus spending is based on responses collected from 2,877 FEMALE caregivers between the dates of November 17th, 2020 and March 5th, 2021. These caregivers represent a range of voices: 7.75% are Black/African American, 11.58% are Latinx, and 24.82% live at or below 1.5 times the federal poverty line.  Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are not weighted. \
   
 # 1. Working Status
   * Survey question: Since the COVID-19 crisis, have you considered any of the following? Select all that apply. \
     + Reducing my work hours\
     + Switching to less demanding job\
     + Taking a leave or absence\
-    + Moving from a fulltime role into a parttime role\
+    + Moving from a full-time role into a part-time role\
     + Leaving the workforce altogether\
+  * Since the COVID-19 crisis, which of the following have you done? Select all that apply. (only week 47)\
+    + I reduced my work hours\
+    + I switched to less demanding job\
+    + I took a leave or absence\
+    + I moved from a full-time role into a part-time role\
+    + I left the workforce altogether\
+  * From a financial perspective, can you currently afford to reduce work hours? - yes/no/na (only week 47)\
+  * From a financial perspective, can you currently afford to stop working? - yes/no/na (only week 47)\
+  
 
 ## 1.1 Most recent responses
-
+  * Options considered/have done\
+  
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_rct$WKFORCE.001_0[is.na(wkf_rct$WKFORCE.001_0)] <- 0
+wkf_f$WKFORCE.001.a_0[is.na(wkf_f$WKFORCE.001.a_0)] <- 0
+
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.001_0 == 0)%>%
   summarise(n = n(),
@@ -338,12 +353,32 @@ wkf_crt <- wkf_rct %>%
             Switching_less_demanding_job = sum (WKFORCE.001_2, na.rm = T)/n,
             Leave_absence =sum (WKFORCE.001_3, na.rm = T)/n,
             Moving_to_parttime = sum (WKFORCE.001_4, na.rm = T)/n,
-            Leaving_workforce = sum (WKFORCE.001_5, na.rm = T)/n)%>%
-  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce"), names_to = "wkf", values_to = "prop")%>%
+            Leaving_workforce = sum (WKFORCE.001_5, na.rm = T)/n, 
+            none_of_above = sum (WKFORCE.001_6, na.rm = T)/n)%>%
+  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce", "none_of_above"), names_to = "wkf", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
-          ci_high = prop+moe)
+          ci_high = prop+moe, 
+          type = "Consider")
+
+wkf_done <- wkf_f %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47)%>%
+  summarise(n = n(),
+            Reducing_hours = sum (WKFORCE.001.a_1, na.rm = T)/n,
+            Switching_less_demanding_job = sum (WKFORCE.001.a_2, na.rm = T)/n,
+            Leave_absence =sum (WKFORCE.001.a_3, na.rm = T)/n,
+            Moving_to_parttime = sum (WKFORCE.001.a_4, na.rm = T)/n,
+            Leaving_workforce = sum (WKFORCE.001.a_5, na.rm = T)/n, 
+            none_of_above = sum (WKFORCE.001.a_6, na.rm = T)/n)%>%
+  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce", "none_of_above"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          type = "Have done")
+
+wkf_crt <- rbind (wkf_crt, wkf_done)
 
 wkf_crt %>%
   ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
@@ -353,11 +388,240 @@ wkf_crt %>%
                     width = .3,
                     position = position_dodge(1)) +
   geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
-  labs (y = "")+ theme(legend.position = "none")
+  labs (y = "")+ 
+  theme(legend.position = "none")+
+  facet_wrap (~type)
 ```
 
+  * Ability to afford reducing hours/stopping working 
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_f <- wkf_f %>%
+  mutate (WKFORCE.009 = na_if (WKFORCE.009, 2), 
+          WKFORCE.010 = na_if (WKFORCE.010, 2))
+
+wkf_reduce <- wkf_f %>%
+  filter (Week == 47 & is.na(WKFORCE.009) == F)%>%
+ summarise(n = n(),
+            prop = sum (WKFORCE.009, na.rm = T)/n
+            )%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "afford_reducing_hours")
+
+wkf_stop <- wkf_f %>%
+  filter (Week == 47 & is.na(WKFORCE.010) == F)%>%
+  summarise(n = n(),
+            prop = sum (WKFORCE.010, na.rm = T)/n)%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "afford_stopping_working")
+
+wkf_done <- rbind (wkf_reduce, wkf_stop)
+  
+wkf_done %>%
+  ggplot(mapping = aes (x =  wkf, y = prop*100, fill = wkf)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (x = "")+ 
+  theme(legend.position = "none")
+
+```
+
+  * Crosstab of Ability to afford & have done\
+    + "Reduced" category includes parents who reduced working hours or moved to part time jobs\
+    + "Left" category includes parents who left workforce or took a leave/absence\
+    
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_f$WKFORCE.001.a_1[is.na(wkf_f$WKFORCE.001.a_1)] <- 0
+wkf_f$WKFORCE.001.a_2[is.na(wkf_f$WKFORCE.001.a_2)] <- 0
+wkf_f$WKFORCE.001.a_3[is.na(wkf_f$WKFORCE.001.a_3)] <- 0
+wkf_f$WKFORCE.001.a_4[is.na(wkf_f$WKFORCE.001.a_4)] <- 0
+wkf_f$WKFORCE.001.a_5[is.na(wkf_f$WKFORCE.001.a_5)] <- 0
+
+wkf_reduced <- wkf_f %>%
+  filter (Week == 47 & WKFORCE.001.a_0 == 0 & is.na(WKFORCE.009) == F)%>%
+  filter (WKFORCE.001.a_1 == 1|WKFORCE.001.a_4 == 1)%>%
+  mutate (afford_to_reduce = ifelse (WKFORCE.009 == 1, 1, 0), 
+          not_afford_to_reduce = ifelse (WKFORCE.009 == 0, 1, 0)
+          )%>%
+  summarise(n = n(),
+            afford_to_reduce = sum (afford_to_reduce, na.rm = T)/n, 
+            not_afford_to_reduce = sum (not_afford_to_reduce, na.rm = T)/n
+            )%>%
+  pivot_longer (cols = c("afford_to_reduce","not_afford_to_reduce"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          reduce = "reduced hours")
+
+wkf_not_reduced <- wkf_f %>%
+  filter (Week == 47 & WKFORCE.001.a_0 == 0& is.na(WKFORCE.009) == F )%>%
+  filter (WKFORCE.001.a_1 == 0 & WKFORCE.001.a_4 == 0)%>%
+  mutate (afford_to_reduce = ifelse (WKFORCE.009 == 1, 1, 0), 
+          not_afford_to_reduce = ifelse (WKFORCE.009 == 0, 1, 0)
+          )%>%
+  summarise(n = n(),
+            afford_to_reduce = sum (afford_to_reduce, na.rm = T)/n, 
+            not_afford_to_reduce = sum (not_afford_to_reduce, na.rm = T)/n
+            )%>%
+  pivot_longer (cols = c("afford_to_reduce","not_afford_to_reduce"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          reduce = "not reduced hours")
+
+wkf_reduce <- rbind (wkf_reduced, wkf_not_reduced)
+
+wkf_reduce %>%
+  ggplot(mapping = aes (x =  reduce, y = prop*100, fill = wkf)) +
+  geom_bar (stat = "identity", position = "stack")+
+  geom_text(aes(label = round(prop*100,2)),vjust = 3, size = 2.5, color = "black",  position ="stack")+
+  labs (x = "")+
+  ggtitle (label = "Reduce Working Hours")
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_stopped <- wkf_f %>%
+  filter (Week == 47 & WKFORCE.001.a_0 == 0 & is.na(WKFORCE.010) == F)%>%
+  filter (WKFORCE.001.a_3 == 1|WKFORCE.001.a_5 == 1)%>%
+  mutate (afford_to_stop = ifelse (WKFORCE.010 == 1, 1, 0), 
+          not_afford_to_stop = ifelse (WKFORCE.010 == 0, 1, 0)
+          )%>%
+  summarise(n = n(),
+            afford_to_stop = sum (afford_to_stop, na.rm = T)/n, 
+            not_afford_to_stop = sum (not_afford_to_stop, na.rm = T)/n
+            )%>%
+  pivot_longer (cols = c("afford_to_stop","not_afford_to_stop"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          stop = "stopped working")
+
+wkf_not_stopped <- wkf_f %>%
+  filter (Week == 47 & WKFORCE.001.a_0 == 0& is.na(WKFORCE.010) == F )%>%
+  filter (WKFORCE.001.a_3 == 0 & WKFORCE.001.a_5 == 0)%>%
+  mutate (afford_to_stop = ifelse (WKFORCE.010 == 1, 1, 0), 
+          not_afford_to_stop = ifelse (WKFORCE.010 == 0, 1, 0)
+          )%>%
+  summarise(n = n(),
+            afford_to_stop = sum (afford_to_stop, na.rm = T)/n, 
+            not_afford_to_stop = sum (not_afford_to_stop, na.rm = T)/n
+            )%>%
+  pivot_longer (cols = c("afford_to_stop","not_afford_to_stop"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          stop = "not stopped working")
+
+wkf_stop <- rbind (wkf_stopped, wkf_not_stopped)
+
+wkf_stop %>%
+  ggplot(mapping = aes (x =  stop, y = prop*100, fill = wkf)) +
+  geom_bar (stat = "identity", position = "stack")+
+  geom_text(aes(label = round(prop*100,2)),vjust = 3, size = 2.5, color = "black",  position ="stack")+
+  labs (x = "")+
+  ggtitle (label = "Reduce Working Hours")
+
+```
+
+  * Crosstab of forced to reduce hours/leave workforce & have done\
+    + Survey question about current work status: What is your current employment status - working full time/unemployed or laid off/temporarily out of work or furloughed/other\
+    + "Forced to reduce/leave work" category includes participants who reported being unemployed or laid off, and being temporarily out of work or furloughed\
+    + "Voluntarily reduce/leave work" category includes participants who did not report being unemployed, laid off, temporarily out of work, or furloughed.\
+    
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_f <- wkf_f %>%
+  mutate (forced = ifelse (JOB.008.2 %in% c(2,3), 1, 0), 
+          voluntarily = ifelse (JOB.008.2 %in% c(2,3), 0, 1))
+
+wkf_reducing_hours <- wkf_f %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47 & WKFORCE.001.a_1 == 1)%>%
+  summarise (n = 694,
+             forced_to_reduce_leave_work = sum (forced, na.rm = T)/n, 
+             voluntarily_reduce_leave_work = sum (voluntarily, na.rm = T)/n)%>%
+  pivot_longer (cols = c("forced_to_reduce_leave_work", "voluntarily_reduce_leave_work"), names_to = "condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "Reducing hours")
+
+wkf_switching_less_demanding_job <- wkf_f %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47 & WKFORCE.001.a_2 == 1)%>%
+  summarise (n = 694,
+             forced_to_reduce_leave_work = sum (forced, na.rm = T)/n, 
+             voluntarily_reduce_leave_work = sum (voluntarily, na.rm = T)/n)%>%
+  pivot_longer (cols = c("forced_to_reduce_leave_work", "voluntarily_reduce_leave_work"), names_to = "condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "Switching to Less Demanding Jobs")
+
+wkf_leave_absence <- wkf_f %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47 & WKFORCE.001.a_3 == 1)%>%
+  summarise (n = 694,
+             forced_to_reduce_leave_work = sum (forced, na.rm = T)/n, 
+             voluntarily_reduce_leave_work = sum (voluntarily, na.rm = T)/n)%>%
+  pivot_longer (cols = c("forced_to_reduce_leave_work", "voluntarily_reduce_leave_work"), names_to = "condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "Take a leave or absence")
+
+wkf_leaving_workforce <- wkf_f %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47 & WKFORCE.001.a_5 == 1)%>%
+  summarise (n = 694,
+             forced_to_reduce_leave_work = sum (forced, na.rm = T)/n, 
+             voluntarily_reduce_leave_work = sum (voluntarily, na.rm = T)/n)%>%
+  pivot_longer (cols = c("forced_to_reduce_leave_work", "voluntarily_reduce_leave_work"), names_to = "condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "Leaving Workforce Alltogether")
+
+wkf_move_to_parttime <- wkf_f %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47 & WKFORCE.001.a_4 == 1)%>%
+  summarise (n = 694,
+             forced_to_reduce_leave_work = sum (forced, na.rm = T)/n, 
+             voluntarily_reduce_leave_work = sum (voluntarily, na.rm = T)/n)%>%
+  pivot_longer (cols = c("forced_to_reduce_leave_work", "voluntarily_reduce_leave_work"), names_to = "condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "Move to part time")
+
+
+wkf_done <- rbind (rbind (rbind (rbind (wkf_reducing_hours, wkf_switching_less_demanding_job), wkf_leave_absence), wkf_leaving_workforce), wkf_move_to_parttime)
+
+wkf_done %>%
+  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = condition)) +
+  geom_bar (stat = "identity", position = "stack")+
+  geom_text(aes(label = round(prop*100,2)), size = 2.5, color = "black",  position = "stack")+
+  labs (y = "")
+
+
+```
 
 ### 1.1.1 By race/ethnicity
+  * Options considered/have done\
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.001_0 == 0 & race_ethnic != "NA")%>%
@@ -367,26 +631,92 @@ wkf_crt <- wkf_rct %>%
             Switching_less_demanding_job = sum (WKFORCE.001_2, na.rm = T)/n,
             Leave_absence =sum (WKFORCE.001_3, na.rm = T)/n,
             Moving_to_parttime = sum (WKFORCE.001_4, na.rm = T)/n,
-            Leaving_workforce = sum (WKFORCE.001_5, na.rm = T)/n)%>%
-  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce"), names_to = "wkf", values_to = "prop")%>%
+            Leaving_workforce = sum (WKFORCE.001_5, na.rm = T)/n, 
+            none_of_above = sum (WKFORCE.001_6, na.rm = T)/n)%>%
+  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce", "none_of_above"), names_to = "wkf", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
-          ci_high = prop+moe)
+          ci_high = prop+moe, 
+          type = "Consider")
+
+wkf_done <- wkf_f %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47 & race_ethnic != "NA")%>%
+   group_by (race_ethnic)%>%
+  summarise(n = n(),
+            Reducing_hours = sum (WKFORCE.001.a_1, na.rm = T)/n,
+            Switching_less_demanding_job = sum (WKFORCE.001.a_2, na.rm = T)/n,
+            Leave_absence =sum (WKFORCE.001.a_3, na.rm = T)/n,
+            Moving_to_parttime = sum (WKFORCE.001.a_4, na.rm = T)/n,
+            Leaving_workforce = sum (WKFORCE.001.a_5, na.rm = T)/n, 
+            none_of_above = sum (WKFORCE.001.a_6, na.rm = T)/n)%>%
+  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce", "none_of_above"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          type = "Have done")
+
+wkf_crt <- rbind (wkf_crt, wkf_done)
 
 wkf_crt %>%
-  ggplot(mapping = aes (y =  race_ethnic, x = prop*100, fill = race_ethnic)) +
+  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
                     width = .3,
                     position = position_dodge(1)) +
-  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
   labs (y = "")+
-  facet_wrap (~wkf, nrow = 2)
+  theme(legend.position = "none")+
+  facet_wrap (race_ethnic~type, nrow = 3)
+```
+
+  * Ability to afford reducing hours/stopping working 
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+wkf_reduce <- wkf_f %>%
+  filter (Week == 47 & is.na(WKFORCE.009) == F & race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+ summarise(n = n(),
+          prop = sum (WKFORCE.009, na.rm = T)/n
+            )%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "afford_reducing_hours")
+
+wkf_stop <- wkf_f %>%
+  filter (Week == 47 & is.na(WKFORCE.010) == F & race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise(n = n(),
+            prop = sum (WKFORCE.010, na.rm = T)/n)%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "afford_stopping_working")
+
+wkf_done <- rbind (wkf_reduce, wkf_stop)
+  
+wkf_done %>%
+  ggplot(mapping = aes (x =  race_ethnic, y = prop*100, fill = race_ethnic)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (x = "")+ 
+  theme(legend.position = "none")+
+  facet_wrap(~wkf, nrow = 1)
+
 ```
 
 ### 1.1.2 By poverty level
+  * Options considered/have done\
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.001_0 == 0 & poverty_cat != "NA")%>%
@@ -396,26 +726,92 @@ wkf_crt <- wkf_rct %>%
             Switching_less_demanding_job = sum (WKFORCE.001_2, na.rm = T)/n,
             Leave_absence =sum (WKFORCE.001_3, na.rm = T)/n,
             Moving_to_parttime = sum (WKFORCE.001_4, na.rm = T)/n,
-            Leaving_workforce = sum (WKFORCE.001_5, na.rm = T)/n)%>%
-  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce"), names_to = "wkf", values_to = "prop")%>%
+            Leaving_workforce = sum (WKFORCE.001_5, na.rm = T)/n, 
+            none_of_above = sum (WKFORCE.001_6, na.rm = T)/n)%>%
+  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce", "none_of_above"), names_to = "wkf", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
-          ci_high = prop+moe)
+          ci_high = prop+moe, 
+          type = "Consider")
+
+wkf_done <- wkf %>%
+  filter (WKFORCE.001.a_0 == 0 & Week == 47 & poverty_cat != "NA")%>%
+   group_by (poverty_cat)%>%
+  summarise(n = n(),
+            Reducing_hours = sum (WKFORCE.001.a_1, na.rm = T)/n,
+            Switching_less_demanding_job = sum (WKFORCE.001.a_2, na.rm = T)/n,
+            Leave_absence =sum (WKFORCE.001.a_3, na.rm = T)/n,
+            Moving_to_parttime = sum (WKFORCE.001.a_4, na.rm = T)/n,
+            Leaving_workforce = sum (WKFORCE.001.a_5, na.rm = T)/n, 
+            none_of_above = sum (WKFORCE.001.a_6, na.rm = T)/n)%>%
+  pivot_longer (cols = c("Reducing_hours", "Switching_less_demanding_job", "Leave_absence", "Moving_to_parttime", "Leaving_workforce", "none_of_above"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          type = "Have done")
+
+wkf_crt <- rbind (wkf_crt, wkf_done)
 
 wkf_crt %>%
-  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = poverty_cat)) +
+  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
                     width = .3,
                     position = position_dodge(1)) +
-  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
-  labs (y = "")
+  geom_text(aes(label = round(prop*100,2)),vjust = -0.5, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "")+
+  theme(legend.position = "none")+
+  facet_wrap (poverty_cat~type, nrow = 2)
 ```
 
-### 1.1.3 By race/ethnicity & poverty level
+  * Ability to afford reducing hours/stopping working 
+  
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+wkf_reduce <- wkf_f %>%
+  filter (Week == 47 & is.na(WKFORCE.009) == F & poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+ summarise(n = n(),
+          prop = sum (WKFORCE.009, na.rm = T)/n
+            )%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "afford_reducing_hours")
+
+wkf_stop <- wkf_f %>%
+  filter (Week == 47 & is.na(WKFORCE.010) == F & poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise(n = n(),
+            prop = sum (WKFORCE.010, na.rm = T)/n)%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          wkf = "afford_stopping_working")
+
+wkf_done <- rbind (wkf_reduce, wkf_stop)
+  
+wkf_done %>%
+  ggplot(mapping = aes (x =  poverty_cat, y = prop*100, fill = poverty_cat)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (x = "")+ 
+  theme(legend.position = "none")+
+  facet_wrap(~wkf, nrow = 1)
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show="hide"}
+### 1.1.3 By race/ethnicity & poverty level
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.001_0 == 0 & race_ethnic != "NA" & poverty_cat!= "NA")%>%
   group_by (race_ethnic, poverty_cat)%>%
@@ -445,22 +841,33 @@ wkf_crt %>%
 
 ## 1.2 Whether people chose these options are the same group of people
 
-  * Based on this figure, about 50% of caregivers did not consider any of these options. Among the rest, about 25% chose one option, 10% chose two, 7% chose three, and 8% chose four or all five options.\
-  
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_rct <- wkf_rct %>%
   rowwise %>%
   mutate (num_options = sum (WKFORCE.001_1,WKFORCE.001_2, WKFORCE.001_3, WKFORCE.001_4, WKFORCE.001_5, na.rm = T))%>%
   ungroup()
 
+wkf_done <- wkf_f %>%
+  filter (Week == 47)%>%
+  rowwise %>%
+  mutate (num_options = sum (WKFORCE.001.a_1,WKFORCE.001.a_2, WKFORCE.001.a_3, WKFORCE.001.a_4, WKFORCE.001.a_5, na.rm = T))%>%
+  ungroup()
+
 wkf_rct %>%
   filter (WKFORCE.001_0 == 0)%>%
   ggplot (mapping = aes (x = num_options, y = stat (prop)))+
-  geom_bar()
+  geom_bar()+
+  ggtitle (label = "Consider")
+
+wkf_done %>%
+  filter (WKFORCE.001.a_0 == 0)%>%
+  ggplot (mapping = aes (x = num_options, y = stat (prop)))+
+  geom_bar()+
+  ggtitle (label = "Have Done")
 
 ```
 
-## 1.3 Trend
+## 1.3 Trend (Only for "Consider")
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_f$WKFORCE.001_0[is.na(wkf_f$WKFORCE.001_0)] <- 0
 wkf_trend <- wkf_f %>%
@@ -640,8 +1047,9 @@ wkf_crt %>%
   labs (y = "")
 ```
 
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show="hide"}
 ### 2.1.3 By race/ethnicity & poverty level
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.003_0 == 0 & race_ethnic!= "NA"& poverty_cat!= "NA")%>%
   group_by (race_ethnic,poverty_cat)%>%
@@ -792,7 +1200,7 @@ wkf_crt <- wkf_rct %>%
           ci_high = prop+moe)
 
 wkf_crt %>%
-  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
+  ggplot(mapping = aes (y =  wkf, x = prop*100, fill = wkf)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -824,7 +1232,7 @@ wkf_crt <- wkf_rct %>%
           ci_high = prop+moe)
 
 wkf_crt %>%
-  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
+  ggplot(mapping = aes (y =  wkf, x = prop*100, fill = wkf)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -857,7 +1265,7 @@ wkf_crt <- wkf_rct %>%
           ci_high = prop+moe)
 
 wkf_crt %>%
-  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
+  ggplot(mapping = aes (y =  wkf, x = prop*100, fill = wkf)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -890,7 +1298,7 @@ wkf_crt <- wkf_rct %>%
           ci_high = prop+moe)
 
 wkf_crt %>%
-  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
+  ggplot(mapping = aes (y =  wkf, x = prop*100, fill = wkf)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(xmin = ci_low*100, 
                     xmax = ci_high*100),
@@ -1074,8 +1482,9 @@ wkf_crt %>%
   labs (y = "")
 ```
 
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show="hide"}
+
 ## 4.3 By race/ethnicity & poverty level
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (race_ethnic!= "NA" & poverty_cat!= "NA")%>%
   group_by (race_ethnic, poverty_cat)%>%
@@ -1280,8 +1689,9 @@ wkf_crt %>%
   labs (y = "Practices")
 ```
 
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show="hide"}
 ## 5.3 By race/ethnicity & poverty level
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.006_0 == 0 & race_ethnic!= "NA" & poverty_cat!= "NA")%>%
   group_by (race_ethnic, poverty_cat)%>%
@@ -1430,9 +1840,10 @@ wkf_crt %>%
   labs (y = "")
 ```
 
-## 6.3 By race/ethnicity & poverty level
+
    
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show="hide"}
+## 6.3 By race/ethnicity & poverty level
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.008 != 0 & race_ethnic!= "NA" & poverty_cat!= "NA")%>%
   group_by (race_ethnic, poverty_cat)%>%

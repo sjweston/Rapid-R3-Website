@@ -13,21 +13,28 @@
 
 <title>Low income households</title>
 
-<script src="site_libs/header-attrs-2.5/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -43,11 +50,6 @@
     </style>
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 <script type="text/javascript">
 if (window.hljs) {
   hljs.configure({languages: []});
@@ -60,32 +62,7 @@ if (window.hljs) {
 
 
 
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
+
 
 
 
@@ -95,10 +72,6 @@ h6 {
   max-width: 940px;
   margin-left: auto;
   margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
 }
 img {
   max-width:100%;
@@ -115,40 +88,13 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+pre code {
+  padding: 0;
+}
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 51px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
 .dropdown-submenu {
   position: relative;
 }
@@ -176,7 +122,7 @@ body {
   margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
+  border-left-color: #adb5bd;
 }
 .dropdown-submenu.pull-left {
   float: none;
@@ -188,7 +134,7 @@ body {
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -199,10 +145,23 @@ $(document).ready(function () {
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
-  menuAnchor.parent().addClass('active');
+  menuAnchor.tab('show');
 
   // if it's got a parent navbar menu mark it active as well
   menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
 
@@ -214,7 +173,6 @@ $(document).ready(function () {
   max-height: 500px;
   min-height: 44px;
   overflow-y: auto;
-  background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -340,13 +298,13 @@ div.tocify {
 
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
 <div id="TOC" class="tocify">
 </div>
 </div>
 
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
 
 
 
@@ -680,7 +638,7 @@ div.tocify {
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/sjweston/Rapid-R3-Website">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -689,7 +647,7 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+<div id="header">
 
 
 
@@ -761,7 +719,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 (Intercept)
 </td>
 <td style="text-align:right;">
@@ -778,7 +736,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week
 </td>
 <td style="text-align:right;">
@@ -795,7 +753,7 @@ Week
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 poverty
 </td>
 <td style="text-align:right;">
@@ -812,7 +770,7 @@ poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week:poverty
 </td>
 <td style="text-align:right;">
@@ -834,7 +792,7 @@ Week:poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__(Intercept)
 </td>
 <td style="text-align:right;">
@@ -848,7 +806,7 @@ sd__(Intercept)
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__Observation
 </td>
 <td style="text-align:right;">
@@ -1310,7 +1268,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 (Intercept)
 </td>
 <td style="text-align:right;">
@@ -1327,7 +1285,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week
 </td>
 <td style="text-align:right;">
@@ -1344,7 +1302,7 @@ Week
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 poverty
 </td>
 <td style="text-align:right;">
@@ -1361,7 +1319,7 @@ poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week:poverty
 </td>
 <td style="text-align:right;">
@@ -1383,7 +1341,7 @@ Week:poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__(Intercept)
 </td>
 <td style="text-align:right;">
@@ -1397,7 +1355,7 @@ sd__(Intercept)
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__Observation
 </td>
 <td style="text-align:right;">
@@ -1859,7 +1817,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 (Intercept)
 </td>
 <td style="text-align:right;">
@@ -1876,7 +1834,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week
 </td>
 <td style="text-align:right;">
@@ -1893,7 +1851,7 @@ Week
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 poverty
 </td>
 <td style="text-align:right;">
@@ -1910,7 +1868,7 @@ poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week:poverty
 </td>
 <td style="text-align:right;">
@@ -1932,7 +1890,7 @@ Week:poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__(Intercept)
 </td>
 <td style="text-align:right;">
@@ -1946,7 +1904,7 @@ sd__(Intercept)
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__Observation
 </td>
 <td style="text-align:right;">
@@ -2408,7 +2366,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 (Intercept)
 </td>
 <td style="text-align:right;">
@@ -2425,7 +2383,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week
 </td>
 <td style="text-align:right;">
@@ -2442,7 +2400,7 @@ Week
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 poverty
 </td>
 <td style="text-align:right;">
@@ -2459,7 +2417,7 @@ poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week:poverty
 </td>
 <td style="text-align:right;">
@@ -2481,7 +2439,7 @@ Week:poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__(Intercept)
 </td>
 <td style="text-align:right;">
@@ -2495,7 +2453,7 @@ sd__(Intercept)
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__Observation
 </td>
 <td style="text-align:right;">
@@ -2957,7 +2915,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 (Intercept)
 </td>
 <td style="text-align:right;">
@@ -2974,7 +2932,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week
 </td>
 <td style="text-align:right;">
@@ -2991,7 +2949,7 @@ Week
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 poverty
 </td>
 <td style="text-align:right;">
@@ -3008,7 +2966,7 @@ poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week:poverty
 </td>
 <td style="text-align:right;">
@@ -3030,7 +2988,7 @@ Week:poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__(Intercept)
 </td>
 <td style="text-align:right;">
@@ -3044,7 +3002,7 @@ sd__(Intercept)
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__Observation
 </td>
 <td style="text-align:right;">
@@ -3506,7 +3464,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 (Intercept)
 </td>
 <td style="text-align:right;">
@@ -3523,7 +3481,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week
 </td>
 <td style="text-align:right;">
@@ -3540,7 +3498,7 @@ Week
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 poverty
 </td>
 <td style="text-align:right;">
@@ -3557,7 +3515,7 @@ poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week:poverty
 </td>
 <td style="text-align:right;">
@@ -3579,7 +3537,7 @@ Week:poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__(Intercept)
 </td>
 <td style="text-align:right;">
@@ -3593,7 +3551,7 @@ sd__(Intercept)
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__Observation
 </td>
 <td style="text-align:right;">
@@ -4130,7 +4088,7 @@ support_decrease
 ## X-squared = 29.59, df = 1, p-value = 5.337e-08</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n decreased_income percent
-## *   &lt;dbl&gt; &lt;int&gt;            &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;            &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835              343   0.411
 ## 2       1   399              230   0.576</code></pre>
 </div>
@@ -4143,7 +4101,7 @@ support_decrease
 ## X-squared = 28.414, df = 1, p-value = 9.796e-08</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n decrease_nonfamilyCC percent
-## *   &lt;dbl&gt; &lt;int&gt;                &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;                &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835                  478   0.572
 ## 2       1   399                  163   0.409</code></pre>
 </div>
@@ -4156,7 +4114,7 @@ support_decrease
 ## X-squared = 112.15, df = 1, p-value &lt; 2.2e-16</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n difficulty_basics percent
-## *   &lt;dbl&gt; &lt;int&gt;             &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;             &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835                74  0.0886
 ## 2       1   399               132  0.331</code></pre>
 </div>
@@ -4169,7 +4127,7 @@ support_decrease
 ## X-squared = 5.6987, df = 1, p-value = 0.01698</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n delay_healthcare percent
-## *   &lt;dbl&gt; &lt;int&gt;            &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;            &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835              494   0.592
 ## 2       1   399              265   0.664</code></pre>
 </div>
@@ -4182,7 +4140,7 @@ support_decrease
 ## X-squared = 16.46, df = 1, p-value = 4.968e-05</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n lost_free_lunch percent
-## *   &lt;dbl&gt; &lt;int&gt;           &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;           &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835              67  0.0802
 ## 2       1   399              63  0.158</code></pre>
 </div>
@@ -4195,7 +4153,7 @@ support_decrease
 ## X-squared = 2.2319, df = 1, p-value = 0.1352</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n access_telehealth percent
-## *   &lt;dbl&gt; &lt;int&gt;             &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;             &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835               325   0.389
 ## 2       1   399               137   0.343</code></pre>
 </div>
@@ -4208,7 +4166,7 @@ support_decrease
 ## X-squared = 41.121, df = 1, p-value = 1.431e-10</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n insurance percent
-## *   &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835       777   0.931
 ## 2       1   399       324   0.812</code></pre>
 </div>
@@ -4221,7 +4179,7 @@ support_decrease
 ## X-squared = 9.0795, df = 1, p-value = 0.002585</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   poverty     n child_insurance percent
-## *   &lt;dbl&gt; &lt;int&gt;           &lt;dbl&gt;   &lt;dbl&gt;
+##     &lt;dbl&gt; &lt;int&gt;           &lt;dbl&gt;   &lt;dbl&gt;
 ## 1       0   835             752   0.901
 ## 2       1   399             337   0.845</code></pre>
 </div>
@@ -4255,7 +4213,7 @@ Corrected p-value
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4272,7 +4230,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4289,7 +4247,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4306,7 +4264,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4323,7 +4281,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4345,7 +4303,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4362,7 +4320,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4379,7 +4337,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4396,7 +4354,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4413,7 +4371,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4435,7 +4393,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4452,7 +4410,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4469,7 +4427,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4486,7 +4444,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4503,7 +4461,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4525,7 +4483,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4542,7 +4500,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4559,7 +4517,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4576,7 +4534,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4593,7 +4551,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4615,7 +4573,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4632,7 +4590,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4649,7 +4607,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4666,7 +4624,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4683,7 +4641,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4705,7 +4663,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4722,7 +4680,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4739,7 +4697,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4756,7 +4714,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4773,7 +4731,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4795,7 +4753,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4812,7 +4770,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4829,7 +4787,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4846,7 +4804,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4863,7 +4821,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4885,7 +4843,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4902,7 +4860,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -4919,7 +4877,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -4936,7 +4894,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -4953,7 +4911,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -4975,7 +4933,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -4992,7 +4950,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -5009,7 +4967,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -5026,7 +4984,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -5043,7 +5001,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -5065,7 +5023,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -5082,7 +5040,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -5099,7 +5057,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -5116,7 +5074,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -5133,7 +5091,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -5155,7 +5113,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -5172,7 +5130,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -5189,7 +5147,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -5206,7 +5164,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -5223,7 +5181,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -5245,7 +5203,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -5262,7 +5220,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -5279,7 +5237,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -5296,7 +5254,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -5313,7 +5271,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -5335,7 +5293,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -5352,7 +5310,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -5369,7 +5327,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -5386,7 +5344,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -5403,7 +5361,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -5425,7 +5383,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -5442,7 +5400,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -5459,7 +5417,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -5476,7 +5434,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -5493,7 +5451,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -5515,7 +5473,7 @@ Child internalizing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver anxiety
 </td>
 <td style="text-align:right;">
@@ -5532,7 +5490,7 @@ Caregiver anxiety
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver depression
 </td>
 <td style="text-align:right;">
@@ -5549,7 +5507,7 @@ Caregiver depression
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Caregiver stress
 </td>
 <td style="text-align:right;">
@@ -5566,7 +5524,7 @@ Caregiver stress
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child externalzing
 </td>
 <td style="text-align:right;">
@@ -5583,7 +5541,7 @@ Child externalzing
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Child internalizing
 </td>
 <td style="text-align:right;">
@@ -5674,7 +5632,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 (Intercept)
 </td>
 <td style="text-align:right;">
@@ -5691,7 +5649,7 @@ p
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week
 </td>
 <td style="text-align:right;">
@@ -5708,7 +5666,7 @@ Week
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 poverty
 </td>
 <td style="text-align:right;">
@@ -5725,7 +5683,7 @@ poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 Week:poverty
 </td>
 <td style="text-align:right;">
@@ -5747,7 +5705,7 @@ Week:poverty
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__(Intercept)
 </td>
 <td style="text-align:right;">
@@ -5761,7 +5719,7 @@ sd__(Intercept)
 </td>
 </tr>
 <tr>
-<td style="text-align:left; padding-left:  2em;" indentlevel="1">
+<td style="text-align:left;padding-left: 2em;" indentlevel="1">
 sd__Observation
 </td>
 <td style="text-align:right;">
@@ -6217,7 +6175,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
+    $(this).parent().toggleClass('nav-tabs-open');
   });
 });
 </script>
