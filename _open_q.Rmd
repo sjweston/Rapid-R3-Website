@@ -54,16 +54,16 @@ response_table = master %>%
            DEMO.004.a.2 >= 1 ~ "Yes",
            !is.na(DEMO.004.a.2) ~ "No",
            TRUE ~ NA_character_)) %>%
-  select(CaregiverID, Week, starts_with(params$variable), State, FPL.150, RaceGroup, CaregiverAge,
+  select(CaregiverID, Week, starts_with(params$variable), State, FPL.2019.UM.150, RaceGroup, CaregiverAge,
          child_age03, OPEN.006) %>%
   filter(OPEN.006 == 1) %>%
   arrange(Week) %>%
   group_by(CaregiverID) %>%
   mutate_if(is.labelled, as_factor, levels = "labels") %>%
-  mutate_at(vars(State, FPL.150, RaceGroup, CaregiverAge, child_age03), na.locf0) %>%
+  mutate_at(vars(State, FPL.2019.UM.150, RaceGroup, CaregiverAge, child_age03), na.locf0) %>%
   ungroup() %>%
   select(-CaregiverID, -OPEN.006) %>%
-  rename(`Below 1.5xFPL` = FPL.150,
+  rename(`Below 1.5xFPL` = FPL.2019.UM.150,
          `Child 0-3` = child_age03) %>%
   gather("Question", "Response", starts_with(params$variable)) %>%
   filter(Response != "")

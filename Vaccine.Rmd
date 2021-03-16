@@ -121,11 +121,11 @@ mutate (race_ethnic = case_when(
 
 ##Povertyline - 0 = high income, 1 = low income
 master <- master %>%
-  mutate (poverty_100 = FPL.100, 
-          poverty_200 = FPL.200, 
-          poverty_3c = case_when (FPL == 1 ~ 1,
-                                  FPL %in% c(2,3,4)~ 2,
-                                  FPL == 5 ~ 3))
+  mutate (poverty_100 = FPL.2019.UM.100, 
+          poverty_200 = FPL.2019.UM.200, 
+          poverty_3c = case_when (FPL.2019.UM == 1 ~ 1,
+                                  FPL.2019.UM %in% c(2,3,4)~ 2,
+                                  FPL.2019.UM == 5 ~ 3))
 
 master <- master %>%
   mutate (FPL_line = case_when (STATE_CODED == 1 & JOB.002 == 1 ~ 12760,
@@ -306,7 +306,7 @@ master_dem <- master %>%
   group_by (CaregiverID) %>%
   summarise (BaselineWeek = my.max (BaselineWeek),
              race_ethnic = my.max(race_ethnic),
-             poverty_cat = my.max (FPL.150),
+             poverty_cat = my.max (FPL.2019.UM.150),
              poverty_100 = my.max(poverty_100),
              poverty_200 = my.max(poverty_200),
              poverty_3c = my.min(poverty_3c),
