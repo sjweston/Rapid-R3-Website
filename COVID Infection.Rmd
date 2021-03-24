@@ -271,13 +271,62 @@ master_dem <- master %>%
 
 ```
 
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+CaregiverID_fl <- master%>%
+  mutate (follow_up = ifelse(SurveyType == 2, 1, 0))%>%
+  group_by (CaregiverID)%>%
+  summarise (follow_up = my.max (follow_up))%>%
+  ungroup()%>%
+  filter (follow_up == 1)%>%
+  select (CaregiverID)
+
+CaregiverID_fl <- as.character (CaregiverID_fl$CaregiverID)
+
+master_fl <- master %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+master_dem_fl <- master_dem %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+```
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 #Extract COVID Related Questions
-covid <- master %>%
-  select (CaregiverID, StartDate, SurveyType, Week, month, baseline, contains ("COVID"))
+covid <- master_fl %>%
+  select (CaregiverID, StartDate, SurveyType, Week, month, baseline, contains ("COVID"), contains ("PHQ"), contains ("GAD"), STRESS.001, STRESS.002, LONE.001.a, LONE.001.b, contains("CBCL") )
 
-covid <- merge (x = master_dem, y = covid, by.x = "CaregiverID", by.y = "CaregiverID")
+covid$depress_crt= rowMeans(covid[,find_items("PHQ.002.[a-b]$", covid)], na.rm=T)
+covid$anxiety_crt = rowMeans(covid[,find_items("GAD2.002.[a-b]$", covid)], na.rm=T)
+
+covid <- covid %>%
+  mutate (depress_crt_r = depress_crt/3*100,
+          anxiety_crt_r =anxiety_crt/3*100,
+          stress_crt_r = STRESS.002/4*100,
+          lonely_crt_r = LONE.001.b/4*100)%>%
+  rename (fussy_cr1 = CBCL.002.a,
+          fussy_cr2 = CBCL.005.a,
+          fussy_cr3 = CBCL.008.a,
+          fussy_cr4 = CBCL.011.a,
+          fussy_cr5 = CBCL.014.a,
+          fear_cr1 = CBCL.002.b,
+          fear_cr2 = CBCL.005.b,
+          fear_cr3 = CBCL.008.b,
+          fear_cr4 = CBCL.011.b,
+          fear_cr5 = CBCL.014.b)
+
+fussy_crt_items = c(find_items("fussy_cr", covid))
+fear_crt_items = c(find_items("fear_cr", covid))
+covid$fussy_crt = rowMeans(covid[,fussy_crt_items], na.rm=T)/2*100
+covid$fear_crt = rowMeans(covid[,fear_crt_items], na.rm=T)/2*100
+
+cp_crt_items = c("fussy_crt", "fear_crt")
+covid$cp_total_crt = rowMeans (covid[, cp_crt_items], na.rm=T)
+
+pmh_crt_variable = c("depress_crt_r", "anxiety_crt_r", "stress_crt_r", "lonely_crt_r")
+covid$pmh_total_crt = rowMeans(covid[, pmh_crt_variable], na.rm = T)
+
+covid <- merge (x = master_dem_fl, y = covid, by.x = "CaregiverID", by.y = "CaregiverID", all.y = T)%>%
+  select (CaregiverID, StartDate, SurveyType, Week, month, baseline, race_ethnic, poverty_cat, contains ("COVID"), pmh_total_crt, cp_total_crt)
 
 num_responses = function(x){length(which(!is.na(x)))}
 covid.num <- covid %>%
@@ -297,28 +346,15 @@ covid.num <- covid %>%
     + Yes, diagnosed by a healthcare professional or public health official without a test\
     + No\
     
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
-CaregiverID_fl <- master%>%
-  group_by (CaregiverID)%>%
-  summarise (SurveyType = my.max (SurveyType))%>%
-  ungroup()%>%
-  filter (SurveyType == 2)%>%
-  select (CaregiverID)
-
-CaregiverID_fl <- as.character (CaregiverID_fl$CaregiverID)
-  
-covid_fl <- covid %>%
-  filter (CaregiverID %in% CaregiverID_fl)
-```
-
 ## 1.1 Most recent responses
 ### 1.1.1 Overall
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
-
-covid_dg <- covid_fl %>%
+covid_dg <- covid %>%
   group_by (CaregiverID) %>%
   summarise (COVID.001 = my.max(COVID.001)) %>%
-  mutate (diagnosis = ifelse(COVID.001 %in% c(1,2,3), 1, 0),
+  ungroup()%>%
+  mutate (suspect_or_diagnosis = ifelse(COVID.001 %in% c(1,2,3), 1, 0),
+          diagnosis = ifelse(COVID.001 %in% c(2,3), 1, 0),
           suspect = ifelse (COVID.001 == 1, 1, 0), 
           test_positive = ifelse (COVID.001 == 2, 1, 0), 
           diagnose_no_test = ifelse (COVID.001 == 3, 1, 0), 
@@ -328,17 +364,15 @@ covid_dg <- merge (x = master_dem, y = covid_dg, by.x = "CaregiverID", by.y = "C
 covid_dg_smy <- covid_dg %>%
   summarise (n = n(),
              a.diagnosis = sum(diagnosis, na.rm = TRUE)/n, 
-             b.no = sum(no, na.rm = TRUE)/n,
-             a.suspect = sum(suspect, na.rm = TRUE)/n, 
-             a.test_positive = sum(test_positive, na.rm = TRUE)/n, 
-             a.diagnose_no_test = sum(diagnose_no_test, na.rm = TRUE)/n) %>%
-  pivot_longer (cols = c("a.diagnosis", "b.no", "a.suspect", "a.test_positive", "a.diagnose_no_test"), names_to = "condition", values_to = "prop") %>%
+             c.no = sum(no, na.rm = TRUE)/n,
+             b.suspect = sum(suspect, na.rm = TRUE)/n
+             ) %>%
+  pivot_longer (cols = c("a.diagnosis", "c.no", "b.suspect"), names_to = "condition", values_to = "prop") %>%
   mutate (count = n*prop) %>%
   mutate (moe = map2_dbl(prop, n, moe.p))
 
 covid_dg_smy %>%
-  filter (condition != "a.diagnosis")%>%
-  ggplot(mapping = aes (x = condition, y = prop*100, fill = condition)) +
+ ggplot(mapping = aes (x = condition, y = prop*100, fill = condition)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(ymin = (prop*100-moe*100), 
                     ymax = (prop*100+moe*100)),
@@ -356,16 +390,14 @@ covid_dg_smy <- covid_dg %>%
   group_by (race_ethnic) %>%
   summarise (n = n(),
              a.diagnosis = sum(diagnosis, na.rm = TRUE)/n, 
-             b.no = sum(no, na.rm = TRUE)/n,
-             a.suspect = sum(suspect, na.rm = TRUE)/n, 
-             a.test_positive = sum(test_positive, na.rm = TRUE)/n, 
-             a.diagnose_no_test = sum(diagnose_no_test, na.rm = TRUE)/n) %>%
-  pivot_longer (cols = c("a.diagnosis", "b.no", "a.suspect", "a.test_positive", "a.diagnose_no_test"), names_to = "condition", values_to = "prop") %>%
+             c.no = sum(no, na.rm = TRUE)/n,
+             b.suspect = sum(suspect, na.rm = TRUE)/n
+             ) %>%
+  pivot_longer (cols = c("a.diagnosis", "c.no", "b.suspect"), names_to = "condition", values_to = "prop") %>%
   mutate (count = n*prop) %>%
   mutate (moe = map2_dbl(prop, n, moe.p))
 
 covid_dg_smy %>%
-  filter (condition != "a.diagnosis")%>%
   ggplot(mapping = aes (x = race_ethnic, y = prop*100, fill = race_ethnic)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(ymin = (prop*100-moe*100), 
@@ -389,16 +421,14 @@ covid_dg_smy <- covid_dg %>%
   group_by (poverty_cat) %>%
   summarise (n = n(),
              a.diagnosis = sum(diagnosis, na.rm = TRUE)/n, 
-             b.no = sum(no, na.rm = TRUE)/n,
-             a.suspect = sum(suspect, na.rm = TRUE)/n, 
-             a.test_positive = sum(test_positive, na.rm = TRUE)/n, 
-             a.diagnose_no_test = sum(diagnose_no_test, na.rm = TRUE)/n) %>%
-  pivot_longer (cols = c("a.diagnosis", "b.no", "a.suspect", "a.test_positive", "a.diagnose_no_test"), names_to = "condition", values_to = "prop") %>%
+             c.no = sum(no, na.rm = TRUE)/n,
+             b.suspect = sum(suspect, na.rm = TRUE)/n
+             ) %>%
+  pivot_longer (cols = c("a.diagnosis", "c.no", "b.suspect"), names_to = "condition", values_to = "prop") %>%
   mutate (count = n*prop) %>%
   mutate (moe = map2_dbl(prop, n, moe.p))
 
 covid_dg_smy %>%
-  filter (condition != "a.diagnosis")%>%
   ggplot(mapping = aes (x = poverty_cat, y = prop*100, fill = poverty_cat)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(ymin = (prop*100-moe*100), 
@@ -419,18 +449,16 @@ pairwise.prop.test(x = covid_dg_smy$count, n = covid_dg_smy$n, p.adjust.method =
 covid_dg_smy <- covid_dg %>%
   filter (poverty_cat != "NA" & race_ethnic!= "NA") %>%
   group_by (poverty_cat, race_ethnic) %>%
-  summarise (n = n(),
+ summarise (n = n(),
              a.diagnosis = sum(diagnosis, na.rm = TRUE)/n, 
-             b.no = sum(no, na.rm = TRUE)/n,
-             a.suspect = sum(suspect, na.rm = TRUE)/n, 
-             a.test_positive = sum(test_positive, na.rm = TRUE)/n, 
-             a.diagnose_no_test = sum(diagnose_no_test, na.rm = TRUE)/n) %>%
-  pivot_longer (cols = c("a.diagnosis", "b.no", "a.suspect", "a.test_positive", "a.diagnose_no_test"), names_to = "condition", values_to = "prop") %>%
+             c.no = sum(no, na.rm = TRUE)/n,
+             b.suspect = sum(suspect, na.rm = TRUE)/n
+             ) %>%
+  pivot_longer (cols = c("a.diagnosis", "c.no", "b.suspect"), names_to = "condition", values_to = "prop") %>%
   mutate (count = n*prop) %>%
   mutate (moe = map2_dbl(prop, n, moe.p))
 
 covid_dg_smy %>%
-  filter (condition != "a.diagnosis")%>%
   ggplot(mapping = aes (x = condition, y = prop*100, fill = condition)) +
   geom_bar (stat = "identity", position = position_dodge(1))+
   geom_errorbar(aes(ymin = (prop*100-moe*100), 
@@ -445,22 +473,23 @@ covid_dg_smy %>%
 ### 1.2.1 Overall
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
-covid_fl <- covid_fl %>%
-  mutate (suspect = ifelse (COVID.001 == 1, 1, 0), 
+covid <- covid %>%
+  mutate (suspect_or_diagnosis = ifelse(COVID.001 %in% c(1,2,3), 1, 0),
+          diagnosis = ifelse(COVID.001 %in% c(2,3), 1, 0),
+          suspect = ifelse (COVID.001 == 1, 1, 0), 
           test_positive = ifelse (COVID.001 == 2, 1, 0), 
           diagnose_no_test = ifelse (COVID.001 == 3, 1, 0), 
           no = ifelse (COVID.001 == 0, 1, 0))
 
-covid_trend <- covid_fl %>%
+covid_trend <- covid %>%
   filter (SurveyType == 2)%>%
   group_by (Week)%>%
   summarise (n = n(),
-             b.no = sum(no, na.rm = TRUE)/n,
-             a.suspect = sum(suspect, na.rm = TRUE)/n, 
-             a.test_positive = sum(test_positive, na.rm = TRUE)/n, 
-             a.diagnose_no_test = sum(diagnose_no_test, na.rm = TRUE)/n, 
+             c.no = sum(no, na.rm = TRUE)/n,
+             b.suspect = sum(suspect, na.rm = TRUE)/n, 
+             a.diagnosis = sum(diagnosis, na.rm = TRUE)/n,
             date = as.Date(min (StartDate))) %>%
-  pivot_longer (cols = c("b.no", "a.suspect", "a.test_positive", "a.diagnose_no_test"), names_to = "condition", values_to = "prop") %>%
+  pivot_longer (cols = c("c.no", "b.suspect", "a.diagnosis"), names_to = "condition", values_to = "prop") %>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -480,16 +509,15 @@ covid_trend %>%
 ### 1.2.2 By race/ethnicity
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
-covid_trend <- covid_fl %>%
+covid_trend <- covid %>%
   filter (SurveyType == 2 & race_ethnic!= "NA")%>%
   group_by (Week, race_ethnic)%>%
   summarise (n = n(),
-             b.no = sum(no, na.rm = TRUE)/n,
-             a.suspect = sum(suspect, na.rm = TRUE)/n, 
-             a.test_positive = sum(test_positive, na.rm = TRUE)/n, 
-             a.diagnose_no_test = sum(diagnose_no_test, na.rm = TRUE)/n, 
+             c.no = sum(no, na.rm = TRUE)/n,
+             b.suspect = sum(suspect, na.rm = TRUE)/n, 
+             a.diagnosis = sum(diagnosis, na.rm = TRUE)/n,
             date = as.Date(min (StartDate))) %>%
-  pivot_longer (cols = c("b.no", "a.suspect", "a.test_positive", "a.diagnose_no_test"), names_to = "condition", values_to = "prop") %>%
+  pivot_longer (cols = c("c.no", "b.suspect", "a.diagnosis"), names_to = "condition", values_to = "prop") %>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -510,16 +538,15 @@ covid_trend %>%
 ### 1.2.3 By poverty level
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
-covid_trend <- covid_fl %>%
+covid_trend <- covid %>%
   filter (SurveyType == 2 & poverty_cat!= "NA")%>%
   group_by (Week, poverty_cat)%>%
   summarise (n = n(),
-             b.no = sum(no, na.rm = TRUE)/n,
-             a.suspect = sum(suspect, na.rm = TRUE)/n, 
-             a.test_positive = sum(test_positive, na.rm = TRUE)/n, 
-             a.diagnose_no_test = sum(diagnose_no_test, na.rm = TRUE)/n, 
+             c.no = sum(no, na.rm = TRUE)/n,
+             b.suspect = sum(suspect, na.rm = TRUE)/n, 
+             a.diagnosis = sum(diagnosis, na.rm = TRUE)/n,
             date = as.Date(min (StartDate))) %>%
-  pivot_longer (cols = c("b.no", "a.suspect", "a.test_positive", "a.diagnose_no_test"), names_to = "condition", values_to = "prop") %>%
+  pivot_longer (cols = c("c.no", "b.suspect", "a.diagnosis"), names_to = "condition", values_to = "prop") %>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -540,7 +567,7 @@ covid_trend %>%
 ### 1.2.4 By poverty level & race/ethnicity
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
-covid_trend <- covid_fl %>%
+covid_trend <- covid %>%
   filter (SurveyType == 2 & poverty_cat!= "NA" & race_ethnic != "NA")%>%
   group_by (Week, poverty_cat, race_ethnic)%>%
   summarise (n = n(),
@@ -567,6 +594,49 @@ covid_trend %>%
 
 ```
 
+# 1.3 Association with Mental Health - Based on Most Recent Responses
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+covid_rct <- covid %>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  mutate (covid_status = case_when (no == 1 ~ "Not infected",
+                                    suspect == 1 ~ "Suspect", 
+                                    diagnosis == 1 ~ "Diagnosed", 
+                                    ))
+
+covid_mh_m <- covid_rct %>%
+  group_by (covid_status) %>%
+  summarise (n = n(),
+             parent = mean(pmh_total_crt, na.rm = TRUE), 
+             child = mean(cp_total_crt, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean") 
+
+covid_mh_sd <- covid_rct %>%
+  group_by (covid_status) %>%
+  summarise (parent = sd(pmh_total_crt, na.rm = TRUE), 
+             child = sd(cp_total_crt, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd") 
+
+covid_mh_smy <- merge (covid_mh_m, covid_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+covid_mh_smy %>%
+  filter (covid_status != "NA")%>%
+  ggplot(mapping = aes (x = covid_status, y = mean, fill = covid_status)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -2, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~who)+ 
+  theme(axis.text.x = element_blank())
+```
+
+
 # 2. Know Anyone Diagnosed/hospitalized with COVID
   * Survey question: Do you personally know anyone in the U.S. who... - Has been officially diagnosed as having COVID-19 by a health care provider - yes/no\
   * Do you personally know anyone in the U.S. who... - Has been hospitalized or died as a result of having COVID-19 - yes/no\
@@ -576,7 +646,7 @@ covid_trend %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45))%>%
+  filter (Week >= 29 & SurveyType == 2)%>%
   group_by (CaregiverID) %>%
   filter (Week == max(Week))%>%
   ungroup()%>%
@@ -605,7 +675,7 @@ covid_know_dg %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45))%>%
+  filter (Week >= 29 & SurveyType == 2)%>%
   group_by (CaregiverID) %>%
   filter (Week == max(Week))%>%
   ungroup()%>%
@@ -637,7 +707,7 @@ covid_know_dg %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45))%>%
+  filter (Week >= 29 & SurveyType == 2)%>%
   group_by (CaregiverID) %>%
   filter (Week == max(Week))%>%
   ungroup()%>%
@@ -669,7 +739,7 @@ covid_know_dg %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45))%>%
+  filter (Week >= 29 & SurveyType == 2)%>%
   group_by (CaregiverID) %>%
   filter (Week == max(Week))%>%
   ungroup()%>%
@@ -703,7 +773,7 @@ covid_know_dg %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45))%>%
+  filter (Week >= 29 & SurveyType == 2)%>%
   group_by (Week)%>%
   summarise (n = n(),
              know_diagnose = sum(COVID.003, na.rm = TRUE)/n, 
@@ -729,7 +799,7 @@ covid_know_dg %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45) & race_ethnic!= "NA")%>%
+  filter (Week >= 29 & SurveyType == 2 & race_ethnic!= "NA")%>%
   group_by (Week, race_ethnic)%>%
   summarise (n = n(),
              know_diagnose = sum(COVID.003, na.rm = TRUE)/n, 
@@ -756,7 +826,7 @@ covid_know_dg %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45) & poverty_cat!= "NA")%>%
+  filter (Week >= 29 & SurveyType == 2 & poverty_cat!= "NA")%>%
   group_by (Week, poverty_cat)%>%
   summarise (n = n(),
              know_diagnose = sum(COVID.003, na.rm = TRUE)/n, 
@@ -783,7 +853,7 @@ covid_know_dg %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 covid_know_dg <- covid %>%
-  filter (Week %in% c(29, 31, 33, 35, 37, 39, 41, 43, 45) & poverty_cat!= "NA" & race_ethnic != "NA")%>%
+  filter (Week >= 29 & SurveyType == 2 & poverty_cat!= "NA" & race_ethnic!= "NA")%>%
   group_by (Week, poverty_cat, race_ethnic)%>%
   summarise (n = n(),
              know_diagnose = sum(COVID.003, na.rm = TRUE)/n, 
@@ -804,4 +874,82 @@ covid_know_dg %>%
   labs (y = "Percentage")+
   ggtitle(label = "Trend of changes")+
   facet_wrap(poverty_cat ~ race_ethnic, ncol = 3)
+```
+
+# 2.3 Association with Mental Health - Based on Most Recent Responses
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+covid_rct <- covid %>%
+  filter (Week >= 29 & SurveyType == 2)%>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  mutate (know_diagnose = case_when (COVID.003 == 1 ~ "Know someone diagnosed with COVID-19",
+                                    COVID.003 == 0 ~ "Not know someone diagnosed with COVID-19"), 
+          know_hospitalized_died = case_when (COVID.004 == 1 ~ "Know someone hospitalized/died from COVID-19",
+                                    COVID.004 == 0 ~ "Not know someone hospitalized/died from COVID-19"))
+
+covid_mh_m <- covid_rct %>%
+  group_by (know_diagnose) %>%
+  summarise (n = n(),
+             parent = mean(pmh_total_crt, na.rm = TRUE), 
+             child = mean(cp_total_crt, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean") 
+
+covid_mh_sd <- covid_rct %>%
+  group_by (know_diagnose) %>%
+  summarise (parent = sd(pmh_total_crt, na.rm = TRUE), 
+             child = sd(cp_total_crt, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd") 
+
+covid_mh_smy <- merge (covid_mh_m, covid_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+covid_mh_smy %>%
+  filter (know_diagnose != "NA")%>%
+  ggplot(mapping = aes (x = know_diagnose, y = mean, fill = know_diagnose)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -2, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~who)+ 
+  theme(axis.text.x = element_blank())+
+  ggtitle (label = "Based on knowing someone diagnosed with COVID-19")
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+covid_mh_m <- covid_rct %>%
+  group_by (know_hospitalized_died) %>%
+  summarise (n = n(),
+             parent = mean(pmh_total_crt, na.rm = TRUE), 
+             child = mean(cp_total_crt, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean") 
+
+covid_mh_sd <- covid_rct %>%
+  group_by (know_hospitalized_died) %>%
+  summarise (parent = sd(pmh_total_crt, na.rm = TRUE), 
+             child = sd(cp_total_crt, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd") 
+
+covid_mh_smy <- merge (covid_mh_m, covid_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+covid_mh_smy %>%
+  filter (know_hospitalized_died != "NA")%>%
+  ggplot(mapping = aes (x = know_hospitalized_died, y = mean, fill = know_hospitalized_died)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -2, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~who)+ 
+  theme(axis.text.x = element_blank())+
+  ggtitle (label = "Based on knowing someone hospitalized/died from COVID-19")
 ```
