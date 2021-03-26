@@ -1,0 +1,1123 @@
+---
+title: "Health Care Interrupted"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, include = FALSE}
+library(here)
+library(knitr)
+library(readr)
+library(haven)
+library(tidyverse)
+library(lavaan)
+```
+
+
+```{r, echo=FALSE, message = FALSE}
+#Define functions
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+
+moe.m = function(sd,n){
+  moe = 1.96*sd/sqrt(n)
+  return(moe)}
+
+combine.cat = function(x, cols, id, newvar.name){
+  subset = x[,c(id, "Week", cols)]
+  names(subset) = c("id", "Week", paste0("X",1:length(cols)))
+  subset = suppressWarnings(gather(subset, "key", "value", -id, -Week))
+  subset = filter(subset, !is.na(value))
+  subset$key = gsub("X", "", subset$key)
+  subset = group_by(subset, id, Week)
+  subset = summarise(subset, newvar = paste(key, collapse = ",")) %>% ungroup()
+  names(subset) = c(id,"Week", newvar.name)
+  x = suppressMessages(full_join(x, subset))
+  return(x)
+}
+
+find_items = function(string, data2){
+  items = names(data2)
+  locations = which(grepl(string, items))
+  final = items[locations]
+  return(final)
+}
+
+my.max = function(x) ifelse (!all(is.na(x)), max(x,na.rm = TRUE), NA)
+my.min = function(x) ifelse (!all(is.na(x)), min(x,na.rm = TRUE), NA)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, include=FALSE}
+master_2020 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2020.sav"))
+master_2021 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2021.sav"))
+
+master <- full_join (master_2020, master_2021)
+
+# Remove cases should be excluded
+master <- master %>%
+  filter ( CaregiverID != "" & is.na(Exclude) == T)
+
+master = master %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup()
+
+total_week <- my.max(master$Week)
+```
+
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+#Code demographics
+master <- master %>%
+  mutate (month = case_when(
+                  Week == 0 ~ "Pre-COVID",
+                  Week >0 & Week <= 4 ~ "April",
+                  Week >=5 & Week <=8 ~ "May",
+                  Week >=9 & Week <=13 ~ "June",
+                  Week >=14 & Week <=17 ~ "July",
+                  Week >=18 & Week <=21 ~ "August",
+                  Week >=22 & Week <=26 ~ "September",
+                  Week >=27 ~ "October"), 
+           baseline = case_when (Week - BaselineWeek == 1 ~ 1, 
+                                 Week - BaselineWeek > 1 ~ 0))
+
+##Race/ethnicity - 1 = black, 2 = latinx, 3 = white
+
+master <- master %>%
+  mutate (RaceGroup = na_if (RaceGroup, 99))%>%
+    mutate(
+      minority = ifelse(RaceGroup != 5, 1, 0),
+      black = ifelse(RaceGroup == 3, 1, 0),
+      native = ifelse(RaceGroup == 1, 1, 0),
+      asian = ifelse(RaceGroup == 2, 1, 0),
+      hawaii = ifelse(RaceGroup == 4, 1, 0),
+      white = ifelse(RaceGroup == 5, 1, 0),
+      other_race = ifelse(RaceGroup %in% c(6, 7), 1, 0))
+
+master <- master %>%
+      mutate(latinx = case_when(
+        DEMO.008 == 1 ~ 1,
+        DEMO.008 == 0 ~ 0,
+        DEMO.008.2 == 0 ~ 0,
+        DEMO.008.2 == 1 ~ 1,
+        DEMO.008.2 == 2 ~ 1,
+        TRUE ~ NA_real_))
+
+master <- master %>%
+mutate (race_ethnic = case_when(
+      black == 1 ~ "1",
+      latinx == 1 ~ "2",
+      !is.na(black) ~ "3",
+      !is.na(latinx) ~ "3",
+      TRUE ~ NA_character_))  
+
+##Povertyline - 0 = high income, 1 = low income
+master <- master %>%
+  mutate (poverty_cat = FPL.2019.UM.150)
+
+master <- master %>%
+  mutate (FPL_line = case_when (STATE_CODED == 1 & JOB.002 == 1 ~ 12760,
+                                STATE_CODED == 1 & JOB.002 == 2 ~ 17240,
+                                STATE_CODED == 1 & JOB.002 == 3 ~ 21720,
+                                STATE_CODED == 1 & JOB.002 == 4 ~ 26200,
+                                STATE_CODED == 1 & JOB.002 == 5 ~ 30680,
+                                STATE_CODED == 1 & JOB.002 == 6 ~ 35160,
+                                STATE_CODED == 1 & JOB.002 == 7 ~ 39640,
+                                STATE_CODED == 1 & JOB.002 == 8 ~ 44120,
+                                STATE_CODED == 1 & JOB.002 == 9 ~ 48600,
+                                STATE_CODED == 1 & JOB.002 == 10 ~ 53080,
+                                STATE_CODED == 1 & JOB.002 == 11 ~ 57560,
+                                STATE_CODED == 1 & JOB.002 == 12 ~ 62040,
+                                STATE_CODED == 1 & JOB.002 == 13 ~ 66520,
+                                STATE_CODED == 1 & JOB.002 == 14 ~ 71000,
+                                STATE_CODED == 1 & JOB.002 == 15 ~ 75480,
+                                STATE_CODED == 1 & JOB.002 == 16 ~ 79960,
+                                STATE_CODED == 1 & JOB.002 == 17 ~ 84440,
+                                STATE_CODED == 1 & JOB.002 == 18 ~ 88920,
+                                STATE_CODED == 1 & JOB.002 == 19 ~ 93400,
+                                STATE_CODED == 1 & JOB.002 == 20 ~ 97880,
+                                STATE_CODED == 1 & JOB.002 == 21 ~ 102360, 
+                                STATE_CODED == 2 & JOB.002 == 1 ~ 15950,
+                                STATE_CODED == 2 & JOB.002 == 2 ~ 21550,
+                                STATE_CODED == 2 & JOB.002 == 3 ~ 27150,
+                                STATE_CODED == 2 & JOB.002 == 4 ~ 32750,
+                                STATE_CODED == 2 & JOB.002 == 5 ~ 38350,
+                                STATE_CODED == 2 & JOB.002 == 6 ~ 43950,
+                                STATE_CODED == 2 & JOB.002 == 7 ~ 49550,
+                                STATE_CODED == 2 & JOB.002 == 8 ~ 55150,
+                                STATE_CODED == 2 & JOB.002 == 9 ~ 60750,
+                                STATE_CODED == 2 & JOB.002 == 10 ~ 66350,
+                                STATE_CODED == 2 & JOB.002 == 11 ~ 71950,
+                                STATE_CODED == 2 & JOB.002 == 12 ~ 77550,
+                                STATE_CODED == 2 & JOB.002 == 13 ~ 83150,
+                                STATE_CODED == 2 & JOB.002 == 14 ~ 88750,
+                                STATE_CODED == 2 & JOB.002 == 15 ~ 94350,
+                                STATE_CODED == 2 & JOB.002 == 16 ~ 99950,
+                                STATE_CODED == 2 & JOB.002 == 17 ~ 105550,
+                                STATE_CODED == 2 & JOB.002 == 18 ~ 111150,
+                                STATE_CODED == 2 & JOB.002 == 19 ~ 116750,
+                                STATE_CODED == 2 & JOB.002 == 20 ~ 122350,
+                                STATE_CODED == 2 & JOB.002 == 21 ~ 127950,
+                                STATE_CODED == 3 & JOB.002 == 1 ~ 14680,
+                                STATE_CODED == 3 & JOB.002 == 2 ~ 19830,
+                                STATE_CODED == 3 & JOB.002 == 3 ~ 24980,
+                                STATE_CODED == 3 & JOB.002 == 4 ~ 30130,
+                                STATE_CODED == 3 & JOB.002 == 5 ~ 35280,
+                                STATE_CODED == 3 & JOB.002 == 6 ~ 40430,
+                                STATE_CODED == 3 & JOB.002 == 7 ~ 45580,
+                                STATE_CODED == 3 & JOB.002 == 8 ~ 50730,
+                                STATE_CODED == 3 & JOB.002 == 9 ~ 55880,
+                                STATE_CODED == 3 & JOB.002 == 10 ~ 61030,
+                                STATE_CODED == 3 & JOB.002 == 11 ~ 66180,
+                                STATE_CODED == 3 & JOB.002 == 12 ~ 71330,
+                                STATE_CODED == 3 & JOB.002 == 13 ~ 76480,
+                                STATE_CODED == 3 & JOB.002 == 14 ~ 81630,
+                                STATE_CODED == 3 & JOB.002 == 15 ~ 86780,
+                                STATE_CODED == 3 & JOB.002 == 16 ~ 91930,
+                                STATE_CODED == 3 & JOB.002 == 17 ~ 97080,
+                                STATE_CODED == 3 & JOB.002 == 18 ~ 102230,
+                                STATE_CODED == 3 & JOB.002 == 19 ~ 107380,
+                                STATE_CODED == 3 & JOB.002 == 20 ~ 112530,
+                                STATE_CODED == 3 & JOB.002 == 21 ~ 117680))
+
+#Material hardship
+master <- master %>%
+  combine.cat(cols = find_items("FSTR.002_.{1}$", master), 
+              id = "CaregiverID",
+              newvar.name = "FSTR.002_cat")
+  
+
+master <- master %>%
+  mutate (diff_pay_food = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("1", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_), 
+          diff_pay_utilities = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("3", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_house = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("2", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_healthcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("4", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_social = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("5", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_emotional = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("6", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_childcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("7", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_other = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("8", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_))
+
+master <- master %>%
+  rowwise() %>%
+  mutate(material_hardship = case_when(
+    Week == 0 ~ NA_real_,
+    TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
+  ungroup() %>%
+  mutate(num_hardship = material_hardship,
+    material_hardship = ifelse(material_hardship > 0, 1, 0)) 
+
+## Children with special needs
+master <- combine.cat(x = master, 
+                       cols = find_items("HEALTH.005_[0-9]{1}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.005_cat")
+master <- master %>%
+   mutate (disability = case_when (HEALTH.005_1 == 1 ~ 1,
+                                   HEALTH.005_2 == 1 ~ 1,
+                                   HEALTH.005_3 == 1 ~ 1,
+                                   HEALTH.005_4 == 1 ~ 1,
+                                   HEALTH.005_5 == 1 ~ 0,
+                                   HEALTH.005_6 == 1 ~ 1,
+                                   TRUE ~ NA_real_))
+
+
+## Single parent status
+master <- master %>%
+  mutate (single = case_when (
+                   DEMO.002 %in% c(3,4,5,7,8)~1, 
+                   DEMO.011 %in% c(2,4)~1,
+                   !is.na(DEMO.002)~0,
+                   !is.na(DEMO.011)~0,
+                   TRUE ~ NA_real_))
+                     
+## Employment status
+master <- combine.cat (x = master,
+                       cols = find_items ("JOB.010_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.010_cat")
+  
+master$JOB.010_cat = gsub("10", "0", master$JOB.010_cat)
+master$working_pre = ifelse (grepl("[1,2,6]", master$JOB.010_cat), 1, 0)
+master = combine.cat (x = master,
+                       cols = find_items ("JOB.008_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.008_cat")
+master$JOB.008_cat = gsub("10", "0", master$JOB.008_cat)
+master <- master %>%
+  mutate (work_status = case_when(
+                        grepl ("1", JOB.008_cat) ~ "1", 
+                        grepl ("2", JOB.008_cat) ~ "1", 
+                        grepl ("3", JOB.008_cat) ~ "0", 
+                        grepl ("4", JOB.008_cat) ~ "0", 
+                        grepl ("5", JOB.008_cat) ~ "1", 
+                        JOB.008.2 == 1 ~ "1",
+                        JOB.008.2 %in% c(2,3) ~ "0",
+                        TRUE~NA_character_),
+          work_status_pre = case_when(
+                        grepl ("1", JOB.010_cat) ~ "1", 
+                        grepl ("2", JOB.010_cat) ~ "1", 
+                        grepl ("3", JOB.010_cat) ~ "0", 
+                        grepl ("4", JOB.010_cat) ~ "0", 
+                        grepl ("5", JOB.010_cat) ~ "1", 
+                        TRUE~NA_character_))
+#1 = stable employed 2 = became unemployed 3 = became employed4 = stable unemployed
+
+# Region
+master <- master %>%
+  mutate (region = na_if (DEMO.001.b, 5))
+
+master_dem <- master %>%
+  group_by (CaregiverID) %>%
+  summarise (BaselineWeek = my.max (BaselineWeek),
+             race_ethnic = my.max(race_ethnic),
+             poverty_cat = my.max(poverty_cat),
+             income19 = my.min (allyearly2019),
+             FPL_line = my.min (FPL_line),
+             disability = my.max (disability),
+             num_hm = my.max (JOB.002),
+             num_cd = my.max (DEMO.003),
+             single = my.max (single),
+             work_status = my.max (work_status),
+             work_status_pre = my.max (work_status_pre), 
+             region = my.max(region))%>%
+  mutate ( ep_change = case_when(
+                        work_status == 1 & work_status_pre == 1 ~ "1", 
+                        work_status == 1 & work_status_pre == 0 ~ "2", 
+                        work_status == 0 & work_status_pre == 1 ~ "3", 
+                        work_status == 0 & work_status_pre == 0 ~ "4", 
+                        TRUE~NA_character_), 
+           num_adult = num_hm - num_cd, 
+           FPL_pct = income19/FPL_line)%>%
+  mutate (race_ethnic = case_when (
+                        race_ethnic == 1 ~ "Black", 
+                        race_ethnic == 2 ~ "Latinx", 
+                        race_ethnic == 3 ~ "White", 
+                        TRUE~NA_character_),
+         poverty_cat = case_when (
+                        poverty_cat == 1 ~ "Below 150%FPL", 
+                        poverty_cat == 0 ~ "Above 150%FPL", 
+                        TRUE~NA_character_),
+          disability = case_when (
+                        disability == 1 ~ "With disability", 
+                        disability == 0 ~ "Without disability", 
+                        TRUE~NA_character_),
+          single = case_when (
+                        single == 1 ~ "Single parent", 
+                        single == 0 ~ "Dual parent", 
+                        TRUE~NA_character_),
+          work_status = case_when (
+                        work_status == 1 ~ "Employed", 
+                        work_status == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          work_status_pre = case_when (
+                        work_status_pre == 1 ~ "Employed", 
+                        work_status_pre == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          ep_change = case_when (
+                        ep_change == 1 ~ "Stable employed", 
+                        ep_change == 2 ~ "Became employed", 
+                        ep_change == 3 ~ "Became unemployed",
+                        ep_change == 4 ~ "Stable unemployed",
+                        TRUE~NA_character_), 
+          region = case_when (
+                        region == 1 ~ "Northeast", 
+                        region == 2 ~ "Midwest", 
+                        region == 3 ~ "South", 
+                        region == 4 ~ "West",
+                        TRUE~NA_character_))
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+CaregiverID_fl <- master%>%
+  mutate (follow_up = ifelse(SurveyType == 2, 1, 0))%>%
+  group_by (CaregiverID)%>%
+  summarise (follow_up = my.max (follow_up))%>%
+  ungroup()%>%
+  filter (follow_up == 1)%>%
+  select (CaregiverID)
+
+CaregiverID_fl <- as.character (CaregiverID_fl$CaregiverID)
+  
+master_fl <- master %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+master_dem_fl <- master_dem %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+```
+
+```{r, echo=FALSE, message = FALSE}
+
+master_fl$num_delay_healthcare = rowSums(master_fl[,find_items("HEALTH.003.[a-f]$", master_fl)],na.rm=T)
+
+master_fl <- master_fl %>%
+  mutate (delay_healthcare = ifelse(num_delay_healthcare > 0 | HEALTH.003.2 == 1, 1, 0),
+          hc_barrier_cost = ifelse(HEALTH.003.a > 0, 1, 0),
+          hc_barrier_time = ifelse(HEALTH.003.b > 0, 1, 0),
+          hc_barrier_childcare = ifelse(HEALTH.003.c > 0, 1, 0),
+          hc_barrier_covid = ifelse(HEALTH.003.d > 0, 1, 0),
+          hc_barrier_family = ifelse(HEALTH.003.e > 0, 1, 0),
+          hc_barrier_family = ifelse(HEALTH.003.e > 0, 1, 0),
+          miss_wellbaby = ifelse(HEALTH.004 == 1, 1, 0),
+          miss_vaccine_any = case_when(
+                             HEALTH.009.b == 1 ~ 1, 
+                             HEALTH.009.b.2 == 1 ~ 1, 
+                             HEALTH.010.b == 1 ~ 1, 
+                             HEALTH.011.b == 1 ~ 1, 
+                             HEALTH.012.b == 1 ~ 1, 
+                             HEALTH.013.b == 1 ~ 1, 
+                             HEALTH.009.b == 0 ~ 0, 
+                             HEALTH.009.b.2 == 0 ~ 0, 
+                             HEALTH.010.b == 0 ~ 0, 
+                             HEALTH.011.b == 0 ~ 0, 
+                             HEALTH.012.b == 0 ~ 0, 
+                             HEALTH.013.b == 0 ~ 0, 
+                             HEALTH.004 != 1 ~ 0,
+                             TRUE ~ NA_real_))
+    
+master_fl = combine.cat(x = master_fl, 
+                       cols = find_items("HEALTH.004\\.a_.{1}$", master_fl), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.004a_cat")
+master_fl$missed_wb_cost = ifelse(grepl("1", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_time.away.from.work = ifelse(grepl("2", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_inability.find.childcare = ifelse(grepl("3", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_concern.for.covid = ifelse(grepl("4", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_caring.for.family = ifelse(grepl("5", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_vaccine.hesitancy = ifelse(grepl("6", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_other = ifelse(grepl("7", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_doctor.cancel = ifelse(grepl("8", master_fl$HEALTH.004a_cat), 1, 0)
+master_fl$missed_wb_transportation = ifelse(grepl("9", master_fl$HEALTH.004a_cat), 1, 0)
+
+master_fl <- master_fl %>%
+  mutate (which_wellbaby_missed.1 = HEALTH.009.a,
+          which_wellbaby_missed.2 = HEALTH.010.a,
+          which_wellbaby_missed.3 = HEALTH.011.a,
+          which_wellbaby_missed.4 = HEALTH.012.a,
+          which_wellbaby_missed.5 = HEALTH.013.a)
+  
+health <- master_fl %>%
+  select (CaregiverID, Week, StartDate, num_delay_healthcare, delay_healthcare, contains ("hc_barrier"), contains ("miss_", ), contains ("missed_wb_"), contains ("which_wellbaby_missed"))
+
+health <- merge (x = health, y = master_dem_fl, by.x = "CaregiverID", by.y = "CaregiverID")%>%
+  filter (Week <= 38)
+
+num_responses = function(x){length(which(!is.na(x)))}
+health.num <- health %>%
+  group_by(Week) %>%
+  summarize_all(num_responses) %>%
+  gather("Variable", "num_responses",-Week) %>%
+  mutate(week = paste0("Week", Week),
+         week = factor(Week, levels = paste0("Week", c(1:total_week)))) %>%
+  spread(Week, num_responses)
+
+health_rct <- health %>%
+  group_by (CaregiverID) %>%
+  filter (Week == max (Week)) %>%
+  ungroup ()
+
+
+```
+
+# 0. Sample Disclaimer
+  * This set of analyses on healthcare is based on responses collected from 4,808 caregivers between the dates of April 6th 2020 and December 23rd 2020. These caregivers represent a range of voices: 6.83% are non-Latinx Black/African American, 14.01% are Latinx, and 28.67% live at or below 1.5 times the federal poverty line. Only data from follow-up surveys were included in the analyses for "current mental health" situations.  Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are not weighted. 
+
+  
+```{r, echo=FALSE, message = FALSE}
+library(janitor)
+tabyl(health_rct$race_ethnic)
+tabyl(health_rct$poverty_cat)
+```
+
+# 1. Percentage of Parents Who Delayed Healthcare, Missed Preventive Visits, or Missed Vaccines
+  * Survey question:
+  * HEALTH.003.2 At any time in the last month, did you DELAY getting medical care (including physical or mental health visits)? - yes/no/unsure
+  * HEALTH.003.a-f Since the coronavirus (COVID-19) pandemic, have you delayed getting medical care (including physical or mental health visits) for any of the following reasons?\
+    + Cost\
+    + Unable to get time away from work\
+    + Inability to find childcare\
+    + Concern over exposure to COVID-19\
+    + Caring for family members\
+    + Other\
+  * HEALTH.004  Have you missed a well baby check up since the coronavirus (COVID-19) pandemic began? - Yes/No/NA\
+  * HEALTH.004.a_1-7 What prevented you from going to a well baby check up? Select all that apply\
+    + Cost\
+    + Unable to get time away from work\
+    + Inability to find childcare\
+    + Concern over exposure to COVID-19\
+    + Caring for family members\
+    + Vaccine hesitancy\
+    + Doctor or clinic canceled appointment (introduced week 31)\
+    + Transportation (introduced week 33)\
+    + Other\
+  * HEALTH.004.b how many visits have you missed? (introduced week 33)\
+  * HEALTH.009/010/011/012/013(.b) Did your child(ren) miss a scheduled vaccine at this visit?  - yes/no
+    
+
+## 1.1 Cumulative percentage during the COVID-19 pandemic
+
+```{r, echo=FALSE, message = FALSE}
+health_smy <- health %>%
+  group_by (CaregiverID)%>%
+  summarise (delay_healthcare = my.max (delay_healthcare), 
+             miss_wellbaby = my.max (miss_wellbaby), 
+             miss_vaccine_any = my.max (miss_vaccine_any))%>%
+  ungroup()%>%
+  summarise (n = n(), 
+             delay_healthcare = sum (delay_healthcare, na.rm = TRUE)/n, 
+             miss_wellbaby = sum (miss_wellbaby, na.rm = T)/n, 
+             miss_vaccine_any= sum (miss_vaccine_any, na.rm = T)/n)%>%
+  pivot_longer (cols = c("delay_healthcare", "miss_wellbaby", "miss_vaccine_any"), names_to = "type", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+health_smy %>%
+  ggplot(mapping = aes (x = type, y = prop*100, fill = type)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))+
+  theme(legend.position = "none")+
+  labs (x = "")
+
+```
+
+### 1.1.1 By race/ethnicity
+```{r, echo=FALSE, message = FALSE}
+health_smy <- health %>%
+  group_by (CaregiverID)%>%
+  summarise (delay_healthcare = my.max (delay_healthcare), 
+             miss_wellbaby = my.max (miss_wellbaby), 
+             miss_vaccine_any = my.max (miss_vaccine_any), 
+             race_ethnic = my.max (race_ethnic))%>%
+  ungroup()%>%
+  filter (race_ethnic != "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(), 
+             delay_healthcare = sum (delay_healthcare, na.rm = TRUE)/n, 
+             miss_wellbaby = sum (miss_wellbaby, na.rm = T)/n, 
+             miss_vaccine_any= sum (miss_vaccine_any, na.rm = T)/n)%>%
+  pivot_longer (cols = c("delay_healthcare", "miss_wellbaby", "miss_vaccine_any"), names_to = "type", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+health_smy %>%
+  ggplot(mapping = aes (x = type, y = prop*100, fill = type)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))+
+  theme(legend.position = "none")+
+  labs (x = "")+
+  facet_wrap (~race_ethnic, ncol = 3)+
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+### 1.1.2 By poverty level
+```{r, echo=FALSE, message = FALSE}
+health_smy <- health %>%
+  group_by (CaregiverID)%>%
+  summarise (delay_healthcare = my.max (delay_healthcare), 
+             miss_wellbaby = my.max (miss_wellbaby), 
+             miss_vaccine_any = my.max (miss_vaccine_any), 
+             poverty_cat = my.max (poverty_cat))%>%
+  ungroup()%>%
+  filter (poverty_cat != "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(), 
+             delay_healthcare = sum (delay_healthcare, na.rm = TRUE)/n, 
+             miss_wellbaby = sum (miss_wellbaby, na.rm = T)/n, 
+             miss_vaccine_any= sum (miss_vaccine_any, na.rm = T)/n)%>%
+  pivot_longer (cols = c("delay_healthcare", "miss_wellbaby", "miss_vaccine_any"), names_to = "type", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+health_smy %>%
+  ggplot(mapping = aes (x = type, y = prop*100, fill = type)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))+
+  theme(legend.position = "none")+
+  labs (x = "")+
+  facet_wrap (~poverty_cat, ncol = 2)+
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+### 1.1.3 By child disability status
+```{r, echo=FALSE, message = FALSE}
+health_smy <- health %>%
+  group_by (CaregiverID)%>%
+  summarise (delay_healthcare = my.max (delay_healthcare), 
+             miss_wellbaby = my.max (miss_wellbaby), 
+             miss_vaccine_any = my.max (miss_vaccine_any), 
+             disability = my.max (disability))%>%
+  ungroup()%>%
+  filter (disability != "NA")%>%
+  group_by (disability)%>%
+  summarise (n = n(), 
+             delay_healthcare = sum (delay_healthcare, na.rm = TRUE)/n, 
+             miss_wellbaby = sum (miss_wellbaby, na.rm = T)/n, 
+             miss_vaccine_any= sum (miss_vaccine_any, na.rm = T)/n)%>%
+  pivot_longer (cols = c("delay_healthcare", "miss_wellbaby", "miss_vaccine_any"), names_to = "type", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+health_smy %>%
+  ggplot(mapping = aes (x = type, y = prop*100, fill = type)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))+
+  theme(legend.position = "none")+
+  labs (x = "")+
+  facet_wrap (~disability, ncol = 2)+
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+### 1.1.4 By single parent status
+```{r, echo=FALSE, message = FALSE}
+health_smy <- health %>%
+  group_by (CaregiverID)%>%
+  summarise (delay_healthcare = my.max (delay_healthcare), 
+             miss_wellbaby = my.max (miss_wellbaby), 
+             miss_vaccine_any = my.max (miss_vaccine_any), 
+             single = my.max (single))%>%
+  ungroup()%>%
+  filter (single != "NA")%>%
+  group_by (single)%>%
+  summarise (n = n(), 
+             delay_healthcare = sum (delay_healthcare, na.rm = TRUE)/n, 
+             miss_wellbaby = sum (miss_wellbaby, na.rm = T)/n, 
+             miss_vaccine_any= sum (miss_vaccine_any, na.rm = T)/n)%>%
+  pivot_longer (cols = c("delay_healthcare", "miss_wellbaby", "miss_vaccine_any"), names_to = "type", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+health_smy %>%
+  ggplot(mapping = aes (x = type, y = prop*100, fill = type)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (prop*100-moe*100), 
+                    ymax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black",  position = position_dodge(1))+
+  theme(legend.position = "none")+
+  labs (x = "")+
+  facet_wrap (~single, ncol = 2)+
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+## 1.2 Trend During the Pandemic for the Overall Sample
+```{r, echo=FALSE, message = FALSE}
+health_smy <- health %>%
+  group_by (Week)%>%
+  summarise (n = n(), 
+             delay_healthcare = sum (delay_healthcare, na.rm = TRUE)/n, 
+             miss_wellbaby = sum (miss_wellbaby, na.rm = T)/n, 
+             miss_vaccine_any= sum (miss_vaccine_any, na.rm = T)/n, 
+             date = as.Date(min (StartDate)))%>%
+  pivot_longer (cols = c("delay_healthcare", "miss_wellbaby", "miss_vaccine_any"), names_to = "type", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+health_smy %>%
+  filter ((Week %in% c(25, 27, 29, 31, 33, 35,37, 39, 41, 43, 44, 45, 47))==F)%>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = type)) +   
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")    # Change the break and labels of x axis dates
+
+```
+
+# 2. Reasons for Delayed Healthcare & Missed Visits
+
+```{r, echo=FALSE, message = FALSE}
+health_delay <- health %>%
+  filter (delay_healthcare == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (hc_barrier_cost), 
+             time_away_work = my.max (hc_barrier_time), 
+             inability_find_childcare = my.max (hc_barrier_childcare), 
+             covid = my.max (hc_barrier_covid), 
+             caring_family = my.max (hc_barrier_family))%>%
+  ungroup()%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n)%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Delayed healthcare")
+
+health_wb <- health %>%
+  filter (miss_wellbaby == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (missed_wb_cost), 
+             time_away_work = my.max (missed_wb_time.away.from.work), 
+             inability_find_childcare = my.max (missed_wb_inability.find.childcare), 
+             covid = my.max (missed_wb_concern.for.covid), 
+             caring_family = my.max (missed_wb_caring.for.family), 
+             vaccine_hesitancy = my.max (missed_wb_vaccine.hesitancy), 
+             doctor_cancel = my.max (missed_wb_doctor.cancel), 
+             transportation = my.max (missed_wb_transportation))%>%
+  ungroup()%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n, 
+             vaccine_hesitancy = sum (vaccine_hesitancy, na.rm = TRUE)/n, 
+             doctor_cancel = sum (doctor_cancel, na.rm = TRUE)/n, 
+             transportation = sum (transportation, na.rm = TRUE)/n, 
+             )%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family", "vaccine_hesitancy", "doctor_cancel", "transportation"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Missed Wellbaby Visits")
+
+health_smy <- rbind (health_delay, health_wb)
+
+health_smy %>%
+  ggplot(mapping = aes (y = reorder(barrier, -prop), x = prop*100, fill = barrier)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size = 2.5, position = position_dodge(1))+
+  facet_wrap(~condition, ncol = 2)+
+  theme(legend.position = "none")
+
+```
+
+## 2.1 By race/ethnicity
+```{r, echo=FALSE, message = FALSE}
+health_delay <- health %>%
+  filter (delay_healthcare == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (hc_barrier_cost), 
+             time_away_work = my.max (hc_barrier_time), 
+             inability_find_childcare = my.max (hc_barrier_childcare), 
+             covid = my.max (hc_barrier_covid), 
+             caring_family = my.max (hc_barrier_family), 
+             race_ethnic = my.max (race_ethnic))%>%
+  ungroup()%>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n)%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Delayed healthcare")
+
+health_wb <- health %>%
+  filter (miss_wellbaby == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (missed_wb_cost), 
+             time_away_work = my.max (missed_wb_time.away.from.work), 
+             inability_find_childcare = my.max (missed_wb_inability.find.childcare), 
+             covid = my.max (missed_wb_concern.for.covid), 
+             caring_family = my.max (missed_wb_caring.for.family), 
+             vaccine_hesitancy = my.max (missed_wb_vaccine.hesitancy), 
+             doctor_cancel = my.max (missed_wb_doctor.cancel), 
+             transportation = my.max (missed_wb_transportation), 
+             race_ethnic = my.max (race_ethnic))%>%
+  ungroup()%>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n, 
+             vaccine_hesitancy = sum (vaccine_hesitancy, na.rm = TRUE)/n, 
+             doctor_cancel = sum (doctor_cancel, na.rm = TRUE)/n, 
+             transportation = sum (transportation, na.rm = TRUE)/n, 
+             )%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family", "vaccine_hesitancy", "doctor_cancel", "transportation"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Missed Wellbaby Visits")
+
+health_smy <- rbind (health_delay, health_wb)
+
+health_smy %>%
+  ggplot(mapping = aes (y = reorder(barrier, -prop), x = prop*100, fill = barrier)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size = 2, position = position_dodge(1))+
+  facet_wrap(race_ethnic~condition, ncol = 2)+
+  theme(legend.position = "none")
+
+```
+
+## 2.2 By poverty level
+```{r, echo=FALSE, message = FALSE}
+health_delay <- health %>%
+  filter (delay_healthcare == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (hc_barrier_cost), 
+             time_away_work = my.max (hc_barrier_time), 
+             inability_find_childcare = my.max (hc_barrier_childcare), 
+             covid = my.max (hc_barrier_covid), 
+             caring_family = my.max (hc_barrier_family), 
+             poverty_cat = my.max (poverty_cat))%>%
+  ungroup()%>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n)%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Delayed healthcare")
+
+health_wb <- health %>%
+  filter (miss_wellbaby == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (missed_wb_cost), 
+             time_away_work = my.max (missed_wb_time.away.from.work), 
+             inability_find_childcare = my.max (missed_wb_inability.find.childcare), 
+             covid = my.max (missed_wb_concern.for.covid), 
+             caring_family = my.max (missed_wb_caring.for.family), 
+             vaccine_hesitancy = my.max (missed_wb_vaccine.hesitancy), 
+             doctor_cancel = my.max (missed_wb_doctor.cancel), 
+             transportation = my.max (missed_wb_transportation), 
+             poverty_cat = my.max (poverty_cat))%>%
+  ungroup()%>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n, 
+             vaccine_hesitancy = sum (vaccine_hesitancy, na.rm = TRUE)/n, 
+             doctor_cancel = sum (doctor_cancel, na.rm = TRUE)/n, 
+             transportation = sum (transportation, na.rm = TRUE)/n, 
+             )%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family", "vaccine_hesitancy", "doctor_cancel", "transportation"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Missed Wellbaby Visits")
+
+health_smy <- rbind (health_delay, health_wb)
+
+health_smy %>%
+  ggplot(mapping = aes (y = reorder(barrier, -prop), x = prop*100, fill = barrier)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size = 2, position = position_dodge(1))+
+  facet_wrap(poverty_cat~condition, ncol = 2)+
+  theme(legend.position = "none")
+
+```
+
+## 2.3 By child disability status
+```{r, echo=FALSE, message = FALSE}
+health_delay <- health %>%
+  filter (delay_healthcare == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (hc_barrier_cost), 
+             time_away_work = my.max (hc_barrier_time), 
+             inability_find_childcare = my.max (hc_barrier_childcare), 
+             covid = my.max (hc_barrier_covid), 
+             caring_family = my.max (hc_barrier_family), 
+             disability = my.max (disability))%>%
+  ungroup()%>%
+  filter (disability!= "NA")%>%
+  group_by (disability)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n)%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Delayed healthcare")
+
+health_wb <- health %>%
+  filter (miss_wellbaby == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (missed_wb_cost), 
+             time_away_work = my.max (missed_wb_time.away.from.work), 
+             inability_find_childcare = my.max (missed_wb_inability.find.childcare), 
+             covid = my.max (missed_wb_concern.for.covid), 
+             caring_family = my.max (missed_wb_caring.for.family), 
+             vaccine_hesitancy = my.max (missed_wb_vaccine.hesitancy), 
+             doctor_cancel = my.max (missed_wb_doctor.cancel), 
+             transportation = my.max (missed_wb_transportation), 
+             disability = my.max (disability))%>%
+  ungroup()%>%
+  filter (disability!= "NA")%>%
+  group_by (disability)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n, 
+             vaccine_hesitancy = sum (vaccine_hesitancy, na.rm = TRUE)/n, 
+             doctor_cancel = sum (doctor_cancel, na.rm = TRUE)/n, 
+             transportation = sum (transportation, na.rm = TRUE)/n, 
+             )%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family", "vaccine_hesitancy", "doctor_cancel", "transportation"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Missed Wellbaby Visits")
+
+health_smy <- rbind (health_delay, health_wb)
+
+health_smy %>%
+  ggplot(mapping = aes (y = reorder(barrier, -prop), x = prop*100, fill = barrier)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size = 2, position = position_dodge(1))+
+  facet_wrap(disability~condition, ncol = 2)+
+  theme(legend.position = "none")
+
+```
+
+## 2.4 By single parent status
+```{r, echo=FALSE, message = FALSE}
+health_delay <- health %>%
+  filter (delay_healthcare == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (hc_barrier_cost), 
+             time_away_work = my.max (hc_barrier_time), 
+             inability_find_childcare = my.max (hc_barrier_childcare), 
+             covid = my.max (hc_barrier_covid), 
+             caring_family = my.max (hc_barrier_family), 
+             single = my.max (single))%>%
+  ungroup()%>%
+  filter (single!= "NA")%>%
+  group_by (single)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n)%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Delayed healthcare")
+
+health_wb <- health %>%
+  filter (miss_wellbaby == 1) %>%
+  group_by (CaregiverID)%>%
+  summarise (cost = my.max (missed_wb_cost), 
+             time_away_work = my.max (missed_wb_time.away.from.work), 
+             inability_find_childcare = my.max (missed_wb_inability.find.childcare), 
+             covid = my.max (missed_wb_concern.for.covid), 
+             caring_family = my.max (missed_wb_caring.for.family), 
+             vaccine_hesitancy = my.max (missed_wb_vaccine.hesitancy), 
+             doctor_cancel = my.max (missed_wb_doctor.cancel), 
+             transportation = my.max (missed_wb_transportation), 
+             single = my.max (single))%>%
+  ungroup()%>%
+  filter (single!= "NA")%>%
+  group_by (single)%>%
+  summarise (n = n(), 
+             cost = sum (cost, na.rm = TRUE)/n,
+             time_away_work = sum (time_away_work, na.rm = TRUE)/n,
+             inability_find_childcare = sum (inability_find_childcare, na.rm = TRUE)/n,
+             covid = sum (covid, na.rm = TRUE)/n,
+             caring_family = sum (caring_family, na.rm = TRUE)/n, 
+             vaccine_hesitancy = sum (vaccine_hesitancy, na.rm = TRUE)/n, 
+             doctor_cancel = sum (doctor_cancel, na.rm = TRUE)/n, 
+             transportation = sum (transportation, na.rm = TRUE)/n, 
+             )%>%
+  pivot_longer (cols = c("cost", "time_away_work", "inability_find_childcare", "covid", "caring_family", "vaccine_hesitancy", "doctor_cancel", "transportation"), names_to = "barrier", values_to = "prop")%>%
+   mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          condition = "Missed Wellbaby Visits")
+
+health_smy <- rbind (health_delay, health_wb)
+
+health_smy %>%
+  ggplot(mapping = aes (y = reorder(barrier, -prop), x = prop*100, fill = barrier)) +
+  geom_col (position = position_dodge(1))+
+  geom_errorbar(aes(xmin = (prop*100-moe*100), 
+                    xmax = (prop*100+moe*100)),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, color = "black", size = 2, position = position_dodge(1))+
+  facet_wrap(single~condition, ncol = 2)+
+  theme(legend.position = "none")
+
+```
+
+# 3.  Which Preventive Visit Missed
+
+```{r, echo=FALSE, message = FALSE}
+health_wb <- health%>%
+  mutate (missed_wb_1 = ifelse (which_wellbaby_missed.1==1|which_wellbaby_missed.2==1|which_wellbaby_missed.3==1|which_wellbaby_missed.4==1|which_wellbaby_missed.5==1, 1, 0), 
+          missed_wb_2 = ifelse (which_wellbaby_missed.1==2|which_wellbaby_missed.2==2|which_wellbaby_missed.3==2|which_wellbaby_missed.4==2|which_wellbaby_missed.5==2, 1, 0), 
+          missed_wb_3 = ifelse (which_wellbaby_missed.1==3|which_wellbaby_missed.2==3|which_wellbaby_missed.3==3|which_wellbaby_missed.4==3|which_wellbaby_missed.5==3, 1, 0), 
+          missed_wb_4 = ifelse (which_wellbaby_missed.1==4|which_wellbaby_missed.2==4|which_wellbaby_missed.3==4|which_wellbaby_missed.4==4|which_wellbaby_missed.5==4, 1, 0), 
+          missed_wb_5 = ifelse (which_wellbaby_missed.1==5|which_wellbaby_missed.2==5|which_wellbaby_missed.3==5|which_wellbaby_missed.4==5|which_wellbaby_missed.5==5, 1, 0), 
+          missed_wb_6 = ifelse (which_wellbaby_missed.1==6|which_wellbaby_missed.2==6|which_wellbaby_missed.3==6|which_wellbaby_missed.4==6|which_wellbaby_missed.5==6, 1, 0), 
+          missed_wb_7 = ifelse (which_wellbaby_missed.1==7|which_wellbaby_missed.2==7|which_wellbaby_missed.3==7|which_wellbaby_missed.4==7|which_wellbaby_missed.5==7, 1, 0), 
+          missed_wb_8 = ifelse (which_wellbaby_missed.1==8|which_wellbaby_missed.2==8|which_wellbaby_missed.3==8|which_wellbaby_missed.4==8|which_wellbaby_missed.5==8, 1, 0), 
+          missed_wb_9 = ifelse (which_wellbaby_missed.1==9|which_wellbaby_missed.2==9|which_wellbaby_missed.3==9|which_wellbaby_missed.4==9|which_wellbaby_missed.5==9, 1, 0), 
+          missed_wb_10 = ifelse (which_wellbaby_missed.1==10|which_wellbaby_missed.2==10|which_wellbaby_missed.3==10|which_wellbaby_missed.4==10|which_wellbaby_missed.5==10, 1, 0), 
+          missed_wb_11 = ifelse (which_wellbaby_missed.1==11|which_wellbaby_missed.2==11|which_wellbaby_missed.3==11|which_wellbaby_missed.4==11|which_wellbaby_missed.5==11, 1, 0), 
+          missed_wb_12 = ifelse (which_wellbaby_missed.1==12|which_wellbaby_missed.2==12|which_wellbaby_missed.3==12|which_wellbaby_missed.4==12|which_wellbaby_missed.5==12, 1, 0), 
+          missed_wb_13 = ifelse (which_wellbaby_missed.1==13|which_wellbaby_missed.2==13|which_wellbaby_missed.3==13|which_wellbaby_missed.4==13|which_wellbaby_missed.5==13, 1, 0), 
+          missed_wb_14 = ifelse (which_wellbaby_missed.1==14|which_wellbaby_missed.2==14|which_wellbaby_missed.3==14|which_wellbaby_missed.4==14|which_wellbaby_missed.5==14, 1, 0) 
+          )%>%
+  group_by (CaregiverID)%>%
+  summarise (missed_wb_1 = my.max (missed_wb_1), 
+             missed_wb_2 = my.max (missed_wb_2),
+             missed_wb_3 = my.max (missed_wb_3),
+             missed_wb_4 = my.max (missed_wb_4),
+             missed_wb_5 = my.max (missed_wb_5),
+             missed_wb_6 = my.max (missed_wb_6),
+             missed_wb_7 = my.max (missed_wb_7),
+             missed_wb_8 = my.max (missed_wb_8),
+             missed_wb_9 = my.max (missed_wb_9),
+             missed_wb_10 = my.max (missed_wb_10),
+             missed_wb_11 = my.max (missed_wb_11),
+             missed_wb_12 = my.max (missed_wb_12),
+             missed_wb_13 = my.max (missed_wb_13),
+             missed_wb_14 = my.max (missed_wb_14))%>%
+  ungroup()%>%
+  summarise (n = n(),
+             a.3to5days = sum (missed_wb_1, na.rm = T)/n, 
+             b.1month = sum (missed_wb_2, na.rm = T)/n, 
+             c.2months = sum (missed_wb_3, na.rm = T)/n, 
+             d.4months = sum (missed_wb_4, na.rm = T)/n, 
+             e.6months = sum (missed_wb_5, na.rm = T)/n, 
+             f.9months = sum (missed_wb_6, na.rm = T)/n, 
+             g.12months = sum (missed_wb_7, na.rm = T)/n, 
+             h.15months = sum (missed_wb_8, na.rm = T)/n, 
+             i.18months = sum (missed_wb_9, na.rm = T)/n, 
+             j.2years = sum (missed_wb_10, na.rm = T)/n, 
+             k.2.5years = sum (missed_wb_11, na.rm = T)/n, 
+             l.3years = sum (missed_wb_12, na.rm = T)/n, 
+             m.4years = sum (missed_wb_13, na.rm = T)/n, 
+             n.5years = sum (missed_wb_14, na.rm = T)/n)%>%
+  pivot_longer (cols = c("a.3to5days","b.1month","c.2months","d.4months","e.6months","f.9months","g.12months","h.15months","i.18months","j.2years","k.2.5years","l.3years","m.4years","n.5years" ), names_to = "which", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+health_wb %>%
+  ggplot(mapping = aes (x = which, y = prop*100, fill = which)) + # To order y axis by percentage: mapping = aes (y = reorder(XXX, -prop))
+  geom_bar (stat = "identity", position = position_dodge(1))+ # stacked bar chart: position = "stack"
+  geom_errorbar(aes(ymin = ci_low*100,                        # Error bar 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = 0, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+                                              # y axis label
+  labs (x = "")+                                              # x axis label
+  theme(legend.position = "none")+                            # Remove legend or change legend position
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
