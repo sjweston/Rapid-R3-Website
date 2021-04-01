@@ -28,6 +28,11 @@ Rural communities are defined as zipcodes with density smaller than 500 people p
 ```{r inequality-3 }
 library(here)
 library(conflicted)
+library(weights)
+library(ggpubr)
+library(dplyr)
+library(ggplot2)
+
 conflict_prefer("chisq.test", "stats")
 ```
 
@@ -188,12 +193,6 @@ labels4 = c("white", "poc")
 labelsi = c("High Income", "Low Income")
 labels5 = c("Midwest","Northeast", "South", "West")
 labels6 = c("Rural","Urban")
-```
-
-```{r inequality-9 }
-library(weights)
-library(ggpubr)
-library(dplyr)
 ```
 
 # Sample sizes

@@ -1435,11 +1435,11 @@ score_report = function(data = NULL, week = NULL, zipcode = zipcode, master = FA
   }
   
   if(contains_items("FPL\\.", data)){
-  newdata$poverty = data$FPL.150
-  newdata$poverty100 = data$FPL.100
-  newdata$poverty125 = data$FPL.125
-  newdata$poverty150 = data$FPL.150
-  newdata$poverty200 = data$FPL.200
+  newdata$poverty = data$FPL.2019.UM.150
+  newdata$poverty100 = data$FPL.2019.UM.100
+  newdata$poverty125 = data$FPL.2019.UM.125
+  newdata$poverty150 = data$FPL.2019.UM.150
+  newdata$poverty200 = data$FPL.2019.UM.200
   }
   
   ss = data %>%
