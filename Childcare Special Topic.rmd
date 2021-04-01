@@ -79,7 +79,7 @@ mutate (race_ethnic = case_when(
 
 ##Povertyline
 master <- master %>%
-  mutate (poverty_cat = factor(FPL.150, labels = c("High Income", "Low Income")))
+  mutate (poverty_cat = factor(FPL.2019.UM.150, labels = c("High Income", "Low Income")))
 
 #Single parent status
 master <- master %>%
