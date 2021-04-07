@@ -1,0 +1,1204 @@
+---
+title: "Child & Parent Mental Health Trend"
+author: "Sihong"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, include = FALSE}
+library(here)
+library(knitr)
+library(readr)
+library(haven)
+library(tidyverse)
+library(lavaan)
+```
+
+```{r, echo=FALSE, message = FALSE}
+#Define functions
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+
+moe.m = function(sd,n){
+  moe = 1.96*sd/sqrt(n)
+  return(moe)}
+
+combine.cat = function(x, cols, id, newvar.name){
+  subset = x[,c(id, "Week", cols)]
+  names(subset) = c("id", "Week", paste0("X",1:length(cols)))
+  subset = suppressWarnings(gather(subset, "key", "value", -id, -Week))
+  subset = filter(subset, !is.na(value))
+  subset$key = gsub("X", "", subset$key)
+  subset = group_by(subset, id, Week)
+  subset = summarise(subset, newvar = paste(key, collapse = ",")) %>% ungroup()
+  names(subset) = c(id,"Week", newvar.name)
+  x = suppressMessages(full_join(x, subset))
+  return(x)
+}
+
+find_items = function(string, data2){
+  items = names(data2)
+  locations = which(grepl(string, items))
+  final = items[locations]
+  return(final)
+}
+
+my.max = function(x) ifelse (!all(is.na(x)), max(x,na.rm = TRUE), NA)
+my.min = function(x) ifelse (!all(is.na(x)), min(x,na.rm = TRUE), NA)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, include=FALSE}
+master_2020 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2020.sav"))
+master_2021 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2021.sav"))
+
+master <- full_join (master_2020, master_2021)
+
+# Remove cases should be excluded
+master <- master %>%
+  filter ( CaregiverID != "" & is.na(Exclude) == T)
+
+master = master %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup()
+
+total_week <- my.max(master$Week)
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+#Code demographics
+master <- master %>%
+  mutate (month = case_when(
+                  Week == 0 ~ "Pre-COVID",
+                  Week >0 & Week <= 4 ~ "April",
+                  Week >=5 & Week <=8 ~ "May",
+                  Week >=9 & Week <=13 ~ "June",
+                  Week >=14 & Week <=17 ~ "July",
+                  Week >=18 & Week <=21 ~ "August",
+                  Week >=22 & Week <=26 ~ "September",
+                  Week >=27 ~ "October"), 
+           baseline = case_when (Week - BaselineWeek == 1 ~ 1, 
+                                 Week - BaselineWeek > 1 ~ 0))
+
+##Race/ethnicity - 1 = black, 2 = latinx, 3 = white
+
+master <- master %>%
+  mutate (RaceGroup = na_if (RaceGroup, 99))%>%
+    mutate(
+      minority = ifelse(RaceGroup != 5, 1, 0),
+      black = ifelse(RaceGroup == 3, 1, 0),
+      native = ifelse(RaceGroup == 1, 1, 0),
+      asian = ifelse(RaceGroup == 2, 1, 0),
+      hawaii = ifelse(RaceGroup == 4, 1, 0),
+      white = ifelse(RaceGroup == 5, 1, 0),
+      other_race = ifelse(RaceGroup %in% c(6, 7), 1, 0))
+
+master <- master %>%
+      mutate(latinx = case_when(
+        DEMO.008 == 1 ~ 1,
+        DEMO.008 == 0 ~ 0,
+        DEMO.008.2 == 0 ~ 0,
+        DEMO.008.2 == 1 ~ 1,
+        DEMO.008.2 == 2 ~ 1,
+        TRUE ~ NA_real_))
+
+master <- master %>%
+mutate (race_ethnic = case_when(
+      black == 1 ~ "1",
+      latinx == 1 ~ "2",
+      !is.na(black) ~ "3",
+      !is.na(latinx) ~ "3",
+      TRUE ~ NA_character_))  
+
+##Povertyline - 0 = high income, 1 = low income
+master <- master %>%
+  mutate (poverty_cat = FPL.2019.UM.150)
+
+#Material hardship
+master <- master %>%
+  combine.cat(cols = find_items("FSTR.002_.{1}$", master), 
+              id = "CaregiverID",
+              newvar.name = "FSTR.002_cat")
+  
+
+master <- master %>%
+  mutate (diff_pay_food = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("1", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_), 
+          diff_pay_utilities = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("3", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_house = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("2", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_healthcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("4", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_social = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("5", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_emotional = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("6", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_childcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("7", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_other = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("8", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_))
+
+master <- master %>%
+  rowwise() %>%
+  mutate(material_hardship = case_when(
+    Week == 0 ~ NA_real_,
+    TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
+  ungroup() %>%
+  mutate(num_hardship = material_hardship,
+    material_hardship = ifelse(material_hardship > 0, 1, 0)) 
+
+## Children with special needs
+master <- combine.cat(x = master, 
+                       cols = find_items("HEALTH.005_[0-9]{1}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.005_cat")
+master <- master %>%
+   mutate (disability = case_when (HEALTH.005_1 == 1 ~ 1,
+                                   HEALTH.005_2 == 1 ~ 1,
+                                   HEALTH.005_3 == 1 ~ 1,
+                                   HEALTH.005_4 == 1 ~ 1,
+                                   HEALTH.005_5 == 1 ~ 0,
+                                   HEALTH.005_6 == 1 ~ 1,
+                                   TRUE ~ NA_real_))
+
+
+## Single parent status
+master <- master %>%
+  mutate (single = case_when (
+                   DEMO.002 %in% c(3,4,5,7,8)~1, 
+                   DEMO.011 %in% c(2,4)~1,
+                   !is.na(DEMO.002)~0,
+                   !is.na(DEMO.011)~0,
+                   TRUE ~ NA_real_))
+                     
+## Employment status
+master <- combine.cat (x = master,
+                       cols = find_items ("JOB.010_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.010_cat")
+  
+master$JOB.010_cat = gsub("10", "0", master$JOB.010_cat)
+master$working_pre = ifelse (grepl("[1,2,6]", master$JOB.010_cat), 1, 0)
+master = combine.cat (x = master,
+                       cols = find_items ("JOB.008_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.008_cat")
+master$JOB.008_cat = gsub("10", "0", master$JOB.008_cat)
+master <- master %>%
+  mutate (work_status = case_when(
+                        grepl ("1", JOB.008_cat) ~ "1", 
+                        grepl ("2", JOB.008_cat) ~ "1", 
+                        grepl ("3", JOB.008_cat) ~ "0", 
+                        grepl ("4", JOB.008_cat) ~ "0", 
+                        grepl ("5", JOB.008_cat) ~ "1", 
+                        JOB.008.2 == 1 ~ "1",
+                        JOB.008.2 %in% c(2,3) ~ "0",
+                        TRUE~NA_character_),
+          work_status_pre = case_when(
+                        grepl ("1", JOB.010_cat) ~ "1", 
+                        grepl ("2", JOB.010_cat) ~ "1", 
+                        grepl ("3", JOB.010_cat) ~ "0", 
+                        grepl ("4", JOB.010_cat) ~ "0", 
+                        grepl ("5", JOB.010_cat) ~ "1", 
+                        TRUE~NA_character_))
+#1 = stable employed 2 = became unemployed 3 = became employed4 = stable unemployed
+
+# Region
+master <- master %>%
+  mutate (region = na_if (DEMO.001.b, 5))
+
+master_dem <- master %>%
+  group_by (CaregiverID) %>%
+  summarise (BaselineWeek = my.max (BaselineWeek),
+             race_ethnic = my.max(race_ethnic),
+             poverty_cat = my.max(poverty_cat),
+             disability = my.max (disability),
+             single = my.max (single),
+             work_status = my.max (work_status),
+             work_status_pre = my.max (work_status_pre), 
+             region = my.max(region), 
+             gender = my.min(DEMO.006))%>%
+  mutate ( ep_change = case_when(
+                        work_status == 1 & work_status_pre == 1 ~ "1", 
+                        work_status == 1 & work_status_pre == 0 ~ "2", 
+                        work_status == 0 & work_status_pre == 1 ~ "3", 
+                        work_status == 0 & work_status_pre == 0 ~ "4", 
+                        TRUE~NA_character_))%>%
+  mutate (race_ethnic = case_when (
+                        race_ethnic == 1 ~ "Black", 
+                        race_ethnic == 2 ~ "Latinx", 
+                        race_ethnic == 3 ~ "White", 
+                        TRUE~NA_character_),
+          poverty_cat = case_when (
+                        poverty_cat == 1 ~ "Below 150%FPL", 
+                        poverty_cat == 0 ~ "Above 150%FPL", 
+                        TRUE~NA_character_),
+          disability = case_when (
+                        disability == 1 ~ "With disability", 
+                        disability == 0 ~ "Without disability", 
+                        TRUE~NA_character_),
+          single = case_when (
+                        single == 1 ~ "Single parent", 
+                        single == 0 ~ "Dual parent", 
+                        TRUE~NA_character_),
+          work_status = case_when (
+                        work_status == 1 ~ "Employed", 
+                        work_status == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          work_status_pre = case_when (
+                        work_status_pre == 1 ~ "Employed", 
+                        work_status_pre == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          ep_change = case_when (
+                        ep_change == 1 ~ "Stable employed", 
+                        ep_change == 2 ~ "Became employed", 
+                        ep_change == 3 ~ "Became unemployed",
+                        ep_change == 4 ~ "Stable unemployed",
+                        TRUE~NA_character_), 
+          region = case_when (
+                        region == 1 ~ "Northeast", 
+                        region == 2 ~ "Midwest", 
+                        region == 3 ~ "South", 
+                        region == 4 ~ "West",
+                        TRUE~NA_character_))
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+CaregiverID_fl <- master%>%
+  mutate (follow_up = ifelse(SurveyType == 2, 1, 0))%>%
+  group_by (CaregiverID)%>%
+  summarise (follow_up = my.max (follow_up))%>%
+  ungroup()%>%
+  filter (follow_up == 1)
+
+CaregiverID_fl <- as.character (CaregiverID_fl$CaregiverID)
+  
+master_fl <- master %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+master_dem_fl <- master_dem %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Extract Relevant Variables
+##RL questions - online learning
+mh <- master_fl %>%
+  dplyr::select (CaregiverID, StartDate, Week, SurveyType, Source,contains ("PHQ"), contains ("GAD"), STRESS.001, STRESS.002, LONE.001.a, LONE.001.b, contains("CBCL") )
+
+mh$depress_crt= rowMeans(mh[,find_items("PHQ.002.[a-b]$", mh)], na.rm=T)
+mh$anxiety_crt = rowMeans(mh[,find_items("GAD2.002.[a-b]$", mh)], na.rm=T)
+mh$depress_pre= rowMeans(mh[,find_items("PHQ.001.[a-b]$", mh)], na.rm=T)
+mh$anxiety_pre = rowMeans(mh[,find_items("GAD2.001.[a-b]$", mh)], na.rm=T)
+
+mh <- mh %>%
+  mutate (depress_crt_r = depress_crt/3*100,
+          anxiety_crt_r =anxiety_crt/3*100,
+          stress_crt_r = STRESS.002/4*100,
+          lonely_crt_r = LONE.001.b/4*100, 
+          depress_pre_r = depress_pre/3*100,
+          anxiety_pre_r =anxiety_pre/3*100,
+          stress_pre_r = STRESS.001/4*100,
+          lonely_pre_r = LONE.001.a/4*100)%>%
+  rename (fussy_cr1 = CBCL.002.a,
+          fussy_cr2 = CBCL.005.a,
+          fussy_cr3 = CBCL.008.a,
+          fussy_cr4 = CBCL.011.a,
+          fussy_cr5 = CBCL.014.a,
+          fear_cr1 = CBCL.002.b,
+          fear_cr2 = CBCL.005.b,
+          fear_cr3 = CBCL.008.b,
+          fear_cr4 = CBCL.011.b,
+          fear_cr5 = CBCL.014.b, 
+          fussy_pr1 = CBCL.001.a,
+          fussy_pr2 = CBCL.004.a,
+          fussy_pr3 = CBCL.007.a,
+          fussy_pr4 = CBCL.010.a,
+          fussy_pr5 = CBCL.013.a,
+          fear_pr1 = CBCL.001.b,
+          fear_pr2 = CBCL.004.b,
+          fear_pr3 = CBCL.007.b,
+          fear_pr4 = CBCL.010.b,
+          fear_pr5 = CBCL.013.b)
+
+fussy_pre_items = c(find_items("fussy_pr", mh))
+fear_pre_items = c(find_items("fear_pr", mh))
+fussy_crt_items = c(find_items("fussy_cr", mh))
+fear_crt_items = c(find_items("fear_cr", mh))
+
+mh$fussy_pre = rowMeans(mh[,fussy_pre_items], na.rm=T)/2*100
+mh$fear_pre = rowMeans(mh[,fear_pre_items], na.rm=T)/2*100
+mh$fussy_crt = rowMeans(mh[,fussy_crt_items], na.rm=T)/2*100
+mh$fear_crt = rowMeans(mh[,fear_crt_items], na.rm=T)/2*100
+
+cp_crt_items = c("fussy_crt", "fear_crt")
+cp_pre_items = c("fussy_pre", "fear_pre")
+
+mh$cp_total_crt = rowMeans (mh[, cp_crt_items], na.rm=T)
+mh$cp_total_pre = rowMeans (mh[, cp_pre_items], na.rm=T)
+
+pmh_crt_variable = c("depress_crt_r", "anxiety_crt_r", "stress_crt_r", "lonely_crt_r")
+pmh_pre_variable = c("depress_pre_r", "anxiety_pre_r", "stress_pre_r", "lonely_pre_r")
+mh$pmh_total_crt = rowMeans(mh[, pmh_crt_variable], na.rm = T)
+mh$pmh_total_pre = rowMeans(mh[, pmh_pre_variable], na.rm = T)
+
+mh_pre <- mh %>%
+  group_by (CaregiverID)%>%
+  summarise (pmh_total_pre = mean (pmh_total_pre, na.rm = T), 
+             cp_total_pre = mean (cp_total_pre, na.rm = T),
+             depress_pre = mean(depress_pre_r, na.rm = T), 
+             anxiety_pre = mean(anxiety_pre_r, na.rm = T), 
+             lonely_pre = mean(lonely_pre_r, na.rm = T), 
+             stress_pre = mean(stress_pre_r, na.rm = T), 
+             fussy_pre = mean(fussy_pre, na.rm = T), 
+             fear_pre = mean(fear_pre, na.rm = T), 
+             )%>%
+  ungroup()
+
+mh_pre = merge (x = mh_pre, y = master_dem_fl, by.x = "CaregiverID", by.y = "CaregiverID")
+
+mh_crt = mh%>%
+  dplyr::select(CaregiverID, Week, SurveyType, StartDate, pmh_total_crt, cp_total_crt, depress_crt_r, anxiety_crt_r, lonely_crt_r, stress_crt_r, fussy_crt, fear_crt)
+
+mh_crt <- merge (x = mh_crt, y = master_dem_fl, by.x = "CaregiverID", by.y = "CaregiverID")%>%
+  filter (SurveyType == 2)
+
+mh_rct <- mh %>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()
+mh_rct <- merge (x = mh_rct, y = master_dem_fl, by.x = "CaregiverID", by.y = "CaregiverID")
+
+```
+
+# 0. Sample Disclaimer
+  * This set of analyses on well-being is based on responses collected from 5,336 caregivers between the dates of April 6th 2020 and March 20th 2021. These caregivers represent a range of voices: 7.13% are non-Latinx Black/African American, 12.62% are Latinx, and 27.95% live at or below 1.5 times the federal poverty line. Only data from follow-up surveys were included in the analyses for "current mental health" situations.  Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are not weighted. 
+
+  
+# 1. Trend of Parent Mental Health
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  summarise (n = n(),
+             total = mean (pmh_total_pre, na.rm = T), 
+             depress = mean (depress_pre, na.rm = T), 
+             anxiety = mean (anxiety_pre, na.rm = T), 
+             stress = mean (stress_pre, na.rm = T), 
+             lonely = mean (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  summarise (total = sd (pmh_total_pre, na.rm = T), 
+             depress = sd (depress_pre, na.rm = T), 
+             anxiety = sd (anxiety_pre, na.rm = T), 
+             stress = sd (stress_pre, na.rm = T), 
+             lonely = sd (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  group_by (Week)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (pmh_total_crt, na.rm = T), 
+             depress = mean (depress_crt_r, na.rm = T), 
+             anxiety = mean (anxiety_crt_r, na.rm = T), 
+             stress = mean (stress_crt_r, na.rm = T), 
+             lonely = mean (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  group_by (Week)%>%
+  summarise (total = sd (pmh_total_crt, na.rm = T), 
+             depress = sd (depress_crt_r, na.rm = T), 
+             anxiety = sd (anxiety_crt_r, na.rm = T), 
+             stress = sd (stress_crt_r, na.rm = T), 
+             lonely = sd (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week"), by.y = c("probs", "Week"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean)) +   
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")
+```
+
+## 1.1 By race/ethnicity
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             total = mean (pmh_total_pre, na.rm = T), 
+             depress = mean (depress_pre, na.rm = T), 
+             anxiety = mean (anxiety_pre, na.rm = T), 
+             stress = mean (stress_pre, na.rm = T), 
+             lonely = mean (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (total = sd (pmh_total_pre, na.rm = T), 
+             depress = sd (depress_pre, na.rm = T), 
+             anxiety = sd (anxiety_pre, na.rm = T), 
+             stress = sd (stress_pre, na.rm = T), 
+             lonely = sd (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (Week, race_ethnic)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (pmh_total_crt, na.rm = T), 
+             depress = mean (depress_crt_r, na.rm = T), 
+             anxiety = mean (anxiety_crt_r, na.rm = T), 
+             stress = mean (stress_crt_r, na.rm = T), 
+             lonely = mean (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (Week, race_ethnic)%>%
+  summarise (total = sd (pmh_total_crt, na.rm = T), 
+             depress = sd (depress_crt_r, na.rm = T), 
+             anxiety = sd (anxiety_crt_r, na.rm = T), 
+             stress = sd (stress_crt_r, na.rm = T), 
+             lonely = sd (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "race_ethnic"), by.y = c("probs", "Week", "race_ethnic"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = race_ethnic)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")+
+  facet_wrap (~race_ethnic)
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~race_ethnic, nrow = 1)
+```
+
+## 1.2 By poverty level
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(),
+             total = mean (pmh_total_pre, na.rm = T), 
+             depress = mean (depress_pre, na.rm = T), 
+             anxiety = mean (anxiety_pre, na.rm = T), 
+             stress = mean (stress_pre, na.rm = T), 
+             lonely = mean (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (total = sd (pmh_total_pre, na.rm = T), 
+             depress = sd (depress_pre, na.rm = T), 
+             anxiety = sd (anxiety_pre, na.rm = T), 
+             stress = sd (stress_pre, na.rm = T), 
+             lonely = sd (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (Week, poverty_cat)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (pmh_total_crt, na.rm = T), 
+             depress = mean (depress_crt_r, na.rm = T), 
+             anxiety = mean (anxiety_crt_r, na.rm = T), 
+             stress = mean (stress_crt_r, na.rm = T), 
+             lonely = mean (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (Week, poverty_cat)%>%
+  summarise (total = sd (pmh_total_crt, na.rm = T), 
+             depress = sd (depress_crt_r, na.rm = T), 
+             anxiety = sd (anxiety_crt_r, na.rm = T), 
+             stress = sd (stress_crt_r, na.rm = T), 
+             lonely = sd (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "poverty_cat"), by.y = c("probs", "Week", "poverty_cat"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = poverty_cat)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~poverty_cat, nrow = 1)
+```
+
+## 1.3 By child disability status
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (disability!= "NA")%>%
+  group_by (disability)%>%
+  summarise (n = n(),
+             total = mean (pmh_total_pre, na.rm = T), 
+             depress = mean (depress_pre, na.rm = T), 
+             anxiety = mean (anxiety_pre, na.rm = T), 
+             stress = mean (stress_pre, na.rm = T), 
+             lonely = mean (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (disability!= "NA")%>%
+  group_by (disability)%>%
+  summarise (total = sd (pmh_total_pre, na.rm = T), 
+             depress = sd (depress_pre, na.rm = T), 
+             anxiety = sd (anxiety_pre, na.rm = T), 
+             stress = sd (stress_pre, na.rm = T), 
+             lonely = sd (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (disability!= "NA")%>%
+  group_by (Week, disability)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (pmh_total_crt, na.rm = T), 
+             depress = mean (depress_crt_r, na.rm = T), 
+             anxiety = mean (anxiety_crt_r, na.rm = T), 
+             stress = mean (stress_crt_r, na.rm = T), 
+             lonely = mean (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (disability!= "NA")%>%
+  group_by (Week, disability)%>%
+  summarise (total = sd (pmh_total_crt, na.rm = T), 
+             depress = sd (depress_crt_r, na.rm = T), 
+             anxiety = sd (anxiety_crt_r, na.rm = T), 
+             stress = sd (stress_crt_r, na.rm = T), 
+             lonely = sd (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "disability"), by.y = c("probs", "Week", "disability"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = disability)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~disability, nrow = 1)
+```
+
+## 1.4 By single parent status
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (single!= "NA")%>%
+  group_by (single)%>%
+  summarise (n = n(),
+             total = mean (pmh_total_pre, na.rm = T), 
+             depress = mean (depress_pre, na.rm = T), 
+             anxiety = mean (anxiety_pre, na.rm = T), 
+             stress = mean (stress_pre, na.rm = T), 
+             lonely = mean (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (single!= "NA")%>%
+  group_by (single)%>%
+  summarise (total = sd (pmh_total_pre, na.rm = T), 
+             depress = sd (depress_pre, na.rm = T), 
+             anxiety = sd (anxiety_pre, na.rm = T), 
+             stress = sd (stress_pre, na.rm = T), 
+             lonely = sd (lonely_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (single!= "NA")%>%
+  group_by (Week, single)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (pmh_total_crt, na.rm = T), 
+             depress = mean (depress_crt_r, na.rm = T), 
+             anxiety = mean (anxiety_crt_r, na.rm = T), 
+             stress = mean (stress_crt_r, na.rm = T), 
+             lonely = mean (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (single!= "NA")%>%
+  group_by (Week, single)%>%
+  summarise (total = sd (pmh_total_crt, na.rm = T), 
+             depress = sd (depress_crt_r, na.rm = T), 
+             anxiety = sd (anxiety_crt_r, na.rm = T), 
+             stress = sd (stress_crt_r, na.rm = T), 
+             lonely = sd (lonely_crt_r, na.rm = T))%>%
+  pivot_longer (cols = c("total", "depress", "anxiety", "stress", "lonely"), names_to = "probs", values_to = "sd")
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "single"), by.y = c("probs", "Week", "single"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = single)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~single, nrow = 1)
+```
+
+# 2. Trend of Child Mental Health
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  summarise (n = n(),
+             total = mean (cp_total_pre, na.rm = T), 
+             fussy = mean (fussy_pre, na.rm = T), 
+             fear = mean (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  summarise (total = sd (cp_total_pre, na.rm = T), 
+             fussy = sd (fussy_pre, na.rm = T), 
+             fear = sd (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  group_by (Week)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (cp_total_crt, na.rm = T), 
+             fussy = mean (fussy_crt, na.rm = T), 
+             fear = mean (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  group_by (Week)%>%
+  summarise (total = sd (cp_total_crt, na.rm = T), 
+             fussy = sd (fussy_crt, na.rm = T), 
+             fear = sd (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week"), by.y = c("probs", "Week"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean)) +   
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")
+```
+
+## 2.1 By race/ethnicity
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(),
+             total = mean (cp_total_pre, na.rm = T), 
+             fussy = mean (fussy_pre, na.rm = T), 
+             fear = mean (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (total = sd (cp_total_pre, na.rm = T), 
+             fussy = sd (fussy_pre, na.rm = T), 
+             fear = sd (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (Week, race_ethnic)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (cp_total_crt, na.rm = T), 
+             fussy = mean (fussy_crt, na.rm = T), 
+             fear = mean (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (Week, race_ethnic)%>%
+  summarise (total = sd (cp_total_crt, na.rm = T), 
+             fussy = sd (fussy_crt, na.rm = T), 
+             fear = sd (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "race_ethnic"), by.y = c("probs", "Week", "race_ethnic"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = race_ethnic)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")+
+  facet_wrap (~race_ethnic, nrow = 1)
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~race_ethnic, nrow = 1)
+```
+
+## 2.2 By poverty level
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (n = n(),
+             total = mean (cp_total_pre, na.rm = T), 
+             fussy = mean (fussy_pre, na.rm = T), 
+             fear = mean (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise (total = sd (cp_total_pre, na.rm = T), 
+             fussy = sd (fussy_pre, na.rm = T), 
+             fear = sd (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (Week, poverty_cat)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (cp_total_crt, na.rm = T), 
+             fussy = mean (fussy_crt, na.rm = T), 
+             fear = mean (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (Week, poverty_cat)%>%
+  summarise (total = sd (cp_total_crt, na.rm = T), 
+             fussy = sd (fussy_crt, na.rm = T), 
+             fear = sd (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "poverty_cat"), by.y = c("probs", "Week", "poverty_cat"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = poverty_cat)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~poverty_cat, nrow = 1)
+```
+
+## 2.3 By child disability status
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (disability!= "NA")%>%
+  group_by (disability)%>%
+  summarise (n = n(),
+             total = mean (cp_total_pre, na.rm = T), 
+             fussy = mean (fussy_pre, na.rm = T), 
+             fear = mean (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (disability!= "NA")%>%
+  group_by (disability)%>%
+  summarise (total = sd (cp_total_pre, na.rm = T), 
+             fussy = sd (fussy_pre, na.rm = T), 
+             fear = sd (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (disability!= "NA")%>%
+  group_by (Week, disability)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (cp_total_crt, na.rm = T), 
+             fussy = mean (fussy_crt, na.rm = T), 
+             fear = mean (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (disability!= "NA")%>%
+  group_by (Week, disability)%>%
+  summarise (total = sd (cp_total_crt, na.rm = T), 
+             fussy = sd (fussy_crt, na.rm = T), 
+             fear = sd (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "disability"), by.y = c("probs", "Week", "disability"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = disability)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~disability, nrow = 1)
+```
+
+## 2.4 By single parent status
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+mh_pre_mean <- mh_pre %>%
+  filter (single!= "NA")%>%
+  group_by (single)%>%
+  summarise (n = n(),
+             total = mean (cp_total_pre, na.rm = T), 
+             fussy = mean (fussy_pre, na.rm = T), 
+             fear = mean (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_pre_sd <- mh_pre %>%
+  filter (single!= "NA")%>%
+  group_by (single)%>%
+  summarise (total = sd (cp_total_pre, na.rm = T), 
+             fussy = sd (fussy_pre, na.rm = T), 
+             fear = sd (fear_pre, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+mh_pre_smy <- merge (mh_pre_mean, mh_pre_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe, 
+          Week = 0,
+          date = as.Date("2020-01-01"))
+
+mh_crt_mean <- mh_crt %>%
+  filter (single!= "NA")%>%
+  group_by (Week, single)%>%
+  summarise (n = n(),
+             date = as.Date(min (StartDate)),
+             total = mean (cp_total_crt, na.rm = T), 
+             fussy = mean (fussy_crt, na.rm = T), 
+             fear = mean (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "mean")
+
+mh_crt_sd <- mh_crt %>%
+  filter (single!= "NA")%>%
+  group_by (Week, single)%>%
+  summarise (total = sd (cp_total_crt, na.rm = T), 
+             fussy = sd (fussy_crt, na.rm = T), 
+             fear = sd (fear_crt, na.rm = T))%>%
+  pivot_longer (cols = c("total", "fussy", "fear"), names_to = "probs", values_to = "sd")
+
+
+mh_crt_smy <- merge (mh_crt_mean, mh_crt_sd, by.x = c("probs", "Week", "single"), by.y = c("probs", "Week", "single"))%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+mh_smy <- rbind (mh_pre_smy, mh_crt_smy)
+
+mh_smy %>%
+  filter (probs == "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = single)) +   
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Total Mental Health Problems")
+
+mh_smy %>%
+  filter (probs != "total")%>%
+  ggplot(mapping = aes (x = date, y = mean, fill = probs)) +   
+  geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = .3) +
+  geom_line() +
+  labs (y = "Mean") +                                                 # y axis label
+  labs (x = "Date") +                                                 # x axis label
+  theme(axis.text.x = element_text(angle = 45))+                  # Change x axis label to 45 angle degree
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  ggtitle (label = "Breakdown of Different Mental Health Problems")+
+  facet_wrap (~single, nrow = 1)
+```
