@@ -47,7 +47,7 @@ master = master %>%
            CC.DEMO.003_1 >= 1 ~ "Yes",
            !is.na(CC.DEMO.003_1) ~ "No",
            TRUE ~ NA_character_)) %>%
-  select(ProviderID, Week, CC.VACC.003, CC.STIM.002.d, CC.STIM.003.d, CC.OPEN.001, CC.OPEN.002, CC.OPEN.003, CC.OPEN.004, CC.OPEN.005, CC.OPEN.006, CC.OPEN.007, State, FPL.2019.150, RaceGroup, ProviderAge, child_age03) %>%
+  select(ProviderID, Week, CC.VACC.003, CC.STIM.001.d, CC.STIM.002.d, CC.STIM.003.d, CC.OPEN.001, CC.OPEN.002, CC.OPEN.003, CC.OPEN.004, CC.OPEN.005, CC.OPEN.006, CC.OPEN.007, State, FPL.2019.150, RaceGroup, ProviderAge, child_age03) %>%
   filter(CC.OPEN.007 == 1) %>%
   arrange(Week) %>%
   group_by(ProviderID) %>%
@@ -57,7 +57,7 @@ master = master %>%
   select(-ProviderID, -CC.OPEN.007) %>%
   rename(`Below 1.5xFPL` = FPL.2019.150,
          `Child 0-3` = child_age03) %>%
-  gather("Question", "Response", CC.VACC.003, CC.STIM.002.d, CC.STIM.003.d, CC.OPEN.001, CC.OPEN.002, CC.OPEN.003, CC.OPEN.004, CC.OPEN.005, CC.OPEN.006) %>%
+  gather("Question", "Response", CC.VACC.003, CC.STIM.001.d, CC.STIM.002.d, CC.STIM.003.d, CC.OPEN.001, CC.OPEN.002, CC.OPEN.003, CC.OPEN.004, CC.OPEN.005, CC.OPEN.006) %>%
   filter(Response != "") %>%
   filter(Response != "-99")
 
