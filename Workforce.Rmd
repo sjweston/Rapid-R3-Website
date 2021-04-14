@@ -313,13 +313,13 @@ master_dem <- master %>%
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf <- master %>%
-  select (CaregiverID, Week, StartDate, contains ("WKFORCE"), JOB.008.2, contains ("PHQ"), contains ("GAD"), STRESS.001, STRESS.002, LONE.001.a, LONE.001.b, contains("CBCL") )%>%
+  select (CaregiverID, Week, StartDate, contains ("WKFORCE"), JOB.008.2, contains ("PHQ"), contains ("GAD"), STRESS.001, STRESS.002, LONE.001.a, LONE.001.b, contains("CBCL"), FSTR.001, contains ("FSTR.002") )%>%
   filter (Week %in% c(33, 37, 41, 45, 47, 49))
 
 wkf <- merge (x = wkf, y = master_dem, by.x = "CaregiverID", by.y = "CaregiverID", all.x = T)
 
 wkf_f <- wkf %>%
-  filter (gender %in% c(1,2)&single == "Dual parent")
+  filter (gender %in% c(1,2))
 
 wkf_f$depress_crt= rowMeans(wkf_f[,find_items("PHQ.002.[a-b]$", wkf_f)], na.rm=T)
 wkf_f$anxiety_crt = rowMeans(wkf_f[,find_items("GAD2.002.[a-b]$", wkf_f)], na.rm=T)
@@ -351,6 +351,19 @@ wkf_f$cp_total_crt = rowMeans (wkf_f[, cp_crt_items], na.rm=T)
 pmh_crt_variable = c("depress_crt_r", "anxiety_crt_r", "stress_crt_r", "lonely_crt_r")
 wkf_f$pmh_total_crt = rowMeans(wkf_f[, pmh_crt_variable], na.rm = T)
 
+wkf_f <- wkf_f%>%
+ mutate (fs_food = FSTR.002_1,             # These varialbes indicate different sources of hardship on basic needs
+         fs_housing = FSTR.002_2, 
+         fs_utility = FSTR.002_3, 
+         fs_healthcare = FSTR.002_4,
+         fs_childcare = FSTR.002_7,
+         fs_socialemotional = case_when (FSTR.002_5 == 1|FSTR.002_6==1|FSTR.002_10==1 ~ 1),
+         fs_any = ifelse (fs_food == 1 | fs_housing == 1 | fs_utility == 1|fs_healthcare == 1|fs_childcare == 1|fs_socialemotional == 1, 1, 0))
+# fs_any is the variable indicating that family have at least 1 material hardship to pay for 
+
+fs_items <- c ("fs_food", "fs_housing", "fs_utility", "fs_healthcare", "fs_childcare", "fs_socialemotional")
+wkf_f$fs_num = rowSums(wkf_f[,fs_items],na.rm=T)    # This variable indicates the number of hardship families reported on
+
 num_responses = function(x){length(which(!is.na(x)))}
 wkf.num <- wkf_f %>%
   group_by(Week) %>%
@@ -373,185 +386,12 @@ wkf_rct_47 <- wkf_f %>%
 ```
 
 # 0. Sample Disclaimer
-  * This set of analyses on stimulus spending is based on responses collected from 2,916 FEMALE caregivers in DUAL-PARENT HOUSEHOLDS (i.e., non-single parent) between the dates of November 17th, 2020 and March 19th, 2021. These caregivers represent a range of voices: 5.01% are Black/African American, 13.58% are Latinx, and 22.06% live at or below 1.5 times the federal poverty line.  Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are not weighted. \
+  * This set of analyses on stimulus spending is based on responses collected from 3,161 FEMALE caregivers between the dates of November 17th, 2020 and March 20th, 2021. These caregivers represent a range of voices: 6.45% are Black/African American, 13.54% are Latinx, and 25.10% live at or below 1.5 times the federal poverty line.  Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are not weighted. \
 
-# 1. Who is responsible for household labor
-  * Survey question: Who is responsible for household labor?\
-    + My partner is responsible for all of the work\
-    + my partner is responsible fro most of the work\
-    + I share responsibilities equally with my partner\
-    + I am responsible for most of the work\
-    + I am responsible for all the work\
 
-## 1.1 Overall
-
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
-wkf_crt <- wkf_rct %>%
-  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
-          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
-          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
-         )%>%
-  summarise(n = n(),
-            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
-            b.Share_equally =sum (Share_equally, na.rm = T)/n,
-            c.I_most_all = sum (I_most_all, na.rm = T)/n,
-            )%>%
-  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
-  mutate (count = prop * n, 
-          moe = map2_dbl(prop, n, moe.p), 
-          ci_low = prop-moe,
-          ci_high = prop+moe)
-
-wkf_crt %>%
-  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
-  geom_bar (stat = "identity", position = position_dodge(1))+
-  geom_errorbar(aes(ymin = ci_low*100, 
-                    ymax = ci_high*100),
-                    width = .3,
-                    position = position_dodge(1)) +
-  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
-  labs (y = "")+ theme(legend.position = "none")
-```
-
-## 1.2 By race/ethnicity
-
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
-wkf_crt <- wkf_rct %>%
-  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
-          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
-          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
-         )%>%
-  filter (race_ethnic!= "NA")%>%
-  group_by (race_ethnic)%>%
-  summarise(n = n(),
-            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
-            b.Share_equally =sum (Share_equally, na.rm = T)/n,
-            c.I_most_all = sum (I_most_all, na.rm = T)/n,
-            )%>%
-  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
-  mutate (count = prop * n, 
-          moe = map2_dbl(prop, n, moe.p), 
-          ci_low = prop-moe,
-          ci_high = prop+moe)
-
-wkf_crt %>%
-  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
-  geom_bar (stat = "identity", position = position_dodge(1))+
-  geom_errorbar(aes(ymin = ci_low*100, 
-                    ymax = ci_high*100),
-                    width = .3,
-                    position = position_dodge(1)) +
-  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
-  labs (y = "")+ 
-  theme(axis.text.x = element_blank())+
-  facet_wrap (~race_ethnic, ncol = 3)
-```
-
-## 1.3 By poverty level
-
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
-wkf_crt <- wkf_rct %>%
-  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
-          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
-          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
-         )%>%
-  filter (poverty_cat!= "NA")%>%
-  group_by (poverty_cat)%>%
-  summarise(n = n(),
-            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
-            b.Share_equally =sum (Share_equally, na.rm = T)/n,
-            c.I_most_all = sum (I_most_all, na.rm = T)/n,
-            )%>%
-  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
-  mutate (count = prop * n, 
-          moe = map2_dbl(prop, n, moe.p), 
-          ci_low = prop-moe,
-          ci_high = prop+moe)
-
-wkf_crt %>%
-  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
-  geom_bar (stat = "identity", position = position_dodge(1))+
-  geom_errorbar(aes(ymin = ci_low*100, 
-                    ymax = ci_high*100),
-                    width = .3,
-                    position = position_dodge(1)) +
-  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
-  labs (y = "")+ 
-  theme(legend.position = "none")+
-  facet_wrap (~poverty_cat, ncol = 2)
-```
-
-## 1.4 By race/ethnicity & poverty level
- 
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
-wkf_crt <- wkf_rct %>%
-  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
-          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
-          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
-         )%>%
-  filter (race_ethnic!= "NA" & poverty_cat!= "NA")%>%
-  group_by (race_ethnic, poverty_cat)%>%
-  summarise(n = n(),
-            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
-            b.Share_equally =sum (Share_equally, na.rm = T)/n,
-            c.I_most_all = sum (I_most_all, na.rm = T)/n,
-            )%>%
-  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
-  mutate (count = prop * n, 
-          moe = map2_dbl(prop, n, moe.p), 
-          ci_low = prop-moe,
-          ci_high = prop+moe)
-
-wkf_crt %>%
-  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
-  geom_bar (stat = "identity", position = position_dodge(1))+
-  geom_errorbar(aes(ymin = ci_low*100, 
-                    ymax = ci_high*100),
-                    width = .3,
-                    position = position_dodge(1)) +
-  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
-  labs (y = "")+ 
-  theme(axis.text.x = element_blank())+
-  facet_wrap (poverty_cat~race_ethnic, ncol = 3)
-```
-
-## 1.5 By essential worker status
-
-```{r, echo=FALSE, message = FALSE, warning = FALSE}
-wkf_crt <- wkf_rct %>%
-  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
-          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
-          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
-         )%>%
-  filter (essential_wk!= "NA")%>%
-  group_by (essential_wk)%>%
-  summarise(n = n(),
-            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
-            b.Share_equally =sum (Share_equally, na.rm = T)/n,
-            c.I_most_all = sum (I_most_all, na.rm = T)/n,
-            )%>%
-  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
-  mutate (count = prop * n, 
-          moe = map2_dbl(prop, n, moe.p), 
-          ci_low = prop-moe,
-          ci_high = prop+moe)
-
-wkf_crt %>%
-  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
-  geom_bar (stat = "identity", position = position_dodge(1))+
-  geom_errorbar(aes(ymin = ci_low*100, 
-                    ymax = ci_high*100),
-                    width = .3,
-                    position = position_dodge(1)) +
-  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
-  labs (y = "")+ 
-  theme(legend.position = "none")+
-  facet_wrap (~essential_wk, ncol = 2)
-```
-
-# 2. Working Status
+# 1. Working Status
   
-## 2.1 What have happend to women in workforce
+## 1.1 What have happend to women in workforce
 
   * Survey Question: Since the COVID-19 crisis, which of the following have you done? Select all that apply. (only week 47 & 49)\
     + I reduced my work hours\
@@ -594,29 +434,34 @@ wkf_crt %>%
 ```
 
 
-## 2.2 Grouping & Separate by forced vs. voluntary
+## 1.2 Grouping & Separate by forced vs. voluntary
 
   * Survey question about current work status: What is your current employment status - working full time/unemployed or laid off/temporarily out of work or furloughed/other\
   * Unemployed or laid off/Temporarily out of work or furloughed were coded as "forced", and the other two categories were coded as "Not forced"\
     
-### 2.2.1 Overall
+### 1.2.1 Overall
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_rct_47 <- wkf_rct_47 %>%
   mutate (force = case_when (JOB.008.2 == 2 | JOB.008.2 == 3 ~ 1, 
                              JOB.008.2 %in% c(1,4) ~ 0),
           leave_reduce_hours = ifelse (WKFORCE.001.a_1 == 1|WKFORCE.001.a_2==1|WKFORCE.001.a_3==1|WKFORCE.001.a_4==1|WKFORCE.001.a_5==1, 1, 0), 
           c.not_left_reduced = ifelse (WKFORCE.001.a_6 == 1, 1, 0),
-          a.forced_leave_reduce = ifelse (leave_reduce_hours == 1 & force == 1, 1, 0),
-          b.voluntarily_left_reduced = ifelse (leave_reduce_hours == 1 & force == 0, 1, 0))
+          a.employer_initiated_leave_reduce = ifelse (leave_reduce_hours == 1 & force == 1, 1, 0),
+          b.not_employer_initiated_leave_reduce = ifelse (leave_reduce_hours == 1 & force == 0, 1, 0))
+
+wkf_rct_47 <- wkf_rct_47 %>%
+  mutate (have_reduce_leave = case_when (c.not_left_reduced == 1 ~ "c.Not left or reduced", 
+                                         a.employer_initiated_leave_reduce == 1 ~ "a.Employer initiated leave/reduce",
+                                         b.not_employer_initiated_leave_reduce == 1 ~ "b.Not employer initiated leave/reduce"))
 
 wkf_done <- wkf_rct_47 %>%
   filter (WKFORCE.001.a_0 == 0)%>%
   summarise (n = n(),
              c.not_left_reduced = sum (c.not_left_reduced, na.rm = T)/n,
-             a.forced_leave_reduce = sum (a.forced_leave_reduce, na.rm = T)/n,
-             b.voluntarily_left_reduced = sum (b.voluntarily_left_reduced, na.rm = T)/n
+             a.employer_initiated_leave_reduce = sum (a.employer_initiated_leave_reduce, na.rm = T)/n,
+             b.not_employer_initiated_leave_reduce = sum (b.not_employer_initiated_leave_reduce, na.rm = T)/n
              )%>%
-  pivot_longer (cols = c("c.not_left_reduced", "a.forced_leave_reduce", "b.voluntarily_left_reduced"), names_to = "work_condition", values_to = "prop")%>%
+  pivot_longer (cols = c("c.not_left_reduced", "a.employer_initiated_leave_reduce", "b.not_employer_initiated_leave_reduce"), names_to = "work_condition", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -631,23 +476,23 @@ wkf_done %>%
                     position = position_dodge(1)) +
   geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
   labs (y = "")+
-  ggtitle (label = "Grouping and separate by forced/voluntary")
+  ggtitle (label = "Grouping and separated by whether employer-initiated")+
   theme(legend.position = "none")
 
 ```
 
-### 2.2.2 By race/ethnicity
+### 1.2.2 By race/ethnicity
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_done <- wkf_rct_47 %>%
   filter (WKFORCE.001.a_0 == 0 & race_ethnic!= "NA")%>%
   group_by (race_ethnic)%>%
-  summarise (n = n(),
+   summarise (n = n(),
              c.not_left_reduced = sum (c.not_left_reduced, na.rm = T)/n,
-             a.forced_leave_reduce = sum (a.forced_leave_reduce, na.rm = T)/n,
-             b.voluntarily_left_reduced = sum (b.voluntarily_left_reduced, na.rm = T)/n
+             a.employer_initiated_leave_reduce = sum (a.employer_initiated_leave_reduce, na.rm = T)/n,
+             b.not_employer_initiated_leave_reduce = sum (b.not_employer_initiated_leave_reduce, na.rm = T)/n
              )%>%
-  pivot_longer (cols = c("c.not_left_reduced", "a.forced_leave_reduce", "b.voluntarily_left_reduced"), names_to = "work_condition", values_to = "prop")%>%
+  pivot_longer (cols = c("c.not_left_reduced", "a.employer_initiated_leave_reduce", "b.not_employer_initiated_leave_reduce"), names_to = "work_condition", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -662,24 +507,24 @@ wkf_done %>%
                     position = position_dodge(1)) +
   geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
   labs (y = "")+
-  ggtitle (label = "Grouping and separate by forced/voluntary")+
+  ggtitle (label = "Grouping and separated by whether employer-initiated")+
   facet_wrap (~race_ethnic, ncol = 3)+
   theme(axis.text.x = element_blank()) 
 
 ```  
 
-### 2.2.3 By poverty level
+### 1.2.3 By poverty level
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_done <- wkf_rct_47 %>%
   filter (WKFORCE.001.a_0 == 0 & poverty_cat!= "NA")%>%
   group_by (poverty_cat)%>%
-  summarise (n = n(),
+   summarise (n = n(),
              c.not_left_reduced = sum (c.not_left_reduced, na.rm = T)/n,
-             a.forced_leave_reduce = sum (a.forced_leave_reduce, na.rm = T)/n,
-             b.voluntarily_left_reduced = sum (b.voluntarily_left_reduced, na.rm = T)/n
+             a.employer_initiated_leave_reduce = sum (a.employer_initiated_leave_reduce, na.rm = T)/n,
+             b.not_employer_initiated_leave_reduce = sum (b.not_employer_initiated_leave_reduce, na.rm = T)/n
              )%>%
-  pivot_longer (cols = c("c.not_left_reduced", "a.forced_leave_reduce", "b.voluntarily_left_reduced"), names_to = "work_condition", values_to = "prop")%>%
+  pivot_longer (cols = c("c.not_left_reduced", "a.employer_initiated_leave_reduce", "b.not_employer_initiated_leave_reduce"), names_to = "work_condition", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -694,23 +539,24 @@ wkf_done %>%
                     position = position_dodge(1)) +
   geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
   labs (y = "")+
-  ggtitle (label = "Grouping and separate by forced/voluntary")+
+  ggtitle (label = "Grouping and separated by whether employer-initiated")+
   facet_wrap (~poverty_cat, ncol = 2)+
   theme(axis.text.x = element_blank()) 
 
 ```  
 
-### 2.2.4 By race/ethnicity & poverty level (Have Happened, grouping)
+### 1.2.4 By race/ethnicity & poverty level 
+
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_done <- wkf_rct_47 %>%
   filter (WKFORCE.001.a_0 == 0 & poverty_cat!= "NA" & race_ethnic!="NA")%>%
   group_by (poverty_cat, race_ethnic)%>%
-  summarise (n = n(),
+   summarise (n = n(),
              c.not_left_reduced = sum (c.not_left_reduced, na.rm = T)/n,
-             a.forced_leave_reduce = sum (a.forced_leave_reduce, na.rm = T)/n,
-             b.voluntarily_left_reduced = sum (b.voluntarily_left_reduced, na.rm = T)/n
+             a.employer_initiated_leave_reduce = sum (a.employer_initiated_leave_reduce, na.rm = T)/n,
+             b.not_employer_initiated_leave_reduce = sum (b.not_employer_initiated_leave_reduce, na.rm = T)/n
              )%>%
-  pivot_longer (cols = c("c.not_left_reduced", "a.forced_leave_reduce", "b.voluntarily_left_reduced"), names_to = "work_condition", values_to = "prop")%>%
+  pivot_longer (cols = c("c.not_left_reduced", "a.employer_initiated_leave_reduce", "b.not_employer_initiated_leave_reduce"), names_to = "work_condition", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -725,24 +571,24 @@ wkf_done %>%
                     position = position_dodge(1)) +
   geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
   labs (y = "")+
-  ggtitle (label = "Grouping and separate by forced/voluntary")+
+  ggtitle (label = "Grouping and separated by whether employer-initiated")+
   facet_wrap (poverty_cat~race_ethnic, ncol = 3)+
   theme(axis.text.x = element_blank()) 
 
 ```  
 
-### 2.2.5 By essential worker status
+### 1.2.5 By single parent status
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_done <- wkf_rct_47 %>%
-  filter (WKFORCE.001.a_0 == 0 & essential_wk!= "NA")%>%
-  group_by (essential_wk)%>%
-  summarise (n = n(),
+  filter (WKFORCE.001.a_0 == 0 & single!= "NA")%>%
+  group_by (single)%>%
+   summarise (n = n(),
              c.not_left_reduced = sum (c.not_left_reduced, na.rm = T)/n,
-             a.forced_leave_reduce = sum (a.forced_leave_reduce, na.rm = T)/n,
-             b.voluntarily_left_reduced = sum (b.voluntarily_left_reduced, na.rm = T)/n
+             a.employer_initiated_leave_reduce = sum (a.employer_initiated_leave_reduce, na.rm = T)/n,
+             b.not_employer_initiated_leave_reduce = sum (b.not_employer_initiated_leave_reduce, na.rm = T)/n
              )%>%
-  pivot_longer (cols = c("c.not_left_reduced", "a.forced_leave_reduce", "b.voluntarily_left_reduced"), names_to = "work_condition", values_to = "prop")%>%
+  pivot_longer (cols = c("c.not_left_reduced", "a.employer_initiated_leave_reduce", "b.not_employer_initiated_leave_reduce"), names_to = "work_condition", values_to = "prop")%>%
   mutate (count = prop * n, 
           moe = map2_dbl(prop, n, moe.p), 
           ci_low = prop-moe,
@@ -757,26 +603,163 @@ wkf_done %>%
                     position = position_dodge(1)) +
   geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
   labs (y = "")+
-  ggtitle (label = "Grouping and separate by forced/voluntary")+
+  ggtitle (label = "Grouping and separated by whether employer-initiated")+
+  facet_wrap (~single, ncol = 2)+
+  theme(axis.text.x = element_blank()) 
+
+``` 
+
+### 1.2.6 By essential worker status
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_done <- wkf_rct_47 %>%
+  filter (WKFORCE.001.a_0 == 0 & essential_wk!= "NA")%>%
+  group_by (essential_wk)%>%
+   summarise (n = n(),
+             c.not_left_reduced = sum (c.not_left_reduced, na.rm = T)/n,
+             a.employer_initiated_leave_reduce = sum (a.employer_initiated_leave_reduce, na.rm = T)/n,
+             b.not_employer_initiated_leave_reduce = sum (b.not_employer_initiated_leave_reduce, na.rm = T)/n
+             )%>%
+  pivot_longer (cols = c("c.not_left_reduced", "a.employer_initiated_leave_reduce", "b.not_employer_initiated_leave_reduce"), names_to = "work_condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_done %>%
+  ggplot(mapping = aes (x =  work_condition, y = prop*100, fill = work_condition)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+
+  ggtitle (label = "Grouping and separated by whether employer-initiated")+
   facet_wrap (~essential_wk, ncol = 2)+
   theme(axis.text.x = element_blank()) 
 
 ```  
 
-## 2.3 Association with Parent & Child Mental Health 
+## 1.3 Whether women were able to afford leaving workforce/reducing hours
 
+### 1.3.1 Overall reported percentage
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_rct_47 <- wkf_rct_47 %>%
+  mutate (cannot_afford_leave = 1-(na_if (WKFORCE.010, 2)), 
+          cannot_afford_reduce = 1-(na_if (WKFORCE.009, 2)), 
+          afford = case_when (WKFORCE.009 == 1 | WKFORCE.010 == 1 ~ "can afford", 
+                              WKFORCE.009 == 0 & WKFORCE.010 == 0 ~ "can't afford"), 
+          can_afford = ifelse (WKFORCE.009 == 1 | WKFORCE.010 == 1, 1, 0), 
+          cannot_afford = ifelse (WKFORCE.009 == 0 & WKFORCE.010 == 0 , 1, 0))
+
+wkf_done <- wkf_rct_47 %>%
+  filter (cannot_afford_leave != "NA" | cannot_afford_reduce != "NA")%>%
+  summarise (n = n(),
+             cannot_afford_leave = sum (cannot_afford_leave, na.rm = T)/n, 
+             cannot_afford_reduce = sum (cannot_afford_reduce, na.rm = T)/n)%>%
+  pivot_longer (cols = c("cannot_afford_leave", "cannot_afford_reduce"), names_to = "work_condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_done %>%
+  ggplot(mapping = aes (x =  work_condition, y = prop*100, fill = work_condition)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+
+  ggtitle (label = "Women who cannot afford to leave workforce or reduce hours")
+```
+
+
+### 1.3.2 Grouping by work status
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_done <- wkf_rct_47 %>%
+  filter (WKFORCE.001.a_0 == 0 & afford != "NA" & have_reduce_leave != "NA" )%>%
+  group_by (afford)%>%
+  summarise (n = 1016,
+             c.not_left_reduced = sum (c.not_left_reduced, na.rm = T)/n,
+             a.employer_initiated_leave_reduce = sum (a.employer_initiated_leave_reduce, na.rm = T)/n,
+             b.not_employer_initiated_leave_reduce = sum (b.not_employer_initiated_leave_reduce, na.rm = T)/n
+             )%>%
+  pivot_longer (cols = c("c.not_left_reduced", "a.employer_initiated_leave_reduce", "b.not_employer_initiated_leave_reduce"), names_to = "work_condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_done %>%
+  ggplot(mapping = aes (x =  work_condition, y = prop*100, fill = afford)) +
+  geom_bar (stat = "identity", position = "stack")+
+  geom_text(aes(label = round(prop*100,2)),vjust = 0, hjust = 0, size = 2.5, color = "black",  position ="stack")+
+  labs (y = "")+
+  ggtitle (label = "Percentage of the full sample size")+
+  theme(axis.text.x = element_text(angle = 45))
+
+wkf_done <- wkf_rct_47 %>%
+  filter (WKFORCE.001.a_0 == 0 & have_reduce_leave != "NA" & afford != "NA")%>%
+  group_by (have_reduce_leave)%>%
+  summarise (n = n(),
+             can_afford = sum (can_afford, na.rm = T)/n,
+             cannot_afford = sum (cannot_afford, na.rm = T)/n
+             )%>%
+  pivot_longer (cols = c("can_afford", "cannot_afford"), names_to = "afford", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_done %>%
+  ggplot(mapping = aes (x =  have_reduce_leave, y = prop*100, fill = afford)) +
+  geom_bar (stat = "identity", position = "stack")+
+  geom_text(aes(label = round(prop*100,2)),vjust = 0, hjust = 0, size = 2.5, color = "black",  position ="stack")+
+  labs (y = "")+
+  ggtitle (label = "Percentage of each category (add up 100%)")+
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+### 1.3.3 Association with material hardship 
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_done <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & afford != "NA" & have_reduce_leave != "NA")%>%
+  group_by (have_reduce_leave, afford)%>%
+  summarise(n = n(),
+            prop = sum (fs_any, na.rm = T)/n)%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_done %>%
+  ggplot(mapping = aes (x =  have_reduce_leave, y = prop*100, fill = have_reduce_leave)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+
+  ggtitle (label = "Percentage of families with 1+ mateiral hardship")+
+  facet_wrap (~afford)+
+  theme(axis.text.x = element_blank())
+
+```
+
+## 1.4 Association with Parent & Child Mental Health 
+
+### 1.4.1 Ovearll
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_rct_47$WKFORCE.001.a_1[is.na(wkf_rct_47$WKFORCE.001.a_1)] <- 0
 wkf_rct_47$WKFORCE.001.a_2[is.na(wkf_rct_47$WKFORCE.001.a_2)] <- 0
 wkf_rct_47$WKFORCE.001.a_3[is.na(wkf_rct_47$WKFORCE.001.a_3)] <- 0
 wkf_rct_47$WKFORCE.001.a_4[is.na(wkf_rct_47$WKFORCE.001.a_4)] <- 0
 wkf_rct_47$WKFORCE.001.a_5[is.na(wkf_rct_47$WKFORCE.001.a_5)] <- 0
-
-wkf_rct_47 <- wkf_rct_47 %>%
-  mutate (have_reduce_leave = case_when (c.not_left_reduced == 1 ~ "c.Not left or reduced", 
-                                         a.forced_leave_reduce == 1 ~ "a.Forced to reduced hours/leave",
-                                         b.voluntarily_left_reduced == 1 ~ "b.Voluntarily reduced hours/left"))
-
 
 wkf_mh_m <- wkf_rct_47%>%
   filter (WKFORCE.001.a_0 == 0 )%>%
@@ -815,8 +798,209 @@ wkf_mh_smy %>%
 
 ```
 
+### 1.4.2 By whether they can afford to leave workforce
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
-# 3. Biggest Workforce Challenges
+wkf_mh_m <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & afford!= "NA")%>%
+  group_by (have_reduce_leave, afford)%>%
+  summarise(n = n(),
+            parent = mean (pmh_total_crt, na.rm = T), 
+            child = mean (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean")
+
+wkf_mh_sd <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & afford!= "NA")%>%
+  group_by (have_reduce_leave, afford)%>%
+  summarise(parent = sd (pmh_total_crt, na.rm = T), 
+            child = sd (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd")
+
+wkf_mh_smy <- merge (wkf_mh_m, wkf_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+wkf_mh_smy %>%
+  filter (have_reduce_leave != "NA")%>%
+  ggplot(mapping = aes (x = have_reduce_leave, y = mean, fill = have_reduce_leave)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1,  color = "black", size = 2.5, position = position_dodge(1))+
+  facet_wrap (who ~ afford)+ 
+  theme(axis.text.x = element_blank())+
+  ggtitle ("Work status and emotional distress, by ability to afford leaving/reducing")+
+  ylab ("Mental Health Problems Mean")+
+  xlab ("Work Status")
+
+```
+
+### 1.4.3 By race/ethnicity
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+wkf_mh_m <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & race_ethnic!= "NA")%>%
+  group_by (have_reduce_leave, race_ethnic)%>%
+  summarise(n = n(),
+            parent = mean (pmh_total_crt, na.rm = T), 
+            child = mean (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean")
+
+wkf_mh_sd <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & race_ethnic!= "NA")%>%
+  group_by (have_reduce_leave, race_ethnic)%>%
+  summarise(parent = sd (pmh_total_crt, na.rm = T), 
+            child = sd (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd")
+
+wkf_mh_smy <- merge (wkf_mh_m, wkf_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+wkf_mh_smy %>%
+  filter (have_reduce_leave != "NA")%>%
+  ggplot(mapping = aes (x = have_reduce_leave, y = mean, fill = have_reduce_leave)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1,  color = "black", size = 2.5, position = position_dodge(1))+
+  facet_wrap (who ~ race_ethnic)+ 
+  theme(axis.text.x = element_blank())+
+  ggtitle ("Work status and emotional distress, by race/ethnicity")+
+  ylab ("Mental Health Problems Mean")+
+  xlab ("Work Status")
+
+```
+
+### 1.4.4 By poverty level
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+wkf_mh_m <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & poverty_cat!= "NA")%>%
+  group_by (have_reduce_leave, poverty_cat)%>%
+  summarise(n = n(),
+            parent = mean (pmh_total_crt, na.rm = T), 
+            child = mean (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean")
+
+wkf_mh_sd <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & poverty_cat!= "NA")%>%
+  group_by (have_reduce_leave, poverty_cat)%>%
+  summarise(parent = sd (pmh_total_crt, na.rm = T), 
+            child = sd (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd")
+
+wkf_mh_smy <- merge (wkf_mh_m, wkf_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+wkf_mh_smy %>%
+  filter (have_reduce_leave != "NA")%>%
+  ggplot(mapping = aes (x = have_reduce_leave, y = mean, fill = have_reduce_leave)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1,  color = "black", size = 2.5, position = position_dodge(1))+
+  facet_wrap (who ~ poverty_cat)+ 
+  theme(axis.text.x = element_blank())+
+  ggtitle ("Work status and emotional distress, by poverty level")+
+  ylab ("Mental Health Problems Mean")+
+  xlab ("Work Status")
+
+```
+
+### 1.4.5 By single parent status
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+wkf_mh_m <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & single!= "NA")%>%
+  group_by (have_reduce_leave, single)%>%
+  summarise(n = n(),
+            parent = mean (pmh_total_crt, na.rm = T), 
+            child = mean (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean")
+
+wkf_mh_sd <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & single!= "NA")%>%
+  group_by (have_reduce_leave, single)%>%
+  summarise(parent = sd (pmh_total_crt, na.rm = T), 
+            child = sd (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd")
+
+wkf_mh_smy <- merge (wkf_mh_m, wkf_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+wkf_mh_smy %>%
+  filter (have_reduce_leave != "NA")%>%
+  ggplot(mapping = aes (x = have_reduce_leave, y = mean, fill = have_reduce_leave)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1,  color = "black", size = 2.5, position = position_dodge(1))+
+  facet_wrap (who ~ single)+ 
+  theme(axis.text.x = element_blank())+
+  ggtitle ("Work status and emotional distress, by single parent status")+
+  ylab ("Mental Health Problems Mean")+
+  xlab ("Work Status")
+
+```
+
+### 1.4.6 By essential worker status
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+wkf_mh_m <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & essential_wk!= "NA")%>%
+  group_by (have_reduce_leave, essential_wk)%>%
+  summarise(n = n(),
+            parent = mean (pmh_total_crt, na.rm = T), 
+            child = mean (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean")
+
+wkf_mh_sd <- wkf_rct_47%>%
+  filter (WKFORCE.001.a_0 == 0 & essential_wk!= "NA")%>%
+  group_by (have_reduce_leave, essential_wk)%>%
+  summarise(parent = sd (pmh_total_crt, na.rm = T), 
+            child = sd (cp_total_crt, na.rm = T))%>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd")
+
+wkf_mh_smy <- merge (wkf_mh_m, wkf_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+wkf_mh_smy %>%
+  filter (have_reduce_leave != "NA")%>%
+  ggplot(mapping = aes (x = have_reduce_leave, y = mean, fill = have_reduce_leave)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1,  color = "black", size = 2.5, position = position_dodge(1))+
+  facet_wrap (who ~ essential_wk)+ 
+  theme(axis.text.x = element_blank())+
+  ggtitle ("Work status and emotional distress, by essential worker status")+
+  ylab ("Mental Health Problems Mean")+
+  xlab ("Work Status")
+
+```
+
+
+# 2. Biggest Workforce Challenges
   * Survey question: Since the start of the COVID-19 crisis, what have been the biggest challenges for you as an employee? Select all that apply.\
     + Anxiety over layoffs or furloughs\
     + Burnout\
@@ -825,7 +1009,7 @@ wkf_mh_smy %>%
     + Physical and mental heath of loved ones\
     + Financial insecurity\
 
-## 3.1 Ovearll
+## 2.1 Ovearll
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_rct$WKFORCE.003_0[is.na(wkf_rct$WKFORCE.003_0)] <- 0
 wkf_crt <- wkf_rct %>%
@@ -854,7 +1038,7 @@ wkf_crt %>%
   labs (y = "")+ theme(legend.position = "none")
 ```
 
-## 3.2 By work status
+## 2.2 By work status
 
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_rct_47$WKFORCE.003_0[is.na(wkf_rct_47$WKFORCE.003_0)] <- 0
@@ -887,7 +1071,7 @@ wkf_crt %>%
   facet_wrap (~have_reduce_leave, ncol = 3)
 ```
 
-## 3.3  By race/ethnicity
+## 2.3  By race/ethnicity
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.003_0 == 0 & race_ethnic!= "NA")%>%
@@ -917,7 +1101,7 @@ wkf_crt %>%
   theme(legend.position = "none")
 ```
 
-## 3.4 By poverty level
+## 2.4 By poverty level
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.003_0 == 0 & poverty_cat!= "NA")%>%
@@ -948,7 +1132,7 @@ wkf_crt %>%
   theme(legend.position = "none")
 ```
 
-## 3.5 By race/ethnicity & poverty level
+## 2.5 By race/ethnicity & poverty level
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 
 wkf_crt <- wkf_rct %>%
@@ -980,8 +1164,38 @@ wkf_crt %>%
   theme(legend.position = "none")
 ```
 
+## 2.6 By single parent status
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_crt <- wkf_rct %>%
+  filter (WKFORCE.003_0 == 0 & single!= "NA")%>%
+  group_by (single)%>%
+  summarise(n = n(),
+            Anxiety_layoff = sum (WKFORCE.003_1, na.rm = T)/n,
+            Burnout = sum (WKFORCE.001_3, na.rm = T)/n,
+            Mental_health =sum (WKFORCE.003_3, na.rm = T)/n,
+            Childcare_rsp = sum (WKFORCE.003_4, na.rm = T)/n,
+            Health_loved_ones = sum (WKFORCE.003_5, na.rm = T)/n, 
+            Financial_insecurity = sum (WKFORCE.003_6, na.rm = T)/n, )%>%
+  pivot_longer (cols = c("Anxiety_layoff", "Burnout", "Mental_health", "Childcare_rsp", "Health_loved_ones", "Financial_insecurity"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
 
-## 3.6 By Essential Worker Status
+wkf_crt %>%
+  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+
+  facet_wrap (~single, ncol = 2)+
+  theme(legend.position = "none")
+```
+
+## 2.7 By Essential Worker Status
 ```{r, echo=FALSE, message = FALSE, warning = FALSE}
 wkf_crt <- wkf_rct %>%
   filter (WKFORCE.003_0 == 0 & essential_wk!= "NA")%>%
@@ -1012,3 +1226,432 @@ wkf_crt %>%
   theme(legend.position = "none")
 ```
 
+
+# 3. Who is responsible for household labor in dual-parent families (n = 2,893)
+  * Survey question: Who is responsible for household labor?\
+    + My partner is responsible for all of the work\
+    + my partner is responsible fro most of the work\
+    + I share responsibilities equally with my partner\
+    + I am responsible for most of the work\
+    + I am responsible for all the work\
+
+## 3.1 Overall
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_crt <- wkf_rct %>%
+  filter (single == "Dual parent")%>%
+  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
+          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
+          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
+         )%>%
+  summarise(n = n(),
+            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
+            b.Share_equally =sum (Share_equally, na.rm = T)/n,
+            c.I_most_all = sum (I_most_all, na.rm = T)/n,
+            )%>%
+  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_crt %>%
+  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+ theme(legend.position = "none")
+```
+
+## 3.2 By race/ethnicity
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_crt <- wkf_rct %>%
+  filter (single == "Dual parent")%>%
+  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
+          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
+          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
+         )%>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise(n = n(),
+            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
+            b.Share_equally =sum (Share_equally, na.rm = T)/n,
+            c.I_most_all = sum (I_most_all, na.rm = T)/n,
+            )%>%
+  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_crt %>%
+  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+ 
+  theme(axis.text.x = element_blank())+
+  facet_wrap (~race_ethnic, ncol = 3)
+```
+
+## 3.3 By poverty level
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_crt <- wkf_rct %>%
+  filter (single == "Dual parent")%>%
+  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
+          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
+          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
+         )%>%
+  filter (poverty_cat!= "NA")%>%
+  group_by (poverty_cat)%>%
+  summarise(n = n(),
+            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
+            b.Share_equally =sum (Share_equally, na.rm = T)/n,
+            c.I_most_all = sum (I_most_all, na.rm = T)/n,
+            )%>%
+  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_crt %>%
+  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+ 
+  theme(legend.position = "none")+
+  facet_wrap (~poverty_cat, ncol = 2)
+```
+
+## 3.4 By race/ethnicity & poverty level
+ 
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_crt <- wkf_rct %>%
+  filter (single == "Dual parent")%>%
+  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
+          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
+          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
+         )%>%
+  filter (race_ethnic!= "NA" & poverty_cat!= "NA")%>%
+  group_by (race_ethnic, poverty_cat)%>%
+  summarise(n = n(),
+            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
+            b.Share_equally =sum (Share_equally, na.rm = T)/n,
+            c.I_most_all = sum (I_most_all, na.rm = T)/n,
+            )%>%
+  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_crt %>%
+  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+ 
+  theme(axis.text.x = element_blank())+
+  facet_wrap (poverty_cat~race_ethnic, ncol = 3)
+```
+
+## 3.5 By essential worker status
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_crt <- wkf_rct %>%
+  filter (single == "Dual parent")%>%
+  mutate (Partner_most_all = ifelse (WKFORCE.004 == 1 | WKFORCE.004 == 2, 1, 0), 
+          Share_equally = ifelse (WKFORCE.004 == 3, 1, 0), 
+          I_most_all = ifelse (WKFORCE.004 == 4|WKFORCE.004 == 5, 1, 0)
+         )%>%
+  filter (essential_wk!= "NA")%>%
+  group_by (essential_wk)%>%
+  summarise(n = n(),
+            a.Partner_most_all = sum (Partner_most_all, na.rm = T)/n,
+            b.Share_equally =sum (Share_equally, na.rm = T)/n,
+            c.I_most_all = sum (I_most_all, na.rm = T)/n,
+            )%>%
+  pivot_longer (cols = c("a.Partner_most_all", "b.Share_equally", "c.I_most_all"), names_to = "household_labor", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_crt %>%
+  ggplot(mapping = aes (x =  household_labor, y = prop*100, fill = household_labor)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+ 
+  theme(legend.position = "none")+
+  facet_wrap (~essential_wk, ncol = 2)
+```
+
+
+# 4. COVID-19 Precautions & Feel Protected (Essential Workers)
+
+## 4.1 Workforce Precautions & Practices COVID-19
+  * Survey question: Which of the following precautions does your workplace currently adhere to? Select all that apply. \
+    + Encourage sick employees to stay home (for COVID or any illness)\
+    + Conducting daily in-person health checks\
+    + Conducting virtual health checks\
+    + Employees encouraged to wear a cloth facemask and/or other appropriate PPE\
+    + Employees encouraged to social distance\
+  * During the COVID-19 pandemic, does your workplace adhere to the following practices? Select all that apply.\
+    + Pre-screening employee's temperature and symptoms prior to them starting work\
+    + Requiring employees to self-monitor fever or symptoms regularly\
+    + Require all employees to wear face masks \
+    + Require all other people entering the infrastructure (e.g. clients, customers, patients) to wear face masks\
+    + Require social distancing and provide social distancing guidelines (e.g., markers on the floor)\
+    + Disinfect and clean work spaces\
+    
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_rct$WKFORCE.006_0[is.na(wkf_rct$WKFORCE.006_0)] <- 0
+wkf_rct$WKFORCE.007_0[is.na(wkf_rct$WKFORCE.007_0)] <- 0
+
+wkf_crt <- wkf_rct %>%
+  mutate (employee_facemask = ifelse (WKFORCE.006_4 == 1 |WKFORCE.007_3 == 1, 1, 0 ), 
+          screening_health_checks = ifelse (WKFORCE.006_3 == 1 | WKFORCE.006_2 == 1 |WKFORCE.007_1 == 1, 1, 0), 
+          social_distance = ifelse (WKFORCE.006_5 == 1 |WKFORCE.007_5 == 1, 1, 0 ))%>%
+  filter (WKFORCE.006_0 == 0 & essential_wk != "NA")%>%
+  group_by (essential_wk)%>%
+  summarise(n = n(),
+            screening_health_checks = sum (screening_health_checks, na.rm = T)/n,
+            require_employee_self_monitor = sum (WKFORCE.007_3, na.rm = T)/n,
+            encourage_sick_stay_home = sum (WKFORCE.006_1, na.rm = T)/n,
+            employee_facemask = sum (employee_facemask, na.rm = T)/n,
+            other_people_facemask = sum (WKFORCE.007_4, na.rm = T)/n,
+            social_distance = sum (social_distance, na.rm = T)/n, 
+            disinfect_clean = sum (WKFORCE.007_6, na.rm = T)/n)%>%
+  pivot_longer (cols = c("screening_health_checks", "require_employee_self_monitor", "encourage_sick_stay_home", "employee_facemask", "other_people_facemask", "social_distance", "disinfect_clean"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_crt %>%
+  ggplot(mapping = aes (y =  reorder(wkf, -prop), x = prop*100, fill = wkf)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Precautions")+ theme(legend.position = "none")+
+  facet_wrap (~essential_wk)
+
+```
+
+# 4.2 Feel protected
+  * Survey question: Overall, do you feel protected and safe in your workplace?\
+    + Not protected at all\
+    + Somewhat protected\
+    + Very well protected\
+    
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wkf_crt <- wkf_rct %>%
+  filter (WKFORCE.008 != 0 & essential_wk != "NA")%>%
+  mutate (not_at_all_protected = ifelse (WKFORCE.008 == 1, 1, 0), 
+          somewhat_protected = ifelse (WKFORCE.008 == 2, 1, 0), 
+          very_well_protected = ifelse (WKFORCE.008 == 3, 1, 0))%>%
+  group_by (essential_wk)%>%
+  summarise(n = n(),
+            not_at_all_protected = sum (not_at_all_protected, na.rm = T)/n,
+            somewhat_protected = sum (somewhat_protected, na.rm = T)/n,
+            very_well_protected =sum (very_well_protected, na.rm = T)/n)%>%
+  pivot_longer (cols = c("not_at_all_protected", "somewhat_protected", "very_well_protected"), names_to = "wkf", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+wkf_crt %>%
+  ggplot(mapping = aes (x =  wkf, y = prop*100, fill = wkf)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 3, color = "black",  position = position_dodge(1))+
+  labs (y = "")+ 
+  theme(legend.position = "none")+
+  facet_wrap (~essential_wk)+
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+
+# 5. Compare men vs. women in workforce
+  * This set of analyses on stimulus spending is based on responses collected from 3,161 FEMALE caregivers and 111 MALE caregivers between the dates of November 17th, 2020 and March 20th, 2021. \
+  
+## 5.1 Compare working status
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wk <- master %>%
+  select (CaregiverID, Week, StartDate, JOB.008.2, contains ("PHQ"), contains ("GAD"), STRESS.001, STRESS.002, LONE.001.a, LONE.001.b, contains("CBCL"))%>%
+  filter (Week %in% c(33, 37, 41, 45, 47, 49))
+
+wk <- merge (x = wk, y = master_dem, by.x = "CaregiverID", by.y = "CaregiverID", all.x = T)%>%
+  mutate (gender = case_when (gender %in% c(1,2) ~ "Female", 
+                              gender %in% c(0,3) ~ "Male"))
+
+
+wk$depress_crt= rowMeans(wk[,find_items("PHQ.002.[a-b]$", wk)], na.rm=T)
+wk$anxiety_crt = rowMeans(wk[,find_items("GAD2.002.[a-b]$", wk)], na.rm=T)
+
+wk <- wk %>%
+  mutate (depress_crt_r = depress_crt/3*100,
+          anxiety_crt_r =anxiety_crt/3*100,
+          stress_crt_r = STRESS.002/4*100,
+          lonely_crt_r = LONE.001.b/4*100)%>%
+  rename (fussy_cr1 = CBCL.002.a,
+          fussy_cr2 = CBCL.005.a,
+          fussy_cr3 = CBCL.008.a,
+          fussy_cr4 = CBCL.011.a,
+          fussy_cr5 = CBCL.014.a,
+          fear_cr1 = CBCL.002.b,
+          fear_cr2 = CBCL.005.b,
+          fear_cr3 = CBCL.008.b,
+          fear_cr4 = CBCL.011.b,
+          fear_cr5 = CBCL.014.b)
+
+fussy_crt_items = c(find_items("fussy_cr", wk))
+fear_crt_items = c(find_items("fear_cr", wk))
+wk$fussy_crt = rowMeans(wk[,fussy_crt_items], na.rm=T)/2*100
+wk$fear_crt = rowMeans(wk[,fear_crt_items], na.rm=T)/2*100
+
+cp_crt_items = c("fussy_crt", "fear_crt")
+wk$cp_total_crt = rowMeans (wk[, cp_crt_items], na.rm=T)
+
+pmh_crt_variable = c("depress_crt_r", "anxiety_crt_r", "stress_crt_r", "lonely_crt_r")
+wk$pmh_total_crt = rowMeans(wk[, pmh_crt_variable], na.rm = T)
+
+
+wk_rct <- wk %>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wk_rct <- wk_rct %>%
+  mutate (work_st = case_when (JOB.008.2 == 2 | JOB.008.2 == 3 ~ "Unemployed, laid off, furloughed", 
+                             JOB.008.2 == 1 ~ "Work full time"),
+          work_full_time = ifelse (JOB.008.2 == 1, 1, 0), 
+          unemployed_laid_off_furloughed = ifelse (JOB.008.2 %in% c(2,3), 1, 0),
+          other = ifelse (JOB.008.2 == 4, 1, 0))
+
+wkf_done <- wk_rct %>%
+  filter (gender != "NA")%>%
+  group_by (gender)%>%
+  summarise (n = n(),
+             a.work_full_time = sum (work_full_time, na.rm = T)/n,
+             b.unemployed_laid_off_furloughed = sum (unemployed_laid_off_furloughed, na.rm = T)/n,
+             c.other = sum (other, na.rm = T)/n
+             )%>%
+  pivot_longer (cols = c("a.work_full_time", "b.unemployed_laid_off_furloughed", "c.other"), names_to = "work_condition", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+wkf_done %>%
+  ggplot(mapping = aes (x =  work_condition, y = prop*100, fill = work_condition)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),vjust = -2, hjust = 0, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "")+
+  facet_wrap (~gender)+
+  theme(axis.text.x = element_blank()) 
+
+```
+
+## 5.2 Compare well-being
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wk_mh_m <- wk_rct%>%
+  group_by (gender)%>%
+  summarise(n = n(),
+            mean = mean (pmh_total_crt, na.rm = T))
+  
+wk_mh_sd <- wk_rct%>%
+  group_by (gender)%>%
+  summarise(n = n(),
+            sd = sd (pmh_total_crt, na.rm = T))
+
+wk_mh_smy <- merge (wk_mh_m, wk_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+wk_mh_smy %>%
+  filter (gender != "NA")%>%
+  ggplot(mapping = aes (x = gender, y = mean, fill = gender)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1,  color = "black", size = 3, position = position_dodge(1))+
+  ggtitle ("Emotional Distress by Gender")+
+  ylab ("Mental Health Problems Mean")+
+  xlab ("Gender")+
+  theme(legend.position = "none")
+
+```
+
+## 5.3 Compare well-being by gender and work status
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+wk_mh_m <- wk_rct%>%
+  group_by (gender, work_st)%>%
+  summarise(n = n(),
+            mean = mean (pmh_total_crt, na.rm = T))
+  
+wk_mh_sd <- wk_rct%>%
+  group_by (gender, work_st)%>%
+  summarise(n = n(),
+            sd = sd (pmh_total_crt, na.rm = T))
+
+wk_mh_smy <- merge (wk_mh_m, wk_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+wk_mh_smy %>%
+  filter (gender != "NA" & work_st != "NA")%>%
+  ggplot(mapping = aes (x = work_st, y = mean, fill = work_st)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1,  color = "black", size = 3, position = position_dodge(1))+
+  ggtitle ("Emotional Distress by Gender and Work Status")+
+  ylab ("Mental Health Problems Mean")+
+  xlab ("Gender")+
+  theme(legend.position = "none")+
+  facet_wrap (~gender, ncol = 2)
+
+```

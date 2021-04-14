@@ -1,0 +1,164 @@
+---
+title: "RAPID-CC Open-ended responses"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    theme: paper
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
+```
+
+```{r}
+library(here)
+library(haven)
+library(tidyverse)
+library(zoo)
+library(DT)
+library(zipcode)
+```
+
+```{r}
+identify_state = function(ZC, zipcode.dataset = zipcode){
+  if(!is.na(ZC)) {
+    loc = which(zipcode.dataset$zip == ZC)
+    state = zipcode.dataset$state[loc]
+    if(length(loc) == 0) state = NA
+  }
+  if(is.na(ZC)) state = NA
+  return(state)
+}
+```
+
+
+```{r}
+master <- read_sav(here("../../Data Management R3/CC.MasterFile_groupings.sav"))
+```
+
+```{r}
+data(zipcode)
+
+master = master %>%
+  mutate(State = map_chr(CC.DEMO.001, identify_state),
+         child_age03 = case_when(
+           CC.DEMO.003_1 >= 1 ~ "Yes",
+           !is.na(CC.DEMO.003_1) ~ "No",
+           TRUE ~ NA_character_)) %>%
+  select(ProviderID, Week, CC.VACC.003, CC.STIM.002.d, CC.STIM.003.d, CC.OPEN.001, CC.OPEN.002, CC.OPEN.003, CC.OPEN.004, CC.OPEN.005, CC.OPEN.006, CC.OPEN.007, State, FPL.2019.150, RaceGroup, ProviderAge, child_age03) %>%
+  filter(CC.OPEN.007 == 1) %>%
+  arrange(Week) %>%
+  group_by(ProviderID) %>%
+  mutate_if(is.labelled, as_factor, levels = "labels") %>%
+  mutate_at(vars(State, FPL.2019.150, RaceGroup, ProviderAge, child_age03), na.locf0) %>%
+  ungroup() %>%
+  select(-ProviderID, -CC.OPEN.007) %>%
+  rename(`Below 1.5xFPL` = FPL.2019.150,
+         `Child 0-3` = child_age03) %>%
+  gather("Question", "Response", CC.VACC.003, CC.STIM.002.d, CC.STIM.003.d, CC.OPEN.001, CC.OPEN.002, CC.OPEN.003, CC.OPEN.004, CC.OPEN.005, CC.OPEN.006) %>%
+  filter(Response != "") %>%
+  filter(Response != "-99")
+
+```
+
+# Q1:	How do you feel about the COVID-19 vaccine in terms of its safety and effectiveness, and what are your plans in terms of whether or not to get it?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("VACC.003", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q2: In what ways was the first federal stimulus check in 2020 helpful?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("STIM.001", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q3: In what ways was the second federal stimulus check in winter 2020-2021, helpful?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("STIM.002", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q4:In what ways was the 600 unemployment bonus/benefit from related to COVID-19 helpful? 
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("STIM.003", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q5: What are the biggest challenges and concerns for you and your family right now? 
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("OPEN.001", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q6: What is helping you and your family the most right now? 
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("OPEN.002", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q7: What would you like your elected officials or other policymakers (for example, U.S. Congress, state and local leaders) to know about how your family is doing or what you need during this time?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("OPEN.003", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q8: What are the biggest challenges and concerns for you as a childcare provider right now?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("OPEN.004", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q9: What/who is helping you as a childcare provider the most right now?
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("OPEN.005", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
+
+# Q10: What would you like your elected officials or other policymakers (for example, U.S. Congress, state and local leaders) to know about how you are doing or what you need as a childcare provider during this time? 
+
+```{r, results = 'asis'}
+master %>%
+  filter(grepl("OPEN.006", Question)) %>%
+  select(-Question) %>%
+  datatable(filter = "top", rownames = F, 
+            options = list(autoWidth = T))
+```
