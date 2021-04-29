@@ -1,0 +1,1364 @@
+---
+title: "Material Hardship (Structural Inequalities)"
+author: "Sihong"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r packages, include = FALSE}
+library(here)
+library(knitr)
+library(readr)
+library(haven)
+library(tidyverse)
+library(splines2)
+```
+
+
+```{r, echo=FALSE, message = FALSE}
+#Define functions
+moe.p = function(p, n){
+  q = 1-p
+  moe = 1.96*sqrt((p*q)/n)
+  return(moe)
+}
+
+moe.m = function(sd,n){
+  moe = 1.96*sd/sqrt(n)
+  return(moe)}
+
+combine.cat = function(x, cols, id, newvar.name){
+  subset = x[,c(id, "Week", cols)]
+  names(subset) = c("id", "Week", paste0("X",1:length(cols)))
+  subset = suppressWarnings(gather(subset, "key", "value", -id, -Week))
+  subset = filter(subset, !is.na(value))
+  subset$key = gsub("X", "", subset$key)
+  subset = group_by(subset, id, Week)
+  subset = summarise(subset, newvar = paste(key, collapse = ",")) %>% ungroup()
+  names(subset) = c(id,"Week", newvar.name)
+  x = suppressMessages(full_join(x, subset))
+  return(x)
+}
+
+find_items = function(string, data2){
+  items = names(data2)
+  locations = which(grepl(string, items))
+  final = items[locations]
+  return(final)
+}
+
+my.max = function(x) ifelse (!all(is.na(x)), max(x,na.rm = TRUE), NA)
+my.min = function(x) ifelse (!all(is.na(x)), min(x,na.rm = TRUE), NA)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, include=FALSE}
+#OR load master data file
+master_2020 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2020.sav"))
+master_2021 <- read_sav(here("../../Data Management R3/CC_Clean Survey Data/00_R3 MasterFile/MasterFile_groupings_2021.sav"))
+
+master <- full_join (master_2020, master_2021)
+
+# Remove cases should be excluded
+master <- master %>%
+  filter ( CaregiverID != "" & is.na(Exclude) == T )
+
+master = master %>%
+  group_by(CaregiverID, Week) %>%
+  filter(row_number() == max(row_number())) %>%
+  ungroup()
+
+total_week <- my.max(master$Week)
+
+#master = master %>%
+#  mutate(
+#    Week = case_when(
+#      Week < 17 ~ Week,
+#      Week %% 2 == 0 ~ NA_real_,
+#      TRUE ~ Week)
+#  ) %>%
+#  filter(!is.na(Week))
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+#Code demographics
+master <- master %>%
+  mutate (month = case_when(
+                  Week == 0 ~ "Pre-COVID",
+                  Week >0 & Week <= 4 ~ "April",
+                  Week >=5 & Week <=8 ~ "May",
+                  Week >=9 & Week <=13 ~ "June",
+                  Week >=14 & Week <=17 ~ "July",
+                  Week >=18 & Week <=21 ~ "August",
+                  Week >=22 & Week <=26 ~ "September",
+                  Week >=27 ~ "October"), 
+           baseline = case_when (Week - BaselineWeek == 1 ~ 1, 
+                                 Week - BaselineWeek > 1 ~ 0))
+
+##Race/ethnicity - 1 = black, 2 = latinx, 3 = white
+
+master <- master %>%
+  mutate (RaceGroup = na_if (RaceGroup, 99))%>%
+    mutate(
+      minority = ifelse(RaceGroup != 5, 1, 0),
+      black = ifelse(RaceGroup == 3, 1, 0),
+      native = ifelse(RaceGroup == 1, 1, 0),
+      asian = ifelse(RaceGroup == 2, 1, 0),
+      hawaii = ifelse(RaceGroup == 4, 1, 0),
+      white = ifelse(RaceGroup == 5, 1, 0),
+      other_race = ifelse(RaceGroup %in% c(6, 7), 1, 0))
+
+master <- master %>%
+      mutate(latinx = case_when(
+        DEMO.008 == 1 ~ 1,
+        DEMO.008 == 0 ~ 0,
+        DEMO.008.2 == 0 ~ 0,
+        DEMO.008.2 == 1 ~ 1,
+        DEMO.008.2 == 2 ~ 1,
+        DEMO.008.3_1 == 1 ~ 0,
+        DEMO.008.3_2 == 1 ~ 1,
+        DEMO.008.3_3 == 1 ~ 1,
+        DEMO.008.3_4 == 1 ~ 1,
+        DEMO.008.3_5 == 1 ~ 1,
+        DEMO.008.3_6 == 1 ~ 1,
+        DEMO.008.3_7 == 1 ~ 1,
+        TRUE ~ NA_real_))
+
+master <- master %>%
+mutate (race_ethnic = case_when(
+      black == 1 ~ "1",
+      latinx == 1 ~ "2",
+      !is.na(black) ~ "3",
+      !is.na(latinx) ~ "3",
+      TRUE ~ NA_character_))  
+
+##Povertyline - 0 = high income, 1 = low income
+master <- master %>%
+  mutate (poverty_cat = FPL.2019.UM.150)
+
+master <- master %>%
+  mutate (FPL_line = case_when (STATE_CODED == 1 & JOB.002 == 1 ~ 12760,
+                                STATE_CODED == 1 & JOB.002 == 2 ~ 17240,
+                                STATE_CODED == 1 & JOB.002 == 3 ~ 21720,
+                                STATE_CODED == 1 & JOB.002 == 4 ~ 26200,
+                                STATE_CODED == 1 & JOB.002 == 5 ~ 30680,
+                                STATE_CODED == 1 & JOB.002 == 6 ~ 35160,
+                                STATE_CODED == 1 & JOB.002 == 7 ~ 39640,
+                                STATE_CODED == 1 & JOB.002 == 8 ~ 44120,
+                                STATE_CODED == 1 & JOB.002 == 9 ~ 48600,
+                                STATE_CODED == 1 & JOB.002 == 10 ~ 53080,
+                                STATE_CODED == 1 & JOB.002 == 11 ~ 57560,
+                                STATE_CODED == 1 & JOB.002 == 12 ~ 62040,
+                                STATE_CODED == 1 & JOB.002 == 13 ~ 66520,
+                                STATE_CODED == 1 & JOB.002 == 14 ~ 71000,
+                                STATE_CODED == 1 & JOB.002 == 15 ~ 75480,
+                                STATE_CODED == 1 & JOB.002 == 16 ~ 79960,
+                                STATE_CODED == 1 & JOB.002 == 17 ~ 84440,
+                                STATE_CODED == 1 & JOB.002 == 18 ~ 88920,
+                                STATE_CODED == 1 & JOB.002 == 19 ~ 93400,
+                                STATE_CODED == 1 & JOB.002 == 20 ~ 97880,
+                                STATE_CODED == 1 & JOB.002 == 21 ~ 102360, 
+                                STATE_CODED == 2 & JOB.002 == 1 ~ 15950,
+                                STATE_CODED == 2 & JOB.002 == 2 ~ 21550,
+                                STATE_CODED == 2 & JOB.002 == 3 ~ 27150,
+                                STATE_CODED == 2 & JOB.002 == 4 ~ 32750,
+                                STATE_CODED == 2 & JOB.002 == 5 ~ 38350,
+                                STATE_CODED == 2 & JOB.002 == 6 ~ 43950,
+                                STATE_CODED == 2 & JOB.002 == 7 ~ 49550,
+                                STATE_CODED == 2 & JOB.002 == 8 ~ 55150,
+                                STATE_CODED == 2 & JOB.002 == 9 ~ 60750,
+                                STATE_CODED == 2 & JOB.002 == 10 ~ 66350,
+                                STATE_CODED == 2 & JOB.002 == 11 ~ 71950,
+                                STATE_CODED == 2 & JOB.002 == 12 ~ 77550,
+                                STATE_CODED == 2 & JOB.002 == 13 ~ 83150,
+                                STATE_CODED == 2 & JOB.002 == 14 ~ 88750,
+                                STATE_CODED == 2 & JOB.002 == 15 ~ 94350,
+                                STATE_CODED == 2 & JOB.002 == 16 ~ 99950,
+                                STATE_CODED == 2 & JOB.002 == 17 ~ 105550,
+                                STATE_CODED == 2 & JOB.002 == 18 ~ 111150,
+                                STATE_CODED == 2 & JOB.002 == 19 ~ 116750,
+                                STATE_CODED == 2 & JOB.002 == 20 ~ 122350,
+                                STATE_CODED == 2 & JOB.002 == 21 ~ 127950,
+                                STATE_CODED == 3 & JOB.002 == 1 ~ 14680,
+                                STATE_CODED == 3 & JOB.002 == 2 ~ 19830,
+                                STATE_CODED == 3 & JOB.002 == 3 ~ 24980,
+                                STATE_CODED == 3 & JOB.002 == 4 ~ 30130,
+                                STATE_CODED == 3 & JOB.002 == 5 ~ 35280,
+                                STATE_CODED == 3 & JOB.002 == 6 ~ 40430,
+                                STATE_CODED == 3 & JOB.002 == 7 ~ 45580,
+                                STATE_CODED == 3 & JOB.002 == 8 ~ 50730,
+                                STATE_CODED == 3 & JOB.002 == 9 ~ 55880,
+                                STATE_CODED == 3 & JOB.002 == 10 ~ 61030,
+                                STATE_CODED == 3 & JOB.002 == 11 ~ 66180,
+                                STATE_CODED == 3 & JOB.002 == 12 ~ 71330,
+                                STATE_CODED == 3 & JOB.002 == 13 ~ 76480,
+                                STATE_CODED == 3 & JOB.002 == 14 ~ 81630,
+                                STATE_CODED == 3 & JOB.002 == 15 ~ 86780,
+                                STATE_CODED == 3 & JOB.002 == 16 ~ 91930,
+                                STATE_CODED == 3 & JOB.002 == 17 ~ 97080,
+                                STATE_CODED == 3 & JOB.002 == 18 ~ 102230,
+                                STATE_CODED == 3 & JOB.002 == 19 ~ 107380,
+                                STATE_CODED == 3 & JOB.002 == 20 ~ 112530,
+                                STATE_CODED == 3 & JOB.002 == 21 ~ 117680))
+
+
+#Material hardship
+master <- master %>%
+  combine.cat(cols = find_items("FSTR.002_.{1}$", master), 
+              id = "CaregiverID",
+              newvar.name = "FSTR.002_cat")
+  
+
+master <- master %>%
+  mutate (diff_pay_food = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("1", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_), 
+          diff_pay_utilities = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("3", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_house = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("2", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_healthcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("4", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_social = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("5", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_emotional = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("6", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_childcare = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("7", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_),
+          diff_pay_other = case_when(
+                          FSTR.001 == 0 ~ 0, 
+                          grepl("8", FSTR.002_cat) ~ 1,
+                          TRUE ~ NA_real_))
+
+master <- master %>%
+  rowwise() %>%
+  mutate(material_hardship = case_when(
+    Week == 0 ~ NA_real_,
+    TRUE ~ sum(c_across(starts_with("diff_pay_")), na.rm=T))) %>%
+  ungroup() %>%
+  mutate(num_hardship = material_hardship,
+    material_hardship = ifelse(material_hardship > 0, 1, 0)) 
+
+## Children with special needs
+master <- combine.cat(x = master, 
+                       cols = find_items("HEALTH.005_[0-9]{1}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "HEALTH.005_cat")
+master <- master %>%
+   mutate (disability = case_when (HEALTH.005_1 == 1 ~ 1,
+                                   HEALTH.005_2 == 1 ~ 1,
+                                   HEALTH.005_3 == 1 ~ 1,
+                                   HEALTH.005_4 == 1 ~ 1,
+                                   HEALTH.005_5 == 1 ~ 0,
+                                   HEALTH.005_6 == 1 ~ 1,
+                                   TRUE ~ NA_real_))
+
+
+## Single parent status
+master <- master %>%
+  mutate (single = case_when (
+                   DEMO.002 %in% c(3,4,5,7,8)~1, 
+                   DEMO.011 %in% c(2,4)~1,
+                   !is.na(DEMO.002)~0,
+                   !is.na(DEMO.011)~0,
+                   TRUE ~ NA_real_))
+                     
+## Employment status
+master <- combine.cat (x = master,
+                       cols = find_items ("JOB.010_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.010_cat")
+  
+master$JOB.010_cat = gsub("10", "0", master$JOB.010_cat)
+master$working_pre = ifelse (grepl("[1,2,6]", master$JOB.010_cat), 1, 0)
+master = combine.cat (x = master,
+                       cols = find_items ("JOB.008_.{1,2}$", master), 
+                       id = "CaregiverID",
+                       newvar.name = "JOB.008_cat")
+master$JOB.008_cat = gsub("10", "0", master$JOB.008_cat)
+master <- master %>%
+  mutate (work_status = case_when(
+                        grepl ("1", JOB.008_cat) ~ "1", 
+                        grepl ("2", JOB.008_cat) ~ "1", 
+                        grepl ("3", JOB.008_cat) ~ "0", 
+                        grepl ("4", JOB.008_cat) ~ "0", 
+                        grepl ("5", JOB.008_cat) ~ "1", 
+                        JOB.008.2 == 1 ~ "1",
+                        JOB.008.2 %in% c(2,3) ~ "0",
+                        TRUE~NA_character_),
+          work_status_pre = case_when(
+                        grepl ("1", JOB.010_cat) ~ "1", 
+                        grepl ("2", JOB.010_cat) ~ "1", 
+                        grepl ("3", JOB.010_cat) ~ "0", 
+                        grepl ("4", JOB.010_cat) ~ "0", 
+                        grepl ("5", JOB.010_cat) ~ "1", 
+                        TRUE~NA_character_))
+#1 = stable employed 2 = became unemployed 3 = became employed4 = stable unemployed
+
+# Region
+master <- master %>%
+  mutate (region = na_if (DEMO.001.b, 5))
+
+# Born US
+
+master <- master %>%
+  mutate (bornUS = ifelse (DEMO.012 == 1, 1, 0))
+
+# expect stimulus
+
+master <- master %>%
+  mutate (expect_stimulus = ifelse (STIM.001%in%c(1,2) | STIM.002%in%c(1,2) | STIM.003%in%c(1,2), 1, 0))
+
+master_dem <- master %>%
+  group_by (CaregiverID) %>%
+  summarise (BaselineWeek = my.max (BaselineWeek),
+             race_ethnic = my.max(race_ethnic),
+             poverty_150 = my.max(poverty_cat),
+             FPL_line = my.min (FPL_line),
+             income19 = my.min (allyearly2019),
+             material_hardship = my.max(material_hardship),
+             disability = my.max (disability),
+             single = my.max (single),
+             work_status = my.max (work_status),
+             work_status_pre = my.max (work_status_pre), 
+             region = my.max(region), 
+             bornUS = my.max(bornUS), 
+             expect_stimulus = my.max (expect_stimulus))%>%
+  mutate ( ep_change = case_when(
+                        work_status == 1 & work_status_pre == 1 ~ "1", 
+                        work_status == 1 & work_status_pre == 0 ~ "2", 
+                        work_status == 0 & work_status_pre == 1 ~ "3", 
+                        work_status == 0 & work_status_pre == 0 ~ "4", 
+                        TRUE~NA_character_), 
+           FPL_pct = income19/FPL_line, 
+           poverty_3c = case_when (FPL_pct < 2 ~ "a.Below 200%FPL", 
+                                   FPL_pct >=2 & FPL_pct < 4 ~ "b.200-400%FPL", 
+                                   FPL_pct >=4 ~ "c.Above 400%FPL"))%>%
+  mutate (race_ethnic = case_when (
+                        race_ethnic == 1 ~ "Black", 
+                        race_ethnic == 2 ~ "Latinx", 
+                        race_ethnic == 3 ~ "White", 
+                        TRUE~NA_character_),
+          poverty_150 = case_when (
+                        poverty_150 == 1 ~ "Below 150%FPL", 
+                        poverty_150 == 0 ~ "Above 150%FPL", 
+                        TRUE~NA_character_),
+          material_hardship = case_when (
+                        material_hardship == 1 ~ "With material hardship", 
+                        material_hardship == 0 ~ "Without material hardship", 
+                        TRUE~NA_character_),
+          disability = case_when (
+                        disability == 1 ~ "With disability", 
+                        disability == 0 ~ "Without disability", 
+                        TRUE~NA_character_),
+          single = case_when (
+                        single == 1 ~ "Single parent", 
+                        single == 0 ~ "Dual parent", 
+                        TRUE~NA_character_),
+          work_status = case_when (
+                        work_status == 1 ~ "Employed", 
+                        work_status == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          work_status_pre = case_when (
+                        work_status_pre == 1 ~ "Employed", 
+                        work_status_pre == 0 ~ "Unemployed", 
+                        TRUE~NA_character_),
+          ep_change = case_when (
+                        ep_change == 1 ~ "Stable employed", 
+                        ep_change == 2 ~ "Became employed", 
+                        ep_change == 3 ~ "Became unemployed",
+                        ep_change == 4 ~ "Stable unemployed",
+                        TRUE~NA_character_), 
+          region = case_when (
+                        region == 1 ~ "Northeast", 
+                        region == 2 ~ "Midwest", 
+                        region == 3 ~ "South", 
+                        region == 4 ~ "West",
+                        TRUE~NA_character_), 
+          bornUS = case_when (bornUS == 1 ~ "Born US", 
+                              bornUS == 0 ~ "Not Born US"), 
+          expect_stimulus = case_when (expect_stimulus == 1 ~ "Expect to get stimulus", 
+                              expect_stimulus == 0 ~ "Not expect to get stimulus"))
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+CaregiverID_fl <- master%>%
+  mutate (follow_up = ifelse(SurveyType == 2, 1, 0))%>%
+  group_by (CaregiverID)%>%
+  summarise (follow_up = my.max (follow_up))%>%
+  ungroup()%>%
+  filter (follow_up == 1)%>%
+  select (CaregiverID)
+
+CaregiverID_fl <- as.character (CaregiverID_fl$CaregiverID)
+  
+master_fl <- master %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+master_dem_fl <- master_dem %>%
+  filter (CaregiverID %in% CaregiverID_fl)
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Extract Relevant Variables
+##RL questions - online learning
+
+fs <- master_fl %>%
+  select (CaregiverID, StartDate, SurveyType,Week, baseline, FSTR.001, contains ("FSTR.002"),  PHQ.002.a, PHQ.002.b, GAD2.002.a, GAD2.002.b, STRESS.002, LONE.001.b, contains ("CBCL") )
+  
+fs <- merge (x = master_dem, y = fs,  by.x = "CaregiverID", by.y = "CaregiverID", all.y = T)%>%
+ mutate (fs_food = FSTR.002_1, 
+         fs_housing = FSTR.002_2, 
+         fs_utility = FSTR.002_3, 
+         fs_healthcare = FSTR.002_4,
+         fs_childcare = FSTR.002_7,
+         fs_socialemotional = case_when (FSTR.002_5 == 1|FSTR.002_6==1|FSTR.002_10==1 ~ 1),
+         fs_any = ifelse (fs_food == 1 | fs_housing == 1 | fs_utility == 1|fs_healthcare == 1|fs_childcare == 1|fs_socialemotional == 1, 1, 0))
+
+#Score caregivers' mental health problems
+fs$depress_crt= rowMeans(fs[,find_items("PHQ.002.[a-b]$", fs)], na.rm=T)
+fs$anxiety_crt = rowMeans(fs[,find_items("GAD2.002.[a-b]$", fs)], na.rm=T)
+
+fs <- fs %>%
+  mutate (depress_crt = depress_crt/3*100,
+          anxiety_crt =anxiety_crt/3*100,
+          stress_crt = STRESS.002/4*100,
+          lonely_crt = LONE.001.b/4*100)
+
+pmh_variable = c("depress_crt", "anxiety_crt", "stress_crt", "lonely_crt")
+fs$parent_problems = rowMeans(fs[, pmh_variable], na.rm = T)
+
+#Score children's mental health variables
+
+fs <- fs %>%
+  rename (fussy_cr1 = CBCL.002.a,
+          fussy_cr2 = CBCL.005.a,
+          fussy_cr3 = CBCL.008.a,
+          fussy_cr4 = CBCL.011.a,
+          fussy_cr5 = CBCL.014.a,
+          fear_cr1 = CBCL.002.b,
+          fear_cr2 = CBCL.005.b,
+          fear_cr3 = CBCL.008.b,
+          fear_cr4 = CBCL.011.b,
+          fear_cr5 = CBCL.014.b)
+
+fussy_crt_items = c(find_items("fussy_cr", fs))
+fear_crt_items = c(find_items("fear_cr", fs))
+
+fs$fussy_crt = rowMeans(fs[,fussy_crt_items], na.rm=T)/2*100
+fs$fear_crt = rowMeans(fs[,fear_crt_items], na.rm=T)/2*100
+
+cp_crt_items = c("fussy_crt", "fear_crt")
+fs$child_problems = rowMeans (fs[, cp_crt_items], na.rm=T)
+
+# Score income decrease
+fs = fs %>%
+      mutate(material_hardship = case_when (FSTR.001 == 0 ~ "a.Not very hard", 
+                                            FSTR.001 == 1 ~ "b.Somewaht hard", 
+                                            FSTR.001 == 2 ~ "c.Hard", 
+                                            FSTR.001 == 3 ~ "d.Very hard"))
+
+num_responses = function(x){length(which(!is.na(x)))}
+fs.num <- fs %>%
+  group_by(Week) %>%
+  summarize_all(num_responses) %>%
+  gather("Variable", "num_responses",-Week) %>%
+  mutate(week = paste0("Week", Week),
+         week = factor(Week, levels = paste0("Week", c(1:total_week)))) %>%
+  spread(Week, num_responses)
+
+fs_items <- c ("fs_food", "fs_housing", "fs_utility", "fs_healthcare", "fs_childcare", "fs_socialemotional")
+
+fs$fs_num = rowSums(fs[,fs_items],na.rm=T)
+
+fs <- fs %>%
+  mutate (fs_num_c = case_when(fs_num == 0 ~ "0 hardship", 
+                               fs_num == 1 ~ "1 hardship", 
+                               fs_num == 2 ~ "2 hardships", 
+                               fs_num == 3 ~ "3 hardships", 
+                               fs_num >= 4 ~ "4 or more hardships"))
+
+fs_rct <- fs %>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()
+
+```
+
+# 0. Sample Disclaimer
+  * This set of analyses on material hardship is based on responses collected from 5,336 caregivers between the dates of April 6th 2020 and April 2nd 2021. These caregivers represent a range of voices: 6.55% are non-Latinx Black/African American, 14.59% are Latinx, and 27.91% live at or below 1.5 times the federal poverty line. Only data from follow-up surveys were included in the analyses. Proportions/percentages are calculated based on the item-level response rates, not out of the total sample size. The data for these analyses are not weighted. 
+
+# 1 Percentage of Families Reporting 1+ Material Hardship
+
+## 1.1 Overall
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_trend <- fs %>%
+  filter (SurveyType == 2)%>%
+  group_by (Week)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_trend %>%
+  ggplot(mapping = aes (x = date, y = prop*100)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  geom_text(aes(label = round(prop*100,2)),vjust = -1, size = 2, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage of families with at least one material hardship")+
+  scale_x_date (date_breaks = "1 month", date_labels ="%b %Y") +
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+### 1.1.1 Overall spline model
+  * Fit cubic spline models with 2 spline at weeks 17 & 41\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+spline_5 <- lm (prop ~ bSpline (Week, knots = c(17, 41)), data = fs_trend)
+
+Weeklims <- range (fs_trend$Week)
+Week.grid <- seq (from = Weeklims[1], to = Weeklims[2])
+pred <- predict(spline_5, newdata = list(Week = Week.grid), se = T)
+
+plot (fs_trend$Week, fs_trend$prop, main = "Cubic Spline Plot with two knots", xlab="Week",ylab="Proportion of families with 1+ material hardship", xaxt = "n", ylim = c(0.0, 0.6))
+lines (Week.grid, pred$fit, col = 'black', lwd = 3)
+lines (Week.grid, pred$fit+2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+lines (Week.grid, pred$fit-2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+segments (17, 0, x1 = 17, y1 = 100, col = 'blue')
+segments (41, 0, x1 = 41, y1 = 100, col = 'blue')
+  axis(side=1, at = c(1, 5, 9, 14, 19, 23, 27, 31, 35, 39, 43, 47, 51), labels = c("Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"), size = 1.5)
+```
+
+
+## 1.2 By race/ethnicity (with overall trend in same scale)
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_trend <- fs %>%
+  filter (SurveyType == 2)%>%
+  group_by (Week)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe, 
+          race_ethnic = "All")
+
+fs_trend_rc <- fs %>%
+  filter (SurveyType == 2 & race_ethnic!= "NA")%>%
+  group_by (Week, race_ethnic)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_trend <- rbind (fs_trend, fs_trend_rc)
+
+fs_trend %>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = race_ethnic)) +
+  geom_point(stat = 'summary', size = 1) +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  #geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage of families with at least one material hardship")+
+  facet_wrap (~race_ethnic, nrow = 1)+
+  theme(legend.position = "none")+    
+  scale_x_date (date_breaks = "3 month", date_labels ="%b %Y")+
+  theme(axis.text.x = element_text(angle = 45))+
+  ylim (0, 100)
+
+fs_trend_white <- fs_trend_rc %>%
+  filter (race_ethnic == "White")
+
+fs_trend_black <- fs_trend_rc %>%
+  filter (race_ethnic == "Black")
+
+fs_trend_latinx <- fs_trend_rc %>%
+  filter (race_ethnic == "Latinx")
+```
+
+### 1.2.2 Spline models by race/ethnicity groups
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Fit cubic spline models with 2 spline at weeks 17 & 41
+
+spline_white_c <- lm (prop ~ bSpline (Week, knots = c(17, 41)), data = fs_trend_white)
+
+Weeklims <- range (fs_trend_white$Week)
+Week.grid <- seq (from = Weeklims[1], to = Weeklims[2])
+pred <- predict(spline_white_c, newdata = list(Week = Week.grid), se = T)
+
+plot (fs_trend_white$Week, fs_trend_white$prop, main = "Cubic Spline Plot with two knots (Weeks 17 & 43) - White", xlab="Week",ylab="Proportion of families with 1+ material hardship", xaxt = "n", ylim = c(0.0, 0.6))
+lines (Week.grid, pred$fit, col = 'purple', lwd = 3)
+lines (Week.grid, pred$fit+2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+lines (Week.grid, pred$fit-2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+segments (17, 0, x1 = 17, y1 = 100, col = 'blue')
+segments (41, 0, x1 = 41, y1 = 100, col = 'blue')
+  axis(side=1, at = c(1, 5, 9, 14, 19, 23, 27, 31, 35, 39, 43, 47, 51), labels = c("Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"), size = 1.5)
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Fit cubic spline models with 2 spline at weeks 11 & 45
+
+spline_black_c <- lm (prop ~ bSpline (Week, knots = c(11, 45)), data = fs_trend_black)
+
+Weeklims <- range (fs_trend_black$Week)
+Week.grid <- seq (from = Weeklims[1], to = Weeklims[2])
+pred <- predict(spline_black_c, newdata = list(Week = Week.grid), se = T)
+
+plot (fs_trend_black$Week, fs_trend_black$prop, main = "Cubic Spline Plot with two knots (Weeks 11 & 45) - Black", xlab="Week",ylab="Proportion of families with 1+ material hardship", xaxt = "n",  ylim = c(0.0, 0.6))
+lines (Week.grid, pred$fit, col = 'green', lwd = 3)
+lines (Week.grid, pred$fit+2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+lines (Week.grid, pred$fit-2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+segments (11, 0, x1 = 11, y1 = 100, col = 'blue')
+segments (45, 0, x1 = 45, y1 = 100, col = 'blue')
+  axis(side=1, at = c(1, 5, 9, 14, 19, 23, 27, 31, 35, 39, 43, 47, 51), labels = c("Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"), size = 1.5)
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+# Fit cubic spline models with 1 spline at weeks 29
+
+spline_latinx_c <- lm (prop ~ bSpline (Week, knots = c(29)), data = fs_trend_latinx)
+
+Weeklims <- range (fs_trend_latinx$Week)
+Week.grid <- seq (from = Weeklims[1], to = Weeklims[2])
+pred <- predict(spline_latinx_c, newdata = list(Week = Week.grid), se = T)
+
+plot (fs_trend_latinx$Week, fs_trend_latinx$prop, main = "Cubic Spline Plot with one knot (Week 29) - Latinx", xlab="Week",ylab="Proportion of families with 1+ material hardship", xaxt = "n",  ylim = c(0.0, 0.6))
+lines (Week.grid, pred$fit, col = 'blue', lwd = 3)
+lines (Week.grid, pred$fit+2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+lines (Week.grid, pred$fit-2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+segments (29, 0, x1 = 29, y1 = 100, col = 'blue')
+  axis(side=1, at = c(1, 5, 9, 14, 19, 23, 27, 31, 35, 39, 43, 47, 51), labels = c("Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"), size = 1.5)
+
+
+```
+
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show='hide'}
+
+### 1.2.3 Latinx families only - by whether born US
+fs_trend <- fs %>%
+  filter (Week > 2 & SurveyType == 2 & race_ethnic == "Latinx" & bornUS != "NA")%>%
+  group_by (Week, bornUS)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_trend %>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = bornUS)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  #geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage of families with at least one material hardship")+
+  facet_wrap (~bornUS, nrow = 1)+
+  theme(legend.position = "none")+    
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE, fig.show='hide'}
+
+### 1.2.4 Latinx families only - by whether expect stimulus
+fs_trend <- fs %>%
+  filter (SurveyType == 2 & race_ethnic == "Latinx" & expect_stimulus != "NA") %>%
+  group_by (Week, expect_stimulus)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_trend %>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = expect_stimulus)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  #geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage of families with at least one material hardship")+
+  facet_wrap (~expect_stimulus, nrow = 1)+
+  theme(legend.position = "none")+    
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y")+
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+## 1.3 By poverty level
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_trend <- fs %>%
+  filter (SurveyType == 2 & poverty_3c!= "NA")%>%
+  group_by (Week, poverty_3c)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_trend %>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = poverty_3c)) +
+  geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  #geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage of families with at least one material hardship")+
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y") +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+### 1.3.1 Spline models by poverty groups
+  * Note that the smoothing spline model suggests a linear trend of the above 400%FPL group\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_trend_pvt <- fs %>%
+  filter (SurveyType == 2 & poverty_3c!= "NA")%>%
+  group_by (Week, poverty_3c)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_trend_below200 <- fs_trend_pvt %>%
+  filter (poverty_3c == "a.Below 200%FPL")
+
+fs_trend_200_400 <- fs_trend_pvt %>%
+  filter (poverty_3c == "b.200-400%FPL")
+
+fs_trend_above400 <- fs_trend_pvt %>%
+  filter (poverty_3c == "c.Above 400%FPL")
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+spline_below200_c <- lm (prop ~ bSpline (Week, knots = c(29)), data = fs_trend_below200)
+
+Weeklims <- range (fs_trend_below200$Week)
+Week.grid <- seq (from = Weeklims[1], to = Weeklims[2])
+pred <- predict(spline_below200_c, newdata = list(Week = Week.grid), se = T)
+
+plot (fs_trend_below200$Week, fs_trend_below200$prop, main = "Cubic Spline Plot with one knot (Week 29) - Below 200%FPL", xlab="Week",ylab="Proportion of families with 1+ material hardship", xaxt = "n", ylim = c(0.0, 0.6))
+lines (Week.grid, pred$fit, col = 'red', lwd = 3)
+lines (Week.grid, pred$fit+2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+lines (Week.grid, pred$fit-2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+segments (29, 0, x1 = 29, y1 = 100, col = 'blue')
+
+axis(side=1, at = c(1, 5, 9, 14, 19, 23, 27, 31, 35, 39, 43, 47, 51), labels = c("Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"), size = 1.5)
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+spline_200_400_c <- lm (prop ~ bSpline (Week, knots = c(33)), data = fs_trend_200_400)
+
+Weeklims <- range (fs_trend_200_400$Week)
+Week.grid <- seq (from = Weeklims[1], to = Weeklims[2])
+pred <- predict(spline_200_400_c, newdata = list(Week = Week.grid), se = T)
+
+plot (fs_trend_200_400$Week, fs_trend_200_400$prop, main = "Cubic Spline Plot with one knot (Week 21) - 200-400%FPL", xlab="Week",ylab="Proportion of families with 1+ material hardship", xaxt = "n", ylim = c(0.0, 0.6))
+lines (Week.grid, pred$fit, col = 'green', lwd = 3)
+lines (Week.grid, pred$fit+2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+lines (Week.grid, pred$fit-2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+segments (33, 0, x1 = 33, y1 = 100, col = 'blue')
+
+axis(side=1, at = c(1, 5, 9, 14, 19, 23, 27, 31, 35, 39, 43, 47, 51), labels = c("Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"), size = 1.5)
+
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+spline_above400_c <- lm (prop ~ Week, data = fs_trend_above400)
+
+Weeklims <- range (fs_trend_above400$Week)
+Week.grid <- seq (from = Weeklims[1], to = Weeklims[2])
+pred <- predict(spline_above400_c, newdata = list(Week = Week.grid), se = T)
+
+plot (fs_trend_above400$Week, fs_trend_above400$prop, main = "Linear Regression Plot - Above 400%FPL", xlab="Week",ylab="Proportion of families with 1+ material hardship", xaxt = "n", ylim = c(0.0, 0.6))
+lines (Week.grid, pred$fit, col = 'blue', lwd = 3)
+lines (Week.grid, pred$fit+2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+lines (Week.grid, pred$fit-2*pred$se.fit, lty = "dashed", col = 'gray', lwd = 2)
+
+axis(side=1, at = c(1, 5, 9, 14, 19, 23, 27, 31, 35, 39, 43, 47, 51), labels = c("Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr"), size = 1.5)
+
+```
+
+## 1.4 By poverty level & race/ethnicity
+  * Note that there were very few Black families in the above 400%FPL category, so some weeks had no data points (presented as 0% in the figure)\
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_trend <- fs %>%
+  filter (SurveyType == 2 & poverty_3c!= "NA" & race_ethnic!= "NA")%>%
+  group_by (Week, poverty_3c, race_ethnic)%>%
+  summarise (n = n(),
+             prop= sum (fs_any, na.rm = T)/n,
+             date = as.Date(min (StartDate)))%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_trend %>%
+  filter (Week != 2 & Week != 5 & Week != 6& Week != 3)%>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = poverty_3c)) +
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  #geom_text(aes(label = round(prop*100,2)),vjust = -2, size = 2.5, color = "black",  position = position_dodge(1))+
+  labs (y = "Percentage of families with at least one material hardship")+
+  facet_wrap (poverty_3c~race_ethnic, nrow = 3)+
+   scale_x_date (date_breaks = "2 month", date_labels ="%b %Y") +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+# 2. Sources of Hardship
+
+## 2.1 Most recent responses
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_source <- fs %>%
+  group_by (Week)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  summarise (n = n(), 
+             food = sum(fs_food, na.rm = T)/n, 
+             housing = sum(fs_housing, na.rm = T)/n, 
+             utility = sum(fs_utility, na.rm = T)/n, 
+             healthcare = sum(fs_healthcare, na.rm = T)/n, 
+             childcare = sum(fs_childcare, na.rm = T)/n, 
+             socialemotional = sum(fs_socialemotional, na.rm = T)/n,
+             )%>%
+  pivot_longer (cols = c("food", "housing", "utility", "healthcare", "childcare", "socialemotional"), names_to = "source", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_source %>%
+  ggplot(mapping = aes (y = reorder(source, -prop), x = prop*100, fill = source )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),hjust = -0.5, vjust = -0.5, color = "black", size =3, position = position_dodge(1))+
+  labs (y = "Sources")+
+  theme(legend.position = "none")
+
+```
+
+### 2.1.1 By race/ethnicity
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_source <- fs %>%
+  group_by (Week)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  filter (race_ethnic!= "NA")%>%
+  group_by (race_ethnic)%>%
+  summarise (n = n(), 
+             food = sum(fs_food, na.rm = T)/n, 
+             housing = sum(fs_housing, na.rm = T)/n, 
+             utility = sum(fs_utility, na.rm = T)/n, 
+             healthcare = sum(fs_healthcare, na.rm = T)/n, 
+             childcare = sum(fs_childcare, na.rm = T)/n, 
+             socialemotional = sum(fs_socialemotional, na.rm = T)/n,
+             )%>%
+  pivot_longer (cols = c("food", "housing", "utility", "healthcare", "childcare", "socialemotional"), names_to = "source", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_source %>%
+  ggplot(mapping = aes (y = reorder(source, -prop), x = prop*100, fill = source )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),hjust = -0.5, vjust = -0.5, color = "black", size =2.5, position = position_dodge(1))+
+  labs (y = "Sources")+
+  facet_wrap (~race_ethnic, nrow = 3)+
+  theme(legend.position = "none")
+
+```
+
+### 2.1.2 By poverty level
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_source <- fs %>%
+  group_by (Week)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  filter (poverty_3c!= "NA")%>%
+  group_by (poverty_3c)%>%
+  summarise (n = n(), 
+             food = sum(fs_food, na.rm = T)/n, 
+             housing = sum(fs_housing, na.rm = T)/n, 
+             utility = sum(fs_utility, na.rm = T)/n, 
+             healthcare = sum(fs_healthcare, na.rm = T)/n, 
+             childcare = sum(fs_childcare, na.rm = T)/n, 
+             socialemotional = sum(fs_socialemotional, na.rm = T)/n,
+             )%>%
+  pivot_longer (cols = c("food", "housing", "utility", "healthcare", "childcare", "socialemotional"), names_to = "source", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_source %>%
+  ggplot(mapping = aes (y = reorder(source, -prop), x = prop*100, fill = source )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),hjust = -0.5, vjust = -0.5, color = "black", size =2.5, position = position_dodge(1))+
+  labs (y = "Sources")+
+  facet_wrap (~poverty_3c, nrow = 3)+
+  theme(legend.position = "none")
+
+```
+
+### 2.1.3 By race/ethnicity & poverty level
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_source <- fs %>%
+  group_by (Week)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  filter (poverty_3c!= "NA" & race_ethnic!= "NA")%>%
+  group_by (poverty_3c, race_ethnic)%>%
+  summarise (n = n(), 
+             food = sum(fs_food, na.rm = T)/n, 
+             housing = sum(fs_housing, na.rm = T)/n, 
+             utility = sum(fs_utility, na.rm = T)/n, 
+             healthcare = sum(fs_healthcare, na.rm = T)/n, 
+             childcare = sum(fs_childcare, na.rm = T)/n, 
+             socialemotional = sum(fs_socialemotional, na.rm = T)/n,
+             )%>%
+  pivot_longer (cols = c("food", "housing", "utility", "healthcare", "childcare", "socialemotional"), names_to = "source", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_source %>%
+  ggplot(mapping = aes (y = reorder(source, -prop), x = prop*100, fill = source )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(xmin = ci_low*100, 
+                    xmax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),hjust = 0.5, vjust = -0.5, color = "black", size = 2, position = position_dodge(1))+
+  labs (y = "Sources")+
+  facet_wrap (race_ethnic~poverty_3c, nrow =3)+
+  theme(legend.position = "none")
+
+```
+
+## 2.2 Trend of Source for Hardship
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_source <- fs %>%
+  filter (SurveyType == 2)%>%
+  group_by (Week)%>%
+  summarise (n = n(), 
+             c.food = sum(fs_food, na.rm = T)/n, 
+             b.housing = sum(fs_housing, na.rm = T)/n, 
+             a.utility = sum(fs_utility, na.rm = T)/n, 
+             e.healthcare = sum(fs_healthcare, na.rm = T)/n, 
+             f.childcare = sum(fs_childcare, na.rm = T)/n, 
+             d.socialemotional = sum(fs_socialemotional, na.rm = T)/n,
+             date = as.Date(min (StartDate))
+             )%>%
+  pivot_longer (cols = c("c.food", "b.housing", "a.utility", "e.healthcare", "f.childcare", "d.socialemotional"), names_to = "source", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_source %>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = source)) +
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  labs (y = "Percentage of families with different types of material hardship")+
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y") +
+  theme(axis.text.x = element_text(angle = 45))+
+  facet_wrap (~source, nrow = 2)+
+   theme(legend.position = "none")                            # Remove legend or change legend position
+  
+
+```
+
+### 2.2.1 By race/ethnicity
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_source <- fs %>%
+  filter (SurveyType == 2 & race_ethnic != "NA")%>%
+  group_by (Week, race_ethnic)%>%
+  summarise (n = n(), 
+             c.food = sum(fs_food, na.rm = T)/n, 
+             b.housing = sum(fs_housing, na.rm = T)/n, 
+             a.utility = sum(fs_utility, na.rm = T)/n, 
+             e.healthcare = sum(fs_healthcare, na.rm = T)/n, 
+             f.childcare = sum(fs_childcare, na.rm = T)/n, 
+             d.socialemotional = sum(fs_socialemotional, na.rm = T)/n,
+             date = as.Date(min (StartDate))
+             )%>%
+  pivot_longer (cols = c("c.food", "b.housing", "a.utility", "e.healthcare", "f.childcare", "d.socialemotional"), names_to = "source", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_source %>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = race_ethnic)) +
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  labs (y = "Percentage of families with different types of material hardship")+
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y") +
+  theme(axis.text.x = element_text(angle = 45))+
+  facet_wrap (~source, nrow = 2)                           # Remove legend or change legend position
+  
+
+```
+
+### 2.2.2 By poverty level
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_source <- fs %>%
+  filter (SurveyType == 2 & poverty_3c != "NA")%>%
+  group_by (Week, poverty_3c)%>%
+  summarise (n = n(), 
+             c.food = sum(fs_food, na.rm = T)/n, 
+             b.housing = sum(fs_housing, na.rm = T)/n, 
+             a.utility = sum(fs_utility, na.rm = T)/n, 
+             e.healthcare = sum(fs_healthcare, na.rm = T)/n, 
+             f.childcare = sum(fs_childcare, na.rm = T)/n, 
+             d.socialemotional = sum(fs_socialemotional, na.rm = T)/n,
+             date = as.Date(min (StartDate))
+             )%>%
+  pivot_longer (cols = c("c.food", "b.housing", "a.utility", "e.healthcare", "f.childcare", "d.socialemotional"), names_to = "source", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_source %>%
+  ggplot(mapping = aes (x = date, y = prop*100, fill = poverty_3c)) +
+  #geom_point(stat = 'summary') +
+  geom_ribbon(aes(ymin = ci_low*100, ymax = ci_high*100), alpha = .3) +
+  geom_line() +
+  labs (y = "Percentage of families with different types of material hardship")+
+  scale_x_date (date_breaks = "2 month", date_labels ="%b %Y") +
+  theme(axis.text.x = element_text(angle = 45))+
+  facet_wrap (~source, nrow = 2)                           # Remove legend or change legend position
+  
+
+```
+
+
+# 3. Associations with Mental Health
+
+## 3.1 By material hardship - Overall difficulty
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+library(RColorBrewer)
+hardship_mh_m <- fs_rct %>%
+  group_by (material_hardship) %>%
+  summarise (n = n(),
+             parent = mean(parent_problems, na.rm = TRUE), 
+             child = mean(child_problems, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean") 
+
+hardship_mh_sd <- fs_rct %>%
+  group_by (material_hardship) %>%
+  summarise (parent = sd(parent_problems, na.rm = TRUE), 
+             child = sd(child_problems, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd") 
+
+hardship_mh_smy <- merge (hardship_mh_m, hardship_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+my_colors <- RColorBrewer::brewer.pal(6, "Blues")[3:6]
+
+hardship_mh_smy %>%
+  filter (material_hardship != "NA")%>%
+  ggplot(mapping = aes (x = material_hardship, y = mean, fill = material_hardship)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~who)+
+  ggtitle (label = "By material hardship")+
+  ylab ("Mental Health Problems")+
+  xlab ("Difficulty paying for basic needs")+
+  scale_fill_manual(values = my_colors)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45))+
+  theme(legend.position = "none")
+```
+
+## 3.2 By Number of hardship
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+hardship_mh_m <- fs_rct %>%
+  group_by (fs_num_c) %>%
+  summarise (n = n(),
+             parent = mean(parent_problems, na.rm = TRUE), 
+             child = mean(child_problems, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean") 
+
+hardship_mh_sd <- fs_rct %>%
+  group_by (fs_num_c) %>%
+  summarise (parent = sd(parent_problems, na.rm = TRUE), 
+             child = sd(child_problems, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd") 
+
+hardship_mh_smy <- merge (hardship_mh_m, hardship_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+my_colors <- RColorBrewer::brewer.pal(7, "Blues")[3:7]
+
+hardship_mh_smy %>%
+  filter (fs_num_c != "NA")%>%
+  ggplot(mapping = aes (x = fs_num_c, y = mean, fill = fs_num_c)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~who)+ 
+  ggtitle (label = "By number of material hardship")+
+  ylab ("Mental Health Problems")+
+  xlab ("Number of hardships")+
+  scale_fill_manual(values = my_colors)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45))+
+  theme(legend.position = "none")
+```
+
+# 4. Changes of material hardship since Feb 3rd 2021
+
+## 4.1 Percentage of families who showed changes in material hardship after Feb 16th 2021
+  * For this set of analyses, data were divided into two subsets - collected before Feb. 3rd 2021, and collected after Feb 3rd 2021. For each family, the change in the number of reported material hardship  was calculated, and the percentages of families with increased/decreased/no change in number of hardships are presented below. \
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+fs_after45 <- fs %>%
+  filter (Week >= 45 & SurveyType == 2)%>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  select (CaregiverID, Week, SurveyType, StartDate, parent_problems, child_problems, contains ("fs_"), FSTR.001)%>%
+  rename(Week_after = Week,
+         SurveyType_after = SurveyType, 
+         StartDate_after = StartDate, 
+         parent_problems_after = parent_problems, 
+         child_problems_after = child_problems, 
+         fs_any_after = fs_any, 
+         fs_num_after = fs_num, 
+         fs_food_after = fs_food, 
+         fs_utility_after = fs_utility, 
+         fs_housing_after = fs_housing, 
+         fs_healthcare_after = fs_healthcare, 
+         fs_childcare_after = fs_childcare, 
+         fs_socialemotional_after = fs_socialemotional, 
+         FSTR.001_after = FSTR.001)
+         
+
+fs_after45_ID <- as.character (fs_after45$CaregiverID)
+
+fs_before45 <- fs %>%
+  filter (Week <= 44 & CaregiverID %in% fs_after45_ID)%>%
+  group_by (CaregiverID)%>%
+  filter (Week == max (Week))%>%
+  ungroup()%>%
+  select (CaregiverID, Week, SurveyType, StartDate, parent_problems, child_problems, contains ("fs_"), FSTR.001)%>%
+  rename(Week_before = Week,
+         SurveyType_before = SurveyType, 
+         StartDate_before = StartDate, 
+         parent_problems_before = parent_problems, 
+         child_problems_before = child_problems, 
+         fs_any_before = fs_any, 
+         fs_num_before = fs_num, 
+         fs_food_before = fs_food, 
+         fs_utility_before = fs_utility, 
+         fs_housing_before = fs_housing, 
+         fs_healthcare_before = fs_healthcare, 
+         fs_childcare_before = fs_childcare, 
+         fs_socialemotional_before = fs_socialemotional, 
+         FSTR.001_before = FSTR.001)
+
+fs_45 <- merge (x = fs_after45, y = fs_before45, by.x = "CaregiverID", by.y = "CaregiverID")%>%
+  mutate (change_fs_num = fs_num_after - fs_num_before, 
+          change_fs = FSTR.001_after - FSTR.001_before,
+          change_parent_problems = parent_problems_after - parent_problems_before,
+          change_child_problems = child_problems_after - child_problems_before,
+          change_fs_any = case_when (fs_any_before == 1 & fs_num_after == 0 ~ "Decreased hardship", 
+                                     (fs_num_before == 0 & fs_num_after == 0)|(fs_any_before == 1 & fs_any_after == 1) ~ "No change hardship ", 
+                                     fs_num_before == 0 & fs_any_after == 1 ~ "Increased hardship "), 
+          change_fs_num = case_when (change_fs_num < 0 ~ "Decreased hardship number", 
+                                     change_fs_num == 0 ~ "No change hardship number", 
+                                     change_fs_num > 0 ~ "Increased hardship number"), 
+          change_fs = case_when (change_fs < 0 ~ "Decreased hardship", 
+                                     change_fs == 0 ~ "No change hardship", 
+                                     change_fs > 0 ~ "Increased hardship"), 
+          change_fs_any_dec = ifelse (change_fs_any == "Decreased hardship", 1, 0), 
+          change_fs_any_no_change = ifelse (change_fs_any == "No change hardship", 1, 0), 
+          change_fs_any_inc = ifelse (change_fs_any == "Increased hardship", 1, 0), 
+          change_fs_num_dec = ifelse (change_fs_num == "Decreased hardship number", 1, 0), 
+          change_fs_num_no_change = ifelse (change_fs_num == "No change hardship number", 1, 0), 
+          change_fs_num_inc = ifelse (change_fs_num == "Increased hardship number", 1, 0), 
+          change_fs_dec = ifelse (change_fs =="Decreased hardship", 1, 0), 
+          change_fs_no_change = ifelse (change_fs == "No change hardship", 1, 0), 
+          change_fs_inc = ifelse (change_fs == "Increased hardship", 1, 0))
+          
+```
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+
+fs_num_change<- fs_45 %>%
+  filter (change_fs_num != "NA")%>%
+  summarise (n = n(), 
+             change_fs_num_dec = sum(change_fs_num_dec, na.rm = T)/n, 
+             change_fs_num_no_change = sum(change_fs_num_no_change, na.rm = T)/n, 
+             change_fs_num_inc = sum(change_fs_num_inc, na.rm = T)/n,
+             )%>%
+  pivot_longer (cols = c("change_fs_num_dec", "change_fs_num_no_change", "change_fs_num_inc"), names_to = "change", values_to = "prop")%>%
+  mutate (count = prop * n, 
+          moe = map2_dbl(prop, n, moe.p), 
+          ci_low = prop-moe,
+          ci_high = prop+moe)
+
+fs_num_change %>%
+  ggplot(mapping = aes (x = change, y = prop*100, fill = change )) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = ci_low*100, 
+                    ymax = ci_high*100),
+                    width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(prop*100,2)),hjust = 0.5, vjust = -1.5, color = "black", size = 3, position = position_dodge(1))+
+  labs (y = "Percentage")+
+  ggtitle (label = "Percentage of change, based on reported number of difficulty")
+```
+
+## 4.2 Association of Change with Mental Health Problems
+  * The figure below presented the mean mental health problems assessed AFTER Feb 3rd 2021 (week 43), grouped by whether families' number of hardship increased, decreased, or did not change. \
+  
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+hardship_mh_m <- fs_45 %>%
+  group_by (change_fs_num) %>%
+  summarise (n = n(),
+             parent = mean(parent_problems_after, na.rm = TRUE), 
+             child = mean(child_problems_after, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean") 
+
+hardship_mh_sd <- fs_45 %>%
+  group_by (change_fs_num) %>%
+  summarise (parent = sd(parent_problems_after, na.rm = TRUE), 
+             child = sd(child_problems_after, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd") 
+
+hardship_mh_smy <- merge (hardship_mh_m, hardship_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+hardship_mh_smy %>%
+  filter (change_fs_num != "NA")%>%
+  ggplot(mapping = aes (x = change_fs_num, y = mean, fill = change_fs_num)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1.5, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~who)+ 
+  theme(legend.position = "none")+
+  ggtitle (label = "Current Mental Health Problem Levels, By changed material hardship")+
+  ylab ("Mean Levels of Mental Health Problems")+
+  xlab ("Changes of Material Hardship Numbers")+
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+
+  * The figure below presented the mean mental health problems CHANGES from before to after Feb 3rd 2021, grouped by whether families' number of hardship increased, decreased, or did not change. Negative scores indicate decreased mental health problems \
+
+```{r, echo=FALSE, message = FALSE, warning = FALSE}
+hardship_mh_m <- fs_45 %>%
+  group_by (change_fs_num) %>%
+  summarise (n = n(),
+             parent = mean(change_parent_problems, na.rm = TRUE), 
+             child = mean(change_child_problems, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "mean") 
+
+hardship_mh_sd <- fs_45 %>%
+  group_by (change_fs_num) %>%
+  summarise (parent = sd(change_parent_problems, na.rm = TRUE), 
+             child = sd(change_child_problems, na.rm = TRUE) ) %>%
+  pivot_longer (cols = c("parent", "child"), names_to = "who", values_to = "sd") 
+
+hardship_mh_smy <- merge (hardship_mh_m, hardship_mh_sd)%>%
+  mutate (moe = map2_dbl(sd, n, moe.m), 
+          ci_low = mean-moe,
+          ci_high = mean+moe)
+
+hardship_mh_smy %>%
+  filter (change_fs_num != "NA")%>%
+  ggplot(mapping = aes (x = change_fs_num, y = mean, fill = change_fs_num)) +
+  geom_bar (stat = "identity", position = position_dodge(1))+
+  geom_errorbar(aes(ymin = (mean-moe), 
+                    ymax = (mean+moe)),
+                 width = .3,
+                    position = position_dodge(1)) +
+  geom_text(aes(label = round(mean,2)),vjust = -1, color = "black", size = 3, position = position_dodge(1))+
+  facet_wrap (~who)+ 
+  theme(legend.position = "none")+
+  ggtitle (label = "Changes in Mental Health Problems, By changed material hardship")+
+  ylab ("Changes of Mental Health Problems")+
+  xlab ("Changes of material hardship numbers")+
+  theme(axis.text.x = element_text(angle = 45))
+```
